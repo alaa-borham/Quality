@@ -531,7 +531,7 @@ function inspForm(i,presetOrder){i=i||{};if(!ORDERS.length){toast(t('addFactFirs
   INSP_PHOTOS=(i.photos||[]).slice();renderThumbs();
   INSP_DEFECTS=(i.defects||[]).slice();renderDefList();onStageChange();previewDecision();}
 let INSP_PHOTOS=[],INSP_DEFECTS=[];
-function stageOptions(sel){let out='',cur='';SEQ.forEach(r=>{if(r[0]!==cur){if(cur)out+='</optgroup>';out+=`<optgroup label="${esc(r[0])}">`;cur=r[0];}
+function stageOptions(sel){let out='',cur='';SEQ.filter(r=>r[0]!=='تجهيز'&&r[0]!=='نهاية الخط').forEach(r=>{if(r[0]!==cur){if(cur)out+='</optgroup>';out+=`<optgroup label="${esc(r[0])}">`;cur=r[0];}
   out+=`<option value="${esc(r[1])}" ${sel===r[1]?'selected':''}>${esc(r[1])}</option>`;});if(cur)out+='</optgroup>';return out;}
 function onStageChange(){const el=$('i-stage-hint');if(!el)return;const v=$('i-stage').value;const r=SEQ.find(x=>x[1]===v);
   if(!r){el.innerHTML='';return;}el.innerHTML=`🔍 ${t('colCheckShort')}: <b>${esc(r[5])}</b> · ${t('colStd')}: ${esc(r[6])} ${r[4]==='حرجة'?'· '+catTag('حرِج'):''}`;}
