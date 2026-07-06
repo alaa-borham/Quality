@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#14504f">
+<title>نظام متابعة الجودة</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--teal:#1f6e6e;--dteal:#14504f;--blue:#2e75b6;--dblue:#1f4e78;--green:#2e9e5b;--red:#d9534f;
+--amber:#e0a800;--bg:#f4f6f8;--card:#fff;--line:#e2e7ec;--txt:#1f2a37;--mut:#6b7683;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--txt);font-size:15px}
+button{font-family:inherit;cursor:pointer;border:none;border-radius:10px}
+input,select,textarea{font-family:inherit;font-size:15px;padding:10px 12px;border:1px solid var(--line);
+border-radius:10px;width:100%;background:#fff;color:var(--txt)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);border-color:var(--teal)}
+.hide{display:none!important}
+.screen{min-height:100vh}
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+background:linear-gradient(135deg,#14504f,#1f6e6e)}
+.auth-card{position:relative;background:#fff;border-radius:18px;padding:28px 24px;width:100%;max-width:400px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.langbtn{position:absolute;top:12px;inset-inline-start:12px;background:#eef2f5;color:var(--teal);
+border-radius:20px;padding:5px 12px;font-size:13px;font-weight:700}
+.brand{text-align:center;margin-bottom:18px}
+.brand .logo{width:60px;height:60px;border-radius:16px;background:var(--dteal);color:#fff;display:inline-flex;
+align-items:center;justify-content:center;font-size:30px}
+.brand h1{font-size:19px;margin:12px 0 2px}
+.brand p{margin:0;color:var(--mut);font-size:13px}
+.tabs{display:flex;background:#eef2f5;border-radius:12px;padding:4px;margin-bottom:16px}
+.tabs button{flex:1;padding:9px;background:none;color:var(--mut);font-weight:600;border-radius:9px}
+.tabs button.on{background:#fff;color:var(--teal);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#3a4551}
+.btn{width:100%;padding:12px;background:var(--teal);color:#fff;font-weight:700;font-size:16px;border-radius:11px}
+.btn:active{transform:scale(.99)}
+.btn.sec{background:#eef2f5;color:var(--txt)}
+.btn.red{background:var(--red)}
+.msg{font-size:13px;padding:9px 11px;border-radius:9px;margin-bottom:10px;text-align:center}
+.msg.err{background:#fdecea;color:#b02a26}
+.msg.ok{background:#e7f6ec;color:#1e7e40}
+.topbar{position:sticky;top:0;z-index:20;background:var(--dteal);color:#fff;display:flex;align-items:center;
+justify-content:space-between;padding:11px 16px}
+.topbar .tt{font-weight:700;font-size:17px;display:flex;align-items:center;gap:8px}
+.topbar .ws{font-size:12px;opacity:.85;font-weight:400}
+.topbar .right{display:flex;gap:8px;align-items:center}
+.iconbtn{background:rgba(255,255,255,.15);color:#fff;min-width:36px;height:36px;border-radius:10px;font-size:14px;padding:0 10px;font-weight:700}
+.nav{display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:53px;z-index:19}
+.nav button{flex:0 0 auto;padding:12px 15px;background:none;color:var(--mut);font-weight:600;font-size:14px;
+border-bottom:3px solid transparent;border-radius:0;white-space:nowrap}
+.nav button.on{color:var(--teal);border-bottom-color:var(--teal)}
+.wrap{max-width:960px;margin:0 auto;padding:16px}
+.sec-h{font-size:18px;font-weight:700;margin:4px 0 14px;display:flex;align-items:center;gap:8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+.kpi .v{font-size:26px;font-weight:800;color:var(--dteal)}
+.kpi .l{font-size:12px;color:var(--mut);margin-top:3px}
+.kpi.good .v{color:var(--green)} .kpi.bad .v{color:var(--red)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:560px){.grid3{grid-template-columns:1fr 1fr}}
+.row-btns{display:flex;gap:8px;margin-top:6px}
+.mini{padding:8px 12px;font-size:13px;border-radius:9px;background:var(--teal);color:#fff;font-weight:600}
+.mini.g{background:#eef2f5;color:var(--txt)} .mini.r{background:#fdecea;color:#b02a26}
+.item{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff}
+.item .h{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.item .t{font-weight:700}
+.item .s{font-size:13px;color:var(--mut);margin-top:3px;line-height:1.7}
+.badge{font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.b-pass{background:#e7f6ec;color:#1e7e40}.b-fail{background:#fdecea;color:#b02a26}.b-hold{background:#fff4d6;color:#8a6d00}
+.chip{display:inline-block;font-size:11px;background:#eef2f5;color:#48545f;padding:2px 8px;border-radius:20px;margin-inline-start:4px}
+.empty{text-align:center;color:var(--mut);padding:30px 10px;font-size:14px}
+.bars{display:flex;align-items:flex-end;gap:8px;height:150px;padding-top:10px}
+.bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;height:100%}
+.bar .fill{width:100%;border-radius:6px 6px 0 0;background:linear-gradient(var(--teal),#2b8a8a);min-height:2px;transition:height .3s}
+.bar .cap{font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;max-width:60px;text-overflow:ellipsis}
+.bar .num{font-size:11px;font-weight:700}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:50}
+.sheet{background:#fff;width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:18px;max-height:92vh;overflow:auto}
+@media(min-width:560px){.modal{align-items:center}.sheet{border-radius:18px}}
+.sheet h3{margin:0 0 14px;font-size:17px}
+.res-box{background:#f4f6f8;border:1px dashed var(--line);border-radius:12px;padding:12px;margin-top:10px;text-align:center}
+.res-box .big{font-size:24px;font-weight:800}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1f2a37;color:#fff;
+padding:11px 18px;border-radius:24px;font-size:14px;z-index:99;opacity:0;transition:.3s;pointer-events:none}
+.toast.show{opacity:1}
+.fab{position:fixed;bottom:20px;inset-inline-start:20px;width:56px;height:56px;border-radius:50%;
+background:var(--teal);color:#fff;font-size:28px;box-shadow:0 6px 18px rgba(31,110,110,.5);z-index:15}
+label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 0 4px}
+.note{font-size:12px;color:var(--mut);line-height:1.7}
+.acc{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:#fff;overflow:hidden}
+.acc-h{cursor:pointer;padding:13px 15px;font-weight:700;background:#f4f6f8;display:flex;justify-content:space-between;align-items:center;user-select:none}
+.acc-h .arw{color:var(--teal);transition:transform .2s;font-size:13px}
+.acc-h.open{color:var(--teal)}
+.acc-h.open .arw{transform:rotate(180deg)}
+.acc-body{padding:6px 12px 12px;overflow-x:auto}
+.rtbl{width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px}
+.rtbl th,.rtbl td{border:1px solid var(--line);padding:6px 8px;text-align:start;vertical-align:top}
+.rtbl th{background:var(--teal);color:#fff;white-space:nowrap}
+.rtbl tr:nth-child(even) td{background:#f7f9fb}
+.rtbl .en{color:var(--mut);font-size:11px}
+.tg{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.tg-crit{background:#fdecea;color:#b02a26}.tg-maj{background:#fff1e6;color:#b5580a}.tg-min{background:#e7f6ec;color:#1e7e40}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.thumbs .tw{position:relative}
+.thumbs img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.thumbs .rm{position:absolute;top:-7px;inset-inline-end:-7px;background:var(--red);color:#fff;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:20px;text-align:center;cursor:pointer}
+#print-area{display:none}
+@media print{
+  body{background:#fff}
+  body>*{visibility:hidden}
+  #print-area,#print-area *{visibility:visible}
+  #print-area{display:block;position:absolute;inset:0;padding:0 6mm}
+}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<!-- ============ AUTH ============ -->
+<div id="s-auth" class="screen auth-wrap">
+  <div class="auth-card">
+    <button class="langbtn" onclick="toggleLang()">🌐 <span id="lang-name">EN</span></button>
+    <div class="brand"><div class="logo">🧵</div><h1 data-i18n="appTitle">نظام متابعة الجودة</h1><p>QC Tracking · الشياكة</p></div>
+    <div class="tabs"><button id="tb-login" class="on" onclick="authTab('login')" data-i18n="login">تسجيل الدخول</button>
+      <button id="tb-signup" onclick="authTab('signup')" data-i18n="signup">حساب جديد</button></div>
+    <div id="auth-msg"></div>
+    <div class="field"><label data-i18n="email">البريد الإلكتروني</label><input id="a-email" type="email" autocomplete="email" placeholder="you@example.com"></div>
+    <div class="field"><label data-i18n="password">كلمة المرور</label><input id="a-pass" type="password" autocomplete="current-password" placeholder="••••••"></div>
+    <div class="field" id="a-name-f"><label data-i18n="name">الاسم</label><input id="a-name" data-i18n-ph="namePh" placeholder="اسمك الكامل"></div>
+    <button class="btn" id="a-btn" onclick="doAuth()">دخول</button>
+    <div id="a-forgot" style="text-align:center;margin-top:12px">
+      <a onclick="resetPass()" style="color:var(--teal);cursor:pointer;font-size:13px;font-weight:600" data-i18n="forgot">نسيت كلمة المرور؟</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ONBOARDING ============ -->
+<div id="s-onboard" class="screen auth-wrap hide">
+  <div class="auth-card">
+    <button class="langbtn" onclick="toggleLang()">🌐 <span class="lang-name2">EN</span></button>
+    <div class="brand"><div class="logo">🏭</div><h1 data-i18n="wsTitle">مساحة العمل</h1><p data-i18n="wsSub">أنشئ مساحة جديدة أو انضم بكود</p></div>
+    <div class="tabs"><button id="tb-create" class="on" onclick="obTab('create')" data-i18n="createTab">إنشاء مساحة</button>
+      <button id="tb-join" onclick="obTab('join')" data-i18n="joinTab">انضمام بكود</button></div>
+    <div id="ob-msg"></div>
+    <div id="ob-create">
+      <div class="field"><label data-i18n="wsNameLbl">اسم مساحة العمل (الشركة/القسم)</label><input id="ob-wsname" data-i18n-ph="wsNamePh" placeholder="مثال: جودة الشياكة"></div>
+      <button class="btn" onclick="createWs()" data-i18n="createBtn">إنشاء</button>
+    </div>
+    <div id="ob-join" class="hide">
+      <div class="field"><label data-i18n="codeLbl">كود مساحة العمل</label><input id="ob-code" placeholder="QC-4821" style="text-align:center;letter-spacing:2px"></div>
+      <button class="btn" onclick="joinWs()" data-i18n="joinBtn">انضمام</button>
+    </div>
+    <button class="btn sec" style="margin-top:10px" onclick="logout()" data-i18n="logout">تسجيل الخروج</button>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="s-app" class="screen hide">
+  <div class="topbar">
+    <div class="tt">🧵 <div><div data-i18n="appName">متابعة الجودة</div><div class="ws" id="ws-label">—</div></div></div>
+    <div class="right">
+      <button class="iconbtn" onclick="toggleLang()">🌐 <span class="lang-name2">EN</span></button>
+      <button class="iconbtn" onclick="openMenu()">☰</button>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="on" onclick="go('fact',this)">🏭 <span data-i18n="navFact">المصانع</span></button>
+    <button onclick="go('orders',this)">📦 <span data-i18n="navOrders">الطلبيات</span></button>
+    <button onclick="go('insp',this)">✅ <span data-i18n="navInsp">الفحوصات</span></button>
+    <button onclick="go('dash',this)">📊 <span data-i18n="navDash">المؤشرات</span></button>
+    <button onclick="go('tools',this)">🧮 <span data-i18n="navTools">الأدوات</span></button>
+    <button onclick="go('ref',this)">📋 <span data-i18n="navRef">المراجع</span></button>
+  </div>
+  <div class="wrap">
+    <div id="p-dash" class="hide">
+      <div class="sec-h">📊 <span data-i18n="dashTitle">لوحة المؤشرات</span></div>
+      <div class="kpis" id="kpis"></div>
+      <div class="card"><div style="font-weight:700;margin-bottom:6px" data-i18n="chartTitle">معدل العيوب (DHU) — آخر الفحوصات</div>
+        <div class="bars" id="chart"></div></div>
+      <div class="card"><div style="font-weight:700;margin-bottom:6px" data-i18n="decTitle">توزيع القرارات</div><div id="decdist"></div></div>
+    </div>
+    <div id="p-insp" class="hide"><div class="sec-h">✅ <span data-i18n="inspTitle">الفحوصات</span></div><div id="insp-list"></div></div>
+    <div id="p-orders" class="hide"><div class="sec-h">📦 <span data-i18n="ordersTitle">الطلبيات</span></div><div id="orders-list"></div></div>
+    <div id="p-fact" class="hide"><div class="sec-h">🏭 <span data-i18n="factTitle">المصانع / الموردون</span></div><div id="fact-list"></div></div>
+    <div id="p-tools" class="hide">
+      <div class="sec-h">🧮 <span data-i18n="toolsTitle">أدوات الجودة</span></div>
+      <div class="card"><div style="font-weight:700;margin-bottom:10px" data-i18n="fpTitle">حاسبة نظام النقاط الأربع (فحص القماش)</div>
+        <div class="grid2"><div><label class="inl" data-i18n="fpLen">الطول المفحوص (ياردة)</label><input id="fp-len" type="number" value="120"></div>
+          <div><label class="inl" data-i18n="fpWid">عرض القماش (إنش)</label><input id="fp-wid" type="number" value="60"></div></div>
+        <div class="grid2"><div><label class="inl" data-i18n="fp1">عيوب ≤3 إنش (×1)</label><input id="fp-1" type="number" value="0"></div>
+          <div><label class="inl" data-i18n="fp2">عيوب 3–6 (×2)</label><input id="fp-2" type="number" value="0"></div></div>
+        <div class="grid2"><div><label class="inl" data-i18n="fp3">عيوب 6–9 (×3)</label><input id="fp-3" type="number" value="0"></div>
+          <div><label class="inl" data-i18n="fp4">أكثر من 9 أو ثقب (×4)</label><input id="fp-4" type="number" value="0"></div></div>
+        <label class="inl" data-i18n="fpLim">الحد المسموح (نقطة/100ياردة²)</label><input id="fp-lim" type="number" value="40">
+        <button class="btn" style="margin-top:10px" onclick="calcFP()" data-i18n="calc">احسب</button>
+        <div class="res-box" id="fp-res"></div>
+      </div>
+      <div class="card"><div style="font-weight:700;margin-bottom:10px" data-i18n="shTitle">حاسبة انكماش القماش</div>
+        <div class="grid2"><div><label class="inl" data-i18n="shLb">الطول قبل</label><input id="sh-lb" type="number" value="150"></div>
+          <div><label class="inl" data-i18n="shLa">الطول بعد</label><input id="sh-la" type="number" value="148"></div></div>
+        <div class="grid2"><div><label class="inl" data-i18n="shWb">العرض قبل</label><input id="sh-wb" type="number" value="145"></div>
+          <div><label class="inl" data-i18n="shWa">العرض بعد</label><input id="sh-wa" type="number" value="143"></div></div>
+        <label class="inl" data-i18n="shLim">الحد المسموح %</label><input id="sh-lim" type="number" value="3">
+        <button class="btn" style="margin-top:10px" onclick="calcSH()" data-i18n="calc">احسب</button>
+        <div class="res-box" id="sh-res"></div>
+      </div>
+      <div class="card"><div style="font-weight:700;margin-bottom:10px" data-i18n="aqlTitle">جدول AQL التفاعلي (مستوى II)</div>
+        <div class="grid2"><div><label class="inl" data-i18n="aqlLot">حجم الشحنة</label><input id="aq-lot" type="number" value="1000"></div>
+          <div><label class="inl" data-i18n="aqlMaj">عيوب كبيرة مكتشفة</label><input id="aq-maj" type="number" value="0"></div></div>
+        <label class="inl" data-i18n="aqlMin">عيوب صغيرة مكتشفة</label><input id="aq-min" type="number" value="0">
+        <button class="btn" style="margin-top:10px" onclick="calcAQL()" data-i18n="calc">احسب</button>
+        <div class="res-box" id="aq-res"></div>
+      </div>
+    </div>
+    <div id="p-ref" class="hide"><div class="sec-h">📋 <span data-i18n="refTitle">المراجع الفنية</span></div><div id="ref-body"></div></div>
+  </div>
+  <button class="fab" id="fab" onclick="fabAction()">＋</button>
+</div>
+
+<div id="toast" class="toast"></div>
+<div id="modal-host"></div>
+<div id="print-area"></div>
+
+<script>
+/* ============ Firebase ============ */
+const FB_CONFIG={apiKey:"AIzaSyCLSc1yXa5F5E89RzUJoOsj2eErjXsQjus",authDomain:"level7alaa.firebaseapp.com",
+projectId:"level7alaa",storageBucket:"level7alaa.firebasestorage.app",messagingSenderId:"924441815217",
+appId:"1:924441815217:web:f81b09e1cf0d0639fe9a90"};
+firebase.initializeApp(FB_CONFIG);
+const auth=firebase.auth(), db=firebase.firestore();
+const FV=firebase.firestore.FieldValue;
+
+/* ============ i18n ============ */
+const L={ar:{
+appTitle:'نظام متابعة الجودة',login:'تسجيل الدخول',signup:'حساب جديد',email:'البريد الإلكتروني',password:'كلمة المرور',
+name:'الاسم',namePh:'اسمك الكامل',loginBtn:'دخول',createAccBtn:'إنشاء الحساب',forgot:'نسيت كلمة المرور؟',
+wsTitle:'مساحة العمل',wsSub:'أنشئ مساحة جديدة أو انضم بكود',createTab:'إنشاء مساحة',joinTab:'انضمام بكود',
+wsNameLbl:'اسم مساحة العمل (الشركة/القسم)',wsNamePh:'مثال: جودة الشياكة',createBtn:'إنشاء',codeLbl:'كود مساحة العمل',joinBtn:'انضمام',logout:'تسجيل الخروج',
+appName:'متابعة الجودة',navDash:'المؤشرات',navInsp:'الفحوصات',navOrders:'الطلبيات',navFact:'المصانع',navTools:'الأدوات',navRef:'المراجع',
+refTitle:'المراجع الفنية',refSeq:'تسلسل خياطة الثوب والفحص',refDefects:'دليل العيوب الشائعة',refChecklists:'قوائم فحص المراحل',refGloss:'مسرد المصطلحات',
+colStage:'المرحلة',colOp:'العملية',colCheck:'الفحص',colStd:'المعيار',colImp:'الأهمية',colDefect:'العيب',colCat:'التصنيف',colCause:'السبب',colAction:'الإجراء',colItem:'البند',colTool:'الأداة',
+dashTitle:'لوحة المؤشرات',chartTitle:'معدل العيوب (DHU) — آخر الفحوصات',decTitle:'توزيع القرارات',
+inspTitle:'الفحوصات',ordersTitle:'الطلبيات',factTitle:'المصانع / الموردون',toolsTitle:'أدوات الجودة',
+kTotal:'إجمالي الفحوصات',kDhu:'متوسط DHU',kRft:'نسبة الاجتياز',kOrders:'الطلبيات',
+pass:'مقبول',fail:'مرفوض',passMark:'مقبول ✔',failMark:'مرفوض ✘',noData:'لا بيانات بعد',
+settings:'الإعدادات',yourName:'اسمك',wsNameSet:'اسم مساحة العمل',save:'حفظ',inviteCode:'كود دعوة مساحة العمل (شاركه مع المفتشين)',close:'إغلاق',
+itemsTitle:'الأصناف (ضبط مسبق)',addItemBtn:'أضف',itemPh:'مثال: ثوب',selectItemPh:'— اختر صنفاً —',noItemsHint:'لا أصناف بعد — أضِفها من الإعدادات ☰',itemAdded:'تمت الإضافة',
+roleOwner:'مالك',roleInspector:'مفتش',
+factNew:'مصنع جديد',factEdit:'تعديل مصنع',factNameLbl:'اسم المصنع/المورد *',countryLbl:'الدولة',contactLbl:'جهة الاتصال',
+cancel:'إلغاء',saved:'تم الحفظ',deleted:'تم الحذف',enterFactName:'أدخل اسم المصنع',delFactQ:'حذف المصنع؟',
+noFact:'لا توجد مصانع. أضف أول مصنع بزر ＋',edit:'تعديل',del:'حذف',
+orderNew:'طلبية جديدة',orderEdit:'تعديل طلبية',factoryLbl:'المصنع *',poLbl:'رقم الطلبية (PO) *',modelLbl:'الموديل',
+itemLbl:'الصنف',qtyLbl:'الكمية *',colorLbl:'اللون',addFactFirst:'أضف مصنعاً أولاً',enterPoQty:'أدخل رقم الطلبية والكمية',
+noOrders:'لا توجد طلبيات. أضف طلبية بزر ＋',qtyShort:'الكمية',inspCount:'فحوصات',inspect:'فحص',delOrderQ:'حذف الطلبية؟',
+inspNew:'فحص جديد',inspEdit:'تعديل فحص',orderLbl:'الطلبية *',typeLbl:'نوع الفحص',dateLbl:'التاريخ',stageLbl:'المرحلة (اختياري)',stagePh:'مثال: تركيب الياقة',
+sampleLbl:'حجم العينة *',majorLbl:'عيوب كبيرة',minorLbl:'عيوب صغيرة',criticalLbl:'عيوب حرجة',notesLbl:'ملاحظات',
+saveInsp:'حفظ الفحص',enterSample:'أدخل حجم العينة',noInsp:'لا توجد فحوصات. أضف فحصاً بزر ＋',delInspQ:'حذف الفحص؟',
+typeInline:'أثناء الخط',typeFinal:'الفحص النهائي',prevHint:'أدخل حجم العينة لعرض القرار',
+inspSaved:'تم حفظ الفحص',dhuShort:'DHU',acBig:'حد قبول كبير',acSmall:'صغير',sampleShort:'العينة',
+photosLbl:'الصور (اختياري)',addPhoto:'📷 إضافة صورة',maxPhotos:'الحد الأقصى 4 صور',reportBtn:'تقرير',exportCsv:'⬇ تصدير Excel',printBtn:'🖨 طباعة / حفظ PDF',
+repTitle:'تقرير فحص الجودة',repDecision:'القرار النهائي',repNotes:'ملاحظات',repInspector:'المفتش',repDate:'التاريخ',repPhotos:'الصور',repClose:'إغلاق',compressing:'جارٍ معالجة الصورة…',
+selectStage:'— اختر المرحلة من التسلسل —',addDefBtn:'➕ أضف',defLibLbl:'العيوب من الدليل (تزيد العدّاد تلقائياً)',recordInsp:'📝 سجّل فحصاً',colCheckShort:'يُفحص',
+reasonCritical:'وجود عيب حرِج',reasonMajor:'عيوب كبيرة {m} ≥ حد الرفض {r}',reasonMinor:'عيوب صغيرة {m} ≥ حد الرفض {r}',reasonWithin:'ضمن حدود القبول',
+fpTitle:'حاسبة نظام النقاط الأربع (فحص القماش)',fpLen:'الطول المفحوص (ياردة)',fpWid:'عرض القماش (إنش)',
+fp1:'عيوب ≤3 إنش (×1)',fp2:'عيوب 3–6 (×2)',fp3:'عيوب 6–9 (×3)',fp4:'أكثر من 9 أو ثقب (×4)',fpLim:'الحد المسموح (نقطة/100ياردة²)',
+calc:'احسب',fpUnit:'نقطة/100ياردة²',fpTotal:'إجمالي النقاط',limit:'الحد',enterLW:'أدخل الطول والعرض',
+shTitle:'حاسبة انكماش القماش',shLb:'الطول قبل',shLa:'الطول بعد',shWb:'العرض قبل',shWa:'العرض بعد',shLim:'الحد المسموح %',
+enterMeas:'أدخل القياسات',shrLen:'انكماش الطول',shrWid:'العرض',
+aqlTitle:'جدول AQL التفاعلي (مستوى II)',aqlLot:'حجم الشحنة',aqlMaj:'عيوب كبيرة مكتشفة',aqlMin:'عيوب صغيرة مكتشفة',
+aqlSample:'العينة',aqlBig:'كبير: قبول {ac}/رفض {re}',aqlSmall:'صغير: قبول {ac}/رفض {re}',aqlOverall:'القرار العام',
+resetSent:'أرسلنا رابط استعادة كلمة المرور إلى بريدك ({e}) — تحقق من صندوق الوارد و«المهملات/Spam».',
+enterEmailFirst:'اكتب بريدك في الخانة أولاً ثم اضغط «نسيت كلمة المرور»',enterEmailPass:'أدخل البريد وكلمة المرور',enterNameMsg:'أدخل الاسم',
+nameChanged:'تم تغيير الاسم',wsChanged:'تم تغيير اسم مساحة العمل',enterWsMsg:'أدخل اسم مساحة العمل',
+wsCreated:'تم إنشاء مساحة العمل — الكود: {c}',enterWsName2:'أدخل اسم مساحة العمل',enterCode:'أدخل الكود',noWs:'لا توجد مساحة بهذا الكود',joined:'تم الانضمام',
+rulesHint:'صلاحيات Firestore غير مفعّلة بعد — انشر قواعد qc (راجع README).',
+menuInfo:'مالك',
+e_email:'بريد غير صحيح',e_nouser:'المستخدم غير موجود',e_wrongpass:'كلمة المرور خاطئة',e_inuse:'البريد مستخدم مسبقاً',e_weak:'كلمة المرور ضعيفة (6 أحرف على الأقل)',e_cred:'بيانات الدخول غير صحيحة'
+},en:{
+appTitle:'QC Tracking System',login:'Login',signup:'Sign up',email:'Email',password:'Password',
+name:'Name',namePh:'Your full name',loginBtn:'Login',createAccBtn:'Create account',forgot:'Forgot password?',
+wsTitle:'Workspace',wsSub:'Create a new workspace or join by code',createTab:'Create',joinTab:'Join by code',
+wsNameLbl:'Workspace name (company/dept)',wsNamePh:'e.g. Shiaka QC',createBtn:'Create',codeLbl:'Workspace code',joinBtn:'Join',logout:'Sign out',
+appName:'QC Tracking',navDash:'Dashboard',navInsp:'Inspections',navOrders:'Orders',navFact:'Factories',navTools:'Tools',navRef:'Reference',
+refTitle:'Technical Reference',refSeq:'Thobe sewing sequence & QC',refDefects:'Common defects guide',refChecklists:'Stage checklists',refGloss:'Glossary',
+colStage:'Stage',colOp:'Operation',colCheck:'Check',colStd:'Standard',colImp:'Priority',colDefect:'Defect',colCat:'Category',colCause:'Cause',colAction:'Action',colItem:'Item',colTool:'Tool',
+dashTitle:'Dashboard',chartTitle:'DHU — recent inspections',decTitle:'Decisions',
+inspTitle:'Inspections',ordersTitle:'Orders',factTitle:'Factories / Suppliers',toolsTitle:'QC Tools',
+kTotal:'Total inspections',kDhu:'Avg DHU',kRft:'Pass rate',kOrders:'Orders',
+pass:'Pass',fail:'Fail',passMark:'Pass ✔',failMark:'Fail ✘',noData:'No data yet',
+settings:'Settings',yourName:'Your name',wsNameSet:'Workspace name',save:'Save',inviteCode:'Workspace invite code (share with inspectors)',close:'Close',
+itemsTitle:'Items (preset)',addItemBtn:'Add',itemPh:'e.g. Thobe',selectItemPh:'— select item —',noItemsHint:'No items yet — add them in Settings ☰',itemAdded:'Added',
+roleOwner:'Owner',roleInspector:'Inspector',
+factNew:'New factory',factEdit:'Edit factory',factNameLbl:'Factory / supplier name *',countryLbl:'Country',contactLbl:'Contact',
+cancel:'Cancel',saved:'Saved',deleted:'Deleted',enterFactName:'Enter factory name',delFactQ:'Delete factory?',
+noFact:'No factories yet. Add one with ＋',edit:'Edit',del:'Delete',
+orderNew:'New order',orderEdit:'Edit order',factoryLbl:'Factory *',poLbl:'PO number *',modelLbl:'Model',
+itemLbl:'Item',qtyLbl:'Quantity *',colorLbl:'Color',addFactFirst:'Add a factory first',enterPoQty:'Enter PO number and quantity',
+noOrders:'No orders yet. Add one with ＋',qtyShort:'Qty',inspCount:'inspections',inspect:'Inspect',delOrderQ:'Delete order?',
+inspNew:'New inspection',inspEdit:'Edit inspection',orderLbl:'Order *',typeLbl:'Inspection type',dateLbl:'Date',stageLbl:'Stage (optional)',stagePh:'e.g. Collar attach',
+sampleLbl:'Sample size *',majorLbl:'Major defects',minorLbl:'Minor defects',criticalLbl:'Critical defects',notesLbl:'Notes',
+saveInsp:'Save inspection',enterSample:'Enter sample size',noInsp:'No inspections yet. Add one with ＋',delInspQ:'Delete inspection?',
+typeInline:'Inline',typeFinal:'Final inspection',prevHint:'Enter sample size to preview the decision',
+inspSaved:'Inspection saved',dhuShort:'DHU',acBig:'Major Ac',acSmall:'Minor',sampleShort:'Sample',
+photosLbl:'Photos (optional)',addPhoto:'📷 Add photo',maxPhotos:'Max 4 photos',reportBtn:'Report',exportCsv:'⬇ Export Excel',printBtn:'🖨 Print / save PDF',
+repTitle:'Quality Inspection Report',repDecision:'Final decision',repNotes:'Notes',repInspector:'Inspector',repDate:'Date',repPhotos:'Photos',repClose:'Close',compressing:'Processing image…',
+selectStage:'— select stage from sequence —',addDefBtn:'➕ Add',defLibLbl:'Defects from library (auto-increments counters)',recordInsp:'📝 Record',colCheckShort:'Check',
+reasonCritical:'Critical defect present',reasonMajor:'Major {m} ≥ reject limit {r}',reasonMinor:'Minor {m} ≥ reject limit {r}',reasonWithin:'Within acceptance limits',
+fpTitle:'4-Point System calculator (fabric)',fpLen:'Inspected length (yd)',fpWid:'Fabric width (in)',
+fp1:'Defects ≤3 in (×1)',fp2:'Defects 3–6 (×2)',fp3:'Defects 6–9 (×3)',fp4:'Over 9 in or hole (×4)',fpLim:'Allowed limit (pts/100yd²)',
+calc:'Calculate',fpUnit:'pts/100yd²',fpTotal:'Total points',limit:'Limit',enterLW:'Enter length and width',
+shTitle:'Fabric shrinkage calculator',shLb:'Length before',shLa:'Length after',shWb:'Width before',shWa:'Width after',shLim:'Allowed %',
+enterMeas:'Enter measurements',shrLen:'Length shrink',shrWid:'Width',
+aqlTitle:'Interactive AQL table (Level II)',aqlLot:'Lot size',aqlMaj:'Major defects found',aqlMin:'Minor defects found',
+aqlSample:'Sample',aqlBig:'Major: accept {ac}/reject {re}',aqlSmall:'Minor: accept {ac}/reject {re}',aqlOverall:'Overall decision',
+resetSent:'Password reset link sent to your email ({e}) — check inbox and Spam.',
+enterEmailFirst:'Type your email in the field first, then tap “Forgot password”',enterEmailPass:'Enter email and password',enterNameMsg:'Enter your name',
+nameChanged:'Name updated',wsChanged:'Workspace name updated',enterWsMsg:'Enter workspace name',
+wsCreated:'Workspace created — code: {c}',enterWsName2:'Enter workspace name',enterCode:'Enter the code',noWs:'No workspace with this code',joined:'Joined',
+rulesHint:'Firestore rules not deployed yet — publish the qc rules (see README).',
+menuInfo:'Owner',
+e_email:'Invalid email',e_nouser:'User not found',e_wrongpass:'Wrong password',e_inuse:'Email already in use',e_weak:'Weak password (min 6 chars)',e_cred:'Invalid credentials'
+}};
+let LANG=localStorage.getItem('qcLang')||'ar';
+function t(k){return (L[LANG]&&L[LANG][k])||L.ar[k]||k;}
+function tf(k,o){let s=t(k);for(const x in o)s=s.replace('{'+x+'}',o[x]);return s;}
+function applyI18n(){
+  document.documentElement.lang=LANG;document.documentElement.dir=LANG==='ar'?'rtl':'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>el.placeholder=t(el.dataset.i18nPh));
+  const other=LANG==='ar'?'EN':'ع';
+  if($('lang-name'))$('lang-name').textContent=other;
+  document.querySelectorAll('.lang-name2').forEach(e=>e.textContent=other);
+  authTab(AUTHMODE);
+  if(MEMBER){updateWsLabel();renderFact();renderOrders();renderInsp();renderDash();renderRef();}
+}
+function toggleLang(){LANG=LANG==='ar'?'en':'ar';localStorage.setItem('qcLang',LANG);applyI18n();}
+
+/* ============ Helpers ============ */
+const $=id=>document.getElementById(id);
+const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function fmtDate(d){if(!d)return'';const x=d.toDate?d.toDate():new Date(d);return x.toLocaleDateString(LANG==='ar'?'ar-EG':'en-GB',{day:'2-digit',month:'2-digit',year:'numeric'});}
+function today(){return new Date().toISOString().slice(0,10);}
+function roleTxt(){return MEMBER.role==='owner'?t('roleOwner'):t('roleInspector');}
+
+/* ============ State ============ */
+let ME=null,MEMBER=null,TAB='fact',FACT=[],ORDERS=[],INSP=[],ITEMS=[],WSCODE='—',unsub=[],AUTHMODE='login';
+
+/* ============ AQL logic ============ */
+const AQLTAB=[[2,20,1,2,2,3],[151,32,2,3,3,4],[281,50,3,4,5,6],[501,80,5,6,7,8],
+[1201,125,7,8,10,11],[3201,200,10,11,14,15],[10001,315,14,15,21,22]];
+function aqlFor(lot){let r=AQLTAB[0];for(const x of AQLTAB){if(lot>=x[0])r=x;}return{sample:r[1],ac25:r[2],re25:r[3],ac40:r[4],re40:r[5]};}
+function inspDecision({sampleSize,major,minor,critical}){const a=aqlFor(sampleSize||0);
+  if((critical||0)>0)return{d:'FAIL',reason:t('reasonCritical')};
+  if((major||0)>=a.re25)return{d:'FAIL',reason:tf('reasonMajor',{m:major,r:a.re25})};
+  if((minor||0)>=a.re40)return{d:'FAIL',reason:tf('reasonMinor',{m:minor,r:a.re40})};
+  return{d:'PASS',reason:t('reasonWithin')};}
+function dhuOf(i){const u=i.sampleSize||0;if(!u)return 0;return Math.round(((i.major||0)+(i.minor||0)+(i.critical||0))/u*10000)/100;}
+
+/* ============ AUTH ============ */
+function authTab(m){AUTHMODE=m;if($('tb-login')){$('tb-login').classList.toggle('on',m==='login');$('tb-signup').classList.toggle('on',m==='signup');
+  $('a-name-f').classList.toggle('hide',m==='login');$('a-btn').textContent=m==='login'?t('loginBtn'):t('createAccBtn');}}
+function authMsg(txt,ok){$('auth-msg').innerHTML=`<div class="msg ${ok?'ok':'err'}">${esc(txt)}</div>`;}
+function doAuth(){const e=$('a-email').value.trim(),p=$('a-pass').value,n=$('a-name').value.trim();
+  if(!e||!p)return authMsg(t('enterEmailPass'));
+  $('a-btn').disabled=true;const done=()=>{$('a-btn').disabled=false;};
+  if(AUTHMODE==='signup'){if(!n){authMsg(t('enterNameMsg'));return done();}
+    auth.createUserWithEmailAndPassword(e,p).then(c=>c.user.updateProfile({displayName:n})).catch(err=>{authMsg(mapErr(err));done();});
+  }else auth.signInWithEmailAndPassword(e,p).catch(err=>{authMsg(mapErr(err));done();});}
+function mapErr(err){const m={'auth/invalid-email':'e_email','auth/user-not-found':'e_nouser','auth/wrong-password':'e_wrongpass',
+  'auth/email-already-in-use':'e_inuse','auth/weak-password':'e_weak','auth/invalid-credential':'e_cred'};
+  return m[err.code]?t(m[err.code]):err.message;}
+function logout(){unsub.forEach(u=>u&&u());unsub=[];auth.signOut();}
+function resetPass(){const e=$('a-email').value.trim();if(!e)return authMsg(t('enterEmailFirst'));
+  auth.sendPasswordResetEmail(e).then(()=>authMsg(tf('resetSent',{e}),true)).catch(err=>authMsg(mapErr(err)));}
+
+/* ============ ONBOARDING ============ */
+function obTab(m){$('tb-create').classList.toggle('on',m==='create');$('tb-join').classList.toggle('on',m==='join');
+  $('ob-create').classList.toggle('hide',m!=='create');$('ob-join').classList.toggle('hide',m!=='join');$('ob-msg').innerHTML='';}
+function obMsg(txt,ok){$('ob-msg').innerHTML=`<div class="msg ${ok?'ok':'err'}">${esc(txt)}</div>`;}
+function createWs(){const name=$('ob-wsname').value.trim();if(!name)return obMsg(t('enterWsName2'));
+  const code='QC-'+Math.floor(1000+Math.random()*9000);const ref=db.collection('qc_workspaces').doc();
+  ref.set({name,code,ownerUid:ME.uid,createdAt:FV.serverTimestamp()}).then(()=>
+    db.collection('qc_members').doc(ME.uid).set({wsId:ref.id,wsName:name,name:ME.displayName||'',email:ME.email,role:'owner',createdAt:FV.serverTimestamp()})
+  ).then(()=>{toast(tf('wsCreated',{c:code}));boot();}).catch(e=>obMsg(rulesHint(e)));}
+function joinWs(){const code=$('ob-code').value.trim().toUpperCase();if(!code)return obMsg(t('enterCode'));
+  db.collection('qc_workspaces').where('code','==',code).limit(1).get().then(qs=>{
+    if(qs.empty)return obMsg(t('noWs'));const w=qs.docs[0];
+    return db.collection('qc_members').doc(ME.uid).set({wsId:w.id,wsName:w.data().name,name:ME.displayName||'',email:ME.email,role:'inspector',createdAt:FV.serverTimestamp()})
+      .then(()=>{toast(t('joined'));boot();});
+  }).catch(e=>obMsg(rulesHint(e)));}
+function rulesHint(e){console.error(e);return (e&&e.code==='permission-denied')?t('rulesHint'):(e.message||'error');}
+
+/* ============ BOOT ============ */
+auth.onAuthStateChanged(u=>{ME=u;if(!u){show('auth');return;}boot();});
+function boot(){db.collection('qc_members').doc(ME.uid).get().then(d=>{
+  if(!d.exists){show('onboard');return;}MEMBER=d.data();updateWsLabel();show('app');listen();applyI18n();
+}).catch(e=>{show('onboard');obMsg(rulesHint(e));});}
+function show(s){['auth','onboard','app'].forEach(x=>$('s-'+x).classList.toggle('hide',x!==s));}
+function updateWsLabel(){if($('ws-label'))$('ws-label').textContent=(MEMBER.wsName||'')+' · '+roleTxt();}
+
+/* ============ Listeners ============ */
+function listen(){unsub.forEach(u=>u&&u());unsub=[];const ws=MEMBER.wsId;
+  unsub.push(db.collection('qc_workspaces').doc(ws).onSnapshot(d=>{if(d.exists){ITEMS=d.data().items||[];WSCODE=d.data().code||'—';if($('items-list'))renderItemsManager();}},console.error));
+  unsub.push(db.collection('qc_factories').where('wsId','==',ws).onSnapshot(s=>{FACT=s.docs.map(d=>({id:d.id,...d.data()}));renderFact();if(TAB==='dash')renderDash();},console.error));
+  unsub.push(db.collection('qc_orders').where('wsId','==',ws).onSnapshot(s=>{ORDERS=s.docs.map(d=>({id:d.id,...d.data()}));renderOrders();if(TAB==='dash')renderDash();},console.error));
+  unsub.push(db.collection('qc_inspections').where('wsId','==',ws).onSnapshot(s=>{INSP=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));renderInsp();renderDash();},console.error));}
+
+/* ============ NAV ============ */
+function go(tb,btn){TAB=tb;['dash','insp','orders','fact','tools','ref'].forEach(x=>$('p-'+x).classList.toggle('hide',x!==tb));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');
+  $('fab').style.display=['insp','orders','fact'].includes(tb)?'flex':'none';if(tb==='dash')renderDash();if(tb==='ref')renderRef();}
+function fabAction(){if(TAB==='fact')factForm();else if(TAB==='orders')orderForm();else if(TAB==='insp')inspForm();}
+function openMenu(){const owner=MEMBER.role==='owner';modal(`<h3>${t('settings')}</h3>
+  <div class="item"><div class="s">${esc(ME.email)} · ${roleTxt()}</div></div>
+  <label class="inl">${t('yourName')}</label>
+  <div style="display:flex;gap:8px"><input id="set-name" value="${esc(MEMBER.name||'')}" placeholder="${t('namePh')}">
+    <button class="mini" onclick="saveMyName()">${t('save')}</button></div>
+  ${owner?`<label class="inl">${t('wsNameSet')}</label>
+  <div style="display:flex;gap:8px"><input id="set-ws" value="${esc(MEMBER.wsName||'')}" placeholder="${t('wsNamePh')}">
+    <button class="mini" onclick="saveWsName()">${t('save')}</button></div>
+  <label class="inl">${t('itemsTitle')}</label>
+  <div style="display:flex;gap:8px"><input id="new-item" placeholder="${t('itemPh')}" onkeydown="if(event.key==='Enter')addItem()">
+    <button class="mini" onclick="addItem()">${t('addItemBtn')}</button></div>
+  <div id="items-list" style="margin-top:8px"></div>`:''}
+  <div class="card" style="text-align:center;margin-top:12px"><div class="note">${t('inviteCode')}</div>
+    <div style="font-size:22px;font-weight:800;letter-spacing:2px;color:var(--teal)" id="ws-code">${esc(WSCODE)}</div></div>
+  <button class="btn red" onclick="logout();closeModal()">${t('logout')}</button>
+  <button class="btn sec" style="margin-top:8px" onclick="closeModal()">${t('close')}</button>`);
+  if(owner)renderItemsManager();}
+function renderItemsManager(){const el=$('items-list');if(!el)return;
+  el.innerHTML=ITEMS.length?ITEMS.map(it=>`<span class="chip" style="font-size:13px;padding:5px 10px;margin:0 0 6px 6px;display:inline-flex;align-items:center;gap:6px">${esc(it)}
+    <b style="cursor:pointer;color:var(--red)" onclick="delItem('${esc(it).replace(/'/g,"&#39;")}')">✕</b></span>`).join(''):`<span class="note">${t('noItemsHint')}</span>`;}
+function addItem(){const v=$('new-item').value.trim();if(!v)return;
+  db.collection('qc_workspaces').doc(MEMBER.wsId).update({items:FV.arrayUnion(v)}).then(()=>{$('new-item').value='';toast(t('itemAdded'));}).catch(e=>toast(rulesHint(e)));}
+function delItem(v){db.collection('qc_workspaces').doc(MEMBER.wsId).update({items:FV.arrayRemove(v)}).catch(e=>toast(rulesHint(e)));}
+function saveMyName(){const n=$('set-name').value.trim();if(!n)return toast(t('enterNameMsg'));
+  db.collection('qc_members').doc(ME.uid).update({name:n}).then(()=>{MEMBER.name=n;if(ME.updateProfile)ME.updateProfile({displayName:n});updateWsLabel();toast(t('nameChanged'));}).catch(e=>toast(rulesHint(e)));}
+function saveWsName(){const n=$('set-ws').value.trim();if(!n)return toast(t('enterWsMsg'));
+  Promise.all([db.collection('qc_workspaces').doc(MEMBER.wsId).update({name:n}),db.collection('qc_members').doc(ME.uid).update({wsName:n})])
+    .then(()=>{MEMBER.wsName=n;updateWsLabel();toast(t('wsChanged'));}).catch(e=>toast(rulesHint(e)));}
+
+/* ============ MODAL ============ */
+function modal(html){$('modal-host').innerHTML=`<div class="modal" onclick="if(event.target===this)closeModal()"><div class="sheet">${html}</div></div>`;}
+function closeModal(){$('modal-host').innerHTML='';}
+function empty(txt){return`<div class="empty">${esc(txt)}</div>`;}
+
+/* ============ FACTORIES ============ */
+function factForm(f){f=f||{};modal(`<h3>${f.id?t('factEdit'):t('factNew')}</h3>
+  <label class="inl">${t('factNameLbl')}</label><input id="f-name" value="${esc(f.name||'')}">
+  <label class="inl">${t('countryLbl')}</label><input id="f-country" value="${esc(f.country||'')}">
+  <label class="inl">${t('contactLbl')}</label><input id="f-contact" value="${esc(f.contact||'')}">
+  <div class="row-btns"><button class="btn" onclick="saveFact('${f.id||''}')">${t('save')}</button>
+  <button class="btn sec" onclick="closeModal()">${t('cancel')}</button></div>`);}
+function saveFact(id){const name=$('f-name').value.trim();if(!name)return toast(t('enterFactName'));
+  const data={wsId:MEMBER.wsId,name,country:$('f-country').value.trim(),contact:$('f-contact').value.trim()};
+  const p=id?db.collection('qc_factories').doc(id).update(data):db.collection('qc_factories').add({...data,createdAt:FV.serverTimestamp()});
+  p.then(()=>{closeModal();toast(t('saved'));}).catch(e=>toast(rulesHint(e)));}
+function delFact(id){if(!confirm(t('delFactQ')))return;db.collection('qc_factories').doc(id).delete().then(()=>toast(t('deleted')));}
+function renderFact(){const el=$('fact-list');if(!el)return;if(!FACT.length){el.innerHTML=empty(t('noFact'));return;}
+  el.innerHTML=FACT.map(f=>`<div class="item"><div class="h"><div><div class="t">🏭 ${esc(f.name)}</div>
+    <div class="s">${esc(f.country||'—')} ${f.contact?'· '+esc(f.contact):''}</div></div></div>
+    <div class="row-btns"><button class="mini g" onclick='factForm(${JSON.stringify(f).replace(/'/g,"&#39;")})'>${t('edit')}</button>
+    <button class="mini r" onclick="delFact('${f.id}')">${t('del')}</button></div></div>`).join('');}
+
+/* ============ ORDERS ============ */
+function orderForm(o){o=o||{};if(!FACT.length){toast(t('addFactFirst'));go('fact',document.querySelectorAll('.nav button')[3]);return;}
+  const opts=FACT.map(f=>`<option value="${f.id}" ${o.factoryId===f.id?'selected':''}>${esc(f.name)}</option>`).join('');
+  const itemField=ITEMS.length
+    ? `<select id="o-item"><option value="">${t('selectItemPh')}</option>${ITEMS.map(it=>`<option ${o.item===it?'selected':''}>${esc(it)}</option>`).join('')}</select>`
+    : `<input id="o-item" value="${esc(o.item||'')}" placeholder="${t('noItemsHint')}">`;
+  modal(`<h3>${o.id?t('orderEdit'):t('orderNew')}</h3>
+  <label class="inl">${t('factoryLbl')}</label><select id="o-fact">${opts}</select>
+  <div class="grid2"><div><label class="inl">${t('poLbl')}</label><input id="o-po" value="${esc(o.po||'')}"></div>
+    <div><label class="inl">${t('modelLbl')}</label><input id="o-model" value="${esc(o.model||'')}"></div></div>
+  <div class="grid2"><div><label class="inl">${t('itemLbl')}</label>${itemField}</div>
+    <div><label class="inl">${t('qtyLbl')}</label><input id="o-qty" type="number" value="${esc(o.qty||'')}"></div></div>
+  <label class="inl">${t('colorLbl')}</label><input id="o-color" value="${esc(o.color||'')}">
+  <div class="row-btns"><button class="btn" onclick="saveOrder('${o.id||''}')">${t('save')}</button>
+  <button class="btn sec" onclick="closeModal()">${t('cancel')}</button></div>`);}
+function saveOrder(id){const fid=$('o-fact').value,po=$('o-po').value.trim(),qty=+$('o-qty').value||0;
+  if(!po||!qty)return toast(t('enterPoQty'));const fname=(FACT.find(f=>f.id===fid)||{}).name||'';
+  const data={wsId:MEMBER.wsId,factoryId:fid,factoryName:fname,po,model:$('o-model').value.trim(),item:$('o-item').value.trim(),qty,color:$('o-color').value.trim()};
+  const p=id?db.collection('qc_orders').doc(id).update(data):db.collection('qc_orders').add({...data,createdAt:FV.serverTimestamp()});
+  p.then(()=>{closeModal();toast(t('saved'));}).catch(e=>toast(rulesHint(e)));}
+function delOrder(id){if(!confirm(t('delOrderQ')))return;db.collection('qc_orders').doc(id).delete().then(()=>toast(t('deleted')));}
+function renderOrders(){const el=$('orders-list');if(!el)return;if(!ORDERS.length){el.innerHTML=empty(t('noOrders'));return;}
+  el.innerHTML=ORDERS.map(o=>{const n=INSP.filter(i=>i.orderId===o.id).length;
+    return `<div class="item"><div class="h"><div><div class="t">📦 ${esc(o.po)} <span class="chip">${esc(o.item||'')}</span></div>
+    <div class="s">🏭 ${esc(o.factoryName||'')} · ${t('qtyShort')} ${o.qty} ${o.color?'· '+esc(o.color):''} · ${t('inspCount')}: ${n}</div></div></div>
+    <div class="row-btns"><button class="mini" onclick='inspForm(null,"${o.id}")'>${t('inspect')}</button>
+    <button class="mini g" onclick='orderForm(${JSON.stringify(o).replace(/'/g,"&#39;")})'>${t('edit')}</button>
+    <button class="mini r" onclick="delOrder('${o.id}')">${t('del')}</button></div></div>`;}).join('');}
+
+/* ============ INSPECTIONS ============ */
+function inspForm(i,presetOrder){i=i||{};if(!ORDERS.length){toast(t('addFactFirst'));go('orders',document.querySelectorAll('.nav button')[2]);return;}
+  const oid=i.orderId||presetOrder||ORDERS[0].id;
+  const opts=ORDERS.map(o=>`<option value="${o.id}" ${oid===o.id?'selected':''}>${esc(o.po)} · ${esc(o.factoryName||'')}</option>`).join('');
+  const types=[['أثناء الخط',t('typeInline')],['الفحص النهائي',t('typeFinal')]];
+  const typeOpts=types.map(([v,lbl])=>`<option value="${v}" ${(i.type||'الفحص النهائي')===v?'selected':''}>${lbl}</option>`).join('');
+  modal(`<h3>${i.id?t('inspEdit'):t('inspNew')}</h3>
+  <label class="inl">${t('orderLbl')}</label><select id="i-order">${opts}</select>
+  <div class="grid2"><div><label class="inl">${t('typeLbl')}</label><select id="i-type">${typeOpts}</select></div>
+    <div><label class="inl">${t('dateLbl')}</label><input id="i-date" type="date" value="${i.date||today()}"></div></div>
+  <label class="inl">${t('stageLbl')}</label>
+  <select id="i-stage" onchange="onStageChange()"><option value="">${t('selectStage')}</option>${stageOptions(i.stage)}</select>
+  <div id="i-stage-hint" class="note" style="margin-top:4px"></div>
+  <div class="grid3"><div><label class="inl">${t('sampleLbl')}</label><input id="i-samp" type="number" value="${esc(i.sampleSize||'')}" oninput="previewDecision()"></div>
+    <div><label class="inl">${t('majorLbl')}</label><input id="i-maj" type="number" value="${esc(i.major||0)}" oninput="previewDecision()"></div>
+    <div><label class="inl">${t('minorLbl')}</label><input id="i-min" type="number" value="${esc(i.minor||0)}" oninput="previewDecision()"></div></div>
+  <label class="inl">${t('criticalLbl')}</label><input id="i-cri" type="number" value="${esc(i.critical||0)}" oninput="previewDecision()">
+  <label class="inl">${t('defLibLbl')}</label>
+  <div style="display:flex;gap:8px"><select id="i-defsel">${DEFECTS.map(d=>`<option value="${esc(d[0])}">${esc(d[0])} — ${esc(d[1])}</option>`).join('')}</select>
+    <button type="button" class="mini" onclick="addDefectFromLib()">${t('addDefBtn')}</button></div>
+  <div id="i-deflist" style="margin-top:8px"></div>
+  <label class="inl">${t('notesLbl')}</label><textarea id="i-notes" rows="2">${esc(i.notes||'')}</textarea>
+  <label class="inl">${t('photosLbl')}</label>
+  <input id="i-photo-input" type="file" accept="image/*" capture="environment" style="display:none" onchange="onPhotoPick(event)">
+  <button type="button" class="mini g" onclick="document.getElementById('i-photo-input').click()">${t('addPhoto')}</button>
+  <div id="i-photos" class="thumbs"></div>
+  <div class="res-box" id="i-prev"></div>
+  <div class="row-btns"><button class="btn" onclick="saveInsp('${i.id||''}')">${t('saveInsp')}</button>
+  <button class="btn sec" onclick="closeModal()">${t('cancel')}</button></div>`);
+  const o=ORDERS.find(x=>x.id===oid);if(o&&!i.sampleSize)$('i-samp').value=aqlFor(o.qty).sample;
+  INSP_PHOTOS=(i.photos||[]).slice();renderThumbs();
+  INSP_DEFECTS=(i.defects||[]).slice();renderDefList();onStageChange();previewDecision();}
+let INSP_PHOTOS=[],INSP_DEFECTS=[];
+function stageOptions(sel){let out='',cur='';SEQ.forEach(r=>{if(r[0]!==cur){if(cur)out+='</optgroup>';out+=`<optgroup label="${esc(r[0])}">`;cur=r[0];}
+  out+=`<option value="${esc(r[1])}" ${sel===r[1]?'selected':''}>${esc(r[1])}</option>`;});if(cur)out+='</optgroup>';return out;}
+function onStageChange(){const el=$('i-stage-hint');if(!el)return;const v=$('i-stage').value;const r=SEQ.find(x=>x[1]===v);
+  if(!r){el.innerHTML='';return;}el.innerHTML=`🔍 ${t('colCheckShort')}: <b>${esc(r[5])}</b> · ${t('colStd')}: ${esc(r[6])} ${r[4]==='حرجة'?'· '+catTag('حرِج'):''}`;}
+function catOf(name){const d=DEFECTS.find(x=>x[0]===name);return d?d[1]:'كبير';}
+function fieldOf(cat){return cat.indexOf('حر')>=0?'i-cri':(cat==='كبير'?'i-maj':'i-min');}
+function bump(cat,n){const id=fieldOf(cat);const el=$(id);if(el)el.value=Math.max(0,(+el.value||0)+n);}
+function addDefectFromLib(){const name=$('i-defsel').value;const cat=catOf(name);INSP_DEFECTS.push({name,cat});bump(cat,1);renderDefList();previewDecision();}
+function removeDef(i){const d=INSP_DEFECTS[i];if(!d)return;bump(d.cat,-1);INSP_DEFECTS.splice(i,1);renderDefList();previewDecision();}
+function renderDefList(){const el=$('i-deflist');if(!el)return;
+  el.innerHTML=INSP_DEFECTS.map((d,i)=>`<span class="tg ${d.cat.indexOf('حر')>=0?'tg-crit':(d.cat==='كبير'?'tg-maj':'tg-min')}" style="margin:0 0 6px 6px;display:inline-flex;align-items:center;gap:6px;padding:4px 10px">${esc(d.name)}
+    <b style="cursor:pointer" onclick="removeDef(${i})">✕</b></span>`).join('');}
+function inspFromRef(op){go('insp',document.querySelectorAll('.nav button')[2]);inspForm({stage:op});}
+function renderThumbs(){const el=$('i-photos');if(!el)return;
+  el.innerHTML=INSP_PHOTOS.map((p,idx)=>`<div class="tw"><img src="${p}"><div class="rm" onclick="rmPhoto(${idx})">✕</div></div>`).join('');}
+function rmPhoto(i){INSP_PHOTOS.splice(i,1);renderThumbs();}
+function onPhotoPick(ev){const f=ev.target.files&&ev.target.files[0];ev.target.value='';if(!f)return;
+  if(INSP_PHOTOS.length>=4)return toast(t('maxPhotos'));
+  toast(t('compressing'));compressImg(f).then(d=>{INSP_PHOTOS.push(d);renderThumbs();}).catch(()=>toast('خطأ في الصورة'));}
+function compressImg(file,maxDim=900,q=0.6){return new Promise((res,rej)=>{const r=new FileReader();
+  r.onerror=rej;r.onload=()=>{const img=new Image();img.onerror=rej;img.onload=()=>{
+    let{width:w,height:h}=img;if(w>h&&w>maxDim){h=h*maxDim/w;w=maxDim;}else if(h>maxDim){w=w*maxDim/h;h=maxDim;}
+    const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+    res(c.toDataURL('image/jpeg',q));};img.src=r.result;};r.readAsDataURL(file);});}
+function readInsp(){return{sampleSize:+$('i-samp').value||0,major:+$('i-maj').value||0,minor:+$('i-min').value||0,critical:+$('i-cri').value||0};}
+function previewDecision(){const v=readInsp();if(!v.sampleSize){$('i-prev').innerHTML=`<span class="note">${t('prevHint')}</span>`;return;}
+  const dhu=dhuOf(v),dec=inspDecision(v),a=aqlFor(v.sampleSize);
+  $('i-prev').innerHTML=`<div class="big" style="color:${dec.d==='PASS'?'var(--green)':'var(--red)'}">${dec.d==='PASS'?t('passMark'):t('failMark')}</div>
+    <div class="note">${t('dhuShort')}: <b>${dhu}</b> · ${t('acBig')} ${a.ac25} / ${t('acSmall')} ${a.ac40} · ${esc(dec.reason)}</div>`;}
+function saveInsp(id){const oid=$('i-order').value,o=ORDERS.find(x=>x.id===oid)||{},v=readInsp();
+  if(!v.sampleSize)return toast(t('enterSample'));const dec=inspDecision(v);
+  const data={wsId:MEMBER.wsId,orderId:oid,po:o.po||'',factoryName:o.factoryName||'',type:$('i-type').value,
+    stage:$('i-stage').value.trim(),date:$('i-date').value||today(),inspector:MEMBER.name||ME.email,
+    sampleSize:v.sampleSize,major:v.major,minor:v.minor,critical:v.critical,dhu:dhuOf(v),decision:dec.d,notes:$('i-notes').value.trim(),photos:INSP_PHOTOS.slice(),defects:INSP_DEFECTS.slice()};
+  const p=id?db.collection('qc_inspections').doc(id).update(data):db.collection('qc_inspections').add({...data,createdAt:FV.serverTimestamp()});
+  p.then(()=>{closeModal();toast(t('inspSaved'));}).catch(e=>toast(rulesHint(e)));}
+function delInsp(id){if(!confirm(t('delInspQ')))return;db.collection('qc_inspections').doc(id).delete().then(()=>toast(t('deleted')));}
+function typeLabel(v){return v==='أثناء الخط'?t('typeInline'):(v==='الفحص النهائي'?t('typeFinal'):v);}
+function editInsp(id){const i=INSP.find(x=>x.id===id);if(i)inspForm(i);}
+function renderInsp(){const el=$('insp-list');if(!el)return;if(!INSP.length){el.innerHTML=empty(t('noInsp'));return;}
+  const bar=`<div style="display:flex;gap:8px;margin-bottom:10px"><button class="mini g" onclick="exportCSV()">${t('exportCsv')}</button></div>`;
+  el.innerHTML=bar+INSP.map(i=>{const b=i.decision==='PASS'?'b-pass':'b-fail';const ph=(i.photos||[]).length;
+    return `<div class="item"><div class="h"><div><div class="t">${esc(i.po||'—')} <span class="chip">${esc(typeLabel(i.type))}</span>${ph?`<span class="chip">📷 ${ph}</span>`:''}</div>
+    <div class="s">🏭 ${esc(i.factoryName||'')} · ${fmtDate(i.date)} · 👤 ${esc(i.inspector||'')}<br>
+    ${t('sampleShort')} ${i.sampleSize} · ${t('majorLbl')} ${i.major} · ${t('minorLbl')} ${i.minor} · ${t('criticalLbl')} ${i.critical} · <b>${t('dhuShort')} ${i.dhu}</b></div></div>
+    <span class="badge ${b}">${i.decision==='PASS'?t('pass'):t('fail')}</span></div>
+    <div class="row-btns"><button class="mini" onclick="printInsp('${i.id}')">${t('reportBtn')}</button>
+    <button class="mini g" onclick="editInsp('${i.id}')">${t('edit')}</button>
+    <button class="mini r" onclick="delInsp('${i.id}')">${t('del')}</button></div></div>`;}).join('');}
+function csvCell(v){v=(v==null?'':String(v));return '"'+v.replace(/"/g,'""')+'"';}
+function exportCSV(){if(!INSP.length)return;
+  const head=['التاريخ / Date','الطلبية / PO','المصنع / Factory','النوع / Type','العينة / Sample','كبير / Major','صغير / Minor','حرِج / Critical','DHU','القرار / Decision','المفتش / Inspector','ملاحظات / Notes'];
+  const rows=INSP.map(i=>[i.date,i.po,i.factoryName,typeLabel(i.type),i.sampleSize,i.major,i.minor,i.critical,i.dhu,i.decision,i.inspector,i.notes]);
+  const csv='﻿'+[head,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='inspections_'+today()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
+function printInsp(id){const i=INSP.find(x=>x.id===id);if(!i)return;const a=aqlFor(i.sampleSize||0);
+  const row=(l,v)=>`<tr><td style="font-weight:700;background:#f2f6f6;width:38%">${l}</td><td>${esc(v)}</td></tr>`;
+  const dec=i.decision==='PASS'?t('passMark'):t('failMark');const dcol=i.decision==='PASS'?'#1e7e40':'#b02a26';
+  const photos=(i.photos||[]).map(p=>`<img src="${p}" style="width:31%;margin:1%;border:1px solid #ccc;border-radius:6px">`).join('');
+  $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:720px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
+      <div><div style="font-size:22px;font-weight:800;color:#14504f">🧵 ${esc(MEMBER.wsName||'')}</div>
+      <div style="font-size:15px;color:#555">${t('repTitle')}</div></div>
+      <div style="text-align:${LANG==='ar'?'left':'right'};font-size:12px;color:#666">${fmtDate(i.date)}</div></div>
+    <table style="width:100%;border-collapse:collapse;margin-top:14px;font-size:14px" border="1" cellpadding="8" style="border-color:#ddd">
+      ${row(t('poLbl').replace(' *',''),i.po)}${row(t('factoryLbl').replace(' *',''),i.factoryName)}
+      ${row(t('typeLbl'),typeLabel(i.type))}${row('المرحلة / Stage',i.stage||'—')}
+      ${row(t('repInspector'),i.inspector)}${row(t('sampleLbl').replace(' *',''),i.sampleSize)}
+      ${row(t('majorLbl'),i.major+'   (Ac '+a.ac25+')')}${row(t('minorLbl'),i.minor+'   (Ac '+a.ac40+')')}
+      ${row(t('criticalLbl'),i.critical)}${row('DHU',i.dhu)}
+      ${row(t('repNotes'),i.notes||'—')}</table>
+    <div style="margin-top:14px;padding:12px;border:2px solid ${dcol};border-radius:10px;text-align:center">
+      <span style="font-size:13px;color:#555">${t('repDecision')}: </span>
+      <span style="font-size:22px;font-weight:800;color:${dcol}">${dec}</span></div>
+    ${photos?`<div style="margin-top:14px"><div style="font-weight:700;margin-bottom:6px">${t('repPhotos')}</div><div style="display:flex;flex-wrap:wrap">${photos}</div></div>`:''}
+    <div style="margin-top:26px;display:flex;justify-content:space-between;font-size:13px;color:#444">
+      <div>${t('repInspector')}: ______________</div><div>QC: ______________</div></div></div>`;
+  window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
+
+/* ============ DASHBOARD ============ */
+function renderDash(){if(!$('kpis'))return;
+  const n=INSP.length,pass=INSP.filter(i=>i.decision==='PASS').length;
+  const avgDhu=n?Math.round(INSP.reduce((s,i)=>s+(i.dhu||0),0)/n*100)/100:0,rft=n?Math.round(pass/n*100):0;
+  $('kpis').innerHTML=`
+    <div class="kpi"><div class="v">${n}</div><div class="l">${t('kTotal')}</div></div>
+    <div class="kpi ${avgDhu<=20?'good':'bad'}"><div class="v">${avgDhu}</div><div class="l">${t('kDhu')}</div></div>
+    <div class="kpi ${rft>=90?'good':(rft<70?'bad':'')}"><div class="v">${rft}%</div><div class="l">${t('kRft')}</div></div>
+    <div class="kpi"><div class="v">${ORDERS.length}</div><div class="l">${t('kOrders')}</div></div>`;
+  const last=INSP.slice(0,8).reverse(),mx=Math.max(10,...last.map(i=>i.dhu||0));
+  $('chart').innerHTML=last.length?last.map(i=>`<div class="bar"><div class="num">${i.dhu||0}</div>
+    <div class="fill" style="height:${Math.max(2,(i.dhu||0)/mx*100)}%;background:${(i.dhu||0)<=20?'linear-gradient(var(--green),#3bbf72)':'linear-gradient(var(--red),#e8726e)'}"></div>
+    <div class="cap">${esc(i.po||'')}</div></div>`).join(''):empty(t('noData'));
+  const f=n-pass;
+  $('decdist').innerHTML=n?`<div style="display:flex;height:26px;border-radius:8px;overflow:hidden">
+    <div style="width:${pass/n*100}%;background:var(--green)"></div><div style="width:${f/n*100}%;background:var(--red)"></div></div>
+    <div class="note" style="margin-top:6px">✔ ${t('pass')}: ${pass} · ✘ ${t('fail')}: ${f}</div>`:empty(t('noData'));}
+
+/* ============ TOOLS ============ */
+function calcFP(){const Ln=+$('fp-len').value,W=+$('fp-wid').value,lim=+$('fp-lim').value||40;
+  const pts=(+$('fp-1').value||0)*1+(+$('fp-2').value||0)*2+(+$('fp-3').value||0)*3+(+$('fp-4').value||0)*4;
+  if(!Ln||!W){$('fp-res').innerHTML=`<span class="note">${t('enterLW')}</span>`;return;}
+  const p100=Math.round(pts*36*100/(Ln*W)*100)/100,ok=p100<=lim;
+  $('fp-res').innerHTML=`<div class="big" style="color:${ok?'var(--green)':'var(--red)'}">${p100} ${t('fpUnit')}</div>
+    <div class="note">${t('fpTotal')} ${pts} · ${t('limit')} ${lim} · <b>${ok?t('passMark'):t('failMark')}</b></div>`;}
+function calcSH(){const lb=+$('sh-lb').value,la=+$('sh-la').value,wb=+$('sh-wb').value,wa=+$('sh-wa').value,lim=+$('sh-lim').value||3;
+  if(!lb||!wb){$('sh-res').innerHTML=`<span class="note">${t('enterMeas')}</span>`;return;}
+  const sl=Math.round((lb-la)/lb*10000)/100,sw=Math.round((wb-wa)/wb*10000)/100,ok=Math.max(sl,sw)<=lim;
+  $('sh-res').innerHTML=`<div class="big" style="color:${ok?'var(--green)':'var(--red)'}">${ok?t('passMark'):t('failMark')}</div>
+    <div class="note">${t('shrLen')} ${sl}% · ${t('shrWid')} ${sw}% · ${t('limit')} ${lim}%</div>`;}
+function calcAQL(){const lot=+$('aq-lot').value,mj=+$('aq-maj').value||0,mn=+$('aq-min').value||0,a=aqlFor(lot);
+  const majOk=mj<a.re25,minOk=mn<a.re40,ok=majOk&&minOk;
+  $('aq-res').innerHTML=`<div class="big">${t('aqlSample')}: ${a.sample}</div>
+    <div class="note">${tf('aqlBig',{ac:a.ac25,re:a.re25})} → ${majOk?t('passMark'):t('failMark')}<br>
+    ${tf('aqlSmall',{ac:a.ac40,re:a.re40})} → ${minOk?t('passMark'):t('failMark')}<br>
+    <b style="color:${ok?'var(--green)':'var(--red)'}">${t('aqlOverall')}: ${ok?t('passMark'):t('failMark')}</b></div>`;}
+
+/* ============ REFERENCE (from integrated Excel) ============ */
+const SEQ=[
+['تجهيز','استلام الأجزاء المقصوصة والإكسسوارات','Receiving cut parts & trims','أول الخط','عادية','اكتمال الأجزاء ومطابقة الترقيم','لا اختلاط ألوان'],
+['تجهيز','الترقيم وربط الحزم','Numbering & bundling','أثناء الخط','عادية','تطابق أرقام الحزم والمقاسات','مطابق للقص'],
+['تجهيز','تثبيت / كبس الحشوات','Fusing / interlining pressing','أثناء الخط','عادية','قوة اللصق وعدم الانتفاخات','لصق متماسك'],
+['الأجزاء الأمامية','تحضير الجبازير','Placket preparation','أثناء الخط','عادية','عرض الجبزور وخلوّه من العيوب','متماثل'],
+['الأجزاء الأمامية','تحضير جيب الصدر','Chest pocket preparation','أثناء الخط','عادية','المسافات والاستقامة','منتظم'],
+['الأجزاء الأمامية','تركيب الجبازير وجيب الصدر','Attaching plackets & pocket','أثناء الخط','عادية','مطابقة نصفي الصدر واستقامة الجيب','بلا تجعّد'],
+['الياقة','تجهيز وقلب الياقة','Collar preparation & turning','أثناء الخط','عادية','تماثل أطراف الياقة','متماثل وحادّ'],
+['التجميع','تجميع الكتف مع الظهر وتركيب الشعار','Shoulder-to-back join & logo','أثناء الخط','عادية','خلوّه من الكرمشة ووجود الشعار والليبل','متمركزة'],
+['التجميع','تجميع الصدر مع الخلف والدرز الخارجي','Front-to-back join & topstitch','أثناء الخط','حرجة','عدم شدّ أي جزء والتماثل التام','متماثل'],
+['الياقة','تركيب الياقة','Collar attaching','أثناء الخط','حرجة','مطابقة القياس وعدم وجود زم','بلا تجعّد'],
+['التجميع','تركيب الأشتك في الأكمام','Sleeve placket attaching','أثناء الخط','عادية','استقامة وقوة الخياطة','متين'],
+['التجميع','تحضير جيب الجنب','Side pocket preparation','أثناء الخط','حرجة','تماثل فتحات الجيب والبارتك','متطابق'],
+['التجميع','تجميع الأكمام مع الأجناب','Sleeves-to-sides join','أثناء الخط','عادية','التماثل يمين/يسار','متماثل'],
+['التجميع','تجميع الأجناب مع البدن','Sides-to-body join','أثناء الخط','حرجة','خلوّه من الكرمشة وبروز أي قطعة','منتظم'],
+['التجميع','درز الأجناب من الخارج','Side seam topstitch','أثناء الخط','حرجة','كرمشة بسيطة لا تؤثر','يجتاز السحب'],
+['التشطيب','تحديد الطول وعمل الكفة','Length setting & hemming','أثناء الخط','عادية','مطابقة الطول وعدم فراغ أسفل الكفة','مكتملة'],
+['التشطيب','فتح العراوي وتركيب الأزرار','Buttonholing & button attaching','أثناء الخط','حرجة','المحاذاة وقوة التثبيت','يجتاز السحب'],
+['التشطيب','تركيب الطقطق','Snap-button attaching','أثناء الخط','حرجة','المحاذاة وقوة التثبيت','يجتاز السحب'],
+['نهاية الخط','قص الخيوط والتنظيف','Thread trimming & cleaning','نهاية الخط','عادية','خلوّه من الخيوط','نظيف'],
+['نهاية الخط','قياس نقاط القياس','Measuring (POM)','نهاية الخط','عادية','المقاسات ضمن الجدول','ضمن التسامح'],
+['نهاية الخط','الفحص المظهري الكامل','Full visual inspection','نهاية الخط','عادية','الصنعة والنظافة','بلا عيوب كبيرة'],
+['نهاية الخط','الكشف عن الإبر','Needle detection','نهاية الخط','عادية','لا إنذار','يجتاز الكشف']];
+const DEFECTS=[
+['غرزة مفتوحة / قفز','كبير','غرز مفقودة أو متقطعة','ضبط ماكينة خاطئ أو خيط مقطوع','إعادة الحياكة وضبط الماكينة'],
+['خيوط سائبة/زائدة','صغير','خيوط غير مقصوصة','إهمال في التنظيف','قص الخيوط والتنظيف'],
+['اختلاف لون (Shade)','كبير','فرق لون بين الأجزاء','خلط دفعات مختلفة','فصل الدفعات وإعادة الفرز'],
+['بقعة/اتساخ','كبير','زيت ماكينة أو أوساخ','تلوث أثناء الإنتاج','تنظيف/غسيل موضعي'],
+['قياس خارج التسامح','كبير','مقاس لا يطابق POM','قص أو خياطة خاطئة','تعديل أو استبعاد القطعة'],
+['كرمشة/زم','كبير','تجعّد في الخياطة','شدّ غير متساوٍ','إعادة الخياطة بشدّ متوازن'],
+['زر/إكسسوار ضعيف','حرِج','لا يجتاز اختبار السحب','تثبيت ضعيف','إعادة التثبيت والاختبار'],
+['إبرة مكسورة داخل القطعة','حرِج','خطر على السلامة','كسر إبرة أثناء الخياطة','عزل فوري + سياسة كشف الإبر'],
+['ثقب/تلف بالقماش','كبير','خرم أو تمزق','عيب خامة أو ماكينة','استبعاد الجزء المتضرر'],
+['عدم تماثل','صغير','فرق بين اليمين واليسار','قص/تركيب غير دقيق','التعديل حسب العينة']];
+const CHECKLISTS=[
+['استلام وفحص الأقمشة',[['مطابقة المستندات','PO + فاتورة + بوليصة','مراجعة'],['مطابقة الكمية','عدد اللفات/الأوزان = PO','عدّ + ميزان'],['اللون والدفعة','مطابق للعينة المعتمدة','Light Box'],['عيوب القماش','≤ 40 نقطة/100ياردة²','طاولة فحص'],['الوزن GSM','ضمن التسامح','قاطع + ميزان'],['العرض','مطابق للمواصفة','شريط قياس'],['الانكماش','ضمن الحد','غسيل عينة'],['ثبات اللون','درجة مقبولة','اختبار']]],
+['ما قبل الإنتاج (PP)',[['اجتماع PP','مراجعة Tech Pack + POM','اجتماع'],['عينة PP','مطابقة للعينة الذهبية','مقارنة'],['اعتماد الإكسسوارات','Trims Card معتمد','مطابقة'],['ألوان الصبغة','معتمدة','Light Box'],['اختبار الانكماش والكي','ضبط القص','اختبار']]],
+['القص',[['تخطيط القص Marker','الاتجاه/الاستهلاك','مراجعة'],['الفرش','الشد/الطبقات','معاينة'],['دقة القطع','ضمن التسامح','مقارنة بالباترون'],['فصل الـ Shades','لا اختلاط','ترقيم'],['فحص الأجزاء','مطابقة المقاسات','معاينة']]],
+['التشطيب والكي',[['قص الخيوط','نظيف تماماً','معاينة'],['الكي/البخار','بلا لمعان/حرق','مكواة'],['النظافة من البقع','خالٍ من الأوساخ','معاينة'],['الليبلات والتاجات','باركود صحيح','مسح'],['كشف الإبر','لا إنذار','Detector']]],
+['الفحص النهائي (AQL)',[['حجم العينة','حسب جدول AQL','سحب عشوائي'],['المظهر والصنعة','Major 2.5 / Minor 4.0','معاينة'],['القياسات POM','ضمن التسامح','قياس'],['اللون والتماثل','متجانس','Light Box'],['التغليف والوسم','مطابق','مطابقة'],['اختبار السحب','الأزرار','جهاز سحب']]],
+['التعبئة والشحن',[['طريقة التعبئة','حسب المواصفة','معاينة'],['بيانات الكرتون','Marks/الوزن','مطابقة'],['محتوى الكراتين','Solid/Assorted','فتح عشوائي'],['مستندات الشحن','مطابقة PO','مراجعة'],['إذن الشحن','تقرير + Release','إصدار']]]];
+const GLOSS=[['أول الخط','فحص أول قطعة قبل الإنتاج الكمّي'],['أثناء الخط','فحص دوري متنقل أثناء سير الخط (Inline)'],['نهاية الخط','فحص شامل في نهاية الخط (End of line)'],['حرجة','عملية تؤثر مباشرة على الشكل/الوظيفة'],['DHU','عدد العيوب لكل 100 قطعة'],['POM','نقاط القياس (Points of Measure)'],['AQL','الحد المقبول للجودة'],['4-Point','نظام نقاط فحص القماش'],['Shade','دفعة/تدرّج اللون'],['اختبار السحب','شدّ الزر للتأكد من التثبيت']];
+function catTag(c){const cls=c.indexOf('حرِج')>=0||c.indexOf('حرج')>=0?'tg-crit':(c==='كبير'?'tg-maj':'tg-min');return`<span class="tg ${cls}">${esc(c)}</span>`;}
+function renderRef(){const el=$('ref-body');if(!el)return;
+  const seqRows=SEQ.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r[0])}</td><td>${esc(r[1])}<div class="en">${esc(r[2])}</div></td>
+    <td>${esc(r[3])}</td><td>${r[4]==='حرجة'?catTag('حرِج'):esc(r[4])}</td><td>${esc(r[5])}</td><td>${esc(r[6])}</td>
+    <td><button class="mini" style="white-space:nowrap" onclick="inspFromRef('${esc(r[1]).replace(/'/g,"&#39;")}')">${t('recordInsp')}</button></td></tr>`).join('');
+  const seq=`<table class="rtbl"><tr><th>م</th><th>${t('colStage')}</th><th>${t('colOp')}</th><th>توقيت</th><th>${t('colImp')}</th><th>${t('colCheck')}</th><th>${t('colStd')}</th><th></th></tr>${seqRows}</table>`;
+  const defRows=DEFECTS.map((d,i)=>`<tr><td>${i+1}</td><td>${esc(d[0])}</td><td>${catTag(d[1])}</td><td>${esc(d[2])}</td><td>${esc(d[3])}</td><td>${esc(d[4])}</td></tr>`).join('');
+  const def=`<table class="rtbl"><tr><th>م</th><th>${t('colDefect')}</th><th>${t('colCat')}</th><th>الوصف</th><th>${t('colCause')}</th><th>${t('colAction')}</th></tr>${defRows}</table>`;
+  const chk=CHECKLISTS.map(([title,rows])=>acc(esc(title),
+    `<table class="rtbl" style="min-width:420px"><tr><th>${t('colItem')}</th><th>${t('colStd')}</th><th>${t('colTool')}</th></tr>
+    ${rows.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')}</table>`,false)).join('');
+  const gloss=`<table class="rtbl" style="min-width:320px"><tr><th>${t('colItem')}</th><th>المعنى</th></tr>${GLOSS.map(g=>`<tr><td><b>${esc(g[0])}</b></td><td>${esc(g[1])}</td></tr>`).join('')}</table>`;
+  el.innerHTML=
+    acc('🧵 '+t('refSeq'),seq,true)+
+    acc('🔍 '+t('refDefects'),def,false)+
+    acc('✅ '+t('refChecklists'),chk,false)+
+    acc('📖 '+t('refGloss'),gloss,false);}
+function acc(title,body,open){return `<div class="acc"><div class="acc-h${open?' open':''}" onclick="toggleAcc(this)"><span>${title}</span><span class="arw">▾</span></div><div class="acc-body" style="display:${open?'block':'none'}">${body}</div></div>`;}
+function toggleAcc(h){const b=h.nextElementSibling;const isOpen=b.style.display!=='none';b.style.display=isOpen?'none':'block';h.classList.toggle('open',!isOpen);}
+
+/* ============ INIT ============ */
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+  let refreshing=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(refreshing)return;refreshing=true;location.reload();});
+}
+applyI18n();
+</script>
+</body>
+</html>

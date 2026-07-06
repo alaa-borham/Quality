@@ -1,0 +1,45 @@
+// ═══════════════════════════════════════════════════════════════
+// قواعد أمان Firestore الخاصة بنظام متابعة الجودة (qc_*)
+// انسخ هذه الكتل داخل بلوك: match /databases/{database}/documents { ... }
+// في ملف قواعد مشروع level7alaa الحالي، ثم انشر القواعد من Firebase Console.
+// (لا تحذف قواعدك الحالية — أضِف هذه بجانبها)
+// ═══════════════════════════════════════════════════════════════
+
+// مساحة عمل المستخدم الحالي (wsId) من مستند عضويته
+function qcWs() {
+  return get(/databases/$(database)/documents/qc_members/$(request.auth.uid)).data.wsId;
+}
+function qcIsMember() {
+  return request.auth != null
+    && exists(/databases/$(database)/documents/qc_members/$(request.auth.uid));
+}
+
+// العضوية: كل مستخدم يكتب/يقرأ مستنده فقط
+match /qc_members/{uid} {
+  allow read:  if request.auth != null;
+  allow create, update, delete: if request.auth != null && request.auth.uid == uid;
+}
+
+// مساحات العمل: أي مستخدم مسجّل يقرأ (للبحث بالكود) وينشئ؛ المالك فقط يعدّل/يحذف
+match /qc_workspaces/{wsId} {
+  allow read:   if request.auth != null;
+  allow create: if request.auth != null && request.resource.data.ownerUid == request.auth.uid;
+  allow update, delete: if request.auth != null && resource.data.ownerUid == request.auth.uid;
+}
+
+// البيانات التشغيلية: مقصورة على أعضاء نفس مساحة العمل
+match /qc_factories/{id} {
+  allow read:   if qcIsMember() && resource.data.wsId == qcWs();
+  allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
+  allow update, delete: if qcIsMember() && resource.data.wsId == qcWs();
+}
+match /qc_orders/{id} {
+  allow read:   if qcIsMember() && resource.data.wsId == qcWs();
+  allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
+  allow update, delete: if qcIsMember() && resource.data.wsId == qcWs();
+}
+match /qc_inspections/{id} {
+  allow read:   if qcIsMember() && resource.data.wsId == qcWs();
+  allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
+  allow update, delete: if qcIsMember() && resource.data.wsId == qcWs();
+}
