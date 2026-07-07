@@ -339,6 +339,7 @@ aqlInfosample:'العينة = عدد القطع التي تُسحب عشوائي
 aqlInfomaj:'حد قبول العيوب الكبيرة داخل العينة: إذا وجدت عيوباً كبيرة أكثر من هذا العدد تُرفض الشحنة (حد الرفض = هذا الحد + 1). العيب الكبير يؤثر على شكل أو استخدام القطعة.',
 aqlInfomin:'حد قبول العيوب الصغيرة داخل العينة، بنفس فكرة العيوب الكبيرة لكن بسقف أعلى — العيب الصغير لا يمنع الاستخدام لكنه يقلل الجودة.',
 aqlInfocrit:'العيوب الحرجة هي الخطرة على السلامة (مثل إبرة مكسورة داخل القطعة). تجاوز هذا الحد يرفض الفحص فوراً مهما كانت بقية النتائج — والمعيار العالمي 0 (لا تسامح).',
+addChkItem:'➕ بند جديد',enterItemName:'أدخل اسم البند',delItemQ:'حذف هذا البند من القائمة؟',
 inspSaved:'تم حفظ الفحص',dhuShort:'DHU',acBig:'حد قبول كبير',acSmall:'صغير',sampleShort:'العينة',
 photosLbl:'الصور (اختياري)',addPhoto:'📷 إضافة صورة',maxPhotos:'الحد الأقصى 4 صور',reportBtn:'تقرير',exportCsv:'⬇ تصدير Excel',printBtn:'🖨 طباعة / حفظ PDF',
 repTitle:'تقرير فحص الجودة',repDecision:'القرار النهائي',repNotes:'ملاحظات',repInspector:'المفتش',repDate:'التاريخ',repPhotos:'الصور',repClose:'إغلاق',compressing:'جارٍ معالجة الصورة…',
@@ -430,6 +431,7 @@ aqlInfosample:'Sample = how many pieces are drawn at random from the lot and act
 aqlInfomaj:'Acceptance limit for major defects within the sample: more than this number rejects the lot (reject limit = this + 1). A major defect affects the look or usability of the piece.',
 aqlInfomin:'Acceptance limit for minor defects within the sample — same idea as major, with a higher ceiling; a minor defect lowers quality without preventing use.',
 aqlInfocrit:'Critical defects are safety hazards (e.g. a broken needle inside a garment). Exceeding this limit fails the inspection immediately regardless of everything else — the global standard is 0 (zero tolerance).',
+addChkItem:'➕ New item',enterItemName:'Enter the item name',delItemQ:'Delete this item from the checklist?',
 inspSaved:'Inspection saved',dhuShort:'DHU',acBig:'Major Ac',acSmall:'Minor',sampleShort:'Sample',
 photosLbl:'Photos (optional)',addPhoto:'📷 Add photo',maxPhotos:'Max 4 photos',reportBtn:'Report',exportCsv:'⬇ Export Excel',printBtn:'🖨 Print / save PDF',
 repTitle:'Quality Inspection Report',repDecision:'Final decision',repNotes:'Notes',repInspector:'Inspector',repDate:'Date',repPhotos:'Photos',repClose:'Close',compressing:'Processing image…',
@@ -493,7 +495,7 @@ function isOwner(){return !!(MEMBER&&MEMBER.role==='owner');}
 function can(p){return isOwner()||!!(MEMBER&&MEMBER.perms&&MEMBER.perms[p]);}
 
 /* ============ State ============ */
-let ME=null,MEMBER=null,TAB='fact',FACT=[],ORDERS=[],INSP=[],ITEMS=[],WSCODE='—',unsub=[],AUTHMODE='login',CUSTDEF=[],WSEQ=null,TOOLCHK=[],WSAQL=null,WSCRIT=0;
+let ME=null,MEMBER=null,TAB='fact',FACT=[],ORDERS=[],INSP=[],ITEMS=[],WSCODE='—',unsub=[],AUTHMODE='login',CUSTDEF=[],WSEQ=null,TOOLCHK=[],WSAQL=null,WSCRIT=0,WSCHK=null;
 
 /* ============ AQL logic ============ */
 const AQLTAB=[[2,20,1,2,2,3],[151,32,2,3,3,4],[281,50,3,4,5,6],[501,80,5,6,7,8],
@@ -559,6 +561,7 @@ function listen(){unsub.forEach(u=>u&&u());unsub=[];const ws=MEMBER.wsId;
   unsub.push(db.collection('qc_inspections').where('wsId','==',ws).onSnapshot(s=>{INSP=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));renderInsp();renderDash();},console.error));
   unsub.push(db.collection('qc_defects').where('wsId','==',ws).onSnapshot(s=>{CUSTDEF=s.docs.map(d=>({id:d.id,...d.data()}));if(REFSUB==='def')renderRef();},console.error));
   unsub.push(db.collection('qc_seqcfg').doc(ws).onSnapshot(d=>{WSEQ=(d.exists&&d.data().list)?d.data().list:null;if(REFSUB==='seq')renderRef();},console.error));
+  unsub.push(db.collection('qc_chkcfg').doc(ws).onSnapshot(d=>{WSCHK=(d.exists&&d.data().lists)?d.data().lists:null;if(REFSUB==='chk')renderRef();},console.error));
   unsub.push(db.collection('qc_toolchecks').where('wsId','==',ws).onSnapshot(s=>{TOOLCHK=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));if(TAB==='toolchk')renderToolChk();if(TAB==='dash')renderDash();},console.error));}
 
 /* ============ NAV ============ */
@@ -845,17 +848,18 @@ function inspForm(i,presetOrder){i=i||{};if(!ORDERS.length){toast(t('addFactFirs
   renderDefList();onStageChange();onInspTypeChange();}
 let INSP_PHOTOS=[],INSP_DEFECTS=[],INSP_CHKRES=[];
 function isChkType(v){return CHECKLISTS.some(c=>c[0]===v);}
+function curChk(){return WSCHK||CHECKLISTS.map(c=>({title:c[0],items:c[1].map(r=>({name:r[0],std:r[1],tool:r[2]}))}));}
 function onInspTypeChange(){const v=$('i-type').value,chk=isChkType(v);
   $('aql-sec').classList.toggle('hide',chk);$('chk-sec').classList.toggle('hide',!chk);
   if(chk)renderInspChkItems(v);previewDecision();}
-function renderInspChkItems(type){const cl=CHECKLISTS.find(c=>c[0]===type);if(!cl)return;
+function renderInspChkItems(type){const cl=curChk().find(c=>c.title===type);if(!cl)return;
   const cur={};INSP_CHKRES.forEach(r=>cur[r.name]=r.status);
-  $('chk-items').innerHTML=cl[1].map(r=>`<div class="grid2" style="align-items:center;margin-bottom:8px">
-    <div><b>${esc(r[0])}</b><div class="note">${esc(r[1])} · ${esc(r[2])}</div></div>
-    <select class="chk-item" onchange="previewDecision()" data-name="${esc(r[0])}" data-std="${esc(r[1])}" data-tool="${esc(r[2])}">
-      <option value="pass" ${cur[r[0]]!=='fail'&&cur[r[0]]!=='na'?'selected':''}>${t('statusPass')}</option>
-      <option value="fail" ${cur[r[0]]==='fail'?'selected':''}>${t('statusFail')}</option>
-      <option value="na" ${cur[r[0]]==='na'?'selected':''}>${t('statusNA')}</option>
+  $('chk-items').innerHTML=cl.items.map(r=>`<div class="grid2" style="align-items:center;margin-bottom:8px">
+    <div><b>${esc(r.name)}</b><div class="note">${esc(r.std)} · ${esc(r.tool)}</div></div>
+    <select class="chk-item" onchange="previewDecision()" data-name="${esc(r.name)}" data-std="${esc(r.std)}" data-tool="${esc(r.tool)}">
+      <option value="pass" ${cur[r.name]!=='fail'&&cur[r.name]!=='na'?'selected':''}>${t('statusPass')}</option>
+      <option value="fail" ${cur[r.name]==='fail'?'selected':''}>${t('statusFail')}</option>
+      <option value="na" ${cur[r.name]==='na'?'selected':''}>${t('statusNA')}</option>
     </select></div>`).join('');}
 function readChkItems(){return [...document.querySelectorAll('.chk-item')].map(s=>({name:s.dataset.name,std:s.dataset.std,tool:s.dataset.tool,status:s.value}));}
 function stageOptions(sel){let out='',cur='';curSeq().filter(r=>r.cat!=='تجهيز'&&r.cat!=='نهاية الخط').forEach(r=>{if(r.cat!==cur){if(cur)out+='</optgroup>';out+=`<optgroup label="${esc(r.cat)}">`;cur=r.cat;}
@@ -1188,11 +1192,29 @@ function hideDef(name){if(!confirm(t('delDefQ')))return;
 let REFSUB='seq',CHKSUB=0;
 function goRef(id,btn){REFSUB=id;document.querySelectorAll('#ref-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');renderRef();}
 function goChk(i,btn){CHKSUB=i;document.querySelectorAll('#chk-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');renderChk();}
-function chkInfo(i,e){e.preventDefault();modal(`<h3>${esc(CHECKLISTS[i][0])}</h3><p style="line-height:1.7;color:var(--mut)">${esc(t('chkDesc'+i))}</p>
+function chkInfo(i,e){e.preventDefault();modal(`<h3>${esc(curChk()[i].title)}</h3><p style="line-height:1.7;color:var(--mut)">${esc(t('chkDesc'+i))}</p>
   <div class="row-btns"><button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);return false;}
-function renderChk(){const el=$('chk-body');if(!el)return;const [,rows]=CHECKLISTS[CHKSUB];
-  el.innerHTML=`<table class="rtbl" style="min-width:420px"><tr><th>${t('colItem')}</th><th>${t('colStd')}</th><th>${t('colTool')}</th></tr>
-    ${rows.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')}</table>`;}
+function renderChk(){const el=$('chk-body');if(!el)return;const cl=curChk()[CHKSUB];
+  el.innerHTML=`<button class="mini g" style="margin-bottom:8px" onclick="chkItemForm()">${t('addChkItem')}</button>
+  <table class="rtbl" style="min-width:480px"><tr><th>${t('colItem')}</th><th>${t('colStd')}</th><th>${t('colTool')}</th><th></th></tr>
+    ${cl.items.map((r,i)=>`<tr><td>${esc(r.name)}</td><td>${esc(r.std)}</td><td>${esc(r.tool)}</td>
+    <td style="white-space:nowrap"><button class="mini" onclick="chkItemForm(${i})">${t('edit')}</button>
+    ${can('del')?`<button class="mini" onclick="delChkItem(${i})">${t('del')}</button>`:''}</td></tr>`).join('')}</table>`;}
+function chkItemForm(i){const cl=curChk()[CHKSUB];const r=(i!=null)?cl.items[i]:{name:'',std:'',tool:''};
+  modal(`<h3>${(i!=null)?t('edit'):t('addChkItem')} — ${esc(cl.title)}</h3>
+  <label class="inl">${t('colItem')} *</label><input id="ci-name" value="${esc(r.name)}">
+  <label class="inl">${t('colStd')}</label><input id="ci-std" value="${esc(r.std)}">
+  <label class="inl">${t('colTool')}</label><input id="ci-tool" value="${esc(r.tool)}">
+  <div class="row-btns"><button class="btn" onclick="saveChkItem(${i==null?'null':i})">${t('save')}</button>
+  <button class="btn sec" onclick="closeModal()">${t('cancel')}</button></div>`);}
+function chkCopy(){return curChk().map(c=>({title:c.title,items:c.items.map(x=>({name:x.name,std:x.std||'',tool:x.tool||''}))}));}
+function saveChkItem(i){const name=$('ci-name').value.trim();if(!name)return toast(t('enterItemName'));
+  const lists=chkCopy();const item={name,std:$('ci-std').value.trim(),tool:$('ci-tool').value.trim()};
+  if(i==null)lists[CHKSUB].items.push(item);else lists[CHKSUB].items[i]=item;
+  db.collection('qc_chkcfg').doc(MEMBER.wsId).set({lists}).then(()=>{closeModal();toast(t('saved'));}).catch(e=>toast(rulesHint(e)));}
+function delChkItem(i){if(!confirm(t('delItemQ')))return;
+  const lists=chkCopy();lists[CHKSUB].items.splice(i,1);
+  db.collection('qc_chkcfg').doc(MEMBER.wsId).set({lists}).then(()=>toast(t('deleted'))).catch(e=>toast(rulesHint(e)));}
 function renderRef(){const el=$('ref-body');if(!el)return;
   if(REFSUB==='seq'){
     const list=curSeq();

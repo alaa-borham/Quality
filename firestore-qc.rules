@@ -63,6 +63,11 @@ match /qc_seqcfg/{wsId} {
   allow read, write: if qcIsMember() && wsId == qcWs();
 }
 
+// قوائم فحص المراحل القابلة للتخصيص (بنود ومعايير): مستند واحد لكل مساحة عمل
+match /qc_chkcfg/{wsId} {
+  allow read, write: if qcIsMember() && wsId == qcWs();
+}
+
 // فحوصات أدوات الجودة المحفوظة (نقاط أربع/انكماش/AQL) المرتبطة بمورد
 match /qc_toolchecks/{id} {
   allow read:   if qcIsMember() && resource.data.wsId == qcWs();

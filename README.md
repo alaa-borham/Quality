@@ -12,7 +12,7 @@
 
 ## بنية البيانات (Firestore)
 مجموعات مستقلة بادئتها `qc_` لا تمسّ بياناتك الحالية:
-`qc_members` · `qc_workspaces` · `qc_factories` · `qc_orders` · `qc_inspections` · `qc_defects` · `qc_seqcfg` · `qc_toolchecks`
+`qc_members` · `qc_workspaces` · `qc_factories` · `qc_orders` · `qc_inspections` · `qc_defects` · `qc_seqcfg` · `qc_chkcfg` · `qc_toolchecks`
 
 ## خطوات التشغيل (مرة واحدة)
 1. **نشر قواعد الأمان:** افتح ملف `firestore-qc.rules`، وانسخ محتواه داخل قواعد مشروع `level7alaa` في Firebase Console (**Firestore → Rules**) بجانب قواعدك الحالية، ثم **Publish**. بدون هذه الخطوة ستظهر رسالة «صلاحيات غير مفعّلة».
