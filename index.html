@@ -1161,9 +1161,12 @@ function saveSeqStage(){const cat=$('sq-cat').value.trim(),op=$('sq-op').value.t
   const arr=curSeq().slice();
   arr.push({cat,op,en:$('sq-en').value.trim(),timing:$('sq-timing').value,imp:$('sq-imp').value,check:$('sq-check').value.trim(),std:$('sq-std').value.trim()});
   persistSeq(arr);closeModal();}
-function allDefects(){return DEFECTS.map(d=>({name:d[0],cat:d[1],desc:d[2],cause:d[3],action:d[4],built:true}))
-  .concat(CUSTDEF.map(d=>({id:d.id,name:d.name,cat:d.cat,desc:d.desc||'',cause:d.cause||'',action:d.action||'',built:false})));}
-function defForm(d){d=d||{};modal(`<h3>${d.id?t('defEdit'):t('defNew')}</h3>
+function allDefects(){const shadow=new Set(CUSTDEF.filter(d=>d.orig).map(d=>d.orig));
+  return DEFECTS.filter(d=>!shadow.has(d[0])).map(d=>({name:d[0],cat:d[1],desc:d[2],cause:d[3],action:d[4],built:true}))
+  .concat(CUSTDEF.filter(d=>!d.hidden).map(d=>({id:d.id,name:d.name,cat:d.cat,desc:d.desc||'',cause:d.cause||'',action:d.action||'',orig:d.orig||'',built:false})));}
+let DEF_ORIG='';
+function defForm(d){d=d||{};DEF_ORIG=d.orig||(d.built?d.name:'');
+  modal(`<h3>${(d.id||d.built)?t('defEdit'):t('defNew')}</h3>
   <label class="inl">${t('defNameLbl')}</label><input id="d-name" value="${esc(d.name||'')}">
   <label class="inl">${t('defCatLbl')}</label><select id="d-cat">
     <option value="كبير" ${(!d.cat||d.cat==='كبير')?'selected':''}>${t('catMajor')}</option>
@@ -1176,9 +1179,12 @@ function defForm(d){d=d||{};modal(`<h3>${d.id?t('defEdit'):t('defNew')}</h3>
   <button class="btn sec" onclick="closeModal()">${t('cancel')}</button></div>`);}
 function saveDef(id){const name=$('d-name').value.trim();if(!name)return toast(t('enterDefName'));
   const data={wsId:MEMBER.wsId,name,cat:$('d-cat').value,desc:$('d-desc').value.trim(),cause:$('d-cause').value.trim(),action:$('d-action').value.trim()};
+  if(DEF_ORIG)data.orig=DEF_ORIG;
   const p=id?db.collection('qc_defects').doc(id).update(data):db.collection('qc_defects').add({...data,createdAt:FV.serverTimestamp()});
   p.then(()=>{closeModal();toast(t('saved'));}).catch(e=>toast(rulesHint(e)));}
 function delDef(id){if(!confirm(t('delDefQ')))return;db.collection('qc_defects').doc(id).delete().catch(e=>toast(rulesHint(e)));}
+function hideDef(name){if(!confirm(t('delDefQ')))return;
+  db.collection('qc_defects').add({wsId:MEMBER.wsId,orig:name,hidden:true,createdAt:FV.serverTimestamp()}).catch(e=>toast(rulesHint(e)));}
 let REFSUB='seq',CHKSUB=0;
 function goRef(id,btn){REFSUB=id;document.querySelectorAll('#ref-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');renderRef();}
 function goChk(i,btn){CHKSUB=i;document.querySelectorAll('#chk-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');renderChk();}
@@ -1199,8 +1205,12 @@ function renderRef(){const el=$('ref-body');if(!el)return;
       <table class="rtbl"><tr><th>م</th><th>${t('colStage')}</th><th>${t('colOp')}</th><th>توقيت</th><th>${t('colImp')}</th><th>${t('colCheck')}</th><th>${t('colStd')}</th><th></th></tr>${seqRows}</table>`;
   }else if(REFSUB==='def'){
     const all=allDefects();
-    const defRows=all.map((d,i)=>`<tr><td>${i+1}</td><td>${esc(d.name)}</td><td>${catTag(d.cat)}</td><td>${esc(d.desc)}</td><td>${esc(d.cause)}</td><td>${esc(d.action)}</td>
-      <td>${d.built?'':`<button class="mini" onclick='defForm(${esc(JSON.stringify(d)).replace(/'/g,"&#39;")})'>${t('edit')}</button> ${can('del')?`<button class="mini" onclick="delDef('${d.id}')">${t('del')}</button>`:''}`}</td></tr>`).join('');
+    const defRows=all.map((d,i)=>{
+      const delBtn=!can('del')?'':(d.built
+        ?`<button class="mini" onclick="hideDef('${esc(d.name).replace(/'/g,"&#39;")}')">${t('del')}</button>`
+        :`<button class="mini" onclick="delDef('${d.id}')">${t('del')}</button>`);
+      return `<tr><td>${i+1}</td><td>${esc(d.name)}</td><td>${catTag(d.cat)}</td><td>${esc(d.desc)}</td><td>${esc(d.cause)}</td><td>${esc(d.action)}</td>
+      <td><button class="mini" onclick='defForm(${esc(JSON.stringify(d)).replace(/'/g,"&#39;")})'>${t('edit')}</button> ${delBtn}</td></tr>`;}).join('');
     el.innerHTML=`<button class="btn" style="margin-bottom:12px" onclick="defForm()">${t('addDefNew')}</button>
       <table class="rtbl"><tr><th>م</th><th>${t('colDefect')}</th><th>${t('colCat')}</th><th>الوصف</th><th>${t('colCause')}</th><th>${t('colAction')}</th><th></th></tr>${defRows}</table>`;
   }else if(REFSUB==='chk'){
