@@ -599,7 +599,7 @@ function renderOrders(){const el=$('orders-list');if(!el)return;if(!ORDERS.lengt
 /* ============ INSPECTIONS ============ */
 function inspForm(i,presetOrder){i=i||{};if(!ORDERS.length){toast(t('addFactFirst'));go('orders',document.querySelectorAll('.nav button')[2]);return;}
   const oid=i.orderId||presetOrder||ORDERS[0].id;
-  const opts=ORDERS.map(o=>`<option value="${o.id}" ${oid===o.id?'selected':''}>${esc(o.po)} · ${esc(o.factoryName||'')}</option>`).join('');
+  const opts=ORDERS.map(o=>`<option value="${o.id}" ${oid===o.id?'selected':''}>📦 ${esc(o.po)}${o.model?' · '+esc(o.model):''}${o.item?' · '+esc(o.item):''} · 🏭 ${esc(o.factoryName||'')}${o.qty?' · '+t('qtyShort')+' '+o.qty:''}</option>`).join('');
   const locked=!!i.type||(TAB==='insp'&&INSPFILTER!=='all');
   const defType=i.type||(TAB==='insp'&&INSPFILTER!=='all'?INSPFILTER:'الفحص النهائي');
   const typeOpts=locked
