@@ -91,12 +91,9 @@ padding:11px 18px;border-radius:24px;font-size:14px;z-index:99;opacity:0;transit
 background:var(--teal);color:#fff;font-size:28px;box-shadow:0 6px 18px rgba(31,110,110,.5);z-index:15}
 label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 0 4px}
 .note{font-size:12px;color:var(--mut);line-height:1.7}
-.acc{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:#fff;overflow:hidden}
-.acc-h{cursor:pointer;padding:13px 15px;font-weight:700;background:#f4f6f8;display:flex;justify-content:space-between;align-items:center;user-select:none}
-.acc-h .arw{color:var(--teal);transition:transform .2s;font-size:13px}
-.acc-h.open{color:var(--teal)}
-.acc-h.open .arw{transform:rotate(180deg)}
-.acc-body{padding:6px 12px 12px;overflow-x:auto}
+.subnav{display:flex;overflow-x:auto;gap:6px;margin-bottom:14px}
+.subnav button{flex:0 0 auto;padding:8px 14px;background:#fff;border:1px solid var(--line);border-radius:20px;font-weight:600;font-size:13px;color:var(--mut);white-space:nowrap}
+.subnav button.on{background:var(--teal);color:#fff;border-color:var(--teal)}
 .rtbl{width:100%;border-collapse:collapse;font-size:12.5px;min-width:520px}
 .rtbl th,.rtbl td{border:1px solid var(--line);padding:6px 8px;text-align:start;vertical-align:top}
 .rtbl th{background:var(--teal);color:#fff;white-space:nowrap}
@@ -190,7 +187,12 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
     <div id="p-fact" class="hide"><div class="sec-h">🏭 <span data-i18n="factTitle">المصانع / الموردون</span></div><div id="fact-list"></div></div>
     <div id="p-tools" class="hide">
       <div class="sec-h">🧮 <span data-i18n="toolsTitle">أدوات الجودة</span></div>
-      <div class="card"><div style="font-weight:700;margin-bottom:10px" data-i18n="fpTitle">حاسبة نظام النقاط الأربع (فحص القماش)</div>
+      <div class="subnav" id="tools-subnav">
+        <button class="on" onclick="goTool('fp',this)" data-i18n="fpTitle">حاسبة نظام النقاط الأربع (فحص القماش)</button>
+        <button onclick="goTool('sh',this)" data-i18n="shTitle">حاسبة انكماش القماش</button>
+        <button onclick="goTool('aq',this)" data-i18n="aqlTitle">جدول AQL التفاعلي (مستوى II)</button>
+      </div>
+      <div id="tool-fp" class="card">
         <div class="grid2"><div><label class="inl" data-i18n="fpLen">الطول المفحوص (ياردة)</label><input id="fp-len" type="number" value="120"></div>
           <div><label class="inl" data-i18n="fpWid">عرض القماش (إنش)</label><input id="fp-wid" type="number" value="60"></div></div>
         <div class="grid2"><div><label class="inl" data-i18n="fp1">عيوب ≤3 إنش (×1)</label><input id="fp-1" type="number" value="0"></div>
@@ -201,7 +203,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <button class="btn" style="margin-top:10px" onclick="calcFP()" data-i18n="calc">احسب</button>
         <div class="res-box" id="fp-res"></div>
       </div>
-      <div class="card"><div style="font-weight:700;margin-bottom:10px" data-i18n="shTitle">حاسبة انكماش القماش</div>
+      <div id="tool-sh" class="card hide">
         <div class="grid2"><div><label class="inl" data-i18n="shLb">الطول قبل</label><input id="sh-lb" type="number" value="150"></div>
           <div><label class="inl" data-i18n="shLa">الطول بعد</label><input id="sh-la" type="number" value="148"></div></div>
         <div class="grid2"><div><label class="inl" data-i18n="shWb">العرض قبل</label><input id="sh-wb" type="number" value="145"></div>
@@ -210,7 +212,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <button class="btn" style="margin-top:10px" onclick="calcSH()" data-i18n="calc">احسب</button>
         <div class="res-box" id="sh-res"></div>
       </div>
-      <div class="card"><div style="font-weight:700;margin-bottom:10px" data-i18n="aqlTitle">جدول AQL التفاعلي (مستوى II)</div>
+      <div id="tool-aq" class="card hide">
         <div class="grid2"><div><label class="inl" data-i18n="aqlLot">حجم الشحنة</label><input id="aq-lot" type="number" value="1000"></div>
           <div><label class="inl" data-i18n="aqlMaj">عيوب كبيرة مكتشفة</label><input id="aq-maj" type="number" value="0"></div></div>
         <label class="inl" data-i18n="aqlMin">عيوب صغيرة مكتشفة</label><input id="aq-min" type="number" value="0">
@@ -218,7 +220,16 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div class="res-box" id="aq-res"></div>
       </div>
     </div>
-    <div id="p-ref" class="hide"><div class="sec-h">📋 <span data-i18n="refTitle">المراجع الفنية</span></div><div id="ref-body"></div></div>
+    <div id="p-ref" class="hide">
+      <div class="sec-h">📋 <span data-i18n="refTitle">المراجع الفنية</span></div>
+      <div class="subnav" id="ref-subnav">
+        <button class="on" onclick="goRef('seq',this)">🧵 <span data-i18n="refSeq">تسلسل خياطة الثوب والفحص</span></button>
+        <button onclick="goRef('def',this)">🔍 <span data-i18n="refDefects">دليل العيوب الشائعة</span></button>
+        <button onclick="goRef('chk',this)">✅ <span data-i18n="refChecklists">قوائم فحص المراحل</span></button>
+        <button onclick="goRef('gloss',this)">📖 <span data-i18n="refGloss">مسرد المصطلحات</span></button>
+      </div>
+      <div id="ref-body"></div>
+    </div>
   </div>
   <button class="fab" id="fab" onclick="fabAction()">＋</button>
 </div>
@@ -630,6 +641,8 @@ function renderDash(){if(!$('kpis'))return;
     <div class="note" style="margin-top:6px">✔ ${t('pass')}: ${pass} · ✘ ${t('fail')}: ${f}</div>`:empty(t('noData'));}
 
 /* ============ TOOLS ============ */
+function goTool(id,btn){['fp','sh','aq'].forEach(x=>$('tool-'+x).classList.toggle('hide',x!==id));
+  document.querySelectorAll('#tools-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');}
 function calcFP(){const Ln=+$('fp-len').value,W=+$('fp-wid').value,lim=+$('fp-lim').value||40;
   const pts=(+$('fp-1').value||0)*1+(+$('fp-2').value||0)*2+(+$('fp-3').value||0)*3+(+$('fp-4').value||0)*4;
   if(!Ln||!W){$('fp-res').innerHTML=`<span class="note">${t('enterLW')}</span>`;return;}
@@ -692,24 +705,27 @@ const CHECKLISTS=[
 ['التعبئة والشحن',[['طريقة التعبئة','حسب المواصفة','معاينة'],['بيانات الكرتون','Marks/الوزن','مطابقة'],['محتوى الكراتين','Solid/Assorted','فتح عشوائي'],['مستندات الشحن','مطابقة PO','مراجعة'],['إذن الشحن','تقرير + Release','إصدار']]]];
 const GLOSS=[['أول الخط','فحص أول قطعة قبل الإنتاج الكمّي'],['أثناء الخط','فحص دوري متنقل أثناء سير الخط (Inline)'],['نهاية الخط','فحص شامل في نهاية الخط (End of line)'],['حرجة','عملية تؤثر مباشرة على الشكل/الوظيفة'],['DHU','عدد العيوب لكل 100 قطعة'],['POM','نقاط القياس (Points of Measure)'],['AQL','الحد المقبول للجودة'],['4-Point','نظام نقاط فحص القماش'],['Shade','دفعة/تدرّج اللون'],['اختبار السحب','شدّ الزر للتأكد من التثبيت']];
 function catTag(c){const cls=c.indexOf('حرِج')>=0||c.indexOf('حرج')>=0?'tg-crit':(c==='كبير'?'tg-maj':'tg-min');return`<span class="tg ${cls}">${esc(c)}</span>`;}
+let REFSUB='seq',CHKSUB=0;
+function goRef(id,btn){REFSUB=id;document.querySelectorAll('#ref-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');renderRef();}
+function goChk(i,btn){CHKSUB=i;document.querySelectorAll('#chk-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');renderChk();}
+function renderChk(){const el=$('chk-body');if(!el)return;const [,rows]=CHECKLISTS[CHKSUB];
+  el.innerHTML=`<table class="rtbl" style="min-width:420px"><tr><th>${t('colItem')}</th><th>${t('colStd')}</th><th>${t('colTool')}</th></tr>
+    ${rows.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')}</table>`;}
 function renderRef(){const el=$('ref-body');if(!el)return;
-  const seqRows=SEQ.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r[0])}</td><td>${esc(r[1])}<div class="en">${esc(r[2])}</div></td>
-    <td>${esc(r[3])}</td><td>${r[4]==='حرجة'?catTag('حرِج'):esc(r[4])}</td><td>${esc(r[5])}</td><td>${esc(r[6])}</td>
-    <td><button class="mini" style="white-space:nowrap" onclick="inspFromRef('${esc(r[1]).replace(/'/g,"&#39;")}')">${t('recordInsp')}</button></td></tr>`).join('');
-  const seq=`<table class="rtbl"><tr><th>م</th><th>${t('colStage')}</th><th>${t('colOp')}</th><th>توقيت</th><th>${t('colImp')}</th><th>${t('colCheck')}</th><th>${t('colStd')}</th><th></th></tr>${seqRows}</table>`;
-  const defRows=DEFECTS.map((d,i)=>`<tr><td>${i+1}</td><td>${esc(d[0])}</td><td>${catTag(d[1])}</td><td>${esc(d[2])}</td><td>${esc(d[3])}</td><td>${esc(d[4])}</td></tr>`).join('');
-  const def=`<table class="rtbl"><tr><th>م</th><th>${t('colDefect')}</th><th>${t('colCat')}</th><th>الوصف</th><th>${t('colCause')}</th><th>${t('colAction')}</th></tr>${defRows}</table>`;
-  const chk=CHECKLISTS.map(([title,rows])=>acc(esc(title),
-    `<table class="rtbl" style="min-width:420px"><tr><th>${t('colItem')}</th><th>${t('colStd')}</th><th>${t('colTool')}</th></tr>
-    ${rows.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')}</table>`,false)).join('');
-  const gloss=`<table class="rtbl" style="min-width:320px"><tr><th>${t('colItem')}</th><th>المعنى</th></tr>${GLOSS.map(g=>`<tr><td><b>${esc(g[0])}</b></td><td>${esc(g[1])}</td></tr>`).join('')}</table>`;
-  el.innerHTML=
-    acc('🧵 '+t('refSeq'),seq,true)+
-    acc('🔍 '+t('refDefects'),def,false)+
-    acc('✅ '+t('refChecklists'),chk,false)+
-    acc('📖 '+t('refGloss'),gloss,false);}
-function acc(title,body,open){return `<div class="acc"><div class="acc-h${open?' open':''}" onclick="toggleAcc(this)"><span>${title}</span><span class="arw">▾</span></div><div class="acc-body" style="display:${open?'block':'none'}">${body}</div></div>`;}
-function toggleAcc(h){const b=h.nextElementSibling;const isOpen=b.style.display!=='none';b.style.display=isOpen?'none':'block';h.classList.toggle('open',!isOpen);}
+  if(REFSUB==='seq'){
+    const seqRows=SEQ.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r[0])}</td><td>${esc(r[1])}<div class="en">${esc(r[2])}</div></td>
+      <td>${esc(r[3])}</td><td>${r[4]==='حرجة'?catTag('حرِج'):esc(r[4])}</td><td>${esc(r[5])}</td><td>${esc(r[6])}</td>
+      <td><button class="mini" style="white-space:nowrap" onclick="inspFromRef('${esc(r[1]).replace(/'/g,"&#39;")}')">${t('recordInsp')}</button></td></tr>`).join('');
+    el.innerHTML=`<table class="rtbl"><tr><th>م</th><th>${t('colStage')}</th><th>${t('colOp')}</th><th>توقيت</th><th>${t('colImp')}</th><th>${t('colCheck')}</th><th>${t('colStd')}</th><th></th></tr>${seqRows}</table>`;
+  }else if(REFSUB==='def'){
+    const defRows=DEFECTS.map((d,i)=>`<tr><td>${i+1}</td><td>${esc(d[0])}</td><td>${catTag(d[1])}</td><td>${esc(d[2])}</td><td>${esc(d[3])}</td><td>${esc(d[4])}</td></tr>`).join('');
+    el.innerHTML=`<table class="rtbl"><tr><th>م</th><th>${t('colDefect')}</th><th>${t('colCat')}</th><th>الوصف</th><th>${t('colCause')}</th><th>${t('colAction')}</th></tr>${defRows}</table>`;
+  }else if(REFSUB==='chk'){
+    el.innerHTML=`<div class="subnav" id="chk-subnav">${CHECKLISTS.map((c,i)=>`<button class="${i===CHKSUB?'on':''}" onclick="goChk(${i},this)">${esc(c[0])}</button>`).join('')}</div><div id="chk-body"></div>`;
+    renderChk();
+  }else if(REFSUB==='gloss'){
+    el.innerHTML=`<table class="rtbl" style="min-width:320px"><tr><th>${t('colItem')}</th><th>المعنى</th></tr>${GLOSS.map(g=>`<tr><td><b>${esc(g[0])}</b></td><td>${esc(g[1])}</td></tr>`).join('')}</table>`;
+  }}
 
 /* ============ INIT ============ */
 if('serviceWorker' in navigator){
