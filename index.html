@@ -167,13 +167,13 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
     </div>
   </div>
   <div class="nav">
-    <button class="on" onclick="go('fact',this)">🏭 <span data-i18n="navFact">المصانع</span></button>
-    <button onclick="go('orders',this)">📦 <span data-i18n="navOrders">الطلبيات</span></button>
-    <button onclick="go('insp',this)">✅ <span data-i18n="navInsp">الفحوصات</span></button>
-    <button onclick="go('dash',this)">📊 <span data-i18n="navDash">المؤشرات</span></button>
-    <button onclick="go('tools',this)">🧮 <span data-i18n="navTools">الأدوات</span></button>
-    <button onclick="go('ref',this)">📋 <span data-i18n="navRef">المراجع</span></button>
-    <button onclick="go('toolchk',this)">🧪 <span data-i18n="navToolChk">سجل فحص القماش</span></button>
+    <button class="on" onclick="go('fact',this)" oncontextmenu="return navInfo('fact',event)">🏭 <span data-i18n="navFact">المصانع</span></button>
+    <button onclick="go('orders',this)" oncontextmenu="return navInfo('orders',event)">📦 <span data-i18n="navOrders">الطلبيات</span></button>
+    <button onclick="go('insp',this)" oncontextmenu="return navInfo('insp',event)">✅ <span data-i18n="navInsp">الفحوصات</span></button>
+    <button onclick="go('dash',this)" oncontextmenu="return navInfo('dash',event)">📊 <span data-i18n="navDash">المؤشرات</span></button>
+    <button onclick="go('tools',this)" oncontextmenu="return navInfo('tools',event)">🧮 <span data-i18n="navTools">الأدوات</span></button>
+    <button onclick="go('ref',this)" oncontextmenu="return navInfo('ref',event)">📋 <span data-i18n="navRef">المراجع</span></button>
+    <button onclick="go('toolchk',this)" oncontextmenu="return navInfo('toolchk',event)">🧪 <span data-i18n="navToolChk">سجل فحص القماش</span></button>
   </div>
   <div class="wrap">
     <div id="p-dash" class="hide">
@@ -273,6 +273,13 @@ name:'الاسم',namePh:'اسمك الكامل',loginBtn:'دخول',createAccBt
 wsTitle:'مساحة العمل',wsSub:'أنشئ مساحة جديدة أو انضم بكود',createTab:'إنشاء مساحة',joinTab:'انضمام بكود',
 wsNameLbl:'اسم مساحة العمل (الشركة/القسم)',wsNamePh:'مثال: جودة الشياكة',createBtn:'إنشاء',codeLbl:'كود مساحة العمل',joinBtn:'انضمام',logout:'تسجيل الخروج',
 appName:'متابعة الجودة',navDash:'المؤشرات',navInsp:'الفحوصات',navOrders:'الطلبيات',navFact:'المصانع',navTools:'الأدوات',navRef:'المراجع',navToolChk:'سجل فحص القماش',
+navDescfact:'إدارة قائمة المصانع والموردين الذين تتعامل معهم: إضافة مصنع جديد باسمه ودولته وجهة الاتصال، وتعديل أو حذف المصانع الحالية. كل طلبية وكل فحص يُربط بمصنع من هذه القائمة.',
+navDescorders:'تسجيل طلبيات الإنتاج (PO): ربط كل طلبية بمصنع مع رقمها والموديل والصنف والكمية واللون. الكمية تُستخدم تلقائياً لتحديد حجم عينة الفحص حسب جدول AQL.',
+navDescinsp:'تسجيل فحوصات الجودة على الطلبيات (أثناء الخط أو نهائي): إدخال حجم العينة والعيوب المكتشفة، وحساب DHU وقرار القبول/الرفض تلقائياً حسب AQL، مع إمكانية إرفاق صور وطباعة تقرير لكل فحص وتصدير الكل إلى Excel.',
+navDescdash:'لوحة مؤشرات حية تلخص الأداء: إجمالي الفحوصات، متوسط معدل العيوب DHU، نسبة الاجتياز RFT، عدد الطلبيات، رسم بياني لآخر الفحوصات، وتوزيع قرارات القبول والرفض.',
+navDesctools:'حاسبات الجودة المساعدة: نظام النقاط الأربع لفحص القماش، حاسبة الانكماش، جدول AQL التفاعلي، بالإضافة لوضع الفحص الشامل الذي ينفذ الثلاث عمليات دفعة واحدة ويحفظها بتقرير واحد.',
+navDescref:'المراجع الفنية: تسلسل عمليات خياطة الثوب مع نقاط الفحص والمعايير، دليل العيوب الشائعة، قوائم فحص المراحل (من استلام الأقمشة حتى الشحن)، ومسرد المصطلحات.',
+navDesctoolchk:'سجل الفحوصات المحفوظة من أدوات الجودة (النقاط الأربع، الانكماش، AQL، والفحص الشامل) مرتبطة بالمصنع والتاريخ، مع طباعة تقرير لكل فحص أو حذفه.',
 refTitle:'المراجع الفنية',refSeq:'تسلسل خياطة الثوب والفحص',refDefects:'دليل العيوب الشائعة',refChecklists:'قوائم فحص المراحل',refGloss:'مسرد المصطلحات',
 colStage:'المرحلة',colOp:'العملية',colCheck:'الفحص',colStd:'المعيار',colImp:'الأهمية',colDefect:'العيب',colCat:'التصنيف',colCause:'السبب',colAction:'الإجراء',colItem:'البند',colTool:'الأداة',
 dashTitle:'لوحة المؤشرات',chartTitle:'معدل العيوب (DHU) — آخر الفحوصات',decTitle:'توزيع القرارات',
@@ -334,6 +341,13 @@ name:'Name',namePh:'Your full name',loginBtn:'Login',createAccBtn:'Create accoun
 wsTitle:'Workspace',wsSub:'Create a new workspace or join by code',createTab:'Create',joinTab:'Join by code',
 wsNameLbl:'Workspace name (company/dept)',wsNamePh:'e.g. Shiaka QC',createBtn:'Create',codeLbl:'Workspace code',joinBtn:'Join',logout:'Sign out',
 appName:'QC Tracking',navDash:'Dashboard',navInsp:'Inspections',navOrders:'Orders',navFact:'Factories',navTools:'Tools',navRef:'Reference',navToolChk:'Fabric Test Log',
+navDescfact:'Manage the list of factories and suppliers you work with: add a factory with its name, country, and contact, and edit or delete existing ones. Every order and inspection is linked to a factory from this list.',
+navDescorders:'Register production orders (POs): link each order to a factory with its number, model, item, quantity, and color. The quantity automatically determines the inspection sample size per the AQL table.',
+navDescinsp:'Record quality inspections on orders (inline or final): enter the sample size and defects found; DHU and the accept/reject decision are computed automatically per AQL, with photo attachments, a printable report per inspection, and Excel export.',
+navDescdash:'A live dashboard summarizing performance: total inspections, average DHU, pass rate (RFT), order count, a chart of recent inspections, and the accept/reject decision split.',
+navDesctools:'Quality calculators: the 4-Point fabric system, the shrinkage calculator, the interactive AQL table, plus a combined mode that runs all three tests in one batch saved as a single record with one report.',
+navDescref:'Technical references: the thobe sewing operation sequence with checkpoints and standards, the common defects guide, stage checklists (from fabric receiving to shipping), and a glossary.',
+navDesctoolchk:'The log of checks saved from the quality tools (4-Point, shrinkage, AQL, and combined) linked to factory and date, with a printable report per check and delete.',
 refTitle:'Technical Reference',refSeq:'Thobe sewing sequence & QC',refDefects:'Common defects guide',refChecklists:'Stage checklists',refGloss:'Glossary',
 colStage:'Stage',colOp:'Operation',colCheck:'Check',colStd:'Standard',colImp:'Priority',colDefect:'Defect',colCat:'Category',colCause:'Cause',colAction:'Action',colItem:'Item',colTool:'Tool',
 dashTitle:'Dashboard',chartTitle:'DHU — recent inspections',decTitle:'Decisions',
@@ -485,6 +499,10 @@ function go(tb,btn){TAB=tb;['dash','insp','orders','fact','tools','ref','toolchk
   $('fab').style.display=['insp','orders','fact'].includes(tb)?'flex':'none';if(tb==='dash')renderDash();if(tb==='ref')renderRef();
   if(tb==='tools')renderToolFactSelects();if(tb==='toolchk')renderToolChk();}
 function fabAction(){if(TAB==='fact')factForm();else if(TAB==='orders')orderForm();else if(TAB==='insp')inspForm();}
+const NAV_TITLE={fact:'navFact',orders:'navOrders',insp:'navInsp',dash:'navDash',tools:'navTools',ref:'navRef',toolchk:'navToolChk'};
+function navInfo(id,e){e.preventDefault();modal(`<h3>${esc(t(NAV_TITLE[id]))}</h3>
+  <p style="line-height:1.7;color:var(--mut)">${esc(t('navDesc'+id))}</p>
+  <div class="row-btns"><button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);return false;}
 function openMenu(){const owner=MEMBER.role==='owner';modal(`<h3>${t('settings')}</h3>
   <div class="item"><div class="s">${esc(ME.email)} · ${roleTxt()}</div></div>
   <label class="inl">${t('yourName')}</label>
