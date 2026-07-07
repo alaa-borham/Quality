@@ -212,7 +212,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <div><label class="inl" data-i18n="fp4">أكثر من 9 أو ثقب (×4)</label><input id="fp-4" type="number" value="0"></div></div>
         <label class="inl" data-i18n="fpLim">الحد المسموح (نقطة/100ياردة²)</label><input id="fp-lim" type="number" value="40">
         <div class="row-btns"><button class="btn" onclick="calcFP()" data-i18n="calc">احسب</button>
-        <button class="btn sec" onclick="saveToolCheck('fp')" data-i18n="saveCheck">💾 حفظ</button></div>
+        <button class="btn sec" id="fp-save" onclick="saveToolCheck('fp')" data-i18n="saveCheck">💾 حفظ</button></div>
         <div class="res-box" id="fp-res"></div>
       </div>
       <div id="tool-sh" class="card hide">
@@ -224,7 +224,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <div><label class="inl" data-i18n="shWa">العرض بعد</label><input id="sh-wa" type="number" value="143"></div></div>
         <label class="inl" data-i18n="shLim">الحد المسموح %</label><input id="sh-lim" type="number" value="3">
         <div class="row-btns"><button class="btn" onclick="calcSH()" data-i18n="calc">احسب</button>
-        <button class="btn sec" onclick="saveToolCheck('sh')" data-i18n="saveCheck">💾 حفظ</button></div>
+        <button class="btn sec" id="sh-save" onclick="saveToolCheck('sh')" data-i18n="saveCheck">💾 حفظ</button></div>
         <div class="res-box" id="sh-res"></div>
       </div>
       <div id="tool-aq" class="card hide">
@@ -234,7 +234,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <div><label class="inl" data-i18n="aqlMaj">عيوب كبيرة مكتشفة</label><input id="aq-maj" type="number" value="0"></div></div>
         <label class="inl" data-i18n="aqlMin">عيوب صغيرة مكتشفة</label><input id="aq-min" type="number" value="0">
         <div class="row-btns"><button class="btn" onclick="calcAQL()" data-i18n="calc">احسب</button>
-        <button class="btn sec" onclick="saveToolCheck('aq')" data-i18n="saveCheck">💾 حفظ</button></div>
+        <button class="btn sec" id="aq-save" onclick="saveToolCheck('aq')" data-i18n="saveCheck">💾 حفظ</button></div>
         <div class="res-box" id="aq-res"></div>
       </div>
     </div>
@@ -700,7 +700,8 @@ function renderDash(){if(!$('kpis'))return;
 /* ============ TOOLS ============ */
 function goTool(id,btn){const all=id==='all';
   ['fp','sh','aq'].forEach(x=>{$('tool-'+x).classList.toggle('hide',!all&&x!==id);
-    const fr=$(x+'-factrow');if(fr)fr.classList.toggle('hide',all);});
+    const fr=$(x+'-factrow');if(fr)fr.classList.toggle('hide',all);
+    const sv=$(x+'-save');if(sv)sv.classList.toggle('hide',all);});
   $('tool-all').classList.toggle('hide',!all);
   document.querySelectorAll('#tools-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');}
 function toolInfo(id,e){e.preventDefault();modal(`<h3>${esc(t(id==='fp'?'fpTitle':(id==='sh'?'shTitle':(id==='aq'?'aqlTitle':'allTitle'))))}</h3>
