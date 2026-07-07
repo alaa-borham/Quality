@@ -334,6 +334,11 @@ loginIdLbl:'البريد الإلكتروني أو اسم المستخدم',logi
 aqlCfgTitle:'حدود القبول (AQL)',aqlCfgBtn:'تعديل حدود القبول والعينات',critMaxLbl:'الحد الأقصى للعيوب الحرجة (عادة 0)',
 aqlCfgHint:'حد الرفض = حد القبول + 1 تلقائياً. تُطبق هذه الحدود على كل الفحوصات الجديدة وحاسبة AQL وحجم العينة التلقائي.',
 restoreDef:'استعادة الافتراضي',restoreDefQ:'استعادة الجدول الافتراضي (AQL كبير 2.5 / صغير 4.0)؟',aqlSaved:'تم حفظ حدود القبول',badNums:'أدخل أرقاماً صحيحة (العينة أكبر من صفر)',
+aqlInfolot:'حجم الشحنة = إجمالي عدد قطع الطلبية كاملة (الكمية التي أنتجها المصنع)، وليس عدد القطع التي ستفحصها. النظام يحدد منه حجم العينة تلقائياً — مثال: طلبية 1000 قطعة تقع في نطاق 501–1200.',
+aqlInfosample:'العينة = عدد القطع التي تُسحب عشوائياً من الشحنة وتُفحص فعلياً. مثال: شحنة 1000 قطعة ← تفحص 80 قطعة فقط.',
+aqlInfomaj:'حد قبول العيوب الكبيرة داخل العينة: إذا وجدت عيوباً كبيرة أكثر من هذا العدد تُرفض الشحنة (حد الرفض = هذا الحد + 1). العيب الكبير يؤثر على شكل أو استخدام القطعة.',
+aqlInfomin:'حد قبول العيوب الصغيرة داخل العينة، بنفس فكرة العيوب الكبيرة لكن بسقف أعلى — العيب الصغير لا يمنع الاستخدام لكنه يقلل الجودة.',
+aqlInfocrit:'العيوب الحرجة هي الخطرة على السلامة (مثل إبرة مكسورة داخل القطعة). تجاوز هذا الحد يرفض الفحص فوراً مهما كانت بقية النتائج — والمعيار العالمي 0 (لا تسامح).',
 inspSaved:'تم حفظ الفحص',dhuShort:'DHU',acBig:'حد قبول كبير',acSmall:'صغير',sampleShort:'العينة',
 photosLbl:'الصور (اختياري)',addPhoto:'📷 إضافة صورة',maxPhotos:'الحد الأقصى 4 صور',reportBtn:'تقرير',exportCsv:'⬇ تصدير Excel',printBtn:'🖨 طباعة / حفظ PDF',
 repTitle:'تقرير فحص الجودة',repDecision:'القرار النهائي',repNotes:'ملاحظات',repInspector:'المفتش',repDate:'التاريخ',repPhotos:'الصور',repClose:'إغلاق',compressing:'جارٍ معالجة الصورة…',
@@ -420,6 +425,11 @@ loginIdLbl:'Email or username',loginIdPh:'you@example.com or ahmed',
 aqlCfgTitle:'Acceptance limits (AQL)',aqlCfgBtn:'Edit acceptance limits & samples',critMaxLbl:'Max critical defects (usually 0)',
 aqlCfgHint:'Reject limit = accept limit + 1 automatically. These limits apply to all new inspections, the AQL calculator, and the auto sample size.',
 restoreDef:'Restore defaults',restoreDefQ:'Restore the default table (AQL Major 2.5 / Minor 4.0)?',aqlSaved:'Acceptance limits saved',badNums:'Enter valid numbers (sample must be > 0)',
+aqlInfolot:'Lot size = the total number of pieces in the whole order (the quantity the factory produced), not how many you will inspect. The system derives the sample size from it — e.g. a 1000-piece order falls in the 501-1200 range.',
+aqlInfosample:'Sample = how many pieces are drawn at random from the lot and actually inspected. Example: a 1000-piece lot means you inspect only 80 pieces.',
+aqlInfomaj:'Acceptance limit for major defects within the sample: more than this number rejects the lot (reject limit = this + 1). A major defect affects the look or usability of the piece.',
+aqlInfomin:'Acceptance limit for minor defects within the sample — same idea as major, with a higher ceiling; a minor defect lowers quality without preventing use.',
+aqlInfocrit:'Critical defects are safety hazards (e.g. a broken needle inside a garment). Exceeding this limit fails the inspection immediately regardless of everything else — the global standard is 0 (zero tolerance).',
 inspSaved:'Inspection saved',dhuShort:'DHU',acBig:'Major Ac',acSmall:'Minor',sampleShort:'Sample',
 photosLbl:'Photos (optional)',addPhoto:'📷 Add photo',maxPhotos:'Max 4 photos',reportBtn:'Report',exportCsv:'⬇ Export Excel',printBtn:'🖨 Print / save PDF',
 repTitle:'Quality Inspection Report',repDecision:'Final decision',repNotes:'Notes',repInspector:'Inspector',repDate:'Date',repPhotos:'Photos',repClose:'Close',compressing:'Processing image…',
@@ -632,14 +642,17 @@ function saveEmpPerms(uid){const perms={fact:$('e-p-fact').checked,del:$('e-p-de
 function removeEmp(uid){if(!confirm(t('delMemberQ')))return;
   db.collection('qc_members').doc(uid).delete().then(()=>{toast(t('deleted'));renderEmps();}).catch(e=>toast(rulesHint(e)));}
 const AQL_RANGES=['2–150','151–280','281–500','501–1200','1201–3200','3201–10000','10001+'];
+function aqlInfo(k){const el=$('aql-info');if(!el)return;el.textContent=t('aqlInfo'+k);el.style.display='block';}
 function aqlForm(){if(!isOwner())return;const tab=WSAQL||AQLTAB;
+  const inf=k=>`<span style="cursor:pointer" onclick="aqlInfo('${k}')">ℹ️</span>`;
   modal(`<h3>⚙️ ${t('aqlCfgTitle')}</h3>
-  <div style="overflow-x:auto"><table class="rtbl" style="min-width:320px"><tr><th>${t('aqlLot')}</th><th>${t('sampleShort')}</th><th>${t('acBig')}</th><th>${t('acSmall')}</th></tr>
+  <div style="overflow-x:auto"><table class="rtbl" style="min-width:320px"><tr><th style="white-space:nowrap">${t('aqlLot')} ${inf('lot')}</th><th style="white-space:nowrap">${t('sampleShort')} ${inf('sample')}</th><th style="white-space:nowrap">${t('acBig')} ${inf('maj')}</th><th style="white-space:nowrap">${t('acSmall')} ${inf('min')}</th></tr>
   ${tab.map((r,i)=>`<tr><td style="white-space:nowrap">${AQL_RANGES[i]||r[0]}</td>
     <td><input class="aq-s" type="number" value="${r[1]}" style="min-width:64px;padding:6px"></td>
     <td><input class="aq-m" type="number" value="${r[2]}" style="min-width:64px;padding:6px"></td>
     <td><input class="aq-n" type="number" value="${r[4]}" style="min-width:64px;padding:6px"></td></tr>`).join('')}</table></div>
-  <label class="inl">${t('critMaxLbl')}</label><input id="aq-crit" type="number" value="${WSCRIT||0}">
+  <div id="aql-info" style="display:none;margin-top:8px;padding:10px;background:#eef6f6;border-radius:8px;font-size:13px;line-height:1.7;color:#3a4551"></div>
+  <label class="inl">${t('critMaxLbl')} ${inf('crit')}</label><input id="aq-crit" type="number" value="${WSCRIT||0}">
   <div class="note" style="margin-top:6px">${t('aqlCfgHint')}</div>
   <div class="row-btns"><button class="btn" onclick="saveAqlCfg()">${t('save')}</button>
   <button class="btn sec" onclick="resetAqlCfg()">${t('restoreDef')}</button></div>
@@ -857,7 +870,7 @@ function removeDef(i){const d=INSP_DEFECTS[i];if(!d)return;bump(d.cat,-1);INSP_D
 function renderDefList(){const el=$('i-deflist');if(!el)return;
   el.innerHTML=INSP_DEFECTS.map((d,i)=>`<span class="tg ${d.cat.indexOf('حر')>=0?'tg-crit':(d.cat==='كبير'?'tg-maj':'tg-min')}" style="margin:0 0 6px 6px;display:inline-flex;align-items:center;gap:6px;padding:4px 10px">${esc(d.name)}
     <b style="cursor:pointer" onclick="removeDef(${i})">✕</b></span>`).join('');}
-function inspFromRef(op){go('insp',document.querySelectorAll('.nav button')[2]);inspForm({stage:op});}
+function inspFromRef(op){go('insp',document.querySelectorAll('.nav button')[2]);inspForm({type:'أثناء الخط',stage:op});}
 function renderThumbs(){const el=$('i-photos');if(!el)return;
   el.innerHTML=INSP_PHOTOS.map((p,idx)=>`<div class="tw"><img src="${p}"><div class="rm" onclick="rmPhoto(${idx})">✕</div></div>`).join('');}
 function rmPhoto(i){INSP_PHOTOS.splice(i,1);renderThumbs();}
