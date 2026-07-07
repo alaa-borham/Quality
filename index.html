@@ -600,12 +600,11 @@ function renderOrders(){const el=$('orders-list');if(!el)return;if(!ORDERS.lengt
 function inspForm(i,presetOrder){i=i||{};if(!ORDERS.length){toast(t('addFactFirst'));go('orders',document.querySelectorAll('.nav button')[2]);return;}
   const oid=i.orderId||presetOrder||ORDERS[0].id;
   const opts=ORDERS.map(o=>`<option value="${o.id}" ${oid===o.id?'selected':''}>${esc(o.po)} · ${esc(o.factoryName||'')}</option>`).join('');
-  const types=[['أثناء الخط',t('typeInline')],['الفحص النهائي',t('typeFinal')]].concat(CHECKLISTS.map(c=>[c[0],c[0]]));
   const locked=!!i.type||(TAB==='insp'&&INSPFILTER!=='all');
   const defType=i.type||(TAB==='insp'&&INSPFILTER!=='all'?INSPFILTER:'الفحص النهائي');
   const typeOpts=locked
-    ?`<option value="${esc(defType)}" selected>${esc(typeLabel(defType))}</option>`
-    :types.map(([v,lbl])=>`<option value="${v}" ${defType===v?'selected':''}>${lbl}</option>`).join('');
+    ?`<option value="${esc(defType)}" selected>${typeIcon(defType)} ${esc(typeLabel(defType))}</option>`
+    :TYPE_ORDER.map(v=>`<option value="${esc(v)}" ${defType===v?'selected':''}>${typeIcon(v)} ${esc(typeLabel(v))}</option>`).join('');
   modal(`<h3>${i.id?t('inspEdit'):t('inspNew')}</h3>
   <label class="inl">${t('orderLbl')}</label><select id="i-order">${opts}</select>
   <div class="grid2"><div><label class="inl">${t('typeLbl')}</label><select id="i-type" onchange="onInspTypeChange()">${typeOpts}</select></div>
@@ -702,12 +701,15 @@ function saveInsp(id){const oid=$('i-order').value,o=ORDERS.find(x=>x.id===oid)|
   p.then(()=>{closeModal();toast(t('inspSaved'));}).catch(e=>toast(rulesHint(e)));}
 function delInsp(id){if(!confirm(t('delInspQ')))return;db.collection('qc_inspections').doc(id).delete().then(()=>toast(t('deleted')));}
 function typeLabel(v){return v==='أثناء الخط'?t('typeInline'):(v==='الفحص النهائي'?t('typeFinal'):v);}
+const TYPE_ORDER=['استلام وفحص الأقمشة','ما قبل الإنتاج (PP)','القص','أثناء الخط','التشطيب والكي','الفحص النهائي','الفحص النهائي (AQL)','التعبئة والشحن'];
+const TYPE_ICONS={'استلام وفحص الأقمشة':'🧵','ما قبل الإنتاج (PP)':'📝','القص':'✂️','أثناء الخط':'🪡','التشطيب والكي':'♨️','الفحص النهائي':'✅','الفحص النهائي (AQL)':'📊','التعبئة والشحن':'📦'};
+function typeIcon(v){return TYPE_ICONS[v]||'✅';}
 function editInsp(id){const i=INSP.find(x=>x.id===id);if(i)inspForm(i);}
 let INSPFILTER='all';
 function goInspFilter(v){INSPFILTER=v;renderInsp();}
 function renderInsp(){const el=$('insp-list');if(!el)return;if(!INSP.length){el.innerHTML=empty(t('noInsp'));return;}
   const fbtn=(v,lbl)=>`<button class="${INSPFILTER===v?'on':''}" onclick="goInspFilter('${v.replace(/'/g,"\\'")}')">${lbl}</button>`;
-  const bar=`<div class="subnav">${fbtn('all',t('typeAll'))}${fbtn('أثناء الخط',t('typeInline'))}${fbtn('الفحص النهائي',t('typeFinal'))}${CHECKLISTS.map(c=>fbtn(c[0],esc(c[0]))).join('')}</div>
+  const bar=`<div class="subnav">${fbtn('all','📋 '+t('typeAll'))}${TYPE_ORDER.map(v=>fbtn(v,typeIcon(v)+' '+esc(typeLabel(v)))).join('')}</div>
   <div style="display:flex;gap:8px;margin-bottom:10px"><button class="mini g" onclick="exportCSV()">${t('exportCsv')}</button></div>`;
   const list=INSP.filter(i=>INSPFILTER==='all'||i.type===INSPFILTER);
   if(!list.length){el.innerHTML=bar+empty(t('noData'));return;}
@@ -715,7 +717,7 @@ function renderInsp(){const el=$('insp-list');if(!el)return;if(!INSP.length){el.
     const sum=(i.checklist&&i.checklist.length)
       ?`${t('chkItemsLbl')}: <b>${i.checklist.filter(x=>x.status==='pass').length}/${i.checklist.length}</b> ${t('statusPass')}`
       :`${t('sampleShort')} ${i.sampleSize} · ${t('majorLbl')} ${i.major} · ${t('minorLbl')} ${i.minor} · ${t('criticalLbl')} ${i.critical} · <b>${t('dhuShort')} ${i.dhu}</b>`;
-    return `<div class="item"><div class="h"><div><div class="t">${esc(i.po||'—')} <span class="chip">${esc(typeLabel(i.type))}</span>${ph?`<span class="chip">📷 ${ph}</span>`:''}</div>
+    return `<div class="item"><div class="h"><div><div class="t">${esc(i.po||'—')} <span class="chip">${typeIcon(i.type)} ${esc(typeLabel(i.type))}</span>${ph?`<span class="chip">📷 ${ph}</span>`:''}</div>
     <div class="s">🏭 ${esc(i.factoryName||'')} · ${fmtDate(i.date)} · 👤 ${esc(i.inspector||'')}<br>
     ${sum}</div></div>
     <span class="badge ${b}">${i.decision==='PASS'?t('pass'):t('fail')}</span></div>
