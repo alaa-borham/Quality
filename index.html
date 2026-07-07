@@ -299,6 +299,7 @@ inspNew:'فحص جديد',inspEdit:'تعديل فحص',orderLbl:'الطلبية 
 sampleLbl:'حجم العينة *',majorLbl:'عيوب كبيرة',minorLbl:'عيوب صغيرة',criticalLbl:'عيوب حرجة',notesLbl:'ملاحظات',
 saveInsp:'حفظ الفحص',enterSample:'أدخل حجم العينة',noInsp:'لا توجد فحوصات. أضف فحصاً بزر ＋',delInspQ:'حذف الفحص؟',
 typeInline:'أثناء الخط',typeFinal:'الفحص النهائي',typeAll:'الكل',prevHint:'أدخل حجم العينة لعرض القرار',
+chkItemsLbl:'بنود الفحص',statusPass:'مطابق',statusFail:'غير مطابق',statusNA:'لا ينطبق',
 inspSaved:'تم حفظ الفحص',dhuShort:'DHU',acBig:'حد قبول كبير',acSmall:'صغير',sampleShort:'العينة',
 photosLbl:'الصور (اختياري)',addPhoto:'📷 إضافة صورة',maxPhotos:'الحد الأقصى 4 صور',reportBtn:'تقرير',exportCsv:'⬇ تصدير Excel',printBtn:'🖨 طباعة / حفظ PDF',
 repTitle:'تقرير فحص الجودة',repDecision:'القرار النهائي',repNotes:'ملاحظات',repInspector:'المفتش',repDate:'التاريخ',repPhotos:'الصور',repClose:'إغلاق',compressing:'جارٍ معالجة الصورة…',
@@ -367,6 +368,7 @@ inspNew:'New inspection',inspEdit:'Edit inspection',orderLbl:'Order *',typeLbl:'
 sampleLbl:'Sample size *',majorLbl:'Major defects',minorLbl:'Minor defects',criticalLbl:'Critical defects',notesLbl:'Notes',
 saveInsp:'Save inspection',enterSample:'Enter sample size',noInsp:'No inspections yet. Add one with ＋',delInspQ:'Delete inspection?',
 typeInline:'Inline',typeFinal:'Final inspection',typeAll:'All',prevHint:'Enter sample size to preview the decision',
+chkItemsLbl:'Checklist items',statusPass:'Conforms',statusFail:'Non-conforming',statusNA:'N/A',
 inspSaved:'Inspection saved',dhuShort:'DHU',acBig:'Major Ac',acSmall:'Minor',sampleShort:'Sample',
 photosLbl:'Photos (optional)',addPhoto:'📷 Add photo',maxPhotos:'Max 4 photos',reportBtn:'Report',exportCsv:'⬇ Export Excel',printBtn:'🖨 Print / save PDF',
 repTitle:'Quality Inspection Report',repDecision:'Final decision',repNotes:'Notes',repInspector:'Inspector',repDate:'Date',repPhotos:'Photos',repClose:'Close',compressing:'Processing image…',
@@ -588,12 +590,13 @@ function renderOrders(){const el=$('orders-list');if(!el)return;if(!ORDERS.lengt
 function inspForm(i,presetOrder){i=i||{};if(!ORDERS.length){toast(t('addFactFirst'));go('orders',document.querySelectorAll('.nav button')[2]);return;}
   const oid=i.orderId||presetOrder||ORDERS[0].id;
   const opts=ORDERS.map(o=>`<option value="${o.id}" ${oid===o.id?'selected':''}>${esc(o.po)} · ${esc(o.factoryName||'')}</option>`).join('');
-  const types=[['أثناء الخط',t('typeInline')],['الفحص النهائي',t('typeFinal')]];
+  const types=[['أثناء الخط',t('typeInline')],['الفحص النهائي',t('typeFinal')]].concat(CHECKLISTS.map(c=>[c[0],c[0]]));
   const typeOpts=types.map(([v,lbl])=>`<option value="${v}" ${(i.type||'الفحص النهائي')===v?'selected':''}>${lbl}</option>`).join('');
   modal(`<h3>${i.id?t('inspEdit'):t('inspNew')}</h3>
   <label class="inl">${t('orderLbl')}</label><select id="i-order">${opts}</select>
-  <div class="grid2"><div><label class="inl">${t('typeLbl')}</label><select id="i-type">${typeOpts}</select></div>
+  <div class="grid2"><div><label class="inl">${t('typeLbl')}</label><select id="i-type" onchange="onInspTypeChange()">${typeOpts}</select></div>
     <div><label class="inl">${t('dateLbl')}</label><input id="i-date" type="date" value="${i.date||today()}"></div></div>
+  <div id="aql-sec">
   <label class="inl">${t('stageLbl')}</label>
   <select id="i-stage" onchange="onStageChange()"><option value="">${t('selectStage')}</option>${stageOptions(i.stage)}</select>
   <div id="i-stage-hint" class="note" style="margin-top:4px"></div>
@@ -605,6 +608,11 @@ function inspForm(i,presetOrder){i=i||{};if(!ORDERS.length){toast(t('addFactFirs
   <div style="display:flex;gap:8px"><select id="i-defsel">${allDefects().map(d=>`<option value="${esc(d.name)}">${esc(d.name)} — ${esc(d.cat)}</option>`).join('')}</select>
     <button type="button" class="mini" onclick="addDefectFromLib()">${t('addDefBtn')}</button></div>
   <div id="i-deflist" style="margin-top:8px"></div>
+  </div>
+  <div id="chk-sec" class="hide">
+  <label class="inl">${t('chkItemsLbl')}</label>
+  <div id="chk-items"></div>
+  </div>
   <label class="inl">${t('notesLbl')}</label><textarea id="i-notes" rows="2">${esc(i.notes||'')}</textarea>
   <label class="inl">${t('photosLbl')}</label>
   <input id="i-photo-input" type="file" accept="image/*" capture="environment" style="display:none" onchange="onPhotoPick(event)">
@@ -615,8 +623,23 @@ function inspForm(i,presetOrder){i=i||{};if(!ORDERS.length){toast(t('addFactFirs
   <button class="btn sec" onclick="closeModal()">${t('cancel')}</button></div>`);
   const o=ORDERS.find(x=>x.id===oid);if(o&&!i.sampleSize)$('i-samp').value=aqlFor(o.qty).sample;
   INSP_PHOTOS=(i.photos||[]).slice();renderThumbs();
-  INSP_DEFECTS=(i.defects||[]).slice();renderDefList();onStageChange();previewDecision();}
-let INSP_PHOTOS=[],INSP_DEFECTS=[];
+  INSP_DEFECTS=(i.defects||[]).slice();INSP_CHKRES=(i.checklist||[]).slice();
+  renderDefList();onStageChange();onInspTypeChange();}
+let INSP_PHOTOS=[],INSP_DEFECTS=[],INSP_CHKRES=[];
+function isChkType(v){return CHECKLISTS.some(c=>c[0]===v);}
+function onInspTypeChange(){const v=$('i-type').value,chk=isChkType(v);
+  $('aql-sec').classList.toggle('hide',chk);$('chk-sec').classList.toggle('hide',!chk);
+  if(chk)renderInspChkItems(v);previewDecision();}
+function renderInspChkItems(type){const cl=CHECKLISTS.find(c=>c[0]===type);if(!cl)return;
+  const cur={};INSP_CHKRES.forEach(r=>cur[r.name]=r.status);
+  $('chk-items').innerHTML=cl[1].map(r=>`<div class="grid2" style="align-items:center;margin-bottom:8px">
+    <div><b>${esc(r[0])}</b><div class="note">${esc(r[1])} · ${esc(r[2])}</div></div>
+    <select class="chk-item" onchange="previewDecision()" data-name="${esc(r[0])}" data-std="${esc(r[1])}" data-tool="${esc(r[2])}">
+      <option value="pass" ${cur[r[0]]!=='fail'&&cur[r[0]]!=='na'?'selected':''}>${t('statusPass')}</option>
+      <option value="fail" ${cur[r[0]]==='fail'?'selected':''}>${t('statusFail')}</option>
+      <option value="na" ${cur[r[0]]==='na'?'selected':''}>${t('statusNA')}</option>
+    </select></div>`).join('');}
+function readChkItems(){return [...document.querySelectorAll('.chk-item')].map(s=>({name:s.dataset.name,std:s.dataset.std,tool:s.dataset.tool,status:s.value}));}
 function stageOptions(sel){let out='',cur='';curSeq().filter(r=>r.cat!=='تجهيز'&&r.cat!=='نهاية الخط').forEach(r=>{if(r.cat!==cur){if(cur)out+='</optgroup>';out+=`<optgroup label="${esc(r.cat)}">`;cur=r.cat;}
   out+=`<option value="${esc(r.op)}" ${sel===r.op?'selected':''}>${esc(r.op)}</option>`;});if(cur)out+='</optgroup>';return out;}
 function onStageChange(){const el=$('i-stage-hint');if(!el)return;const v=$('i-stage').value;const r=curSeq().find(x=>x.op===v);
@@ -642,15 +665,25 @@ function compressImg(file,maxDim=900,q=0.6){return new Promise((res,rej)=>{const
     const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
     res(c.toDataURL('image/jpeg',q));};img.src=r.result;};r.readAsDataURL(file);});}
 function readInsp(){return{sampleSize:+$('i-samp').value||0,major:+$('i-maj').value||0,minor:+$('i-min').value||0,critical:+$('i-cri').value||0};}
-function previewDecision(){const v=readInsp();if(!v.sampleSize){$('i-prev').innerHTML=`<span class="note">${t('prevHint')}</span>`;return;}
+function previewDecision(){
+  if(isChkType($('i-type').value)){const items=readChkItems();const fails=items.filter(x=>x.status==='fail').length;
+    const ok=fails===0;
+    $('i-prev').innerHTML=`<div class="big" style="color:${ok?'var(--green)':'var(--red)'}">${ok?t('passMark'):t('failMark')}</div>
+      <div class="note">${t('chkItemsLbl')}: ${items.filter(x=>x.status==='pass').length}/${items.length} ${t('statusPass')} · ${t('statusFail')}: ${fails}</div>`;return;}
+  const v=readInsp();if(!v.sampleSize){$('i-prev').innerHTML=`<span class="note">${t('prevHint')}</span>`;return;}
   const dhu=dhuOf(v),dec=inspDecision(v),a=aqlFor(v.sampleSize);
   $('i-prev').innerHTML=`<div class="big" style="color:${dec.d==='PASS'?'var(--green)':'var(--red)'}">${dec.d==='PASS'?t('passMark'):t('failMark')}</div>
     <div class="note">${t('dhuShort')}: <b>${dhu}</b> · ${t('acBig')} ${a.ac25} / ${t('acSmall')} ${a.ac40} · ${esc(dec.reason)}</div>`;}
-function saveInsp(id){const oid=$('i-order').value,o=ORDERS.find(x=>x.id===oid)||{},v=readInsp();
-  if(!v.sampleSize)return toast(t('enterSample'));const dec=inspDecision(v);
-  const data={wsId:MEMBER.wsId,orderId:oid,po:o.po||'',factoryName:o.factoryName||'',type:$('i-type').value,
-    stage:$('i-stage').value.trim(),date:$('i-date').value||today(),inspector:MEMBER.name||ME.email,
-    sampleSize:v.sampleSize,major:v.major,minor:v.minor,critical:v.critical,dhu:dhuOf(v),decision:dec.d,notes:$('i-notes').value.trim(),photos:INSP_PHOTOS.slice(),defects:INSP_DEFECTS.slice()};
+function saveInsp(id){const oid=$('i-order').value,o=ORDERS.find(x=>x.id===oid)||{},type=$('i-type').value;
+  const base={wsId:MEMBER.wsId,orderId:oid,po:o.po||'',factoryName:o.factoryName||'',type,
+    date:$('i-date').value||today(),inspector:MEMBER.name||ME.email,notes:$('i-notes').value.trim(),photos:INSP_PHOTOS.slice()};
+  let data;
+  if(isChkType(type)){const items=readChkItems();const fails=items.filter(x=>x.status==='fail').length;
+    data={...base,stage:'',sampleSize:null,major:null,minor:null,critical:null,dhu:null,
+      decision:fails?'FAIL':'PASS',checklist:items,defects:[]};
+  }else{const v=readInsp();if(!v.sampleSize)return toast(t('enterSample'));const dec=inspDecision(v);
+    data={...base,stage:$('i-stage').value.trim(),sampleSize:v.sampleSize,major:v.major,minor:v.minor,
+      critical:v.critical,dhu:dhuOf(v),decision:dec.d,defects:INSP_DEFECTS.slice(),checklist:[]};}
   const p=id?db.collection('qc_inspections').doc(id).update(data):db.collection('qc_inspections').add({...data,createdAt:FV.serverTimestamp()});
   p.then(()=>{closeModal();toast(t('inspSaved'));}).catch(e=>toast(rulesHint(e)));}
 function delInsp(id){if(!confirm(t('delInspQ')))return;db.collection('qc_inspections').doc(id).delete().then(()=>toast(t('deleted')));}
@@ -659,15 +692,18 @@ function editInsp(id){const i=INSP.find(x=>x.id===id);if(i)inspForm(i);}
 let INSPFILTER='all';
 function goInspFilter(v){INSPFILTER=v;renderInsp();}
 function renderInsp(){const el=$('insp-list');if(!el)return;if(!INSP.length){el.innerHTML=empty(t('noInsp'));return;}
-  const fbtn=(v,lbl)=>`<button class="${INSPFILTER===v?'on':''}" onclick="goInspFilter('${v}')">${lbl}</button>`;
-  const bar=`<div class="subnav">${fbtn('all',t('typeAll'))}${fbtn('أثناء الخط',t('typeInline'))}${fbtn('الفحص النهائي',t('typeFinal'))}</div>
+  const fbtn=(v,lbl)=>`<button class="${INSPFILTER===v?'on':''}" onclick="goInspFilter('${v.replace(/'/g,"\\'")}')">${lbl}</button>`;
+  const bar=`<div class="subnav">${fbtn('all',t('typeAll'))}${fbtn('أثناء الخط',t('typeInline'))}${fbtn('الفحص النهائي',t('typeFinal'))}${CHECKLISTS.map(c=>fbtn(c[0],esc(c[0]))).join('')}</div>
   <div style="display:flex;gap:8px;margin-bottom:10px"><button class="mini g" onclick="exportCSV()">${t('exportCsv')}</button></div>`;
   const list=INSP.filter(i=>INSPFILTER==='all'||i.type===INSPFILTER);
   if(!list.length){el.innerHTML=bar+empty(t('noData'));return;}
   el.innerHTML=bar+list.map(i=>{const b=i.decision==='PASS'?'b-pass':'b-fail';const ph=(i.photos||[]).length;
+    const sum=(i.checklist&&i.checklist.length)
+      ?`${t('chkItemsLbl')}: <b>${i.checklist.filter(x=>x.status==='pass').length}/${i.checklist.length}</b> ${t('statusPass')}`
+      :`${t('sampleShort')} ${i.sampleSize} · ${t('majorLbl')} ${i.major} · ${t('minorLbl')} ${i.minor} · ${t('criticalLbl')} ${i.critical} · <b>${t('dhuShort')} ${i.dhu}</b>`;
     return `<div class="item"><div class="h"><div><div class="t">${esc(i.po||'—')} <span class="chip">${esc(typeLabel(i.type))}</span>${ph?`<span class="chip">📷 ${ph}</span>`:''}</div>
     <div class="s">🏭 ${esc(i.factoryName||'')} · ${fmtDate(i.date)} · 👤 ${esc(i.inspector||'')}<br>
-    ${t('sampleShort')} ${i.sampleSize} · ${t('majorLbl')} ${i.major} · ${t('minorLbl')} ${i.minor} · ${t('criticalLbl')} ${i.critical} · <b>${t('dhuShort')} ${i.dhu}</b></div></div>
+    ${sum}</div></div>
     <span class="badge ${b}">${i.decision==='PASS'?t('pass'):t('fail')}</span></div>
     <div class="row-btns"><button class="mini" onclick="printInsp('${i.id}')">${t('reportBtn')}</button>
     <button class="mini g" onclick="editInsp('${i.id}')">${t('edit')}</button>
@@ -680,6 +716,7 @@ function exportCSV(){if(!INSP.length)return;
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
   a.download='inspections_'+today()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
 function printInsp(id){const i=INSP.find(x=>x.id===id);if(!i)return;const a=aqlFor(i.sampleSize||0);
+  const isChk=!!(i.checklist&&i.checklist.length);
   const row=(l,v)=>`<tr><td style="font-weight:700;background:#f2f6f6;width:38%">${l}</td><td>${esc(v)}</td></tr>`;
   const dec=i.decision==='PASS'?t('passMark'):t('failMark');const dcol=i.decision==='PASS'?'#1e7e40':'#b02a26';
   const photos=(i.photos||[]).map(p=>`<img src="${p}" style="width:31%;margin:1%;border:1px solid #ccc;border-radius:6px">`).join('');
@@ -690,11 +727,15 @@ function printInsp(id){const i=INSP.find(x=>x.id===id);if(!i)return;const a=aqlF
       <div style="text-align:${LANG==='ar'?'left':'right'};font-size:12px;color:#666">${fmtDate(i.date)}</div></div>
     <table style="width:100%;border-collapse:collapse;margin-top:14px;font-size:14px" border="1" cellpadding="8" style="border-color:#ddd">
       ${row(t('poLbl').replace(' *',''),i.po)}${row(t('factoryLbl').replace(' *',''),i.factoryName)}
-      ${row(t('typeLbl'),typeLabel(i.type))}${row('المرحلة / Stage',i.stage||'—')}
-      ${row(t('repInspector'),i.inspector)}${row(t('sampleLbl').replace(' *',''),i.sampleSize)}
-      ${row(t('majorLbl'),i.major+'   (Ac '+a.ac25+')')}${row(t('minorLbl'),i.minor+'   (Ac '+a.ac40+')')}
-      ${row(t('criticalLbl'),i.critical)}${row('DHU',i.dhu)}
+      ${row(t('typeLbl'),typeLabel(i.type))}${isChk?'':row('المرحلة / Stage',i.stage||'—')}
+      ${row(t('repInspector'),i.inspector)}${isChk?'':row(t('sampleLbl').replace(' *',''),i.sampleSize)
+      +row(t('majorLbl'),i.major+'   (Ac '+a.ac25+')')+row(t('minorLbl'),i.minor+'   (Ac '+a.ac40+')')
+      +row(t('criticalLbl'),i.critical)+row('DHU',i.dhu)}
       ${row(t('repNotes'),i.notes||'—')}</table>
+    ${isChk?`<table style="width:100%;border-collapse:collapse;margin-top:14px;font-size:14px" border="1" cellpadding="8">
+      <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>م</td><td>${t('colItem')}</td><td>${t('colStd')}</td><td>${t('colTool')}</td><td>${t('colCheck')}</td></tr>
+      ${i.checklist.map((x,n)=>`<tr><td>${n+1}</td><td>${esc(x.name)}</td><td>${esc(x.std||'')}</td><td>${esc(x.tool||'')}</td>
+        <td style="font-weight:700;color:${x.status==='fail'?'#b02a26':(x.status==='na'?'#666':'#1e7e40')}">${x.status==='fail'?t('statusFail'):(x.status==='na'?t('statusNA'):t('statusPass'))}</td></tr>`).join('')}</table>`:''}
     <div style="margin-top:14px;padding:12px;border:2px solid ${dcol};border-radius:10px;text-align:center">
       <span style="font-size:13px;color:#555">${t('repDecision')}: </span>
       <span style="font-size:22px;font-weight:800;color:${dcol}">${dec}</span></div>
