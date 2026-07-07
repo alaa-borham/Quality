@@ -193,7 +193,13 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
       <div class="card"><div style="font-weight:700;margin-bottom:6px" data-i18n="decTitle">توزيع القرارات</div><div id="decdist"></div></div>
       </div>
     </div>
-    <div id="p-insp" class="hide"><div class="sec-h">✅ <span data-i18n="inspTitle">الفحوصات</span></div><div id="insp-list"></div></div>
+    <div id="p-insp" class="hide"><div class="sec-h">✅ <span data-i18n="inspTitle">الفحوصات</span></div>
+      <div class="card" style="padding:12px"><div class="grid3">
+        <div><label class="inl" data-i18n="searchLbl">بحث</label><input id="q-search" data-i18n-ph="searchPh" placeholder="رقم الطلبية / المصنع / ملاحظات..." oninput="INSPQ=this.value;renderInsp()"></div>
+        <div><label class="inl" data-i18n="fromLbl">من تاريخ</label><input id="q-from" type="date" onchange="INSPFROM=this.value;renderInsp()"></div>
+        <div><label class="inl" data-i18n="toLbl">إلى تاريخ</label><input id="q-to" type="date" onchange="INSPTO=this.value;renderInsp()"></div>
+      </div></div>
+      <div id="insp-list"></div></div>
     <div id="p-orders" class="hide"><div class="sec-h">📦 <span data-i18n="ordersTitle">الطلبيات</span></div><div id="orders-list"></div></div>
     <div id="p-fact" class="hide"><div class="sec-h">🏭 <span data-i18n="factTitle">المصانع / الموردون</span></div><div id="fact-list"></div></div>
     <div id="p-tools" class="hide">
@@ -310,6 +316,8 @@ sampleLbl:'حجم العينة *',majorLbl:'عيوب كبيرة',minorLbl:'عي�
 saveInsp:'حفظ الفحص',enterSample:'أدخل حجم العينة',noInsp:'لا توجد فحوصات. أضف فحصاً بزر ＋',delInspQ:'حذف الفحص؟',
 typeInline:'أثناء الخط',typeFinal:'الفحص النهائي',typeAll:'الكل',prevHint:'أدخل حجم العينة لعرض القرار',
 chkItemsLbl:'بنود الفحص',statusPass:'مطابق',statusFail:'غير مطابق',statusNA:'لا ينطبق',
+searchLbl:'بحث',searchPh:'رقم الطلبية / المصنع / ملاحظات...',fromLbl:'من تاريخ',toLbl:'إلى تاريخ',
+repFactTitle:'تقرير المورد الشامل',ratingLbl:'التقييم العام',ratingExc:'ممتاز',ratingGood:'جيد',ratingOk:'مقبول',ratingPoor:'ضعيف',
 inspSaved:'تم حفظ الفحص',dhuShort:'DHU',acBig:'حد قبول كبير',acSmall:'صغير',sampleShort:'العينة',
 photosLbl:'الصور (اختياري)',addPhoto:'📷 إضافة صورة',maxPhotos:'الحد الأقصى 4 صور',reportBtn:'تقرير',exportCsv:'⬇ تصدير Excel',printBtn:'🖨 طباعة / حفظ PDF',
 repTitle:'تقرير فحص الجودة',repDecision:'القرار النهائي',repNotes:'ملاحظات',repInspector:'المفتش',repDate:'التاريخ',repPhotos:'الصور',repClose:'إغلاق',compressing:'جارٍ معالجة الصورة…',
@@ -379,6 +387,8 @@ sampleLbl:'Sample size *',majorLbl:'Major defects',minorLbl:'Minor defects',crit
 saveInsp:'Save inspection',enterSample:'Enter sample size',noInsp:'No inspections yet. Add one with ＋',delInspQ:'Delete inspection?',
 typeInline:'Inline',typeFinal:'Final inspection',typeAll:'All',prevHint:'Enter sample size to preview the decision',
 chkItemsLbl:'Checklist items',statusPass:'Conforms',statusFail:'Non-conforming',statusNA:'N/A',
+searchLbl:'Search',searchPh:'PO / factory / notes...',fromLbl:'From date',toLbl:'To date',
+repFactTitle:'Supplier report',ratingLbl:'Overall rating',ratingExc:'Excellent',ratingGood:'Good',ratingOk:'Acceptable',ratingPoor:'Poor',
 inspSaved:'Inspection saved',dhuShort:'DHU',acBig:'Major Ac',acSmall:'Minor',sampleShort:'Sample',
 photosLbl:'Photos (optional)',addPhoto:'📷 Add photo',maxPhotos:'Max 4 photos',reportBtn:'Report',exportCsv:'⬇ Export Excel',printBtn:'🖨 Print / save PDF',
 repTitle:'Quality Inspection Report',repDecision:'Final decision',repNotes:'Notes',repInspector:'Inspector',repDate:'Date',repPhotos:'Photos',repClose:'Close',compressing:'Processing image…',
@@ -564,8 +574,48 @@ function delFact(id){if(!confirm(t('delFactQ')))return;db.collection('qc_factori
 function renderFact(){const el=$('fact-list');if(!el)return;if(!FACT.length){el.innerHTML=empty(t('noFact'));return;}
   el.innerHTML='<div class="cards">'+FACT.map(f=>`<div class="item"><div class="h"><div><div class="t">🏭 ${esc(f.name)}</div>
     <div class="s">${esc(f.country||'—')} ${f.contact?'· '+esc(f.contact):''}</div></div></div>
-    <div class="row-btns"><button class="mini g" onclick='factForm(${JSON.stringify(f).replace(/'/g,"&#39;")})'>${t('edit')}</button>
+    <div class="row-btns"><button class="mini" onclick="factReport('${f.id}')">${t('reportBtn')}</button>
+    <button class="mini g" onclick='factForm(${JSON.stringify(f).replace(/'/g,"&#39;")})'>${t('edit')}</button>
     <button class="mini r" onclick="delFact('${f.id}')">${t('del')}</button></div></div>`).join('')+'</div>';}
+function factReport(fid){const f=FACT.find(x=>x.id===fid);if(!f)return;
+  const oids=ORDERS.filter(o=>o.factoryId===fid).map(o=>o.id);
+  const insp=INSP.filter(i=>oids.includes(i.orderId)||i.factoryName===f.name);
+  const checks=TOOLCHK.filter(c=>c.factoryId===fid||c.factoryName===f.name);
+  const n=insp.length,pass=insp.filter(i=>i.decision==='PASS').length;
+  const aql=insp.filter(i=>i.dhu!=null);
+  const avgDhu=aql.length?Math.round(aql.reduce((s,i)=>s+(i.dhu||0),0)/aql.length*100)/100:'—';
+  const tn=checks.length,tpass=checks.filter(c=>c.result.decision==='PASS').length;
+  const tot=n+tn,rate=tot?Math.round((pass+tpass)/tot*100):null;
+  const rating=rate==null?'—':(rate>=90?t('ratingExc'):(rate>=75?t('ratingGood'):(rate>=50?t('ratingOk'):t('ratingPoor'))));
+  const rcol=rate==null?'#666':(rate>=90?'#1e7e40':(rate>=75?'#2e75b6':(rate>=50?'#b58900':'#b02a26')));
+  const row=(l,v)=>`<tr><td style="font-weight:700;background:#f2f6f6;width:38%">${l}</td><td>${v}</td></tr>`;
+  const dcell=d=>`<span style="font-weight:700;color:${d==='PASS'?'#1e7e40':'#b02a26'}">${d==='PASS'?t('pass'):t('fail')}</span>`;
+  const th=`style="background:#e6efee;font-weight:800;color:#14504f"`;
+  const inspRows=insp.map(i=>{
+    const sum=(i.checklist&&i.checklist.length)?`${i.checklist.filter(x=>x.status==='pass').length}/${i.checklist.length} ${t('statusPass')}`:`DHU ${i.dhu}`;
+    return `<tr><td>${fmtDate(i.date)}</td><td>${esc(i.po||'—')}</td><td>${typeIcon(i.type)} ${esc(typeLabel(i.type))}</td><td>${esc(sum)}</td><td>${dcell(i.decision)}</td></tr>`;}).join('');
+  const chkRows=checks.map(c=>`<tr><td>${fmtDate(c.date)}</td><td>${esc(toolTypeLabel(c.type))}</td><td>${esc(toolResultSummary(c))}</td><td>${dcell(c.result.decision)}</td></tr>`).join('');
+  $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:760px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
+      <div><div style="font-size:22px;font-weight:800;color:#14504f">🧵 ${esc(MEMBER.wsName||'')}</div>
+      <div style="font-size:15px;color:#555">${t('repFactTitle')}</div></div>
+      <div style="text-align:${LANG==='ar'?'left':'right'};font-size:12px;color:#666">${fmtDate(today())}</div></div>
+    <table style="width:100%;border-collapse:collapse;margin-top:14px;font-size:14px" border="1" cellpadding="8">
+      ${row(t('factNameLbl').replace(' *',''),esc(f.name))}${row(t('countryLbl'),esc(f.country||'—'))}${row(t('contactLbl'),esc(f.contact||'—'))}
+      ${row(t('kTotal'),n)}${row(t('pass')+' / '+t('fail'),pass+' / '+(n-pass))}
+      ${row(t('kDhu'),avgDhu)}${row(t('navToolChk'),tn+(tn?' ('+t('pass')+' '+tpass+')':''))}
+      ${row(t('kRft'),rate==null?'—':rate+'%')}</table>
+    <div style="margin-top:14px;padding:12px;border:2px solid ${rcol};border-radius:10px;text-align:center">
+      <span style="font-size:13px;color:#555">${t('ratingLbl')}: </span>
+      <span style="font-size:22px;font-weight:800;color:${rcol}">${rating}</span></div>
+    ${n?`<div style="font-weight:700;margin:16px 0 6px">${t('inspTitle')}</div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px" border="1" cellpadding="6">
+      <tr ${th}><td>${t('dateLbl')}</td><td>PO</td><td>${t('typeLbl')}</td><td>${t('colCheck')}</td><td>${t('repDecision')}</td></tr>${inspRows}</table>`:''}
+    ${tn?`<div style="font-weight:700;margin:16px 0 6px">${t('navToolChk')}</div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px" border="1" cellpadding="6">
+      <tr ${th}><td>${t('dateLbl')}</td><td>${t('typeLbl')}</td><td>${t('colCheck')}</td><td>${t('repDecision')}</td></tr>${chkRows}</table>`:''}
+    </div>`;
+  window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 
 /* ============ ORDERS ============ */
 function orderForm(o){o=o||{};if(!FACT.length){toast(t('addFactFirst'));go('fact',document.querySelectorAll('.nav button')[3]);return;}
@@ -705,13 +755,19 @@ const TYPE_ORDER=['استلام وفحص الأقمشة','ما قبل الإنت
 const TYPE_ICONS={'استلام وفحص الأقمشة':'🧵','ما قبل الإنتاج (PP)':'📝','القص':'✂️','أثناء الخط':'🪡','التشطيب والكي':'♨️','الفحص النهائي':'✅','الفحص النهائي (AQL)':'📊','التعبئة والشحن':'📦'};
 function typeIcon(v){return TYPE_ICONS[v]||'✅';}
 function editInsp(id){const i=INSP.find(x=>x.id===id);if(i)inspForm(i);}
-let INSPFILTER='all';
+let INSPFILTER='all',INSPQ='',INSPFROM='',INSPTO='';
 function goInspFilter(v){INSPFILTER=v;renderInsp();}
+function filteredInsp(){let list=INSP.filter(i=>INSPFILTER==='all'||i.type===INSPFILTER);
+  if(INSPFROM)list=list.filter(i=>(i.date||'')>=INSPFROM);
+  if(INSPTO)list=list.filter(i=>(i.date||'')<=INSPTO);
+  const q=INSPQ.trim().toLowerCase();
+  if(q)list=list.filter(i=>((i.po||'')+' '+(i.factoryName||'')+' '+(i.notes||'')+' '+(i.type||'')+' '+(i.inspector||'')).toLowerCase().includes(q));
+  return list;}
 function renderInsp(){const el=$('insp-list');if(!el)return;if(!INSP.length){el.innerHTML=empty(t('noInsp'));return;}
   const fbtn=(v,lbl)=>`<button class="${INSPFILTER===v?'on':''}" onclick="goInspFilter('${v.replace(/'/g,"\\'")}')">${lbl}</button>`;
   const bar=`<div class="subnav">${fbtn('all','📋 '+t('typeAll'))}${TYPE_ORDER.map(v=>fbtn(v,typeIcon(v)+' '+esc(typeLabel(v)))).join('')}</div>
   <div style="display:flex;gap:8px;margin-bottom:10px"><button class="mini g" onclick="exportCSV()">${t('exportCsv')}</button></div>`;
-  const list=INSP.filter(i=>INSPFILTER==='all'||i.type===INSPFILTER);
+  const list=filteredInsp();
   if(!list.length){el.innerHTML=bar+empty(t('noData'));return;}
   el.innerHTML=bar+'<div class="cards">'+list.map(i=>{const b=i.decision==='PASS'?'b-pass':'b-fail';const ph=(i.photos||[]).length;
     const sum=(i.checklist&&i.checklist.length)
@@ -725,12 +781,21 @@ function renderInsp(){const el=$('insp-list');if(!el)return;if(!INSP.length){el.
     <button class="mini g" onclick="editInsp('${i.id}')">${t('edit')}</button>
     <button class="mini r" onclick="delInsp('${i.id}')">${t('del')}</button></div></div>`;}).join('')+'</div>';}
 function csvCell(v){v=(v==null?'':String(v));return '"'+v.replace(/"/g,'""')+'"';}
-function exportCSV(){if(!INSP.length)return;
-  const head=['التاريخ / Date','الطلبية / PO','المصنع / Factory','النوع / Type','العينة / Sample','كبير / Major','صغير / Minor','حرِج / Critical','DHU','القرار / Decision','المفتش / Inspector','ملاحظات / Notes'];
-  const rows=INSP.map(i=>[i.date,i.po,i.factoryName,typeLabel(i.type),i.sampleSize,i.major,i.minor,i.critical,i.dhu,i.decision,i.inspector,i.notes]);
+function exportCSV(){const list=filteredInsp();if(!list.length)return toast(t('noData'));
+  const head=['التاريخ / Date','الطلبية / PO','المصنع / Factory','النوع / Type','العينة / Sample','كبير / Major','صغير / Minor','حرِج / Critical','DHU','البنود / Items','بنود غير مطابقة / Failed items','القرار / Decision','المفتش / Inspector','ملاحظات / Notes'];
+  const rows=list.map(i=>[i.date,i.po,i.factoryName,typeLabel(i.type),i.sampleSize,i.major,i.minor,i.critical,i.dhu,
+    (i.checklist&&i.checklist.length)?i.checklist.filter(x=>x.status==='pass').length+'/'+i.checklist.length:'',
+    (i.checklist||[]).filter(x=>x.status==='fail').map(x=>x.name).join(' | '),
+    i.decision,i.inspector,i.notes]);
   const csv='﻿'+[head,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
   a.download='inspections_'+today()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
+function exportToolChk(){if(!TOOLCHK.length)return;
+  const head=['التاريخ / Date','النوع / Type','المصنع / Factory','النتيجة / Result','القرار / Decision','المفتش / Inspector'];
+  const rows=TOOLCHK.map(c=>[c.date,toolTypeLabel(c.type),c.factoryName,toolResultSummary(c),c.result.decision,c.inspector]);
+  const csv='﻿'+[head,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='tool_checks_'+today()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
 function printInsp(id){const i=INSP.find(x=>x.id===id);if(!i)return;const a=aqlFor(i.sampleSize||0);
   const isChk=!!(i.checklist&&i.checklist.length);
   const row=(l,v)=>`<tr><td style="font-weight:700;background:#f2f6f6;width:38%">${l}</td><td>${esc(v)}</td></tr>`;
@@ -823,7 +888,8 @@ function toolResultSummary(c){const r=c.result;const mk=d=>d.decision==='PASS'?'
   if(c.type==='aq')return `${t('aqlSample')}: ${r.sample} · ${t('majorLbl')} ${r.maj}/${r.re25} · ${t('minorLbl')} ${r.min}/${r.re40}`;
   return `${t('fpShort')} ${mk(r.fp)} · ${t('shShort')} ${mk(r.sh)} · AQL ${mk(r.aq)}`;}
 function renderToolChk(){const el=$('toolchk-list');if(!el)return;if(!TOOLCHK.length){el.innerHTML=empty(t('noToolChk'));return;}
-  el.innerHTML='<div class="cards">'+TOOLCHK.map(c=>{const b=c.result.decision==='PASS'?'b-pass':'b-fail';
+  const bar=`<div style="display:flex;gap:8px;margin-bottom:10px"><button class="mini g" onclick="exportToolChk()">${t('exportCsv')}</button></div>`;
+  el.innerHTML=bar+'<div class="cards">'+TOOLCHK.map(c=>{const b=c.result.decision==='PASS'?'b-pass':'b-fail';
     return `<div class="item"><div class="h"><div><div class="t">${esc(toolTypeLabel(c.type))}</div>
     <div class="s">🏭 ${esc(c.factoryName||'')} · ${fmtDate(c.date)}<br>${esc(toolResultSummary(c))}</div></div>
     <span class="badge ${b}">${c.result.decision==='PASS'?t('pass'):t('fail')}</span></div>
