@@ -298,7 +298,7 @@ noOrders:'لا توجد طلبيات. أضف طلبية بزر ＋',qtyShort:'ا
 inspNew:'فحص جديد',inspEdit:'تعديل فحص',orderLbl:'الطلبية *',typeLbl:'نوع الفحص',dateLbl:'التاريخ',stageLbl:'المرحلة (اختياري)',stagePh:'مثال: تركيب الياقة',
 sampleLbl:'حجم العينة *',majorLbl:'عيوب كبيرة',minorLbl:'عيوب صغيرة',criticalLbl:'عيوب حرجة',notesLbl:'ملاحظات',
 saveInsp:'حفظ الفحص',enterSample:'أدخل حجم العينة',noInsp:'لا توجد فحوصات. أضف فحصاً بزر ＋',delInspQ:'حذف الفحص؟',
-typeInline:'أثناء الخط',typeFinal:'الفحص النهائي',prevHint:'أدخل حجم العينة لعرض القرار',
+typeInline:'أثناء الخط',typeFinal:'الفحص النهائي',typeAll:'الكل',prevHint:'أدخل حجم العينة لعرض القرار',
 inspSaved:'تم حفظ الفحص',dhuShort:'DHU',acBig:'حد قبول كبير',acSmall:'صغير',sampleShort:'العينة',
 photosLbl:'الصور (اختياري)',addPhoto:'📷 إضافة صورة',maxPhotos:'الحد الأقصى 4 صور',reportBtn:'تقرير',exportCsv:'⬇ تصدير Excel',printBtn:'🖨 طباعة / حفظ PDF',
 repTitle:'تقرير فحص الجودة',repDecision:'القرار النهائي',repNotes:'ملاحظات',repInspector:'المفتش',repDate:'التاريخ',repPhotos:'الصور',repClose:'إغلاق',compressing:'جارٍ معالجة الصورة…',
@@ -366,7 +366,7 @@ noOrders:'No orders yet. Add one with ＋',qtyShort:'Qty',inspCount:'inspections
 inspNew:'New inspection',inspEdit:'Edit inspection',orderLbl:'Order *',typeLbl:'Inspection type',dateLbl:'Date',stageLbl:'Stage (optional)',stagePh:'e.g. Collar attach',
 sampleLbl:'Sample size *',majorLbl:'Major defects',minorLbl:'Minor defects',criticalLbl:'Critical defects',notesLbl:'Notes',
 saveInsp:'Save inspection',enterSample:'Enter sample size',noInsp:'No inspections yet. Add one with ＋',delInspQ:'Delete inspection?',
-typeInline:'Inline',typeFinal:'Final inspection',prevHint:'Enter sample size to preview the decision',
+typeInline:'Inline',typeFinal:'Final inspection',typeAll:'All',prevHint:'Enter sample size to preview the decision',
 inspSaved:'Inspection saved',dhuShort:'DHU',acBig:'Major Ac',acSmall:'Minor',sampleShort:'Sample',
 photosLbl:'Photos (optional)',addPhoto:'📷 Add photo',maxPhotos:'Max 4 photos',reportBtn:'Report',exportCsv:'⬇ Export Excel',printBtn:'🖨 Print / save PDF',
 repTitle:'Quality Inspection Report',repDecision:'Final decision',repNotes:'Notes',repInspector:'Inspector',repDate:'Date',repPhotos:'Photos',repClose:'Close',compressing:'Processing image…',
@@ -656,9 +656,15 @@ function saveInsp(id){const oid=$('i-order').value,o=ORDERS.find(x=>x.id===oid)|
 function delInsp(id){if(!confirm(t('delInspQ')))return;db.collection('qc_inspections').doc(id).delete().then(()=>toast(t('deleted')));}
 function typeLabel(v){return v==='أثناء الخط'?t('typeInline'):(v==='الفحص النهائي'?t('typeFinal'):v);}
 function editInsp(id){const i=INSP.find(x=>x.id===id);if(i)inspForm(i);}
+let INSPFILTER='all';
+function goInspFilter(v){INSPFILTER=v;renderInsp();}
 function renderInsp(){const el=$('insp-list');if(!el)return;if(!INSP.length){el.innerHTML=empty(t('noInsp'));return;}
-  const bar=`<div style="display:flex;gap:8px;margin-bottom:10px"><button class="mini g" onclick="exportCSV()">${t('exportCsv')}</button></div>`;
-  el.innerHTML=bar+INSP.map(i=>{const b=i.decision==='PASS'?'b-pass':'b-fail';const ph=(i.photos||[]).length;
+  const fbtn=(v,lbl)=>`<button class="${INSPFILTER===v?'on':''}" onclick="goInspFilter('${v}')">${lbl}</button>`;
+  const bar=`<div class="subnav">${fbtn('all',t('typeAll'))}${fbtn('أثناء الخط',t('typeInline'))}${fbtn('الفحص النهائي',t('typeFinal'))}</div>
+  <div style="display:flex;gap:8px;margin-bottom:10px"><button class="mini g" onclick="exportCSV()">${t('exportCsv')}</button></div>`;
+  const list=INSP.filter(i=>INSPFILTER==='all'||i.type===INSPFILTER);
+  if(!list.length){el.innerHTML=bar+empty(t('noData'));return;}
+  el.innerHTML=bar+list.map(i=>{const b=i.decision==='PASS'?'b-pass':'b-fail';const ph=(i.photos||[]).length;
     return `<div class="item"><div class="h"><div><div class="t">${esc(i.po||'—')} <span class="chip">${esc(typeLabel(i.type))}</span>${ph?`<span class="chip">📷 ${ph}</span>`:''}</div>
     <div class="s">🏭 ${esc(i.factoryName||'')} · ${fmtDate(i.date)} · 👤 ${esc(i.inspector||'')}<br>
     ${t('sampleShort')} ${i.sampleSize} · ${t('majorLbl')} ${i.major} · ${t('minorLbl')} ${i.minor} · ${t('criticalLbl')} ${i.critical} · <b>${t('dhuShort')} ${i.dhu}</b></div></div>
