@@ -320,6 +320,10 @@ chkItemsLbl:'بنود الفحص',statusPass:'مطابق',statusFail:'غير م�
 searchLbl:'بحث',searchPh:'رقم الطلبية / المصنع / ملاحظات...',fromLbl:'من تاريخ',toLbl:'إلى تاريخ',
 repFactTitle:'تقرير المورد الشامل',ratingLbl:'التقييم العام',ratingExc:'ممتاز',ratingGood:'جيد',ratingOk:'مقبول',ratingPoor:'ضعيف',
 cmpTitle:'مقارنة الموردين (نسبة الاجتياز)',cmpChecks:'فحص',statusLbl:'حالة الطلبية',stOpen:'🟢 مفتوحة',stClosed:'🔒 مغلقة',stShipped:'🚚 مشحونة',
+copyCodeBtn:'📋 نسخ',newCodeBtn:'🔄 كود جديد',customCodeBtn:'✏️ كود مخصص',codeCopied:'تم نسخ الكود',
+regenQ:'توليد كود جديد؟ الكود القديم سيتوقف فوراً ولن يتمكن أحد من الانضمام به. (المنضمون حالياً لا يتأثرون)',
+customCodePrompt:'أدخل الكود المخصص (أحرف إنجليزية وأرقام وشرطة، 4–16 خانة):',
+badCode:'صيغة الكود غير صحيحة — أحرف إنجليزية وأرقام وشرطة فقط (4–16 خانة)',codeTaken:'هذا الكود مستخدم في مساحة عمل أخرى',codeChanged:'تم تغيير الكود',
 inspSaved:'تم حفظ الفحص',dhuShort:'DHU',acBig:'حد قبول كبير',acSmall:'صغير',sampleShort:'العينة',
 photosLbl:'الصور (اختياري)',addPhoto:'📷 إضافة صورة',maxPhotos:'الحد الأقصى 4 صور',reportBtn:'تقرير',exportCsv:'⬇ تصدير Excel',printBtn:'🖨 طباعة / حفظ PDF',
 repTitle:'تقرير فحص الجودة',repDecision:'القرار النهائي',repNotes:'ملاحظات',repInspector:'المفتش',repDate:'التاريخ',repPhotos:'الصور',repClose:'إغلاق',compressing:'جارٍ معالجة الصورة…',
@@ -392,6 +396,10 @@ chkItemsLbl:'Checklist items',statusPass:'Conforms',statusFail:'Non-conforming',
 searchLbl:'Search',searchPh:'PO / factory / notes...',fromLbl:'From date',toLbl:'To date',
 repFactTitle:'Supplier report',ratingLbl:'Overall rating',ratingExc:'Excellent',ratingGood:'Good',ratingOk:'Acceptable',ratingPoor:'Poor',
 cmpTitle:'Supplier comparison (pass rate)',cmpChecks:'checks',statusLbl:'Order status',stOpen:'🟢 Open',stClosed:'🔒 Closed',stShipped:'🚚 Shipped',
+copyCodeBtn:'📋 Copy',newCodeBtn:'🔄 New code',customCodeBtn:'✏️ Custom code',codeCopied:'Code copied',
+regenQ:'Generate a new code? The old code stops working immediately. (Current members are not affected)',
+customCodePrompt:'Enter a custom code (letters, digits, dash; 4-16 chars):',
+badCode:'Invalid code format — letters, digits, and dash only (4-16 chars)',codeTaken:'This code is used by another workspace',codeChanged:'Code changed',
 inspSaved:'Inspection saved',dhuShort:'DHU',acBig:'Major Ac',acSmall:'Minor',sampleShort:'Sample',
 photosLbl:'Photos (optional)',addPhoto:'📷 Add photo',maxPhotos:'Max 4 photos',reportBtn:'Report',exportCsv:'⬇ Export Excel',printBtn:'🖨 Print / save PDF',
 repTitle:'Quality Inspection Report',repDecision:'Final decision',repNotes:'Notes',repInspector:'Inspector',repDate:'Date',repPhotos:'Photos',repClose:'Close',compressing:'Processing image…',
@@ -511,7 +519,7 @@ function updateWsLabel(){if($('ws-label'))$('ws-label').textContent=(MEMBER.wsNa
 
 /* ============ Listeners ============ */
 function listen(){unsub.forEach(u=>u&&u());unsub=[];const ws=MEMBER.wsId;
-  unsub.push(db.collection('qc_workspaces').doc(ws).onSnapshot(d=>{if(d.exists){ITEMS=d.data().items||[];WSCODE=d.data().code||'—';if($('items-list'))renderItemsManager();}},console.error));
+  unsub.push(db.collection('qc_workspaces').doc(ws).onSnapshot(d=>{if(d.exists){ITEMS=d.data().items||[];WSCODE=d.data().code||'—';if($('items-list'))renderItemsManager();if($('ws-code'))$('ws-code').textContent=WSCODE;}},console.error));
   unsub.push(db.collection('qc_factories').where('wsId','==',ws).onSnapshot(s=>{FACT=s.docs.map(d=>({id:d.id,...d.data()}));renderFact();if(TAB==='dash')renderDash();if(TAB==='tools')renderToolFactSelects();},console.error));
   unsub.push(db.collection('qc_orders').where('wsId','==',ws).onSnapshot(s=>{ORDERS=s.docs.map(d=>({id:d.id,...d.data()}));renderOrders();if(TAB==='dash')renderDash();},console.error));
   unsub.push(db.collection('qc_inspections').where('wsId','==',ws).onSnapshot(s=>{INSP=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));renderInsp();renderDash();},console.error));
@@ -542,10 +550,29 @@ function openMenu(){const owner=MEMBER.role==='owner';modal(`<h3>${t('settings')
     <button class="mini" onclick="addItem()">${t('addItemBtn')}</button></div>
   <div id="items-list" style="margin-top:8px"></div>`:''}
   <div class="card" style="text-align:center;margin-top:12px"><div class="note">${t('inviteCode')}</div>
-    <div style="font-size:22px;font-weight:800;letter-spacing:2px;color:var(--teal)" id="ws-code">${esc(WSCODE)}</div></div>
+    <div style="font-size:22px;font-weight:800;letter-spacing:2px;color:var(--teal)" id="ws-code">${esc(WSCODE)}</div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:8px;flex-wrap:wrap">
+      <button class="mini" onclick="copyWsCode()">${t('copyCodeBtn')}</button>
+      ${owner?`<button class="mini g" onclick="regenWsCode()">${t('newCodeBtn')}</button>
+      <button class="mini" onclick="customWsCode()">${t('customCodeBtn')}</button>`:''}</div></div>
   <button class="btn red" onclick="logout();closeModal()">${t('logout')}</button>
   <button class="btn sec" style="margin-top:8px" onclick="closeModal()">${t('close')}</button>`);
   if(owner)renderItemsManager();}
+function copyWsCode(){(navigator.clipboard?navigator.clipboard.writeText(WSCODE):Promise.reject())
+  .then(()=>toast(t('codeCopied'))).catch(()=>toast(WSCODE));}
+function setWsCode(code){return db.collection('qc_workspaces').doc(MEMBER.wsId).update({code})
+  .then(()=>{WSCODE=code;if($('ws-code'))$('ws-code').textContent=code;toast(t('codeChanged'));}).catch(e=>toast(rulesHint(e)));}
+function regenWsCode(){if(!isOwner())return;if(!confirm(t('regenQ')))return;
+  setWsCode('QC-'+Math.floor(1000+Math.random()*9000));}
+function customWsCode(){if(!isOwner())return;
+  const v=prompt(t('customCodePrompt'),WSCODE);if(v==null)return;
+  const code=v.trim().toUpperCase();
+  if(!/^[A-Z0-9-]{4,16}$/.test(code))return toast(t('badCode'));
+  if(code===WSCODE)return;
+  db.collection('qc_workspaces').where('code','==',code).limit(1).get().then(qs=>{
+    if(!qs.empty&&qs.docs[0].id!==MEMBER.wsId)return toast(t('codeTaken'));
+    return setWsCode(code);
+  }).catch(e=>toast(rulesHint(e)));}
 function renderItemsManager(){const el=$('items-list');if(!el)return;
   el.innerHTML=ITEMS.length?ITEMS.map(it=>`<span class="chip" style="font-size:13px;padding:5px 10px;margin:0 0 6px 6px;display:inline-flex;align-items:center;gap:6px">${esc(it)}
     <b style="cursor:pointer;color:var(--red)" onclick="delItem('${esc(it).replace(/'/g,"&#39;")}')">✕</b></span>`).join(''):`<span class="note">${t('noItemsHint')}</span>`;}
