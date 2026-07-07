@@ -601,8 +601,8 @@ function inspForm(i,presetOrder){i=i||{};if(!ORDERS.length){toast(t('addFactFirs
   const oid=i.orderId||presetOrder||ORDERS[0].id;
   const opts=ORDERS.map(o=>`<option value="${o.id}" ${oid===o.id?'selected':''}>${esc(o.po)} · ${esc(o.factoryName||'')}</option>`).join('');
   const types=[['أثناء الخط',t('typeInline')],['الفحص النهائي',t('typeFinal')]].concat(CHECKLISTS.map(c=>[c[0],c[0]]));
-  const locked=!i.id&&TAB==='insp'&&INSPFILTER!=='all';
-  const defType=i.type||(locked?INSPFILTER:'الفحص النهائي');
+  const locked=!!i.type||(TAB==='insp'&&INSPFILTER!=='all');
+  const defType=i.type||(TAB==='insp'&&INSPFILTER!=='all'?INSPFILTER:'الفحص النهائي');
   const typeOpts=locked
     ?`<option value="${esc(defType)}" selected>${esc(typeLabel(defType))}</option>`
     :types.map(([v,lbl])=>`<option value="${v}" ${defType===v?'selected':''}>${lbl}</option>`).join('');
