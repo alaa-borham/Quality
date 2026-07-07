@@ -135,7 +135,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
     <div class="tabs"><button id="tb-login" class="on" onclick="authTab('login')" data-i18n="login">تسجيل الدخول</button>
       <button id="tb-signup" onclick="authTab('signup')" data-i18n="signup">حساب جديد</button></div>
     <div id="auth-msg"></div>
-    <div class="field"><label data-i18n="email">البريد الإلكتروني</label><input id="a-email" type="email" autocomplete="email" placeholder="you@example.com"></div>
+    <div class="field"><label id="a-email-lbl" data-i18n="email">البريد الإلكتروني</label><input id="a-email" type="text" autocomplete="username" placeholder="you@example.com"></div>
     <div class="field"><label data-i18n="password">كلمة المرور</label><input id="a-pass" type="password" autocomplete="current-password" placeholder="••••••"></div>
     <div class="field" id="a-name-f"><label data-i18n="name">الاسم</label><input id="a-name" data-i18n-ph="namePh" placeholder="اسمك الكامل"></div>
     <button class="btn" id="a-btn" onclick="doAuth()">دخول</button>
@@ -324,6 +324,16 @@ copyCodeBtn:'📋 نسخ',newCodeBtn:'🔄 كود جديد',customCodeBtn:'✏�
 regenQ:'توليد كود جديد؟ الكود القديم سيتوقف فوراً ولن يتمكن أحد من الانضمام به. (المنضمون حالياً لا يتأثرون)',
 customCodePrompt:'أدخل الكود المخصص (أحرف إنجليزية وأرقام وشرطة، 4–16 خانة):',
 badCode:'صيغة الكود غير صحيحة — أحرف إنجليزية وأرقام وشرطة فقط (4–16 خانة)',codeTaken:'هذا الكود مستخدم في مساحة عمل أخرى',codeChanged:'تم تغيير الكود',
+empTitle:'الموظفون (حسابات بصلاحيات)',empNew:'➕ موظف جديد',empName:'اسم الموظف *',empUser:'اسم المستخدم (للدخول) *',empPass:'كلمة المرور *',
+permsLbl:'الصلاحيات',permFact:'إدارة المصانع',permDel:'حذف السجلات',noEmps:'لا موظفون بعد — أنشئ حساباً لكل مفتش',
+empHint:'سيدخل الموظف من شاشة تسجيل الدخول باسم المستخدم وكلمة المرور مباشرة (بدون بريد إلكتروني وبدون كود).',
+empCreated:'تم إنشاء حساب الموظف',empUserTaken:'اسم المستخدم مستخدم مسبقاً',enterEmpFields:'أدخل الاسم واسم المستخدم وكلمة المرور',
+badUser:'اسم المستخدم: أحرف إنجليزية صغيرة وأرقام و . _ - فقط (3–20 خانة)',
+delMemberQ:'إزالة هذا الموظف من مساحة العمل؟ سيفقد الوصول لبياناتها.',permsSaved:'تم حفظ الصلاحيات',
+loginIdLbl:'البريد الإلكتروني أو اسم المستخدم',loginIdPh:'you@example.com أو ahmed',
+aqlCfgTitle:'حدود القبول (AQL)',aqlCfgBtn:'تعديل حدود القبول والعينات',critMaxLbl:'الحد الأقصى للعيوب الحرجة (عادة 0)',
+aqlCfgHint:'حد الرفض = حد القبول + 1 تلقائياً. تُطبق هذه الحدود على كل الفحوصات الجديدة وحاسبة AQL وحجم العينة التلقائي.',
+restoreDef:'استعادة الافتراضي',restoreDefQ:'استعادة الجدول الافتراضي (AQL كبير 2.5 / صغير 4.0)؟',aqlSaved:'تم حفظ حدود القبول',badNums:'أدخل أرقاماً صحيحة (العينة أكبر من صفر)',
 inspSaved:'تم حفظ الفحص',dhuShort:'DHU',acBig:'حد قبول كبير',acSmall:'صغير',sampleShort:'العينة',
 photosLbl:'الصور (اختياري)',addPhoto:'📷 إضافة صورة',maxPhotos:'الحد الأقصى 4 صور',reportBtn:'تقرير',exportCsv:'⬇ تصدير Excel',printBtn:'🖨 طباعة / حفظ PDF',
 repTitle:'تقرير فحص الجودة',repDecision:'القرار النهائي',repNotes:'ملاحظات',repInspector:'المفتش',repDate:'التاريخ',repPhotos:'الصور',repClose:'إغلاق',compressing:'جارٍ معالجة الصورة…',
@@ -400,6 +410,16 @@ copyCodeBtn:'📋 Copy',newCodeBtn:'🔄 New code',customCodeBtn:'✏️ Custom 
 regenQ:'Generate a new code? The old code stops working immediately. (Current members are not affected)',
 customCodePrompt:'Enter a custom code (letters, digits, dash; 4-16 chars):',
 badCode:'Invalid code format — letters, digits, and dash only (4-16 chars)',codeTaken:'This code is used by another workspace',codeChanged:'Code changed',
+empTitle:'Employees (accounts with permissions)',empNew:'➕ New employee',empName:'Employee name *',empUser:'Username (for login) *',empPass:'Password *',
+permsLbl:'Permissions',permFact:'Manage factories',permDel:'Delete records',noEmps:'No employees yet — create an account per inspector',
+empHint:'The employee signs in from the login screen with username and password directly (no email, no code).',
+empCreated:'Employee account created',empUserTaken:'Username already taken',enterEmpFields:'Enter name, username, and password',
+badUser:'Username: lowercase letters, digits, . _ - only (3-20 chars)',
+delMemberQ:'Remove this employee from the workspace? They will lose access.',permsSaved:'Permissions saved',
+loginIdLbl:'Email or username',loginIdPh:'you@example.com or ahmed',
+aqlCfgTitle:'Acceptance limits (AQL)',aqlCfgBtn:'Edit acceptance limits & samples',critMaxLbl:'Max critical defects (usually 0)',
+aqlCfgHint:'Reject limit = accept limit + 1 automatically. These limits apply to all new inspections, the AQL calculator, and the auto sample size.',
+restoreDef:'Restore defaults',restoreDefQ:'Restore the default table (AQL Major 2.5 / Minor 4.0)?',aqlSaved:'Acceptance limits saved',badNums:'Enter valid numbers (sample must be > 0)',
 inspSaved:'Inspection saved',dhuShort:'DHU',acBig:'Major Ac',acSmall:'Minor',sampleShort:'Sample',
 photosLbl:'Photos (optional)',addPhoto:'📷 Add photo',maxPhotos:'Max 4 photos',reportBtn:'Report',exportCsv:'⬇ Export Excel',printBtn:'🖨 Print / save PDF',
 repTitle:'Quality Inspection Report',repDecision:'Final decision',repNotes:'Notes',repInspector:'Inspector',repDate:'Date',repPhotos:'Photos',repClose:'Close',compressing:'Processing image…',
@@ -460,16 +480,17 @@ function fmtDate(d){if(!d)return'';const x=d.toDate?d.toDate():new Date(d);retur
 function today(){return new Date().toISOString().slice(0,10);}
 function roleTxt(){return MEMBER.role==='owner'?t('roleOwner'):t('roleInspector');}
 function isOwner(){return !!(MEMBER&&MEMBER.role==='owner');}
+function can(p){return isOwner()||!!(MEMBER&&MEMBER.perms&&MEMBER.perms[p]);}
 
 /* ============ State ============ */
-let ME=null,MEMBER=null,TAB='fact',FACT=[],ORDERS=[],INSP=[],ITEMS=[],WSCODE='—',unsub=[],AUTHMODE='login',CUSTDEF=[],WSEQ=null,TOOLCHK=[];
+let ME=null,MEMBER=null,TAB='fact',FACT=[],ORDERS=[],INSP=[],ITEMS=[],WSCODE='—',unsub=[],AUTHMODE='login',CUSTDEF=[],WSEQ=null,TOOLCHK=[],WSAQL=null,WSCRIT=0;
 
 /* ============ AQL logic ============ */
 const AQLTAB=[[2,20,1,2,2,3],[151,32,2,3,3,4],[281,50,3,4,5,6],[501,80,5,6,7,8],
 [1201,125,7,8,10,11],[3201,200,10,11,14,15],[10001,315,14,15,21,22]];
-function aqlFor(lot){let r=AQLTAB[0];for(const x of AQLTAB){if(lot>=x[0])r=x;}return{sample:r[1],ac25:r[2],re25:r[3],ac40:r[4],re40:r[5]};}
+function aqlFor(lot){const tab=WSAQL||AQLTAB;let r=tab[0];for(const x of tab){if(lot>=x[0])r=x;}return{sample:r[1],ac25:r[2],re25:r[3],ac40:r[4],re40:r[5]};}
 function inspDecision({sampleSize,major,minor,critical}){const a=aqlFor(sampleSize||0);
-  if((critical||0)>0)return{d:'FAIL',reason:t('reasonCritical')};
+  if((critical||0)>(WSCRIT||0))return{d:'FAIL',reason:t('reasonCritical')};
   if((major||0)>=a.re25)return{d:'FAIL',reason:tf('reasonMajor',{m:major,r:a.re25})};
   if((minor||0)>=a.re40)return{d:'FAIL',reason:tf('reasonMinor',{m:minor,r:a.re40})};
   return{d:'PASS',reason:t('reasonWithin')};}
@@ -477,14 +498,17 @@ function dhuOf(i){const u=i.sampleSize||0;if(!u)return 0;return Math.round(((i.m
 
 /* ============ AUTH ============ */
 function authTab(m){AUTHMODE=m;if($('tb-login')){$('tb-login').classList.toggle('on',m==='login');$('tb-signup').classList.toggle('on',m==='signup');
-  $('a-name-f').classList.toggle('hide',m==='login');$('a-btn').textContent=m==='login'?t('loginBtn'):t('createAccBtn');}}
+  $('a-name-f').classList.toggle('hide',m==='login');$('a-btn').textContent=m==='login'?t('loginBtn'):t('createAccBtn');
+  if($('a-email-lbl'))$('a-email-lbl').textContent=m==='login'?t('loginIdLbl'):t('email');
+  if($('a-email'))$('a-email').placeholder=m==='login'?t('loginIdPh'):'you@example.com';}}
 function authMsg(txt,ok){$('auth-msg').innerHTML=`<div class="msg ${ok?'ok':'err'}">${esc(txt)}</div>`;}
 function doAuth(){const e=$('a-email').value.trim(),p=$('a-pass').value,n=$('a-name').value.trim();
   if(!e||!p)return authMsg(t('enterEmailPass'));
   $('a-btn').disabled=true;const done=()=>{$('a-btn').disabled=false;};
   if(AUTHMODE==='signup'){if(!n){authMsg(t('enterNameMsg'));return done();}
     auth.createUserWithEmailAndPassword(e,p).then(c=>c.user.updateProfile({displayName:n})).catch(err=>{authMsg(mapErr(err));done();});
-  }else auth.signInWithEmailAndPassword(e,p).catch(err=>{authMsg(mapErr(err));done();});}
+  }else{const id=e.includes('@')?e:(e.toLowerCase()+'@qc.local');
+    auth.signInWithEmailAndPassword(id,p).catch(err=>{authMsg(mapErr(err));done();});}}
 function mapErr(err){const m={'auth/invalid-email':'e_email','auth/user-not-found':'e_nouser','auth/wrong-password':'e_wrongpass',
   'auth/email-already-in-use':'e_inuse','auth/weak-password':'e_weak','auth/invalid-credential':'e_cred'};
   return m[err.code]?t(m[err.code]):err.message;}
@@ -519,7 +543,7 @@ function updateWsLabel(){if($('ws-label'))$('ws-label').textContent=(MEMBER.wsNa
 
 /* ============ Listeners ============ */
 function listen(){unsub.forEach(u=>u&&u());unsub=[];const ws=MEMBER.wsId;
-  unsub.push(db.collection('qc_workspaces').doc(ws).onSnapshot(d=>{if(d.exists){ITEMS=d.data().items||[];WSCODE=d.data().code||'—';if($('items-list'))renderItemsManager();if($('ws-code'))$('ws-code').textContent=WSCODE;}},console.error));
+  unsub.push(db.collection('qc_workspaces').doc(ws).onSnapshot(d=>{if(d.exists){ITEMS=d.data().items||[];WSCODE=d.data().code||'—';WSAQL=d.data().aqlTab||null;WSCRIT=d.data().critMax||0;if($('items-list'))renderItemsManager();if($('ws-code'))$('ws-code').textContent=WSCODE;}},console.error));
   unsub.push(db.collection('qc_factories').where('wsId','==',ws).onSnapshot(s=>{FACT=s.docs.map(d=>({id:d.id,...d.data()}));renderFact();if(TAB==='dash')renderDash();if(TAB==='tools')renderToolFactSelects();},console.error));
   unsub.push(db.collection('qc_orders').where('wsId','==',ws).onSnapshot(s=>{ORDERS=s.docs.map(d=>({id:d.id,...d.data()}));renderOrders();if(TAB==='dash')renderDash();},console.error));
   unsub.push(db.collection('qc_inspections').where('wsId','==',ws).onSnapshot(s=>{INSP=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));renderInsp();renderDash();},console.error));
@@ -530,7 +554,7 @@ function listen(){unsub.forEach(u=>u&&u());unsub=[];const ws=MEMBER.wsId;
 /* ============ NAV ============ */
 function go(tb,btn){TAB=tb;['dash','insp','orders','fact','tools','ref','toolchk'].forEach(x=>$('p-'+x).classList.toggle('hide',x!==tb));
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');
-  $('fab').style.display=(['insp','orders'].includes(tb)||(tb==='fact'&&isOwner()))?'flex':'none';if(tb==='dash')renderDash();if(tb==='ref')renderRef();
+  $('fab').style.display=(['insp','orders'].includes(tb)||(tb==='fact'&&can('fact')))?'flex':'none';if(tb==='dash')renderDash();if(tb==='ref')renderRef();
   if(tb==='tools')renderToolFactSelects();if(tb==='toolchk')renderToolChk();}
 function fabAction(){if(TAB==='fact')factForm();else if(TAB==='orders')orderForm();else if(TAB==='insp')inspForm();}
 const NAV_TITLE={fact:'navFact',orders:'navOrders',insp:'navInsp',dash:'navDash',tools:'navTools',ref:'navRef',toolchk:'navToolChk'};
@@ -548,7 +572,12 @@ function openMenu(){const owner=MEMBER.role==='owner';modal(`<h3>${t('settings')
   <label class="inl">${t('itemsTitle')}</label>
   <div style="display:flex;gap:8px"><input id="new-item" placeholder="${t('itemPh')}" onkeydown="if(event.key==='Enter')addItem()">
     <button class="mini" onclick="addItem()">${t('addItemBtn')}</button></div>
-  <div id="items-list" style="margin-top:8px"></div>`:''}
+  <div id="items-list" style="margin-top:8px"></div>
+  <label class="inl">${t('empTitle')}</label>
+  <div id="emp-list" style="margin-top:8px"><span class="note">…</span></div>
+  <button class="mini g" style="margin-top:6px" onclick="empForm()">${t('empNew')}</button>
+  <label class="inl">${t('aqlCfgTitle')}</label>
+  <button class="mini" style="margin-top:4px" onclick="aqlForm()">⚙️ ${t('aqlCfgBtn')}</button>`:''}
   <div class="card" style="text-align:center;margin-top:12px"><div class="note">${t('inviteCode')}</div>
     <div style="font-size:22px;font-weight:800;letter-spacing:2px;color:var(--teal)" id="ws-code">${esc(WSCODE)}</div>
     <div style="display:flex;gap:8px;justify-content:center;margin-top:8px;flex-wrap:wrap">
@@ -557,7 +586,76 @@ function openMenu(){const owner=MEMBER.role==='owner';modal(`<h3>${t('settings')
       <button class="mini" onclick="customWsCode()">${t('customCodeBtn')}</button>`:''}</div></div>
   <button class="btn red" onclick="logout();closeModal()">${t('logout')}</button>
   <button class="btn sec" style="margin-top:8px" onclick="closeModal()">${t('close')}</button>`);
-  if(owner)renderItemsManager();}
+  if(owner){renderItemsManager();renderEmps();}}
+let EMPS=[];
+function renderEmps(){const el=$('emp-list');if(!el)return;
+  db.collection('qc_members').where('wsId','==',MEMBER.wsId).get().then(qs=>{
+    EMPS=qs.docs.map(d=>({id:d.id,...d.data()})).filter(m=>m.id!==ME.uid);
+    const el2=$('emp-list');if(!el2)return;
+    el2.innerHTML=EMPS.length?EMPS.map(m=>{
+      const tags=[m.perms&&m.perms.fact?t('permFact'):'',m.perms&&m.perms.del?t('permDel'):''].filter(Boolean).join(' · ');
+      return `<div class="item" style="margin-bottom:6px"><div class="h"><div><div class="t" style="font-size:14px">👤 ${esc(m.name||'—')}</div>
+      <div class="s">${m.username?'@'+esc(m.username):esc(m.email||'')}${tags?' · '+tags:''}</div></div></div>
+      <div class="row-btns"><button class="mini" onclick="empPerms('${m.id}')">${t('permsLbl')}</button>
+      <button class="mini r" onclick="removeEmp('${m.id}')">${t('del')}</button></div></div>`;}).join(''):`<span class="note">${t('noEmps')}</span>`;
+  }).catch(e=>toast(rulesHint(e)));}
+function empForm(){modal(`<h3>${t('empNew')}</h3>
+  <label class="inl">${t('empName')}</label><input id="e-name">
+  <label class="inl">${t('empUser')}</label><input id="e-user" placeholder="ahmed" style="direction:ltr;text-align:left" autocapitalize="none">
+  <label class="inl">${t('empPass')}</label><input id="e-pass" type="text" placeholder="••••••" style="direction:ltr;text-align:left">
+  <label class="inl">${t('permsLbl')}</label>
+  <label style="display:flex;gap:8px;align-items:center;font-size:14px;margin-bottom:6px"><input type="checkbox" id="e-p-fact" style="width:auto">${t('permFact')}</label>
+  <label style="display:flex;gap:8px;align-items:center;font-size:14px"><input type="checkbox" id="e-p-del" style="width:auto">${t('permDel')}</label>
+  <div class="note" style="margin-top:8px">${t('empHint')}</div>
+  <div class="row-btns"><button class="btn" id="e-save" onclick="saveEmp()">${t('save')}</button>
+  <button class="btn sec" onclick="openMenu()">${t('cancel')}</button></div>`);}
+function saveEmp(){const name=$('e-name').value.trim(),user=$('e-user').value.trim().toLowerCase(),pass=$('e-pass').value;
+  if(!name||!user||!pass)return toast(t('enterEmpFields'));
+  if(!/^[a-z0-9._-]{3,20}$/.test(user))return toast(t('badUser'));
+  if(pass.length<6)return toast(t('e_weak'));
+  const email=user+'@qc.local';const btn=$('e-save');if(btn)btn.disabled=true;
+  let app2;try{app2=firebase.app('emp');}catch(_){app2=firebase.initializeApp(FB_CONFIG,'emp');}
+  const perms={fact:$('e-p-fact').checked,del:$('e-p-del').checked};
+  app2.auth().createUserWithEmailAndPassword(email,pass).then(c=>
+    app2.firestore().collection('qc_members').doc(c.user.uid).set({wsId:MEMBER.wsId,wsName:MEMBER.wsName||'',name,username:user,email,role:'inspector',perms,createdAt:firebase.firestore.FieldValue.serverTimestamp()})
+    .then(()=>app2.auth().signOut())
+  ).then(()=>{toast(t('empCreated'));openMenu();})
+  .catch(e=>{if(btn)btn.disabled=false;toast(e&&e.code==='auth/email-already-in-use'?t('empUserTaken'):mapErr(e));});}
+function empPerms(uid){const m=EMPS.find(x=>x.id===uid);if(!m)return;
+  modal(`<h3>${t('permsLbl')} — ${esc(m.name||'')}</h3>
+  <label style="display:flex;gap:8px;align-items:center;font-size:14px;margin-bottom:6px"><input type="checkbox" id="e-p-fact" style="width:auto" ${m.perms&&m.perms.fact?'checked':''}>${t('permFact')}</label>
+  <label style="display:flex;gap:8px;align-items:center;font-size:14px"><input type="checkbox" id="e-p-del" style="width:auto" ${m.perms&&m.perms.del?'checked':''}>${t('permDel')}</label>
+  <div class="row-btns"><button class="btn" onclick="saveEmpPerms('${uid}')">${t('save')}</button>
+  <button class="btn sec" onclick="openMenu()">${t('cancel')}</button></div>`);}
+function saveEmpPerms(uid){const perms={fact:$('e-p-fact').checked,del:$('e-p-del').checked};
+  db.collection('qc_members').doc(uid).update({perms}).then(()=>{toast(t('permsSaved'));openMenu();}).catch(e=>toast(rulesHint(e)));}
+function removeEmp(uid){if(!confirm(t('delMemberQ')))return;
+  db.collection('qc_members').doc(uid).delete().then(()=>{toast(t('deleted'));renderEmps();}).catch(e=>toast(rulesHint(e)));}
+const AQL_RANGES=['2–150','151–280','281–500','501–1200','1201–3200','3201–10000','10001+'];
+function aqlForm(){if(!isOwner())return;const tab=WSAQL||AQLTAB;
+  modal(`<h3>⚙️ ${t('aqlCfgTitle')}</h3>
+  <div style="overflow-x:auto"><table class="rtbl" style="min-width:320px"><tr><th>${t('aqlLot')}</th><th>${t('sampleShort')}</th><th>${t('acBig')}</th><th>${t('acSmall')}</th></tr>
+  ${tab.map((r,i)=>`<tr><td style="white-space:nowrap">${AQL_RANGES[i]||r[0]}</td>
+    <td><input class="aq-s" type="number" value="${r[1]}" style="min-width:64px;padding:6px"></td>
+    <td><input class="aq-m" type="number" value="${r[2]}" style="min-width:64px;padding:6px"></td>
+    <td><input class="aq-n" type="number" value="${r[4]}" style="min-width:64px;padding:6px"></td></tr>`).join('')}</table></div>
+  <label class="inl">${t('critMaxLbl')}</label><input id="aq-crit" type="number" value="${WSCRIT||0}">
+  <div class="note" style="margin-top:6px">${t('aqlCfgHint')}</div>
+  <div class="row-btns"><button class="btn" onclick="saveAqlCfg()">${t('save')}</button>
+  <button class="btn sec" onclick="resetAqlCfg()">${t('restoreDef')}</button></div>
+  <button class="btn sec" style="margin-top:8px" onclick="openMenu()">${t('cancel')}</button>`);}
+function saveAqlCfg(){const ss=[...document.querySelectorAll('.aq-s')],ms=[...document.querySelectorAll('.aq-m')],ns=[...document.querySelectorAll('.aq-n')];
+  const tab=[];let ok=true;
+  ss.forEach((el,i)=>{const s=+el.value,m=+ms[i].value,n=+ns[i].value;
+    if(!(s>0)||isNaN(m)||m<0||isNaN(n)||n<0)ok=false;
+    tab.push([AQLTAB[i][0],s,m,m+1,n,n+1]);});
+  if(!ok)return toast(t('badNums'));
+  const crit=Math.max(0,+$('aq-crit').value||0);
+  db.collection('qc_workspaces').doc(MEMBER.wsId).update({aqlTab:tab,critMax:crit})
+    .then(()=>{WSAQL=tab;WSCRIT=crit;toast(t('aqlSaved'));openMenu();}).catch(e=>toast(rulesHint(e)));}
+function resetAqlCfg(){if(!confirm(t('restoreDefQ')))return;
+  db.collection('qc_workspaces').doc(MEMBER.wsId).update({aqlTab:FV.delete(),critMax:FV.delete()})
+    .then(()=>{WSAQL=null;WSCRIT=0;toast(t('aqlSaved'));openMenu();}).catch(e=>toast(rulesHint(e)));}
 function copyWsCode(){(navigator.clipboard?navigator.clipboard.writeText(WSCODE):Promise.reject())
   .then(()=>toast(t('codeCopied'))).catch(()=>toast(WSCODE));}
 function setWsCode(code){return db.collection('qc_workspaces').doc(MEMBER.wsId).update({code})
@@ -606,7 +704,7 @@ function renderFact(){const el=$('fact-list');if(!el)return;if(!FACT.length){el.
   el.innerHTML='<div class="cards">'+FACT.map(f=>`<div class="item"><div class="h"><div><div class="t">🏭 ${esc(f.name)}</div>
     <div class="s">${esc(f.country||'—')} ${f.contact?'· '+esc(f.contact):''}</div></div></div>
     <div class="row-btns"><button class="mini" onclick="factReport('${f.id}')">${t('reportBtn')}</button>
-    ${isOwner()?`<button class="mini g" onclick='factForm(${JSON.stringify(f).replace(/'/g,"&#39;")})'>${t('edit')}</button>
+    ${can('fact')?`<button class="mini g" onclick='factForm(${JSON.stringify(f).replace(/'/g,"&#39;")})'>${t('edit')}</button>
     <button class="mini r" onclick="delFact('${f.id}')">${t('del')}</button>`:''}</div></div>`).join('')+'</div>';}
 function factStats(f){const oids=ORDERS.filter(o=>o.factoryId===f.id).map(o=>o.id);
   const insp=INSP.filter(i=>oids.includes(i.orderId)||i.factoryName===f.name);
@@ -688,7 +786,7 @@ function renderOrders(){const el=$('orders-list');if(!el)return;if(!ORDERS.lengt
     <div class="s">🏭 ${esc(o.factoryName||'')} · ${t('qtyShort')} ${o.qty} ${o.color?'· '+esc(o.color):''} · ${t('inspCount')}: ${n}</div></div></div>
     <div class="row-btns"><button class="mini" onclick='inspForm(null,"${o.id}")'>${t('inspect')}</button>
     <button class="mini g" onclick='orderForm(${JSON.stringify(o).replace(/'/g,"&#39;")})'>${t('edit')}</button>
-    ${isOwner()?`<button class="mini r" onclick="delOrder('${o.id}')">${t('del')}</button>`:''}</div></div>`;}).join('')+'</div>';}
+    ${can('del')?`<button class="mini r" onclick="delOrder('${o.id}')">${t('del')}</button>`:''}</div></div>`;}).join('')+'</div>';}
 
 /* ============ INSPECTIONS ============ */
 function inspForm(i,presetOrder){i=i||{};if(!ORDERS.length){toast(t('addFactFirst'));go('orders',document.querySelectorAll('.nav button')[2]);return;}
@@ -823,7 +921,7 @@ function renderInsp(){const el=$('insp-list');if(!el)return;if(!INSP.length){el.
     <span class="badge ${b}">${i.decision==='PASS'?t('pass'):t('fail')}</span></div>
     <div class="row-btns"><button class="mini" onclick="printInsp('${i.id}')">${t('reportBtn')}</button>
     <button class="mini g" onclick="editInsp('${i.id}')">${t('edit')}</button>
-    ${isOwner()?`<button class="mini r" onclick="delInsp('${i.id}')">${t('del')}</button>`:''}</div></div>`;}).join('')+'</div>';}
+    ${can('del')?`<button class="mini r" onclick="delInsp('${i.id}')">${t('del')}</button>`:''}</div></div>`;}).join('')+'</div>';}
 function csvCell(v){v=(v==null?'':String(v));return '"'+v.replace(/"/g,'""')+'"';}
 function exportCSV(){const list=filteredInsp();if(!list.length)return toast(t('noData'));
   const head=['التاريخ / Date','الطلبية / PO','المصنع / Factory','النوع / Type','العينة / Sample','كبير / Major','صغير / Minor','حرِج / Critical','DHU','البنود / Items','بنود غير مطابقة / Failed items','القرار / Decision','المفتش / Inspector','ملاحظات / Notes'];
@@ -943,7 +1041,7 @@ function renderToolChk(){const el=$('toolchk-list');if(!el)return;if(!TOOLCHK.le
     <div class="s">🏭 ${esc(c.factoryName||'')} · ${fmtDate(c.date)}<br>${esc(toolResultSummary(c))}</div></div>
     <span class="badge ${b}">${c.result.decision==='PASS'?t('pass'):t('fail')}</span></div>
     <div class="row-btns"><button class="mini" onclick="printToolChk('${c.id}')">${t('reportBtn')}</button>
-    ${isOwner()?`<button class="mini r" onclick="delToolChk('${c.id}')">${t('del')}</button>`:''}</div></div>`;}).join('')+'</div>';}
+    ${can('del')?`<button class="mini r" onclick="delToolChk('${c.id}')">${t('del')}</button>`:''}</div></div>`;}).join('')+'</div>';}
 function delToolChk(id){if(!confirm(t('delInspQ')))return;db.collection('qc_toolchecks').doc(id).delete().catch(e=>toast(rulesHint(e)));}
 function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
   const row=(l,v)=>`<tr><td style="font-weight:700;background:#f2f6f6;width:38%">${l}</td><td>${esc(v)}</td></tr>`;
@@ -1089,7 +1187,7 @@ function renderRef(){const el=$('ref-body');if(!el)return;
   }else if(REFSUB==='def'){
     const all=allDefects();
     const defRows=all.map((d,i)=>`<tr><td>${i+1}</td><td>${esc(d.name)}</td><td>${catTag(d.cat)}</td><td>${esc(d.desc)}</td><td>${esc(d.cause)}</td><td>${esc(d.action)}</td>
-      <td>${d.built?'':`<button class="mini" onclick='defForm(${esc(JSON.stringify(d)).replace(/'/g,"&#39;")})'>${t('edit')}</button> ${isOwner()?`<button class="mini" onclick="delDef('${d.id}')">${t('del')}</button>`:''}`}</td></tr>`).join('');
+      <td>${d.built?'':`<button class="mini" onclick='defForm(${esc(JSON.stringify(d)).replace(/'/g,"&#39;")})'>${t('edit')}</button> ${can('del')?`<button class="mini" onclick="delDef('${d.id}')">${t('del')}</button>`:''}`}</td></tr>`).join('');
     el.innerHTML=`<button class="btn" style="margin-bottom:12px" onclick="defForm()">${t('addDefNew')}</button>
       <table class="rtbl"><tr><th>م</th><th>${t('colDefect')}</th><th>${t('colCat')}</th><th>الوصف</th><th>${t('colCause')}</th><th>${t('colAction')}</th><th></th></tr>${defRows}</table>`;
   }else if(REFSUB==='chk'){
