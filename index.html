@@ -52,6 +52,14 @@ justify-content:space-between;padding:11px 16px}
 border-bottom:3px solid transparent;border-radius:0;white-space:nowrap}
 .nav button.on{color:var(--teal);border-bottom-color:var(--teal)}
 .wrap{max-width:960px;margin:0 auto;padding:16px}
+@media(min-width:1000px){
+.wrap{max-width:1360px}
+.kpis{grid-template-columns:repeat(4,1fr)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:10px;align-items:start}
+.cards .item{margin-bottom:0}
+.dash-cols{display:grid;grid-template-columns:3fr 2fr;gap:14px;align-items:start}
+.dash-cols .card{margin-bottom:0}
+}
 .sec-h{font-size:18px;font-weight:700;margin:4px 0 14px;display:flex;align-items:center;gap:8px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
 .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}
@@ -179,9 +187,11 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
     <div id="p-dash" class="hide">
       <div class="sec-h">📊 <span data-i18n="dashTitle">لوحة المؤشرات</span></div>
       <div class="kpis" id="kpis"></div>
+      <div class="dash-cols">
       <div class="card"><div style="font-weight:700;margin-bottom:6px" data-i18n="chartTitle">معدل العيوب (DHU) — آخر الفحوصات</div>
         <div class="bars" id="chart"></div></div>
       <div class="card"><div style="font-weight:700;margin-bottom:6px" data-i18n="decTitle">توزيع القرارات</div><div id="decdist"></div></div>
+      </div>
     </div>
     <div id="p-insp" class="hide"><div class="sec-h">✅ <span data-i18n="inspTitle">الفحوصات</span></div><div id="insp-list"></div></div>
     <div id="p-orders" class="hide"><div class="sec-h">📦 <span data-i18n="ordersTitle">الطلبيات</span></div><div id="orders-list"></div></div>
@@ -552,10 +562,10 @@ function saveFact(id){const name=$('f-name').value.trim();if(!name)return toast(
   p.then(()=>{closeModal();toast(t('saved'));}).catch(e=>toast(rulesHint(e)));}
 function delFact(id){if(!confirm(t('delFactQ')))return;db.collection('qc_factories').doc(id).delete().then(()=>toast(t('deleted')));}
 function renderFact(){const el=$('fact-list');if(!el)return;if(!FACT.length){el.innerHTML=empty(t('noFact'));return;}
-  el.innerHTML=FACT.map(f=>`<div class="item"><div class="h"><div><div class="t">🏭 ${esc(f.name)}</div>
+  el.innerHTML='<div class="cards">'+FACT.map(f=>`<div class="item"><div class="h"><div><div class="t">🏭 ${esc(f.name)}</div>
     <div class="s">${esc(f.country||'—')} ${f.contact?'· '+esc(f.contact):''}</div></div></div>
     <div class="row-btns"><button class="mini g" onclick='factForm(${JSON.stringify(f).replace(/'/g,"&#39;")})'>${t('edit')}</button>
-    <button class="mini r" onclick="delFact('${f.id}')">${t('del')}</button></div></div>`).join('');}
+    <button class="mini r" onclick="delFact('${f.id}')">${t('del')}</button></div></div>`).join('')+'</div>';}
 
 /* ============ ORDERS ============ */
 function orderForm(o){o=o||{};if(!FACT.length){toast(t('addFactFirst'));go('fact',document.querySelectorAll('.nav button')[3]);return;}
@@ -579,19 +589,20 @@ function saveOrder(id){const fid=$('o-fact').value,po=$('o-po').value.trim(),qty
   p.then(()=>{closeModal();toast(t('saved'));}).catch(e=>toast(rulesHint(e)));}
 function delOrder(id){if(!confirm(t('delOrderQ')))return;db.collection('qc_orders').doc(id).delete().then(()=>toast(t('deleted')));}
 function renderOrders(){const el=$('orders-list');if(!el)return;if(!ORDERS.length){el.innerHTML=empty(t('noOrders'));return;}
-  el.innerHTML=ORDERS.map(o=>{const n=INSP.filter(i=>i.orderId===o.id).length;
+  el.innerHTML='<div class="cards">'+ORDERS.map(o=>{const n=INSP.filter(i=>i.orderId===o.id).length;
     return `<div class="item"><div class="h"><div><div class="t">📦 ${esc(o.po)} <span class="chip">${esc(o.item||'')}</span></div>
     <div class="s">🏭 ${esc(o.factoryName||'')} · ${t('qtyShort')} ${o.qty} ${o.color?'· '+esc(o.color):''} · ${t('inspCount')}: ${n}</div></div></div>
     <div class="row-btns"><button class="mini" onclick='inspForm(null,"${o.id}")'>${t('inspect')}</button>
     <button class="mini g" onclick='orderForm(${JSON.stringify(o).replace(/'/g,"&#39;")})'>${t('edit')}</button>
-    <button class="mini r" onclick="delOrder('${o.id}')">${t('del')}</button></div></div>`;}).join('');}
+    <button class="mini r" onclick="delOrder('${o.id}')">${t('del')}</button></div></div>`;}).join('')+'</div>';}
 
 /* ============ INSPECTIONS ============ */
 function inspForm(i,presetOrder){i=i||{};if(!ORDERS.length){toast(t('addFactFirst'));go('orders',document.querySelectorAll('.nav button')[2]);return;}
   const oid=i.orderId||presetOrder||ORDERS[0].id;
   const opts=ORDERS.map(o=>`<option value="${o.id}" ${oid===o.id?'selected':''}>${esc(o.po)} · ${esc(o.factoryName||'')}</option>`).join('');
   const types=[['أثناء الخط',t('typeInline')],['الفحص النهائي',t('typeFinal')]].concat(CHECKLISTS.map(c=>[c[0],c[0]]));
-  const typeOpts=types.map(([v,lbl])=>`<option value="${v}" ${(i.type||'الفحص النهائي')===v?'selected':''}>${lbl}</option>`).join('');
+  const defType=i.type||(TAB==='insp'&&INSPFILTER!=='all'?INSPFILTER:'الفحص النهائي');
+  const typeOpts=types.map(([v,lbl])=>`<option value="${v}" ${defType===v?'selected':''}>${lbl}</option>`).join('');
   modal(`<h3>${i.id?t('inspEdit'):t('inspNew')}</h3>
   <label class="inl">${t('orderLbl')}</label><select id="i-order">${opts}</select>
   <div class="grid2"><div><label class="inl">${t('typeLbl')}</label><select id="i-type" onchange="onInspTypeChange()">${typeOpts}</select></div>
@@ -697,7 +708,7 @@ function renderInsp(){const el=$('insp-list');if(!el)return;if(!INSP.length){el.
   <div style="display:flex;gap:8px;margin-bottom:10px"><button class="mini g" onclick="exportCSV()">${t('exportCsv')}</button></div>`;
   const list=INSP.filter(i=>INSPFILTER==='all'||i.type===INSPFILTER);
   if(!list.length){el.innerHTML=bar+empty(t('noData'));return;}
-  el.innerHTML=bar+list.map(i=>{const b=i.decision==='PASS'?'b-pass':'b-fail';const ph=(i.photos||[]).length;
+  el.innerHTML=bar+'<div class="cards">'+list.map(i=>{const b=i.decision==='PASS'?'b-pass':'b-fail';const ph=(i.photos||[]).length;
     const sum=(i.checklist&&i.checklist.length)
       ?`${t('chkItemsLbl')}: <b>${i.checklist.filter(x=>x.status==='pass').length}/${i.checklist.length}</b> ${t('statusPass')}`
       :`${t('sampleShort')} ${i.sampleSize} · ${t('majorLbl')} ${i.major} · ${t('minorLbl')} ${i.minor} · ${t('criticalLbl')} ${i.critical} · <b>${t('dhuShort')} ${i.dhu}</b>`;
@@ -707,7 +718,7 @@ function renderInsp(){const el=$('insp-list');if(!el)return;if(!INSP.length){el.
     <span class="badge ${b}">${i.decision==='PASS'?t('pass'):t('fail')}</span></div>
     <div class="row-btns"><button class="mini" onclick="printInsp('${i.id}')">${t('reportBtn')}</button>
     <button class="mini g" onclick="editInsp('${i.id}')">${t('edit')}</button>
-    <button class="mini r" onclick="delInsp('${i.id}')">${t('del')}</button></div></div>`;}).join('');}
+    <button class="mini r" onclick="delInsp('${i.id}')">${t('del')}</button></div></div>`;}).join('')+'</div>';}
 function csvCell(v){v=(v==null?'':String(v));return '"'+v.replace(/"/g,'""')+'"';}
 function exportCSV(){if(!INSP.length)return;
   const head=['التاريخ / Date','الطلبية / PO','المصنع / Factory','النوع / Type','العينة / Sample','كبير / Major','صغير / Minor','حرِج / Critical','DHU','القرار / Decision','المفتش / Inspector','ملاحظات / Notes'];
@@ -807,12 +818,12 @@ function toolResultSummary(c){const r=c.result;const mk=d=>d.decision==='PASS'?'
   if(c.type==='aq')return `${t('aqlSample')}: ${r.sample} · ${t('majorLbl')} ${r.maj}/${r.re25} · ${t('minorLbl')} ${r.min}/${r.re40}`;
   return `${t('fpShort')} ${mk(r.fp)} · ${t('shShort')} ${mk(r.sh)} · AQL ${mk(r.aq)}`;}
 function renderToolChk(){const el=$('toolchk-list');if(!el)return;if(!TOOLCHK.length){el.innerHTML=empty(t('noToolChk'));return;}
-  el.innerHTML=TOOLCHK.map(c=>{const b=c.result.decision==='PASS'?'b-pass':'b-fail';
+  el.innerHTML='<div class="cards">'+TOOLCHK.map(c=>{const b=c.result.decision==='PASS'?'b-pass':'b-fail';
     return `<div class="item"><div class="h"><div><div class="t">${esc(toolTypeLabel(c.type))}</div>
     <div class="s">🏭 ${esc(c.factoryName||'')} · ${fmtDate(c.date)}<br>${esc(toolResultSummary(c))}</div></div>
     <span class="badge ${b}">${c.result.decision==='PASS'?t('pass'):t('fail')}</span></div>
     <div class="row-btns"><button class="mini" onclick="printToolChk('${c.id}')">${t('reportBtn')}</button>
-    <button class="mini r" onclick="delToolChk('${c.id}')">${t('del')}</button></div></div>`;}).join('');}
+    <button class="mini r" onclick="delToolChk('${c.id}')">${t('del')}</button></div></div>`;}).join('')+'</div>';}
 function delToolChk(id){if(!confirm(t('delInspQ')))return;db.collection('qc_toolchecks').doc(id).delete().catch(e=>toast(rulesHint(e)));}
 function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
   const row=(l,v)=>`<tr><td style="font-weight:700;background:#f2f6f6;width:38%">${l}</td><td>${esc(v)}</td></tr>`;
