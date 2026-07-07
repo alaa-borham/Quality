@@ -293,6 +293,12 @@ defNew:'عيب جديد',defEdit:'تعديل عيب',defNameLbl:'اسم العي
 defDescLbl:'الوصف',defCauseLbl:'السبب',defActionLbl:'الإجراء',addDefNew:'➕ عيب جديد',enterDefName:'أدخل اسم العيب',delDefQ:'حذف هذا العيب؟',
 seqNew:'مرحلة جديدة',addSeqNew:'➕ مرحلة جديدة',seqCatLbl:'المجموعة/القسم *',seqCatPh:'مثال: التجميع',seqOpLbl:'اسم العملية *',
 seqEnLbl:'الاسم بالإنجليزية (اختياري)',seqTimingLbl:'التوقيت',seqImpLbl:'الأهمية',enterSeqFields:'أدخل المجموعة واسم العملية',
+chkDesc0:'فحص القماش والإكسسوارات فور وصولها من المورد وقبل بدء الإنتاج: التأكد من مطابقة المستندات والكمية، فحص عيوب القماش بنظام النقاط الأربع، والتحقق من اللون والدفعة (Shade) والوزن GSM والعرض والانكماش وثبات اللون.',
+chkDesc1:'مرحلة تسبق بدء خط الإنتاج: اجتماع لمراجعة المواصفات الفنية (Tech Pack) ونقاط القياس، فحص عينة الإنتاج الأولى مقارنة بالعينة الذهبية المعتمدة، واعتماد الإكسسوارات وألوان الصبغة واختبار الانكماش.',
+chkDesc2:'التحقق من صحة عملية قص الأقمشة قبل الخياطة: مراجعة تخطيط القص (Marker) والفرش، دقة القطع ومطابقتها للباترون، فصل دفعات الألوان المختلفة (Shades)، وفحص الأجزاء المقصوصة.',
+chkDesc3:'الفحوصات النهائية بعد الخياطة وقبل التعبئة: قص الخيوط الزائدة، الكي والبخار دون حرق أو لمعان، التأكد من النظافة من البقع، مطابقة الليبلات والباركود، وكشف الإبر المكسورة.',
+chkDesc4:'الفحص الإحصائي النهائي قبل الشحن وفق معايير AQL: سحب عينة عشوائية بحجم يحدده جدول AQL، فحص المظهر والصنعة (كبير 2.5 / صغير 4.0)، القياسات، تجانس اللون، التغليف والوسم، واختبار سحب الأزرار.',
+chkDesc5:'التحقق من الجاهزية النهائية للشحن: طريقة تعبئة القطع حسب المواصفة، صحة بيانات الكرتون (Marks) والوزن، محتوى الكراتين (Solid/Assorted)، مطابقة مستندات الشحن لأمر الشراء، وإصدار إذن الشحن.',
 rulesHint:'صلاحيات Firestore غير مفعّلة بعد — انشر قواعد qc (راجع README).',
 menuInfo:'مالك',
 e_email:'بريد غير صحيح',e_nouser:'المستخدم غير موجود',e_wrongpass:'كلمة المرور خاطئة',e_inuse:'البريد مستخدم مسبقاً',e_weak:'كلمة المرور ضعيفة (6 أحرف على الأقل)',e_cred:'بيانات الدخول غير صحيحة'
@@ -341,6 +347,12 @@ defNew:'New defect',defEdit:'Edit defect',defNameLbl:'Defect name *',defCatLbl:'
 defDescLbl:'Description',defCauseLbl:'Cause',defActionLbl:'Action',addDefNew:'➕ New defect',enterDefName:'Enter defect name',delDefQ:'Delete this defect?',
 seqNew:'New stage',addSeqNew:'➕ New stage',seqCatLbl:'Group/section *',seqCatPh:'e.g. Assembly',seqOpLbl:'Operation name *',
 seqEnLbl:'English name (optional)',seqTimingLbl:'Timing',seqImpLbl:'Priority',enterSeqFields:'Enter the group and operation name',
+chkDesc0:'Inspecting fabric and trims as soon as they arrive from the supplier, before production starts: verifying documents and quantity match, checking fabric defects with the 4-Point system, and checking shade, GSM weight, width, shrinkage, and color fastness.',
+chkDesc1:'The stage before the production line starts: a PP meeting to review the Tech Pack and POM, inspecting the first pre-production sample against the approved gold sample, and approving trims and dye lots plus a shrinkage test.',
+chkDesc2:'Verifying the cutting process before sewing: reviewing the marker layout and fabric spreading, cutting accuracy against the pattern, separating shade batches, and inspecting cut parts.',
+chkDesc3:'Final checks after sewing and before packing: trimming loose threads, pressing/steaming without shine or scorching, checking for stains, verifying labels and barcodes, and needle detection.',
+chkDesc4:'The final statistical inspection before shipment per AQL standards: drawing a random sample per the AQL table, checking workmanship (Major 2.5 / Minor 4.0), measurements, color uniformity, packaging and labeling, and a button pull test.',
+chkDesc5:'Verifying final shipment readiness: packing method per spec, correct carton marks and weight, carton content (Solid/Assorted), shipping documents matching the PO, and issuing the shipment release.',
 rulesHint:'Firestore rules not deployed yet — publish the qc rules (see README).',
 menuInfo:'Owner',
 e_email:'Invalid email',e_nouser:'User not found',e_wrongpass:'Wrong password',e_inuse:'Email already in use',e_weak:'Weak password (min 6 chars)',e_cred:'Invalid credentials'
@@ -754,6 +766,8 @@ function delDef(id){if(!confirm(t('delDefQ')))return;db.collection('qc_defects')
 let REFSUB='seq',CHKSUB=0;
 function goRef(id,btn){REFSUB=id;document.querySelectorAll('#ref-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');renderRef();}
 function goChk(i,btn){CHKSUB=i;document.querySelectorAll('#chk-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');renderChk();}
+function chkInfo(i,e){e.preventDefault();modal(`<h3>${esc(CHECKLISTS[i][0])}</h3><p style="line-height:1.7;color:var(--mut)">${esc(t('chkDesc'+i))}</p>
+  <div class="row-btns"><button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);return false;}
 function renderChk(){const el=$('chk-body');if(!el)return;const [,rows]=CHECKLISTS[CHKSUB];
   el.innerHTML=`<table class="rtbl" style="min-width:420px"><tr><th>${t('colItem')}</th><th>${t('colStd')}</th><th>${t('colTool')}</th></tr>
     ${rows.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')}</table>`;}
@@ -774,7 +788,7 @@ function renderRef(){const el=$('ref-body');if(!el)return;
     el.innerHTML=`<button class="btn" style="margin-bottom:12px" onclick="defForm()">${t('addDefNew')}</button>
       <table class="rtbl"><tr><th>م</th><th>${t('colDefect')}</th><th>${t('colCat')}</th><th>الوصف</th><th>${t('colCause')}</th><th>${t('colAction')}</th><th></th></tr>${defRows}</table>`;
   }else if(REFSUB==='chk'){
-    el.innerHTML=`<div class="subnav" id="chk-subnav">${CHECKLISTS.map((c,i)=>`<button class="${i===CHKSUB?'on':''}" onclick="goChk(${i},this)">${esc(c[0])}</button>`).join('')}</div><div id="chk-body"></div>`;
+    el.innerHTML=`<div class="subnav" id="chk-subnav">${CHECKLISTS.map((c,i)=>`<button class="${i===CHKSUB?'on':''}" onclick="goChk(${i},this)" oncontextmenu="return chkInfo(${i},event)">${esc(c[0])}</button>`).join('')}</div><div id="chk-body"></div>`;
     renderChk();
   }else if(REFSUB==='gloss'){
     el.innerHTML=`<table class="rtbl" style="min-width:320px"><tr><th>${t('colItem')}</th><th>المعنى</th></tr>${GLOSS.map(g=>`<tr><td><b>${esc(g[0])}</b></td><td>${esc(g[1])}</td></tr>`).join('')}</table>`;
