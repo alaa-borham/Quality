@@ -43,3 +43,8 @@ match /qc_inspections/{id} {
   allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
   allow update, delete: if qcIsMember() && resource.data.wsId == qcWs();
 }
+match /qc_defects/{id} {
+  allow read:   if qcIsMember() && resource.data.wsId == qcWs();
+  allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
+  allow update, delete: if qcIsMember() && resource.data.wsId == qcWs();
+}

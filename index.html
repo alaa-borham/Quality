@@ -289,6 +289,8 @@ resetSent:'أرسلنا رابط استعادة كلمة المرور إلى ب�
 enterEmailFirst:'اكتب بريدك في الخانة أولاً ثم اضغط «نسيت كلمة المرور»',enterEmailPass:'أدخل البريد وكلمة المرور',enterNameMsg:'أدخل الاسم',
 nameChanged:'تم تغيير الاسم',wsChanged:'تم تغيير اسم مساحة العمل',enterWsMsg:'أدخل اسم مساحة العمل',
 wsCreated:'تم إنشاء مساحة العمل — الكود: {c}',enterWsName2:'أدخل اسم مساحة العمل',enterCode:'أدخل الكود',noWs:'لا توجد مساحة بهذا الكود',joined:'تم الانضمام',
+defNew:'عيب جديد',defEdit:'تعديل عيب',defNameLbl:'اسم العيب *',defCatLbl:'التصنيف',catMajor:'كبير',catMinor:'صغير',catCritical:'حرِج',
+defDescLbl:'الوصف',defCauseLbl:'السبب',defActionLbl:'الإجراء',addDefNew:'➕ عيب جديد',enterDefName:'أدخل اسم العيب',delDefQ:'حذف هذا العيب؟',
 rulesHint:'صلاحيات Firestore غير مفعّلة بعد — انشر قواعد qc (راجع README).',
 menuInfo:'مالك',
 e_email:'بريد غير صحيح',e_nouser:'المستخدم غير موجود',e_wrongpass:'كلمة المرور خاطئة',e_inuse:'البريد مستخدم مسبقاً',e_weak:'كلمة المرور ضعيفة (6 أحرف على الأقل)',e_cred:'بيانات الدخول غير صحيحة'
@@ -333,6 +335,8 @@ resetSent:'Password reset link sent to your email ({e}) — check inbox and Spam
 enterEmailFirst:'Type your email in the field first, then tap “Forgot password”',enterEmailPass:'Enter email and password',enterNameMsg:'Enter your name',
 nameChanged:'Name updated',wsChanged:'Workspace name updated',enterWsMsg:'Enter workspace name',
 wsCreated:'Workspace created — code: {c}',enterWsName2:'Enter workspace name',enterCode:'Enter the code',noWs:'No workspace with this code',joined:'Joined',
+defNew:'New defect',defEdit:'Edit defect',defNameLbl:'Defect name *',defCatLbl:'Category',catMajor:'Major',catMinor:'Minor',catCritical:'Critical',
+defDescLbl:'Description',defCauseLbl:'Cause',defActionLbl:'Action',addDefNew:'➕ New defect',enterDefName:'Enter defect name',delDefQ:'Delete this defect?',
 rulesHint:'Firestore rules not deployed yet — publish the qc rules (see README).',
 menuInfo:'Owner',
 e_email:'Invalid email',e_nouser:'User not found',e_wrongpass:'Wrong password',e_inuse:'Email already in use',e_weak:'Weak password (min 6 chars)',e_cred:'Invalid credentials'
@@ -361,7 +365,7 @@ function today(){return new Date().toISOString().slice(0,10);}
 function roleTxt(){return MEMBER.role==='owner'?t('roleOwner'):t('roleInspector');}
 
 /* ============ State ============ */
-let ME=null,MEMBER=null,TAB='fact',FACT=[],ORDERS=[],INSP=[],ITEMS=[],WSCODE='—',unsub=[],AUTHMODE='login';
+let ME=null,MEMBER=null,TAB='fact',FACT=[],ORDERS=[],INSP=[],ITEMS=[],WSCODE='—',unsub=[],AUTHMODE='login',CUSTDEF=[];
 
 /* ============ AQL logic ============ */
 const AQLTAB=[[2,20,1,2,2,3],[151,32,2,3,3,4],[281,50,3,4,5,6],[501,80,5,6,7,8],
@@ -421,7 +425,8 @@ function listen(){unsub.forEach(u=>u&&u());unsub=[];const ws=MEMBER.wsId;
   unsub.push(db.collection('qc_workspaces').doc(ws).onSnapshot(d=>{if(d.exists){ITEMS=d.data().items||[];WSCODE=d.data().code||'—';if($('items-list'))renderItemsManager();}},console.error));
   unsub.push(db.collection('qc_factories').where('wsId','==',ws).onSnapshot(s=>{FACT=s.docs.map(d=>({id:d.id,...d.data()}));renderFact();if(TAB==='dash')renderDash();},console.error));
   unsub.push(db.collection('qc_orders').where('wsId','==',ws).onSnapshot(s=>{ORDERS=s.docs.map(d=>({id:d.id,...d.data()}));renderOrders();if(TAB==='dash')renderDash();},console.error));
-  unsub.push(db.collection('qc_inspections').where('wsId','==',ws).onSnapshot(s=>{INSP=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));renderInsp();renderDash();},console.error));}
+  unsub.push(db.collection('qc_inspections').where('wsId','==',ws).onSnapshot(s=>{INSP=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));renderInsp();renderDash();},console.error));
+  unsub.push(db.collection('qc_defects').where('wsId','==',ws).onSnapshot(s=>{CUSTDEF=s.docs.map(d=>({id:d.id,...d.data()}));if(REFSUB==='def')renderRef();},console.error));}
 
 /* ============ NAV ============ */
 function go(tb,btn){TAB=tb;['dash','insp','orders','fact','tools','ref'].forEach(x=>$('p-'+x).classList.toggle('hide',x!==tb));
@@ -527,7 +532,7 @@ function inspForm(i,presetOrder){i=i||{};if(!ORDERS.length){toast(t('addFactFirs
     <div><label class="inl">${t('minorLbl')}</label><input id="i-min" type="number" value="${esc(i.minor||0)}" oninput="previewDecision()"></div></div>
   <label class="inl">${t('criticalLbl')}</label><input id="i-cri" type="number" value="${esc(i.critical||0)}" oninput="previewDecision()">
   <label class="inl">${t('defLibLbl')}</label>
-  <div style="display:flex;gap:8px"><select id="i-defsel">${DEFECTS.map(d=>`<option value="${esc(d[0])}">${esc(d[0])} — ${esc(d[1])}</option>`).join('')}</select>
+  <div style="display:flex;gap:8px"><select id="i-defsel">${allDefects().map(d=>`<option value="${esc(d.name)}">${esc(d.name)} — ${esc(d.cat)}</option>`).join('')}</select>
     <button type="button" class="mini" onclick="addDefectFromLib()">${t('addDefBtn')}</button></div>
   <div id="i-deflist" style="margin-top:8px"></div>
   <label class="inl">${t('notesLbl')}</label><textarea id="i-notes" rows="2">${esc(i.notes||'')}</textarea>
@@ -546,7 +551,7 @@ function stageOptions(sel){let out='',cur='';SEQ.filter(r=>r[0]!=='تجهيز'&&
   out+=`<option value="${esc(r[1])}" ${sel===r[1]?'selected':''}>${esc(r[1])}</option>`;});if(cur)out+='</optgroup>';return out;}
 function onStageChange(){const el=$('i-stage-hint');if(!el)return;const v=$('i-stage').value;const r=SEQ.find(x=>x[1]===v);
   if(!r){el.innerHTML='';return;}el.innerHTML=`🔍 ${t('colCheckShort')}: <b>${esc(r[5])}</b> · ${t('colStd')}: ${esc(r[6])} ${r[4]==='حرجة'?'· '+catTag('حرِج'):''}`;}
-function catOf(name){const d=DEFECTS.find(x=>x[0]===name);return d?d[1]:'كبير';}
+function catOf(name){const d=allDefects().find(x=>x.name===name);return d?d.cat:'كبير';}
 function fieldOf(cat){return cat.indexOf('حر')>=0?'i-cri':(cat==='كبير'?'i-maj':'i-min');}
 function bump(cat,n){const id=fieldOf(cat);const el=$(id);if(el)el.value=Math.max(0,(+el.value||0)+n);}
 function addDefectFromLib(){const name=$('i-defsel').value;const cat=catOf(name);INSP_DEFECTS.push({name,cat});bump(cat,1);renderDefList();previewDecision();}
@@ -705,6 +710,24 @@ const CHECKLISTS=[
 ['التعبئة والشحن',[['طريقة التعبئة','حسب المواصفة','معاينة'],['بيانات الكرتون','Marks/الوزن','مطابقة'],['محتوى الكراتين','Solid/Assorted','فتح عشوائي'],['مستندات الشحن','مطابقة PO','مراجعة'],['إذن الشحن','تقرير + Release','إصدار']]]];
 const GLOSS=[['أول الخط','فحص أول قطعة قبل الإنتاج الكمّي'],['أثناء الخط','فحص دوري متنقل أثناء سير الخط (Inline)'],['نهاية الخط','فحص شامل في نهاية الخط (End of line)'],['حرجة','عملية تؤثر مباشرة على الشكل/الوظيفة'],['DHU','عدد العيوب لكل 100 قطعة'],['POM','نقاط القياس (Points of Measure)'],['AQL','الحد المقبول للجودة'],['4-Point','نظام نقاط فحص القماش'],['Shade','دفعة/تدرّج اللون'],['اختبار السحب','شدّ الزر للتأكد من التثبيت']];
 function catTag(c){const cls=c.indexOf('حرِج')>=0||c.indexOf('حرج')>=0?'tg-crit':(c==='كبير'?'tg-maj':'tg-min');return`<span class="tg ${cls}">${esc(c)}</span>`;}
+function allDefects(){return DEFECTS.map(d=>({name:d[0],cat:d[1],desc:d[2],cause:d[3],action:d[4],built:true}))
+  .concat(CUSTDEF.map(d=>({id:d.id,name:d.name,cat:d.cat,desc:d.desc||'',cause:d.cause||'',action:d.action||'',built:false})));}
+function defForm(d){d=d||{};modal(`<h3>${d.id?t('defEdit'):t('defNew')}</h3>
+  <label class="inl">${t('defNameLbl')}</label><input id="d-name" value="${esc(d.name||'')}">
+  <label class="inl">${t('defCatLbl')}</label><select id="d-cat">
+    <option value="كبير" ${(!d.cat||d.cat==='كبير')?'selected':''}>${t('catMajor')}</option>
+    <option value="صغير" ${d.cat==='صغير'?'selected':''}>${t('catMinor')}</option>
+    <option value="حرِج" ${d.cat==='حرِج'?'selected':''}>${t('catCritical')}</option></select>
+  <label class="inl">${t('defDescLbl')}</label><input id="d-desc" value="${esc(d.desc||'')}">
+  <label class="inl">${t('defCauseLbl')}</label><input id="d-cause" value="${esc(d.cause||'')}">
+  <label class="inl">${t('defActionLbl')}</label><input id="d-action" value="${esc(d.action||'')}">
+  <div class="row-btns"><button class="btn" onclick="saveDef('${d.id||''}')">${t('save')}</button>
+  <button class="btn sec" onclick="closeModal()">${t('cancel')}</button></div>`);}
+function saveDef(id){const name=$('d-name').value.trim();if(!name)return toast(t('enterDefName'));
+  const data={wsId:MEMBER.wsId,name,cat:$('d-cat').value,desc:$('d-desc').value.trim(),cause:$('d-cause').value.trim(),action:$('d-action').value.trim()};
+  const p=id?db.collection('qc_defects').doc(id).update(data):db.collection('qc_defects').add({...data,createdAt:FV.serverTimestamp()});
+  p.then(()=>{closeModal();toast(t('saved'));}).catch(e=>toast(rulesHint(e)));}
+function delDef(id){if(!confirm(t('delDefQ')))return;db.collection('qc_defects').doc(id).delete().catch(e=>toast(rulesHint(e)));}
 let REFSUB='seq',CHKSUB=0;
 function goRef(id,btn){REFSUB=id;document.querySelectorAll('#ref-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');renderRef();}
 function goChk(i,btn){CHKSUB=i;document.querySelectorAll('#chk-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');renderChk();}
@@ -718,8 +741,11 @@ function renderRef(){const el=$('ref-body');if(!el)return;
       <td><button class="mini" style="white-space:nowrap" onclick="inspFromRef('${esc(r[1]).replace(/'/g,"&#39;")}')">${t('recordInsp')}</button></td></tr>`).join('');
     el.innerHTML=`<table class="rtbl"><tr><th>م</th><th>${t('colStage')}</th><th>${t('colOp')}</th><th>توقيت</th><th>${t('colImp')}</th><th>${t('colCheck')}</th><th>${t('colStd')}</th><th></th></tr>${seqRows}</table>`;
   }else if(REFSUB==='def'){
-    const defRows=DEFECTS.map((d,i)=>`<tr><td>${i+1}</td><td>${esc(d[0])}</td><td>${catTag(d[1])}</td><td>${esc(d[2])}</td><td>${esc(d[3])}</td><td>${esc(d[4])}</td></tr>`).join('');
-    el.innerHTML=`<table class="rtbl"><tr><th>م</th><th>${t('colDefect')}</th><th>${t('colCat')}</th><th>الوصف</th><th>${t('colCause')}</th><th>${t('colAction')}</th></tr>${defRows}</table>`;
+    const all=allDefects();
+    const defRows=all.map((d,i)=>`<tr><td>${i+1}</td><td>${esc(d.name)}</td><td>${catTag(d.cat)}</td><td>${esc(d.desc)}</td><td>${esc(d.cause)}</td><td>${esc(d.action)}</td>
+      <td>${d.built?'':`<button class="mini" onclick='defForm(${esc(JSON.stringify(d)).replace(/'/g,"&#39;")})'>${t('edit')}</button> <button class="mini" onclick="delDef('${d.id}')">${t('del')}</button>`}</td></tr>`).join('');
+    el.innerHTML=`<button class="btn" style="margin-bottom:12px" onclick="defForm()">${t('addDefNew')}</button>
+      <table class="rtbl"><tr><th>م</th><th>${t('colDefect')}</th><th>${t('colCat')}</th><th>الوصف</th><th>${t('colCause')}</th><th>${t('colAction')}</th><th></th></tr>${defRows}</table>`;
   }else if(REFSUB==='chk'){
     el.innerHTML=`<div class="subnav" id="chk-subnav">${CHECKLISTS.map((c,i)=>`<button class="${i===CHKSUB?'on':''}" onclick="goChk(${i},this)">${esc(c[0])}</button>`).join('')}</div><div id="chk-body"></div>`;
     renderChk();
