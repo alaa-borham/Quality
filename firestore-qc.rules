@@ -13,6 +13,10 @@ function qcIsMember() {
   return request.auth != null
     && exists(/databases/$(database)/documents/qc_members/$(request.auth.uid));
 }
+function qcIsOwner() {
+  return qcIsMember()
+    && get(/databases/$(database)/documents/qc_members/$(request.auth.uid)).data.role == 'owner';
+}
 
 // العضوية: كل مستخدم يكتب/يقرأ مستنده فقط
 match /qc_members/{uid} {
@@ -28,25 +32,29 @@ match /qc_workspaces/{wsId} {
 }
 
 // البيانات التشغيلية: مقصورة على أعضاء نفس مساحة العمل
+// (إدارة المصانع للمالك فقط — والحذف عموماً للمالك فقط)
 match /qc_factories/{id} {
   allow read:   if qcIsMember() && resource.data.wsId == qcWs();
-  allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
-  allow update, delete: if qcIsMember() && resource.data.wsId == qcWs();
+  allow create: if qcIsOwner() && request.resource.data.wsId == qcWs();
+  allow update, delete: if qcIsOwner() && resource.data.wsId == qcWs();
 }
 match /qc_orders/{id} {
   allow read:   if qcIsMember() && resource.data.wsId == qcWs();
   allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
-  allow update, delete: if qcIsMember() && resource.data.wsId == qcWs();
+  allow update: if qcIsMember() && resource.data.wsId == qcWs();
+  allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
 }
 match /qc_inspections/{id} {
   allow read:   if qcIsMember() && resource.data.wsId == qcWs();
   allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
-  allow update, delete: if qcIsMember() && resource.data.wsId == qcWs();
+  allow update: if qcIsMember() && resource.data.wsId == qcWs();
+  allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
 }
 match /qc_defects/{id} {
   allow read:   if qcIsMember() && resource.data.wsId == qcWs();
   allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
-  allow update, delete: if qcIsMember() && resource.data.wsId == qcWs();
+  allow update: if qcIsMember() && resource.data.wsId == qcWs();
+  allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
 }
 
 // تسلسل الخياطة القابل للتخصيص: مستند واحد لكل مساحة عمل (معرّفه = wsId)
@@ -58,5 +66,6 @@ match /qc_seqcfg/{wsId} {
 match /qc_toolchecks/{id} {
   allow read:   if qcIsMember() && resource.data.wsId == qcWs();
   allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
-  allow update, delete: if qcIsMember() && resource.data.wsId == qcWs();
+  allow update: if qcIsMember() && resource.data.wsId == qcWs();
+  allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
 }

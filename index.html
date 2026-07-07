@@ -192,6 +192,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div class="bars" id="chart"></div></div>
       <div class="card"><div style="font-weight:700;margin-bottom:6px" data-i18n="decTitle">توزيع القرارات</div><div id="decdist"></div></div>
       </div>
+      <div class="card"><div style="font-weight:700;margin-bottom:10px" data-i18n="cmpTitle">مقارنة الموردين</div><div id="factcmp"></div></div>
     </div>
     <div id="p-insp" class="hide"><div class="sec-h">✅ <span data-i18n="inspTitle">الفحوصات</span></div>
       <div class="card" style="padding:12px"><div class="grid3">
@@ -318,6 +319,7 @@ typeInline:'أثناء الخط',typeFinal:'الفحص النهائي',typeAll:'
 chkItemsLbl:'بنود الفحص',statusPass:'مطابق',statusFail:'غير مطابق',statusNA:'لا ينطبق',
 searchLbl:'بحث',searchPh:'رقم الطلبية / المصنع / ملاحظات...',fromLbl:'من تاريخ',toLbl:'إلى تاريخ',
 repFactTitle:'تقرير المورد الشامل',ratingLbl:'التقييم العام',ratingExc:'ممتاز',ratingGood:'جيد',ratingOk:'مقبول',ratingPoor:'ضعيف',
+cmpTitle:'مقارنة الموردين (نسبة الاجتياز)',cmpChecks:'فحص',statusLbl:'حالة الطلبية',stOpen:'🟢 مفتوحة',stClosed:'🔒 مغلقة',stShipped:'🚚 مشحونة',
 inspSaved:'تم حفظ الفحص',dhuShort:'DHU',acBig:'حد قبول كبير',acSmall:'صغير',sampleShort:'العينة',
 photosLbl:'الصور (اختياري)',addPhoto:'📷 إضافة صورة',maxPhotos:'الحد الأقصى 4 صور',reportBtn:'تقرير',exportCsv:'⬇ تصدير Excel',printBtn:'🖨 طباعة / حفظ PDF',
 repTitle:'تقرير فحص الجودة',repDecision:'القرار النهائي',repNotes:'ملاحظات',repInspector:'المفتش',repDate:'التاريخ',repPhotos:'الصور',repClose:'إغلاق',compressing:'جارٍ معالجة الصورة…',
@@ -389,6 +391,7 @@ typeInline:'Inline',typeFinal:'Final inspection',typeAll:'All',prevHint:'Enter s
 chkItemsLbl:'Checklist items',statusPass:'Conforms',statusFail:'Non-conforming',statusNA:'N/A',
 searchLbl:'Search',searchPh:'PO / factory / notes...',fromLbl:'From date',toLbl:'To date',
 repFactTitle:'Supplier report',ratingLbl:'Overall rating',ratingExc:'Excellent',ratingGood:'Good',ratingOk:'Acceptable',ratingPoor:'Poor',
+cmpTitle:'Supplier comparison (pass rate)',cmpChecks:'checks',statusLbl:'Order status',stOpen:'🟢 Open',stClosed:'🔒 Closed',stShipped:'🚚 Shipped',
 inspSaved:'Inspection saved',dhuShort:'DHU',acBig:'Major Ac',acSmall:'Minor',sampleShort:'Sample',
 photosLbl:'Photos (optional)',addPhoto:'📷 Add photo',maxPhotos:'Max 4 photos',reportBtn:'Report',exportCsv:'⬇ Export Excel',printBtn:'🖨 Print / save PDF',
 repTitle:'Quality Inspection Report',repDecision:'Final decision',repNotes:'Notes',repInspector:'Inspector',repDate:'Date',repPhotos:'Photos',repClose:'Close',compressing:'Processing image…',
@@ -448,6 +451,7 @@ function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');set
 function fmtDate(d){if(!d)return'';const x=d.toDate?d.toDate():new Date(d);return x.toLocaleDateString(LANG==='ar'?'ar-EG':'en-GB',{day:'2-digit',month:'2-digit',year:'numeric'});}
 function today(){return new Date().toISOString().slice(0,10);}
 function roleTxt(){return MEMBER.role==='owner'?t('roleOwner'):t('roleInspector');}
+function isOwner(){return !!(MEMBER&&MEMBER.role==='owner');}
 
 /* ============ State ============ */
 let ME=null,MEMBER=null,TAB='fact',FACT=[],ORDERS=[],INSP=[],ITEMS=[],WSCODE='—',unsub=[],AUTHMODE='login',CUSTDEF=[],WSEQ=null,TOOLCHK=[];
@@ -513,12 +517,12 @@ function listen(){unsub.forEach(u=>u&&u());unsub=[];const ws=MEMBER.wsId;
   unsub.push(db.collection('qc_inspections').where('wsId','==',ws).onSnapshot(s=>{INSP=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));renderInsp();renderDash();},console.error));
   unsub.push(db.collection('qc_defects').where('wsId','==',ws).onSnapshot(s=>{CUSTDEF=s.docs.map(d=>({id:d.id,...d.data()}));if(REFSUB==='def')renderRef();},console.error));
   unsub.push(db.collection('qc_seqcfg').doc(ws).onSnapshot(d=>{WSEQ=(d.exists&&d.data().list)?d.data().list:null;if(REFSUB==='seq')renderRef();},console.error));
-  unsub.push(db.collection('qc_toolchecks').where('wsId','==',ws).onSnapshot(s=>{TOOLCHK=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));if(TAB==='toolchk')renderToolChk();},console.error));}
+  unsub.push(db.collection('qc_toolchecks').where('wsId','==',ws).onSnapshot(s=>{TOOLCHK=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));if(TAB==='toolchk')renderToolChk();if(TAB==='dash')renderDash();},console.error));}
 
 /* ============ NAV ============ */
 function go(tb,btn){TAB=tb;['dash','insp','orders','fact','tools','ref','toolchk'].forEach(x=>$('p-'+x).classList.toggle('hide',x!==tb));
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');
-  $('fab').style.display=['insp','orders','fact'].includes(tb)?'flex':'none';if(tb==='dash')renderDash();if(tb==='ref')renderRef();
+  $('fab').style.display=(['insp','orders'].includes(tb)||(tb==='fact'&&isOwner()))?'flex':'none';if(tb==='dash')renderDash();if(tb==='ref')renderRef();
   if(tb==='tools')renderToolFactSelects();if(tb==='toolchk')renderToolChk();}
 function fabAction(){if(TAB==='fact')factForm();else if(TAB==='orders')orderForm();else if(TAB==='insp')inspForm();}
 const NAV_TITLE={fact:'navFact',orders:'navOrders',insp:'navInsp',dash:'navDash',tools:'navTools',ref:'navRef',toolchk:'navToolChk'};
@@ -575,17 +579,19 @@ function renderFact(){const el=$('fact-list');if(!el)return;if(!FACT.length){el.
   el.innerHTML='<div class="cards">'+FACT.map(f=>`<div class="item"><div class="h"><div><div class="t">🏭 ${esc(f.name)}</div>
     <div class="s">${esc(f.country||'—')} ${f.contact?'· '+esc(f.contact):''}</div></div></div>
     <div class="row-btns"><button class="mini" onclick="factReport('${f.id}')">${t('reportBtn')}</button>
-    <button class="mini g" onclick='factForm(${JSON.stringify(f).replace(/'/g,"&#39;")})'>${t('edit')}</button>
-    <button class="mini r" onclick="delFact('${f.id}')">${t('del')}</button></div></div>`).join('')+'</div>';}
-function factReport(fid){const f=FACT.find(x=>x.id===fid);if(!f)return;
-  const oids=ORDERS.filter(o=>o.factoryId===fid).map(o=>o.id);
+    ${isOwner()?`<button class="mini g" onclick='factForm(${JSON.stringify(f).replace(/'/g,"&#39;")})'>${t('edit')}</button>
+    <button class="mini r" onclick="delFact('${f.id}')">${t('del')}</button>`:''}</div></div>`).join('')+'</div>';}
+function factStats(f){const oids=ORDERS.filter(o=>o.factoryId===f.id).map(o=>o.id);
   const insp=INSP.filter(i=>oids.includes(i.orderId)||i.factoryName===f.name);
-  const checks=TOOLCHK.filter(c=>c.factoryId===fid||c.factoryName===f.name);
+  const checks=TOOLCHK.filter(c=>c.factoryId===f.id||c.factoryName===f.name);
   const n=insp.length,pass=insp.filter(i=>i.decision==='PASS').length;
   const aql=insp.filter(i=>i.dhu!=null);
-  const avgDhu=aql.length?Math.round(aql.reduce((s,i)=>s+(i.dhu||0),0)/aql.length*100)/100:'—';
+  const avgDhu=aql.length?Math.round(aql.reduce((s,i)=>s+(i.dhu||0),0)/aql.length*100)/100:null;
   const tn=checks.length,tpass=checks.filter(c=>c.result.decision==='PASS').length;
   const tot=n+tn,rate=tot?Math.round((pass+tpass)/tot*100):null;
+  return{insp,checks,n,pass,avgDhu,tn,tpass,tot,rate};}
+function factReport(fid){const f=FACT.find(x=>x.id===fid);if(!f)return;
+  const {insp,checks,n,pass,avgDhu,tn,tpass,rate}=factStats(f);
   const rating=rate==null?'—':(rate>=90?t('ratingExc'):(rate>=75?t('ratingGood'):(rate>=50?t('ratingOk'):t('ratingPoor'))));
   const rcol=rate==null?'#666':(rate>=90?'#1e7e40':(rate>=75?'#2e75b6':(rate>=50?'#b58900':'#b02a26')));
   const row=(l,v)=>`<tr><td style="font-weight:700;background:#f2f6f6;width:38%">${l}</td><td>${v}</td></tr>`;
@@ -603,7 +609,7 @@ function factReport(fid){const f=FACT.find(x=>x.id===fid);if(!f)return;
     <table style="width:100%;border-collapse:collapse;margin-top:14px;font-size:14px" border="1" cellpadding="8">
       ${row(t('factNameLbl').replace(' *',''),esc(f.name))}${row(t('countryLbl'),esc(f.country||'—'))}${row(t('contactLbl'),esc(f.contact||'—'))}
       ${row(t('kTotal'),n)}${row(t('pass')+' / '+t('fail'),pass+' / '+(n-pass))}
-      ${row(t('kDhu'),avgDhu)}${row(t('navToolChk'),tn+(tn?' ('+t('pass')+' '+tpass+')':''))}
+      ${row(t('kDhu'),avgDhu==null?'—':avgDhu)}${row(t('navToolChk'),tn+(tn?' ('+t('pass')+' '+tpass+')':''))}
       ${row(t('kRft'),rate==null?'—':rate+'%')}</table>
     <div style="margin-top:14px;padding:12px;border:2px solid ${rcol};border-radius:10px;text-align:center">
       <span style="font-size:13px;color:#555">${t('ratingLbl')}: </span>
@@ -629,22 +635,33 @@ function orderForm(o){o=o||{};if(!FACT.length){toast(t('addFactFirst'));go('fact
     <div><label class="inl">${t('modelLbl')}</label><input id="o-model" value="${esc(o.model||'')}"></div></div>
   <div class="grid2"><div><label class="inl">${t('itemLbl')}</label>${itemField}</div>
     <div><label class="inl">${t('qtyLbl')}</label><input id="o-qty" type="number" value="${esc(o.qty||'')}"></div></div>
-  <label class="inl">${t('colorLbl')}</label><input id="o-color" value="${esc(o.color||'')}">
+  <div class="grid2"><div><label class="inl">${t('colorLbl')}</label><input id="o-color" value="${esc(o.color||'')}"></div>
+    <div><label class="inl">${t('statusLbl')}</label><select id="o-status">
+      <option value="open" ${(o.status||'open')==='open'?'selected':''}>${t('stOpen')}</option>
+      <option value="closed" ${o.status==='closed'?'selected':''}>${t('stClosed')}</option>
+      <option value="shipped" ${o.status==='shipped'?'selected':''}>${t('stShipped')}</option></select></div></div>
   <div class="row-btns"><button class="btn" onclick="saveOrder('${o.id||''}')">${t('save')}</button>
   <button class="btn sec" onclick="closeModal()">${t('cancel')}</button></div>`);}
 function saveOrder(id){const fid=$('o-fact').value,po=$('o-po').value.trim(),qty=+$('o-qty').value||0;
   if(!po||!qty)return toast(t('enterPoQty'));const fname=(FACT.find(f=>f.id===fid)||{}).name||'';
-  const data={wsId:MEMBER.wsId,factoryId:fid,factoryName:fname,po,model:$('o-model').value.trim(),item:$('o-item').value.trim(),qty,color:$('o-color').value.trim()};
+  const data={wsId:MEMBER.wsId,factoryId:fid,factoryName:fname,po,model:$('o-model').value.trim(),item:$('o-item').value.trim(),qty,color:$('o-color').value.trim(),status:$('o-status').value};
   const p=id?db.collection('qc_orders').doc(id).update(data):db.collection('qc_orders').add({...data,createdAt:FV.serverTimestamp()});
   p.then(()=>{closeModal();toast(t('saved'));}).catch(e=>toast(rulesHint(e)));}
 function delOrder(id){if(!confirm(t('delOrderQ')))return;db.collection('qc_orders').doc(id).delete().then(()=>toast(t('deleted')));}
+let ORDFILTER='all';
+function goOrdFilter(v){ORDFILTER=v;renderOrders();}
+function ordStatusLabel(s){return s==='closed'?t('stClosed'):(s==='shipped'?t('stShipped'):t('stOpen'));}
 function renderOrders(){const el=$('orders-list');if(!el)return;if(!ORDERS.length){el.innerHTML=empty(t('noOrders'));return;}
-  el.innerHTML='<div class="cards">'+ORDERS.map(o=>{const n=INSP.filter(i=>i.orderId===o.id).length;
-    return `<div class="item"><div class="h"><div><div class="t">📦 ${esc(o.po)} <span class="chip">${esc(o.item||'')}</span></div>
+  const fbtn=(v,lbl)=>`<button class="${ORDFILTER===v?'on':''}" onclick="goOrdFilter('${v}')">${lbl}</button>`;
+  const bar=`<div class="subnav">${fbtn('all','📋 '+t('typeAll'))}${fbtn('open',t('stOpen'))}${fbtn('closed',t('stClosed'))}${fbtn('shipped',t('stShipped'))}</div>`;
+  const list=ORDERS.filter(o=>ORDFILTER==='all'||(o.status||'open')===ORDFILTER);
+  if(!list.length){el.innerHTML=bar+empty(t('noData'));return;}
+  el.innerHTML=bar+'<div class="cards">'+list.map(o=>{const n=INSP.filter(i=>i.orderId===o.id).length;
+    return `<div class="item"><div class="h"><div><div class="t">📦 ${esc(o.po)} <span class="chip">${esc(o.item||'')}</span> <span class="chip">${ordStatusLabel(o.status||'open')}</span></div>
     <div class="s">🏭 ${esc(o.factoryName||'')} · ${t('qtyShort')} ${o.qty} ${o.color?'· '+esc(o.color):''} · ${t('inspCount')}: ${n}</div></div></div>
     <div class="row-btns"><button class="mini" onclick='inspForm(null,"${o.id}")'>${t('inspect')}</button>
     <button class="mini g" onclick='orderForm(${JSON.stringify(o).replace(/'/g,"&#39;")})'>${t('edit')}</button>
-    <button class="mini r" onclick="delOrder('${o.id}')">${t('del')}</button></div></div>`;}).join('')+'</div>';}
+    ${isOwner()?`<button class="mini r" onclick="delOrder('${o.id}')">${t('del')}</button>`:''}</div></div>`;}).join('')+'</div>';}
 
 /* ============ INSPECTIONS ============ */
 function inspForm(i,presetOrder){i=i||{};if(!ORDERS.length){toast(t('addFactFirst'));go('orders',document.querySelectorAll('.nav button')[2]);return;}
@@ -779,7 +796,7 @@ function renderInsp(){const el=$('insp-list');if(!el)return;if(!INSP.length){el.
     <span class="badge ${b}">${i.decision==='PASS'?t('pass'):t('fail')}</span></div>
     <div class="row-btns"><button class="mini" onclick="printInsp('${i.id}')">${t('reportBtn')}</button>
     <button class="mini g" onclick="editInsp('${i.id}')">${t('edit')}</button>
-    <button class="mini r" onclick="delInsp('${i.id}')">${t('del')}</button></div></div>`;}).join('')+'</div>';}
+    ${isOwner()?`<button class="mini r" onclick="delInsp('${i.id}')">${t('del')}</button>`:''}</div></div>`;}).join('')+'</div>';}
 function csvCell(v){v=(v==null?'':String(v));return '"'+v.replace(/"/g,'""')+'"';}
 function exportCSV(){const list=filteredInsp();if(!list.length)return toast(t('noData'));
   const head=['التاريخ / Date','الطلبية / PO','المصنع / Factory','النوع / Type','العينة / Sample','كبير / Major','صغير / Minor','حرِج / Critical','DHU','البنود / Items','بنود غير مطابقة / Failed items','القرار / Decision','المفتش / Inspector','ملاحظات / Notes'];
@@ -841,7 +858,12 @@ function renderDash(){if(!$('kpis'))return;
   const f=n-pass;
   $('decdist').innerHTML=n?`<div style="display:flex;height:26px;border-radius:8px;overflow:hidden">
     <div style="width:${pass/n*100}%;background:var(--green)"></div><div style="width:${f/n*100}%;background:var(--red)"></div></div>
-    <div class="note" style="margin-top:6px">✔ ${t('pass')}: ${pass} · ✘ ${t('fail')}: ${f}</div>`:empty(t('noData'));}
+    <div class="note" style="margin-top:6px">✔ ${t('pass')}: ${pass} · ✘ ${t('fail')}: ${f}</div>`:empty(t('noData'));
+  if($('factcmp')){const cmp=FACT.map(x=>({f:x,s:factStats(x)})).filter(x=>x.s.tot>0).sort((a,b)=>(b.s.rate||0)-(a.s.rate||0));
+    $('factcmp').innerHTML=cmp.length?cmp.map(({f,s})=>{const col=s.rate>=90?'var(--green)':(s.rate>=70?'var(--amber)':'var(--red)');
+      return `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;gap:8px;flex-wrap:wrap">
+        <b>🏭 ${esc(f.name)}</b><span>${s.tot} ${t('cmpChecks')}${s.avgDhu!=null?' · DHU '+s.avgDhu:''} · <b>${s.rate}%</b></span></div>
+        <div style="height:10px;background:#eef2f5;border-radius:6px;overflow:hidden"><div style="width:${s.rate}%;height:100%;background:${col}"></div></div></div>`;}).join(''):empty(t('noData'));}}
 
 /* ============ TOOLS ============ */
 function goTool(id,btn){const all=id==='all';
@@ -894,7 +916,7 @@ function renderToolChk(){const el=$('toolchk-list');if(!el)return;if(!TOOLCHK.le
     <div class="s">🏭 ${esc(c.factoryName||'')} · ${fmtDate(c.date)}<br>${esc(toolResultSummary(c))}</div></div>
     <span class="badge ${b}">${c.result.decision==='PASS'?t('pass'):t('fail')}</span></div>
     <div class="row-btns"><button class="mini" onclick="printToolChk('${c.id}')">${t('reportBtn')}</button>
-    <button class="mini r" onclick="delToolChk('${c.id}')">${t('del')}</button></div></div>`;}).join('')+'</div>';}
+    ${isOwner()?`<button class="mini r" onclick="delToolChk('${c.id}')">${t('del')}</button>`:''}</div></div>`;}).join('')+'</div>';}
 function delToolChk(id){if(!confirm(t('delInspQ')))return;db.collection('qc_toolchecks').doc(id).delete().catch(e=>toast(rulesHint(e)));}
 function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
   const row=(l,v)=>`<tr><td style="font-weight:700;background:#f2f6f6;width:38%">${l}</td><td>${esc(v)}</td></tr>`;
@@ -1040,7 +1062,7 @@ function renderRef(){const el=$('ref-body');if(!el)return;
   }else if(REFSUB==='def'){
     const all=allDefects();
     const defRows=all.map((d,i)=>`<tr><td>${i+1}</td><td>${esc(d.name)}</td><td>${catTag(d.cat)}</td><td>${esc(d.desc)}</td><td>${esc(d.cause)}</td><td>${esc(d.action)}</td>
-      <td>${d.built?'':`<button class="mini" onclick='defForm(${esc(JSON.stringify(d)).replace(/'/g,"&#39;")})'>${t('edit')}</button> <button class="mini" onclick="delDef('${d.id}')">${t('del')}</button>`}</td></tr>`).join('');
+      <td>${d.built?'':`<button class="mini" onclick='defForm(${esc(JSON.stringify(d)).replace(/'/g,"&#39;")})'>${t('edit')}</button> ${isOwner()?`<button class="mini" onclick="delDef('${d.id}')">${t('del')}</button>`:''}`}</td></tr>`).join('');
     el.innerHTML=`<button class="btn" style="margin-bottom:12px" onclick="defForm()">${t('addDefNew')}</button>
       <table class="rtbl"><tr><th>م</th><th>${t('colDefect')}</th><th>${t('colCat')}</th><th>الوصف</th><th>${t('colCause')}</th><th>${t('colAction')}</th><th></th></tr>${defRows}</table>`;
   }else if(REFSUB==='chk'){
