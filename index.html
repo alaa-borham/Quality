@@ -192,9 +192,17 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <button class="on" onclick="goTool('fp',this)" oncontextmenu="return toolInfo('fp',event)" data-i18n="fpTitle">حاسبة نظام النقاط الأربع (فحص القماش)</button>
         <button onclick="goTool('sh',this)" oncontextmenu="return toolInfo('sh',event)" data-i18n="shTitle">حاسبة انكماش القماش</button>
         <button onclick="goTool('aq',this)" oncontextmenu="return toolInfo('aq',event)" data-i18n="aqlTitle">جدول AQL التفاعلي (مستوى II)</button>
+        <button onclick="goTool('all',this)" oncontextmenu="return toolInfo('all',event)" data-i18n="allTitle">فحص شامل (الثلاث عمليات)</button>
+      </div>
+      <div id="tool-all" class="card hide">
+        <div class="grid2"><div><label class="inl" data-i18n="factoryLbl2">المصنع</label><select id="all-fact"></select></div>
+          <div><label class="inl" data-i18n="dateLbl">التاريخ</label><input id="all-date" type="date"></div></div>
+        <div class="note" style="margin-top:6px" data-i18n="allHint">املأ حقول العمليات الثلاث بالأسفل ثم احسب واحفظ الكل كسجل واحد.</div>
+        <div class="row-btns"><button class="btn" onclick="calcAll()" data-i18n="calcAll">احسب الكل</button>
+        <button class="btn sec" onclick="saveToolCheck('all')" data-i18n="saveCheck">💾 حفظ</button></div>
       </div>
       <div id="tool-fp" class="card">
-        <div class="grid2"><div><label class="inl" data-i18n="factoryLbl2">المصنع</label><select id="fp-fact"></select></div>
+        <div class="grid2" id="fp-factrow"><div><label class="inl" data-i18n="factoryLbl2">المصنع</label><select id="fp-fact"></select></div>
           <div><label class="inl" data-i18n="dateLbl">التاريخ</label><input id="fp-date" type="date"></div></div>
         <div class="grid2"><div><label class="inl" data-i18n="fpLen">الطول المفحوص (ياردة)</label><input id="fp-len" type="number" value="120"></div>
           <div><label class="inl" data-i18n="fpWid">عرض القماش (إنش)</label><input id="fp-wid" type="number" value="60"></div></div>
@@ -208,7 +216,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div class="res-box" id="fp-res"></div>
       </div>
       <div id="tool-sh" class="card hide">
-        <div class="grid2"><div><label class="inl" data-i18n="factoryLbl2">المصنع</label><select id="sh-fact"></select></div>
+        <div class="grid2" id="sh-factrow"><div><label class="inl" data-i18n="factoryLbl2">المصنع</label><select id="sh-fact"></select></div>
           <div><label class="inl" data-i18n="dateLbl">التاريخ</label><input id="sh-date" type="date"></div></div>
         <div class="grid2"><div><label class="inl" data-i18n="shLb">الطول قبل</label><input id="sh-lb" type="number" value="150"></div>
           <div><label class="inl" data-i18n="shLa">الطول بعد</label><input id="sh-la" type="number" value="148"></div></div>
@@ -220,7 +228,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div class="res-box" id="sh-res"></div>
       </div>
       <div id="tool-aq" class="card hide">
-        <div class="grid2"><div><label class="inl" data-i18n="factoryLbl2">المصنع</label><select id="aq-fact"></select></div>
+        <div class="grid2" id="aq-factrow"><div><label class="inl" data-i18n="factoryLbl2">المصنع</label><select id="aq-fact"></select></div>
           <div><label class="inl" data-i18n="dateLbl">التاريخ</label><input id="aq-date" type="date"></div></div>
         <div class="grid2"><div><label class="inl" data-i18n="aqlLot">حجم الشحنة</label><input id="aq-lot" type="number" value="1000"></div>
           <div><label class="inl" data-i18n="aqlMaj">عيوب كبيرة مكتشفة</label><input id="aq-maj" type="number" value="0"></div></div>
@@ -293,6 +301,9 @@ factoryLbl2:'المصنع',saveCheck:'💾 حفظ',selectFactory:'— اختر �
 toolDescfp:'حاسبة نظام النقاط الأربع لتقييم جودة القماش الخام: تُدخل عيوب القماش المكتشفة موزعة حسب حجمها (أقل من 3 إنش، 3–6، 6–9، أكثر من 9 إنش أو ثقب)، فتحسب عدد النقاط لكل 100 ياردة مربعة وتقارنها بالحد المسموح لتحديد قبول أو رفض اللفة.',
 toolDescsh:'حاسبة انكماش القماش: تقيس نسبة تقلّص الطول والعرض بعد الغسيل أو الكي مقارنة بالمقاس الأصلي، لمعرفة ما إذا كان الانكماش ضمن الحد المسموح المتفق عليه أم يستدعي تعديل الباترون.',
 toolDescaq:'جدول AQL التفاعلي (مستوى فحص II): يحدد حجم العينة المطلوب سحبها حسب حجم الشحنة، وحدود القبول والرفض للعيوب الكبيرة والصغيرة، لاتخاذ قرار قبول أو رفض الشحنة بالكامل إحصائياً.',
+allTitle:'فحص شامل (الثلاث عمليات)',allHint:'املأ حقول العمليات الثلاث بالأسفل ثم احسب واحفظ الكل كسجل واحد.',calcAll:'احسب الكل',
+fpShort:'النقاط الأربع',shShort:'الانكماش',
+toolDescall:'وضع الفحص الشامل: تنفيذ العمليات الثلاث (النقاط الأربع، الانكماش، AQL) دفعة واحدة لنفس المصنع والتاريخ، وحفظها كسجل واحد بقرار إجمالي — يُقبل فقط إذا اجتازت العمليات الثلاث جميعها.',
 fpTitle:'حاسبة نظام النقاط الأربع (فحص القماش)',fpLen:'الطول المفحوص (ياردة)',fpWid:'عرض القماش (إنش)',
 fp1:'عيوب ≤3 إنش (×1)',fp2:'عيوب 3–6 (×2)',fp3:'عيوب 6–9 (×3)',fp4:'أكثر من 9 أو ثقب (×4)',fpLim:'الحد المسموح (نقطة/100ياردة²)',
 calc:'احسب',fpUnit:'نقطة/100ياردة²',fpTotal:'إجمالي النقاط',limit:'الحد',enterLW:'أدخل الطول والعرض',
@@ -351,6 +362,9 @@ factoryLbl2:'Factory',saveCheck:'💾 Save',selectFactory:'— select factory �
 toolDescfp:'The 4-Point System calculator rates raw fabric quality: enter defects found grouped by size (up to 3in, 3–6, 6–9, over 9in or a hole); it computes points per 100 square yards and compares them to the allowed limit to accept or reject the roll.',
 toolDescsh:'The fabric shrinkage calculator measures how much length and width shrink after washing/pressing versus the original size, to check whether shrinkage is within the agreed limit or the pattern needs adjusting.',
 toolDescaq:'The interactive AQL table (inspection level II) determines the required sample size based on lot size, plus the accept/reject limits for major and minor defects, to make a statistical accept/reject decision for the whole shipment.',
+allTitle:'Combined check (all 3 tests)',allHint:'Fill the three test sections below, then calculate and save them all as one record.',calcAll:'Calculate all',
+fpShort:'4-Point',shShort:'Shrinkage',
+toolDescall:'Combined check mode: run all three tests (4-Point, shrinkage, AQL) in one batch for the same factory and date, saved as a single record with an overall decision — it passes only if all three tests pass.',
 fpTitle:'4-Point System calculator (fabric)',fpLen:'Inspected length (yd)',fpWid:'Fabric width (in)',
 fp1:'Defects ≤3 in (×1)',fp2:'Defects 3–6 (×2)',fp3:'Defects 6–9 (×3)',fp4:'Over 9 in or hole (×4)',fpLim:'Allowed limit (pts/100yd²)',
 calc:'Calculate',fpUnit:'pts/100yd²',fpTotal:'Total points',limit:'Limit',enterLW:'Enter length and width',
@@ -684,38 +698,48 @@ function renderDash(){if(!$('kpis'))return;
     <div class="note" style="margin-top:6px">✔ ${t('pass')}: ${pass} · ✘ ${t('fail')}: ${f}</div>`:empty(t('noData'));}
 
 /* ============ TOOLS ============ */
-function goTool(id,btn){['fp','sh','aq'].forEach(x=>$('tool-'+x).classList.toggle('hide',x!==id));
+function goTool(id,btn){const all=id==='all';
+  ['fp','sh','aq'].forEach(x=>{$('tool-'+x).classList.toggle('hide',!all&&x!==id);
+    const fr=$(x+'-factrow');if(fr)fr.classList.toggle('hide',all);});
+  $('tool-all').classList.toggle('hide',!all);
   document.querySelectorAll('#tools-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');}
-function toolInfo(id,e){e.preventDefault();modal(`<h3>${esc(t(id==='fp'?'fpTitle':(id==='sh'?'shTitle':'aqlTitle')))}</h3>
+function toolInfo(id,e){e.preventDefault();modal(`<h3>${esc(t(id==='fp'?'fpTitle':(id==='sh'?'shTitle':(id==='aq'?'aqlTitle':'allTitle'))))}</h3>
   <p style="line-height:1.7;color:var(--mut)">${esc(t('toolDesc'+id))}</p>
   <div class="row-btns"><button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);return false;}
 function renderToolFactSelects(){
   const opts=`<option value="">${t('selectFactory')}</option>`+FACT.map(f=>`<option value="${f.id}">${esc(f.name)}</option>`).join('');
-  ['fp-fact','sh-fact','aq-fact'].forEach(id=>{const el=$(id);if(el){const cur=el.value;el.innerHTML=opts;if(cur)el.value=cur;
+  ['fp-fact','sh-fact','aq-fact','all-fact'].forEach(id=>{const el=$(id);if(el){const cur=el.value;el.innerHTML=opts;if(cur)el.value=cur;
     if(!$(id.replace('-fact','-date')).value)$(id.replace('-fact','-date')).value=today();}});}
+function calcAll(){calcFP();calcSH();calcAQL();}
+function computeFP(){const Ln=+$('fp-len').value,W=+$('fp-wid').value,lim=+$('fp-lim').value||40;
+  const pts=(+$('fp-1').value||0)*1+(+$('fp-2').value||0)*2+(+$('fp-3').value||0)*3+(+$('fp-4').value||0)*4;
+  if(!Ln||!W){toast(t('enterLW'));return null;}
+  const p100=Math.round(pts*36*100/(Ln*W)*100)/100;
+  return {len:Ln,wid:W,points:p100,lim,decision:p100<=lim?'PASS':'FAIL'};}
+function computeSH(){const lb=+$('sh-lb').value,la=+$('sh-la').value,wb=+$('sh-wb').value,wa=+$('sh-wa').value,lim=+$('sh-lim').value||3;
+  if(!lb||!wb){toast(t('enterMeas'));return null;}
+  const sl=Math.round((lb-la)/lb*10000)/100,sw=Math.round((wb-wa)/wb*10000)/100;
+  return {shrLen:sl,shrWid:sw,lim,decision:Math.max(sl,sw)<=lim?'PASS':'FAIL'};}
+function computeAQ(){const lot=+$('aq-lot').value,mj=+$('aq-maj').value||0,mn=+$('aq-min').value||0;
+  if(!lot){toast(t('enterLW'));return null;}
+  const a=aqlFor(lot);
+  return {lot,maj:mj,min:mn,sample:a.sample,ac25:a.ac25,re25:a.re25,ac40:a.ac40,re40:a.re40,decision:(mj<a.re25&&mn<a.re40)?'PASS':'FAIL'};}
 function saveToolCheck(type){const factId=$(type+'-fact').value;if(!factId)return toast(t('selectFactoryFirst'));
   const fact=FACT.find(f=>f.id===factId);const date=$(type+'-date').value||today();let result=null;
-  if(type==='fp'){const Ln=+$('fp-len').value,W=+$('fp-wid').value,lim=+$('fp-lim').value||40;
-    const pts=(+$('fp-1').value||0)*1+(+$('fp-2').value||0)*2+(+$('fp-3').value||0)*3+(+$('fp-4').value||0)*4;
-    if(!Ln||!W)return toast(t('enterLW'));
-    const p100=Math.round(pts*36*100/(Ln*W)*100)/100,ok=p100<=lim;
-    result={len:Ln,wid:W,points:p100,lim,decision:ok?'PASS':'FAIL'};
-  }else if(type==='sh'){const lb=+$('sh-lb').value,la=+$('sh-la').value,wb=+$('sh-wb').value,wa=+$('sh-wa').value,lim=+$('sh-lim').value||3;
-    if(!lb||!wb)return toast(t('enterMeas'));
-    const sl=Math.round((lb-la)/lb*10000)/100,sw=Math.round((wb-wa)/wb*10000)/100,ok=Math.max(sl,sw)<=lim;
-    result={shrLen:sl,shrWid:sw,lim,decision:ok?'PASS':'FAIL'};
-  }else if(type==='aq'){const lot=+$('aq-lot').value,mj=+$('aq-maj').value||0,mn=+$('aq-min').value||0,a=aqlFor(lot);
-    if(!lot)return toast(t('enterLW'));
-    const majOk=mj<a.re25,minOk=mn<a.re40,ok=majOk&&minOk;
-    result={lot,maj:mj,min:mn,sample:a.sample,ac25:a.ac25,re25:a.re25,ac40:a.ac40,re40:a.re40,decision:ok?'PASS':'FAIL'};
-  }
+  if(type==='fp')result=computeFP();
+  else if(type==='sh')result=computeSH();
+  else if(type==='aq')result=computeAQ();
+  else{const fp=computeFP();if(!fp)return;const sh=computeSH();if(!sh)return;const aq=computeAQ();if(!aq)return;
+    result={fp,sh,aq,decision:(fp.decision==='PASS'&&sh.decision==='PASS'&&aq.decision==='PASS')?'PASS':'FAIL'};}
+  if(!result)return;
   const data={wsId:MEMBER.wsId,type,factoryId:factId,factoryName:fact?fact.name:'',date,inspector:MEMBER.name||ME.email,result};
   db.collection('qc_toolchecks').add({...data,createdAt:FV.serverTimestamp()}).then(()=>toast(t('saved'))).catch(e=>toast(rulesHint(e)));}
-function toolTypeLabel(type){return type==='fp'?t('fpTitle'):(type==='sh'?t('shTitle'):t('aqlTitle'));}
-function toolResultSummary(c){const r=c.result;
+function toolTypeLabel(type){return type==='fp'?t('fpTitle'):(type==='sh'?t('shTitle'):(type==='aq'?t('aqlTitle'):t('allTitle')));}
+function toolResultSummary(c){const r=c.result;const mk=d=>d.decision==='PASS'?'✔':'✘';
   if(c.type==='fp')return `${r.points} ${t('fpUnit')} (${t('limit')} ${r.lim})`;
   if(c.type==='sh')return `${t('shrLen')} ${r.shrLen}% · ${t('shrWid')} ${r.shrWid}% (${t('limit')} ${r.lim}%)`;
-  return `${t('aqlSample')}: ${r.sample} · ${t('majorLbl')} ${r.maj}/${r.re25} · ${t('minorLbl')} ${r.min}/${r.re40}`;}
+  if(c.type==='aq')return `${t('aqlSample')}: ${r.sample} · ${t('majorLbl')} ${r.maj}/${r.re25} · ${t('minorLbl')} ${r.min}/${r.re40}`;
+  return `${t('fpShort')} ${mk(r.fp)} · ${t('shShort')} ${mk(r.sh)} · AQL ${mk(r.aq)}`;}
 function renderToolChk(){const el=$('toolchk-list');if(!el)return;if(!TOOLCHK.length){el.innerHTML=empty(t('noToolChk'));return;}
   el.innerHTML=TOOLCHK.map(c=>{const b=c.result.decision==='PASS'?'b-pass':'b-fail';
     return `<div class="item"><div class="h"><div><div class="t">${esc(toolTypeLabel(c.type))}</div>
@@ -728,9 +752,14 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
   const row=(l,v)=>`<tr><td style="font-weight:700;background:#f2f6f6;width:38%">${l}</td><td>${esc(v)}</td></tr>`;
   const dec=c.result.decision==='PASS'?t('passMark'):t('failMark');const dcol=c.result.decision==='PASS'?'#1e7e40':'#b02a26';
   let rows='';const r=c.result;
-  if(c.type==='fp')rows=row(t('fpLen'),r.len)+row(t('fpWid'),r.wid)+row(t('fpTotal')+' / '+t('fpUnit'),r.points)+row(t('limit'),r.lim);
-  else if(c.type==='sh')rows=row(t('shrLen'),r.shrLen+'%')+row(t('shrWid'),r.shrWid+'%')+row(t('limit'),r.lim+'%');
-  else rows=row(t('aqlLot'),r.lot)+row(t('aqlSample'),r.sample)+row(t('aqlMaj'),r.maj+' (Ac '+r.ac25+')')+row(t('aqlMin'),r.min+' (Ac '+r.ac40+')');
+  const fpRows=x=>row(t('fpLen'),x.len)+row(t('fpWid'),x.wid)+row(t('fpTotal')+' / '+t('fpUnit'),x.points)+row(t('limit'),x.lim);
+  const shRows=x=>row(t('shrLen'),x.shrLen+'%')+row(t('shrWid'),x.shrWid+'%')+row(t('limit'),x.lim+'%');
+  const aqRows=x=>row(t('aqlLot'),x.lot)+row(t('aqlSample'),x.sample)+row(t('aqlMaj'),x.maj+' (Ac '+x.ac25+')')+row(t('aqlMin'),x.min+' (Ac '+x.ac40+')');
+  const sec=(title,d)=>`<tr><td colspan="2" style="font-weight:800;background:#e6efee;color:#14504f">${title} — ${d==='PASS'?t('passMark'):t('failMark')}</td></tr>`;
+  if(c.type==='fp')rows=fpRows(r);
+  else if(c.type==='sh')rows=shRows(r);
+  else if(c.type==='aq')rows=aqRows(r);
+  else rows=sec(t('fpTitle'),r.fp.decision)+fpRows(r.fp)+sec(t('shTitle'),r.sh.decision)+shRows(r.sh)+sec(t('aqlTitle'),r.aq.decision)+aqRows(r.aq);
   $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:720px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
       <div><div style="font-size:22px;font-weight:800;color:#14504f">🧵 ${esc(MEMBER.wsName||'')}</div>
