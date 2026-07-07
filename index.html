@@ -291,6 +291,8 @@ nameChanged:'تم تغيير الاسم',wsChanged:'تم تغيير اسم مس�
 wsCreated:'تم إنشاء مساحة العمل — الكود: {c}',enterWsName2:'أدخل اسم مساحة العمل',enterCode:'أدخل الكود',noWs:'لا توجد مساحة بهذا الكود',joined:'تم الانضمام',
 defNew:'عيب جديد',defEdit:'تعديل عيب',defNameLbl:'اسم العيب *',defCatLbl:'التصنيف',catMajor:'كبير',catMinor:'صغير',catCritical:'حرِج',
 defDescLbl:'الوصف',defCauseLbl:'السبب',defActionLbl:'الإجراء',addDefNew:'➕ عيب جديد',enterDefName:'أدخل اسم العيب',delDefQ:'حذف هذا العيب؟',
+seqNew:'مرحلة جديدة',addSeqNew:'➕ مرحلة جديدة',seqCatLbl:'المجموعة/القسم *',seqCatPh:'مثال: التجميع',seqOpLbl:'اسم العملية *',
+seqEnLbl:'الاسم بالإنجليزية (اختياري)',seqTimingLbl:'التوقيت',seqImpLbl:'الأهمية',enterSeqFields:'أدخل المجموعة واسم العملية',
 rulesHint:'صلاحيات Firestore غير مفعّلة بعد — انشر قواعد qc (راجع README).',
 menuInfo:'مالك',
 e_email:'بريد غير صحيح',e_nouser:'المستخدم غير موجود',e_wrongpass:'كلمة المرور خاطئة',e_inuse:'البريد مستخدم مسبقاً',e_weak:'كلمة المرور ضعيفة (6 أحرف على الأقل)',e_cred:'بيانات الدخول غير صحيحة'
@@ -337,6 +339,8 @@ nameChanged:'Name updated',wsChanged:'Workspace name updated',enterWsMsg:'Enter 
 wsCreated:'Workspace created — code: {c}',enterWsName2:'Enter workspace name',enterCode:'Enter the code',noWs:'No workspace with this code',joined:'Joined',
 defNew:'New defect',defEdit:'Edit defect',defNameLbl:'Defect name *',defCatLbl:'Category',catMajor:'Major',catMinor:'Minor',catCritical:'Critical',
 defDescLbl:'Description',defCauseLbl:'Cause',defActionLbl:'Action',addDefNew:'➕ New defect',enterDefName:'Enter defect name',delDefQ:'Delete this defect?',
+seqNew:'New stage',addSeqNew:'➕ New stage',seqCatLbl:'Group/section *',seqCatPh:'e.g. Assembly',seqOpLbl:'Operation name *',
+seqEnLbl:'English name (optional)',seqTimingLbl:'Timing',seqImpLbl:'Priority',enterSeqFields:'Enter the group and operation name',
 rulesHint:'Firestore rules not deployed yet — publish the qc rules (see README).',
 menuInfo:'Owner',
 e_email:'Invalid email',e_nouser:'User not found',e_wrongpass:'Wrong password',e_inuse:'Email already in use',e_weak:'Weak password (min 6 chars)',e_cred:'Invalid credentials'
@@ -365,7 +369,7 @@ function today(){return new Date().toISOString().slice(0,10);}
 function roleTxt(){return MEMBER.role==='owner'?t('roleOwner'):t('roleInspector');}
 
 /* ============ State ============ */
-let ME=null,MEMBER=null,TAB='fact',FACT=[],ORDERS=[],INSP=[],ITEMS=[],WSCODE='—',unsub=[],AUTHMODE='login',CUSTDEF=[];
+let ME=null,MEMBER=null,TAB='fact',FACT=[],ORDERS=[],INSP=[],ITEMS=[],WSCODE='—',unsub=[],AUTHMODE='login',CUSTDEF=[],WSEQ=null;
 
 /* ============ AQL logic ============ */
 const AQLTAB=[[2,20,1,2,2,3],[151,32,2,3,3,4],[281,50,3,4,5,6],[501,80,5,6,7,8],
@@ -426,7 +430,8 @@ function listen(){unsub.forEach(u=>u&&u());unsub=[];const ws=MEMBER.wsId;
   unsub.push(db.collection('qc_factories').where('wsId','==',ws).onSnapshot(s=>{FACT=s.docs.map(d=>({id:d.id,...d.data()}));renderFact();if(TAB==='dash')renderDash();},console.error));
   unsub.push(db.collection('qc_orders').where('wsId','==',ws).onSnapshot(s=>{ORDERS=s.docs.map(d=>({id:d.id,...d.data()}));renderOrders();if(TAB==='dash')renderDash();},console.error));
   unsub.push(db.collection('qc_inspections').where('wsId','==',ws).onSnapshot(s=>{INSP=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));renderInsp();renderDash();},console.error));
-  unsub.push(db.collection('qc_defects').where('wsId','==',ws).onSnapshot(s=>{CUSTDEF=s.docs.map(d=>({id:d.id,...d.data()}));if(REFSUB==='def')renderRef();},console.error));}
+  unsub.push(db.collection('qc_defects').where('wsId','==',ws).onSnapshot(s=>{CUSTDEF=s.docs.map(d=>({id:d.id,...d.data()}));if(REFSUB==='def')renderRef();},console.error));
+  unsub.push(db.collection('qc_seqcfg').doc(ws).onSnapshot(d=>{WSEQ=(d.exists&&d.data().list)?d.data().list:null;if(REFSUB==='seq')renderRef();},console.error));}
 
 /* ============ NAV ============ */
 function go(tb,btn){TAB=tb;['dash','insp','orders','fact','tools','ref'].forEach(x=>$('p-'+x).classList.toggle('hide',x!==tb));
@@ -547,10 +552,10 @@ function inspForm(i,presetOrder){i=i||{};if(!ORDERS.length){toast(t('addFactFirs
   INSP_PHOTOS=(i.photos||[]).slice();renderThumbs();
   INSP_DEFECTS=(i.defects||[]).slice();renderDefList();onStageChange();previewDecision();}
 let INSP_PHOTOS=[],INSP_DEFECTS=[];
-function stageOptions(sel){let out='',cur='';SEQ.filter(r=>r[0]!=='تجهيز'&&r[0]!=='نهاية الخط').forEach(r=>{if(r[0]!==cur){if(cur)out+='</optgroup>';out+=`<optgroup label="${esc(r[0])}">`;cur=r[0];}
-  out+=`<option value="${esc(r[1])}" ${sel===r[1]?'selected':''}>${esc(r[1])}</option>`;});if(cur)out+='</optgroup>';return out;}
-function onStageChange(){const el=$('i-stage-hint');if(!el)return;const v=$('i-stage').value;const r=SEQ.find(x=>x[1]===v);
-  if(!r){el.innerHTML='';return;}el.innerHTML=`🔍 ${t('colCheckShort')}: <b>${esc(r[5])}</b> · ${t('colStd')}: ${esc(r[6])} ${r[4]==='حرجة'?'· '+catTag('حرِج'):''}`;}
+function stageOptions(sel){let out='',cur='';curSeq().filter(r=>r.cat!=='تجهيز'&&r.cat!=='نهاية الخط').forEach(r=>{if(r.cat!==cur){if(cur)out+='</optgroup>';out+=`<optgroup label="${esc(r.cat)}">`;cur=r.cat;}
+  out+=`<option value="${esc(r.op)}" ${sel===r.op?'selected':''}>${esc(r.op)}</option>`;});if(cur)out+='</optgroup>';return out;}
+function onStageChange(){const el=$('i-stage-hint');if(!el)return;const v=$('i-stage').value;const r=curSeq().find(x=>x.op===v);
+  if(!r){el.innerHTML='';return;}el.innerHTML=`🔍 ${t('colCheckShort')}: <b>${esc(r.check)}</b> · ${t('colStd')}: ${esc(r.std)} ${r.imp==='حرجة'?'· '+catTag('حرِج'):''}`;}
 function catOf(name){const d=allDefects().find(x=>x.name===name);return d?d.cat:'كبير';}
 function fieldOf(cat){return cat.indexOf('حر')>=0?'i-cri':(cat==='كبير'?'i-maj':'i-min');}
 function bump(cat,n){const id=fieldOf(cat);const el=$(id);if(el)el.value=Math.max(0,(+el.value||0)+n);}
@@ -710,6 +715,24 @@ const CHECKLISTS=[
 ['التعبئة والشحن',[['طريقة التعبئة','حسب المواصفة','معاينة'],['بيانات الكرتون','Marks/الوزن','مطابقة'],['محتوى الكراتين','Solid/Assorted','فتح عشوائي'],['مستندات الشحن','مطابقة PO','مراجعة'],['إذن الشحن','تقرير + Release','إصدار']]]];
 const GLOSS=[['أول الخط','فحص أول قطعة قبل الإنتاج الكمّي'],['أثناء الخط','فحص دوري متنقل أثناء سير الخط (Inline)'],['نهاية الخط','فحص شامل في نهاية الخط (End of line)'],['حرجة','عملية تؤثر مباشرة على الشكل/الوظيفة'],['DHU','عدد العيوب لكل 100 قطعة'],['POM','نقاط القياس (Points of Measure)'],['AQL','الحد المقبول للجودة'],['4-Point','نظام نقاط فحص القماش'],['Shade','دفعة/تدرّج اللون'],['اختبار السحب','شدّ الزر للتأكد من التثبيت']];
 function catTag(c){const cls=c.indexOf('حرِج')>=0||c.indexOf('حرج')>=0?'tg-crit':(c==='كبير'?'tg-maj':'tg-min');return`<span class="tg ${cls}">${esc(c)}</span>`;}
+function curSeq(){return (WSEQ&&WSEQ.length)?WSEQ:SEQ.map(r=>({cat:r[0],op:r[1],en:r[2],timing:r[3],imp:r[4],check:r[5],std:r[6]}));}
+function persistSeq(arr){db.collection('qc_seqcfg').doc(MEMBER.wsId).set({list:arr}).catch(e=>toast(rulesHint(e)));}
+function moveSeqStage(i,dir){const arr=curSeq().slice();const j=i+dir;if(j<0||j>=arr.length)return;[arr[i],arr[j]]=[arr[j],arr[i]];persistSeq(arr);}
+function seqForm(){modal(`<h3>${t('seqNew')}</h3>
+  <label class="inl">${t('seqCatLbl')}</label><input id="sq-cat" placeholder="${t('seqCatPh')}">
+  <label class="inl">${t('seqOpLbl')}</label><input id="sq-op">
+  <label class="inl">${t('seqEnLbl')}</label><input id="sq-en">
+  <div class="grid2"><div><label class="inl">${t('seqTimingLbl')}</label><select id="sq-timing">
+    <option value="أول الخط">أول الخط</option><option value="أثناء الخط" selected>أثناء الخط</option><option value="نهاية الخط">نهاية الخط</option></select></div>
+   <div><label class="inl">${t('seqImpLbl')}</label><select id="sq-imp"><option value="عادية" selected>عادية</option><option value="حرجة">حرجة</option></select></div></div>
+  <label class="inl">${t('colCheck')}</label><input id="sq-check">
+  <label class="inl">${t('colStd')}</label><input id="sq-std">
+  <div class="row-btns"><button class="btn" onclick="saveSeqStage()">${t('save')}</button>
+  <button class="btn sec" onclick="closeModal()">${t('cancel')}</button></div>`);}
+function saveSeqStage(){const cat=$('sq-cat').value.trim(),op=$('sq-op').value.trim();if(!cat||!op)return toast(t('enterSeqFields'));
+  const arr=curSeq().slice();
+  arr.push({cat,op,en:$('sq-en').value.trim(),timing:$('sq-timing').value,imp:$('sq-imp').value,check:$('sq-check').value.trim(),std:$('sq-std').value.trim()});
+  persistSeq(arr);closeModal();}
 function allDefects(){return DEFECTS.map(d=>({name:d[0],cat:d[1],desc:d[2],cause:d[3],action:d[4],built:true}))
   .concat(CUSTDEF.map(d=>({id:d.id,name:d.name,cat:d.cat,desc:d.desc||'',cause:d.cause||'',action:d.action||'',built:false})));}
 function defForm(d){d=d||{};modal(`<h3>${d.id?t('defEdit'):t('defNew')}</h3>
@@ -736,10 +759,14 @@ function renderChk(){const el=$('chk-body');if(!el)return;const [,rows]=CHECKLIS
     ${rows.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('')}</table>`;}
 function renderRef(){const el=$('ref-body');if(!el)return;
   if(REFSUB==='seq'){
-    const seqRows=SEQ.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r[0])}</td><td>${esc(r[1])}<div class="en">${esc(r[2])}</div></td>
-      <td>${esc(r[3])}</td><td>${r[4]==='حرجة'?catTag('حرِج'):esc(r[4])}</td><td>${esc(r[5])}</td><td>${esc(r[6])}</td>
-      <td><button class="mini" style="white-space:nowrap" onclick="inspFromRef('${esc(r[1]).replace(/'/g,"&#39;")}')">${t('recordInsp')}</button></td></tr>`).join('');
-    el.innerHTML=`<table class="rtbl"><tr><th>م</th><th>${t('colStage')}</th><th>${t('colOp')}</th><th>توقيت</th><th>${t('colImp')}</th><th>${t('colCheck')}</th><th>${t('colStd')}</th><th></th></tr>${seqRows}</table>`;
+    const list=curSeq();
+    const seqRows=list.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.cat)}</td><td>${esc(r.op)}<div class="en">${esc(r.en)}</div></td>
+      <td>${esc(r.timing)}</td><td>${r.imp==='حرجة'?catTag('حرِج'):esc(r.imp)}</td><td>${esc(r.check)}</td><td>${esc(r.std)}</td>
+      <td style="white-space:nowrap"><button class="mini" onclick="inspFromRef('${esc(r.op).replace(/'/g,"&#39;")}')">${t('recordInsp')}</button>
+      <button class="mini" ${i===0?'disabled':''} onclick="moveSeqStage(${i},-1)">▲</button>
+      <button class="mini" ${i===list.length-1?'disabled':''} onclick="moveSeqStage(${i},1)">▼</button></td></tr>`).join('');
+    el.innerHTML=`<button class="btn" style="margin-bottom:12px" onclick="seqForm()">${t('addSeqNew')}</button>
+      <table class="rtbl"><tr><th>م</th><th>${t('colStage')}</th><th>${t('colOp')}</th><th>توقيت</th><th>${t('colImp')}</th><th>${t('colCheck')}</th><th>${t('colStd')}</th><th></th></tr>${seqRows}</table>`;
   }else if(REFSUB==='def'){
     const all=allDefects();
     const defRows=all.map((d,i)=>`<tr><td>${i+1}</td><td>${esc(d.name)}</td><td>${catTag(d.cat)}</td><td>${esc(d.desc)}</td><td>${esc(d.cause)}</td><td>${esc(d.action)}</td>

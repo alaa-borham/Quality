@@ -48,3 +48,8 @@ match /qc_defects/{id} {
   allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
   allow update, delete: if qcIsMember() && resource.data.wsId == qcWs();
 }
+
+// تسلسل الخياطة القابل للتخصيص: مستند واحد لكل مساحة عمل (معرّفه = wsId)
+match /qc_seqcfg/{wsId} {
+  allow read, write: if qcIsMember() && wsId == qcWs();
+}
