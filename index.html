@@ -341,7 +341,7 @@ aqlInfomin:'حد قبول العيوب الصغيرة داخل العينة، ب
 aqlInfocrit:'العيوب الحرجة هي الخطرة على السلامة (مثل إبرة مكسورة داخل القطعة). تجاوز هذا الحد يرفض الفحص فوراً مهما كانت بقية النتائج — والمعيار العالمي 0 (لا تسامح).',
 addChkItem:'➕ بند جديد',enterItemName:'أدخل اسم البند',delItemQ:'حذف هذا البند من القائمة؟',
 critsCol:'المعايير',critsLbl:'معايير القبول (كل معيار في سطر مستقل — يُحكم على كل واحد على حدة)',
-critsPh:'مثال:\nضمن التسامح ± 2 ملم\nحواف نظيفة بلا شقوق\nمطابقة الباترون',
+critsPh:'مثال:\nضمن التسامح ± 2 ملم\nحواف نظيفة بلا شقوق\nمطابقة الباترون',descLbl:'شرح البند (يظهر عند الضغط على ℹ️)',
 inspSaved:'تم حفظ الفحص',dhuShort:'DHU',acBig:'حد قبول كبير',acSmall:'صغير',sampleShort:'العينة',
 photosLbl:'الصور (اختياري)',addPhoto:'📷 إضافة صورة',maxPhotos:'الحد الأقصى 4 صور',reportBtn:'تقرير',exportCsv:'⬇ تصدير Excel',printBtn:'🖨 طباعة / حفظ PDF',
 repTitle:'تقرير فحص الجودة',repDecision:'القرار النهائي',repNotes:'ملاحظات',repInspector:'المفتش',repDate:'التاريخ',repPhotos:'الصور',repClose:'إغلاق',compressing:'جارٍ معالجة الصورة…',
@@ -435,7 +435,7 @@ aqlInfomin:'Acceptance limit for minor defects within the sample — same idea a
 aqlInfocrit:'Critical defects are safety hazards (e.g. a broken needle inside a garment). Exceeding this limit fails the inspection immediately regardless of everything else — the global standard is 0 (zero tolerance).',
 addChkItem:'➕ New item',enterItemName:'Enter the item name',delItemQ:'Delete this item from the checklist?',
 critsCol:'Criteria',critsLbl:'Acceptance criteria (one per line — each is judged separately)',
-critsPh:'Example:\nWithin tolerance ± 2mm\nClean edges, no nicks\nMatches the pattern',
+critsPh:'Example:\nWithin tolerance ± 2mm\nClean edges, no nicks\nMatches the pattern',descLbl:'Item description (shown when tapping ℹ️)',
 inspSaved:'Inspection saved',dhuShort:'DHU',acBig:'Major Ac',acSmall:'Minor',sampleShort:'Sample',
 photosLbl:'Photos (optional)',addPhoto:'📷 Add photo',maxPhotos:'Max 4 photos',reportBtn:'Report',exportCsv:'⬇ Export Excel',printBtn:'🖨 Print / save PDF',
 repTitle:'Quality Inspection Report',repDecision:'Final decision',repNotes:'Notes',repInspector:'Inspector',repDate:'Date',repPhotos:'Photos',repClose:'Close',compressing:'Processing image…',
@@ -852,8 +852,8 @@ function inspForm(i,presetOrder){i=i||{};if(!ORDERS.length){toast(t('addFactFirs
   renderDefList();onStageChange();onInspTypeChange();}
 let INSP_PHOTOS=[],INSP_DEFECTS=[],INSP_CHKRES=[];
 function isChkType(v){return CHECKLISTS.some(c=>c[0]===v);}
-function curChk(){const norm=c=>({title:c.title,items:(c.items||[]).map(x=>({name:x.name,tool:x.tool||'',crits:(x.crits&&x.crits.length)?x.crits.slice():(x.std?[x.std]:[])}))});
-  return WSCHK?WSCHK.map(norm):CHECKLISTS.map(c=>norm({title:c[0],items:c[1].map(r=>({name:r[0],std:r[1],tool:r[2]}))}));}
+function curChk(){const norm=c=>({title:c.title,items:(c.items||[]).map(x=>({name:x.name,tool:x.tool||'',desc:x.desc||'',crits:(x.crits&&x.crits.length)?x.crits.slice():(x.std?[x.std]:[])}))});
+  return WSCHK?WSCHK.map(norm):CHECKLISTS.map(c=>norm({title:c[0],items:c[1].map(r=>({name:r[0],std:r[1],tool:r[2],desc:r[3]||''}))}));}
 function onInspTypeChange(){const v=$('i-type').value,chk=isChkType(v);
   $('aql-sec').classList.toggle('hide',chk);$('chk-sec').classList.toggle('hide',!chk);
   if(chk)renderInspChkItems(v);previewDecision();}
@@ -864,7 +864,8 @@ function renderInspChkItems(type){const cl=curChk().find(c=>c.title===type);if(!
     const p=prev[it.name]||{};
     const stOf=txt=>{if(p.crits){const f=p.crits.find(c=>c.text===txt);if(f)return f.status;}return p.status||'pass';};
     return `<div class="chk-itemblock" data-name="${esc(it.name)}" data-tool="${esc(it.tool||'')}" style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;background:#fff">
-      <b>${esc(it.name)}</b>${it.tool?` <span class="note">· ${esc(it.tool)}</span>`:''}
+      <b>${esc(it.name)}</b>${it.tool?` <span class="note">· ${esc(it.tool)}</span>`:''}${it.desc?` <span style="cursor:pointer" onclick="this.parentNode.querySelector('.chk-desc').classList.toggle('hide')">ℹ️</span>
+      <div class="chk-desc note hide" style="margin-top:6px;background:#eef6f6;padding:8px;border-radius:8px;line-height:1.7">${esc(it.desc)}</div>`:''}
       ${crits.map(c=>`<div class="grid2" style="align-items:center;margin-top:6px">
         <div class="note">${esc(c||'—')}</div>
         <select class="chk-crit" onchange="previewDecision()" data-text="${esc(c)}">
@@ -1158,12 +1159,49 @@ const DEFECTS=[
 ['ثقب/تلف بالقماش','كبير','خرم أو تمزق','عيب خامة أو ماكينة','استبعاد الجزء المتضرر'],
 ['عدم تماثل','صغير','فرق بين اليمين واليسار','قص/تركيب غير دقيق','التعديل حسب العينة']];
 const CHECKLISTS=[
-['استلام وفحص الأقمشة',[['مطابقة المستندات','PO + فاتورة + بوليصة','مراجعة'],['مطابقة الكمية','عدد اللفات/الأوزان = PO','عدّ + ميزان'],['اللون والدفعة','مطابق للعينة المعتمدة','Light Box'],['عيوب القماش','≤ 40 نقطة/100ياردة²','طاولة فحص'],['الوزن GSM','ضمن التسامح','قاطع + ميزان'],['العرض','مطابق للمواصفة','شريط قياس'],['الانكماش','ضمن الحد','غسيل عينة'],['ثبات اللون','درجة مقبولة','اختبار']]],
-['ما قبل الإنتاج (PP)',[['اجتماع PP','مراجعة Tech Pack + POM','اجتماع'],['عينة PP','مطابقة للعينة الذهبية','مقارنة'],['اعتماد الإكسسوارات','Trims Card معتمد','مطابقة'],['ألوان الصبغة','معتمدة','Light Box'],['اختبار الانكماش والكي','ضبط القص','اختبار']]],
-['القص',[['تخطيط القص Marker','الاتجاه/الاستهلاك','مراجعة'],['نسبة الاستهلاك في الماركر','ضمن الاستهلاك المعتمد للموديل','حساب/مقارنة'],['الفرش','الشد/الطبقات','معاينة'],['طريقة الفرد','فرد مستوٍ دون شدّ أو تموج وباتجاه واحد','معاينة'],['دقة القطع','ضمن التسامح','مقارنة بالباترون'],['فصل الـ Shades','لا اختلاط','ترقيم'],['فحص الأجزاء','مطابقة المقاسات','معاينة'],['طريقة فحص الأجزاء','فحص عينة من كل طبقة/حزمة','معاينة']]],
-['التشطيب والكي',[['قص الخيوط','نظيف تماماً','معاينة'],['الكي/البخار','بلا لمعان/حرق','مكواة'],['النظافة من البقع','خالٍ من الأوساخ','معاينة'],['الليبلات والتاجات','باركود صحيح','مسح'],['كشف الإبر','لا إنذار','Detector']]],
-['الفحص النهائي (AQL)',[['حجم العينة','حسب جدول AQL','سحب عشوائي'],['المظهر والصنعة','Major 2.5 / Minor 4.0','معاينة'],['القياسات POM','ضمن التسامح','قياس'],['اللون والتماثل','متجانس','Light Box'],['التغليف والوسم','مطابق','مطابقة'],['اختبار السحب','الأزرار','جهاز سحب']]],
-['التعبئة والشحن',[['طريقة التعبئة','حسب المواصفة','معاينة'],['بيانات الكرتون','Marks/الوزن','مطابقة'],['محتوى الكراتين','Solid/Assorted','فتح عشوائي'],['مستندات الشحن','مطابقة PO','مراجعة'],['إذن الشحن','تقرير + Release','إصدار']]]];
+['استلام وفحص الأقمشة',[
+['مطابقة المستندات','PO + فاتورة + بوليصة','مراجعة','التأكد أن مستندات الشحنة (أمر الشراء والفاتورة والبوليصة) متطابقة مع ما وصل فعلياً قبل الاستلام.'],
+['مطابقة الكمية','عدد اللفات/الأوزان = PO','عدّ + ميزان','عدّ اللفات ووزنها والتأكد أن الكمية المستلمة تساوي الكمية المطلوبة في أمر الشراء.'],
+['اللون والدفعة','مطابق للعينة المعتمدة','Light Box','مقارنة لون القماش بالعينة المعتمدة تحت صندوق الإضاءة، والتأكد من عدم اختلاط دفعات صبغة مختلفة.'],
+['عيوب القماش','≤ 40 نقطة/100ياردة²','طاولة فحص','فحص القماش على طاولة الفحص بنظام النقاط الأربع؛ يُرفض ما تجاوز 40 نقطة لكل 100 ياردة مربعة.'],
+['الوزن GSM','ضمن التسامح','قاطع + ميزان','قص عينة دائرية ووزنها للتأكد أن وزن المتر المربع ضمن التسامح المتفق عليه.'],
+['العرض','مطابق للمواصفة','شريط قياس','قياس عرض القماش ومطابقته للمواصفة — العرض الأقل يعني استهلاكاً أعلى في القص.'],
+['الانكماش','ضمن الحد','غسيل عينة','غسل عينة وقياسها قبل وبعد للتأكد أن نسبة الانكماش ضمن الحد المسموح.'],
+['ثبات اللون','درجة مقبولة','اختبار','اختبار احتكاك/غسيل للتأكد أن اللون لا ينتقل للأقمشة الأخرى ولا يبهت بدرجة غير مقبولة.']]],
+['ما قبل الإنتاج (PP)',[
+['اجتماع PP','مراجعة Tech Pack + POM','اجتماع','اجتماع قبل بدء الإنتاج يضم الجودة والإنتاج لمراجعة المواصفات الفنية (Tech Pack) ونقاط القياس والتفاصيل الحرجة للموديل.'],
+['عينة PP','مطابقة للعينة الذهبية','مقارنة','فحص عينة ما قبل الإنتاج ومطابقتها بالعينة الذهبية المعتمدة من العميل قبل السماح ببدء الخط.'],
+['اعتماد الإكسسوارات','Trims Card معتمد','مطابقة','التأكد أن جميع الإكسسوارات (أزرار، سحابات، ليبلات، خيوط) مطابقة لبطاقة الخامات المعتمدة Trims Card.'],
+['ألوان الصبغة','معتمدة','Light Box','مطابقة ألوان أقمشة الإنتاج بالدرجات المعتمدة تحت صندوق الإضاءة قبل القص.'],
+['اختبار الانكماش والكي','ضبط القص','اختبار','إجراء اختبار انكماش وكي على قماش الإنتاج الفعلي لضبط مقاسات القص بناءً على النتيجة.']]],
+['القص',[
+['تخطيط القص Marker','الاتجاه/الاستهلاك','مراجعة','مراجعة تخطيط القص: اتجاه الأجزاء مع اتجاه النسيج، واكتمال جميع الأجزاء، وكفاءة استغلال القماش.'],
+['نسبة الاستهلاك في الماركر','ضمن الاستهلاك المعتمد للموديل','حساب/مقارنة','مقارنة استهلاك القماش الفعلي في الماركر بالاستهلاك المعتمد للموديل حتى لا تتجاوز التكلفة المخططة.'],
+['الفرش','الشد/الطبقات','معاينة','التأكد من فرش طبقات القماش دون شد أو ارتخاء وبعدد طبقات لا يتجاوز قدرة ماكينة القص.'],
+['طريقة الفرد','فرد مستوٍ دون شدّ أو تموج وباتجاه واحد','معاينة','معاينة أسلوب فرد القماش: مستوٍ بلا تموجات، وباتجاه واحد حسب طبيعة الخامة (خاصة المخملية والمقلمة).'],
+['دقة القطع','ضمن التسامح','مقارنة بالباترون','مقارنة الأجزاء المقصوصة بالباترون والتأكد أنها ضمن التسامح المسموح دون انحراف.'],
+['فصل الـ Shades','لا اختلاط','ترقيم','ترقيم وفصل دفعات الألوان حتى لا تختلط درجتا لون مختلفتان في قطعة واحدة.'],
+['فحص الأجزاء','مطابقة المقاسات','معاينة','فحص عينة من الأجزاء المقصوصة والتأكد من مطابقة المقاسات وصحة الترقيم.'],
+['طريقة فحص الأجزاء','فحص عينة من كل طبقة/حزمة','معاينة','التحقق من أسلوب الفحص نفسه: سحب عينة من كل طبقة وكل حزمة، وليس من الطبقات العليا فقط.']]],
+['التشطيب والكي',[
+['قص الخيوط','نظيف تماماً','معاينة','التأكد من إزالة جميع الخيوط الزائدة والسائبة من القطعة من الداخل والخارج.'],
+['الكي/البخار','بلا لمعان/حرق','مكواة','معاينة الكي: بلا لمعان أو حروق أو كسرات، وبدرجة حرارة مناسبة لنوع الخامة.'],
+['النظافة من البقع','خالٍ من الأوساخ','معاينة','التأكد من خلو القطع من بقع الزيت والأوساخ والأتربة قبل التعبئة.'],
+['الليبلات والتاجات','باركود صحيح','مسح','التأكد من صحة الليبلات والتاجات ومسح الباركود والتحقق من مطابقته للمقاس واللون.'],
+['كشف الإبر','لا إنذار','Detector','تمرير القطع على جهاز كشف الإبر والتأكد من عدم وجود أي إنذار معدني — بند سلامة لا تسامح فيه.']]],
+['الفحص النهائي (AQL)',[
+['حجم العينة','حسب جدول AQL','سحب عشوائي','سحب عينة عشوائية من كراتين مختلفة بحجم يحدده جدول AQL حسب كمية الشحنة.'],
+['المظهر والصنعة','Major 2.5 / Minor 4.0','معاينة','فحص شامل لمظهر القطعة وجودة الصنعة وتصنيف العيوب المكتشفة كبير/صغير حسب حدود AQL.'],
+['القياسات POM','ضمن التسامح','قياس','قياس نقاط القياس الأساسية (POM) ومطابقتها لجدول المقاسات ضمن التسامح المسموح.'],
+['اللون والتماثل','متجانس','Light Box','التأكد من تجانس اللون بين القطع وبين أجزاء القطعة الواحدة تحت إضاءة قياسية.'],
+['التغليف والوسم','مطابق','مطابقة','مطابقة طريقة الطي والتغليف والعلامات والملصقات لمواصفة العميل.'],
+['اختبار السحب','الأزرار','جهاز سحب','شد الأزرار والإكسسوارات بجهاز السحب للتأكد من قوة تثبيتها — بند سلامة خاصة في ملابس الأطفال.']]],
+['التعبئة والشحن',[
+['طريقة التعبئة','حسب المواصفة','معاينة','التأكد من التعبئة حسب المواصفة: عدد القطع في الكيس والكرتون وطريقة الرص.'],
+['بيانات الكرتون','Marks/الوزن','مطابقة','مراجعة بيانات الكراتين (Marks): الأرقام والمقاسات والألوان والأوزان وعناوين الشحن.'],
+['محتوى الكراتين','Solid/Assorted','فتح عشوائي','فتح كراتين عشوائية والتأكد أن المحتوى مطابق للبيان (Solid مقاس واحد أو Assorted تشكيلة).'],
+['مستندات الشحن','مطابقة PO','مراجعة','مراجعة مستندات الشحن ومطابقتها لأمر الشراء قبل الإفراج عن الشحنة.'],
+['إذن الشحن','تقرير + Release','إصدار','إصدار تقرير الفحص النهائي وإذن الشحن Release بعد اجتياز جميع الفحوصات.']]]];
 const GLOSS=[['أول الخط','فحص أول قطعة قبل الإنتاج الكمّي'],['أثناء الخط','فحص دوري متنقل أثناء سير الخط (Inline)'],['نهاية الخط','فحص شامل في نهاية الخط (End of line)'],['حرجة','عملية تؤثر مباشرة على الشكل/الوظيفة'],['DHU','عدد العيوب لكل 100 قطعة'],['POM','نقاط القياس (Points of Measure)'],['AQL','الحد المقبول للجودة'],['4-Point','نظام نقاط فحص القماش'],['Shade','دفعة/تدرّج اللون'],['اختبار السحب','شدّ الزر للتأكد من التثبيت']];
 function catTag(c){const cls=c.indexOf('حرِج')>=0||c.indexOf('حرج')>=0?'tg-crit':(c==='كبير'?'tg-maj':'tg-min');return`<span class="tg ${cls}">${esc(c)}</span>`;}
 function curSeq(){return (WSEQ&&WSEQ.length)?WSEQ:SEQ.map(r=>({cat:r[0],op:r[1],en:r[2],timing:r[3],imp:r[4],check:r[5],std:r[6]}));}
@@ -1216,20 +1254,27 @@ function chkInfo(i,e){e.preventDefault();modal(`<h3>${esc(curChk()[i].title)}</h
 function renderChk(){const el=$('chk-body');if(!el)return;const cl=curChk()[CHKSUB];
   el.innerHTML=`<button class="mini g" style="margin-bottom:8px" onclick="chkItemForm()">${t('addChkItem')}</button>
   <table class="rtbl" style="min-width:480px"><tr><th>${t('colItem')}</th><th>${t('critsCol')}</th><th>${t('colTool')}</th><th></th></tr>
-    ${cl.items.map((r,i)=>`<tr><td>${esc(r.name)}</td><td>${r.crits.map(c=>'• '+esc(c)).join('<br>')}</td><td>${esc(r.tool)}</td>
+    ${cl.items.map((r,i)=>`<tr><td>${esc(r.name)}${r.desc?` <span style="cursor:pointer" onclick="chkItemInfo(${i})">ℹ️</span>`:''}</td><td>${r.crits.map(c=>'• '+esc(c)).join('<br>')}</td><td>${esc(r.tool)}</td>
     <td style="white-space:nowrap"><button class="mini" onclick="chkItemForm(${i})">${t('edit')}</button>
     ${can('del')?`<button class="mini" onclick="delChkItem(${i})">${t('del')}</button>`:''}</td></tr>`).join('')}</table>`;}
-function chkItemForm(i){const cl=curChk()[CHKSUB];const r=(i!=null)?cl.items[i]:{name:'',crits:[],tool:''};
+function chkItemInfo(i){const r=curChk()[CHKSUB].items[i];if(!r)return;
+  modal(`<h3>${esc(r.name)}</h3>
+  <p style="line-height:1.7;color:var(--mut)">${esc(r.desc||'')}</p>
+  ${r.crits.length?`<div style="font-weight:700;margin-bottom:4px">${t('critsCol')}:</div><div class="note" style="line-height:1.9">${r.crits.map(c=>'• '+esc(c)).join('<br>')}</div>`:''}
+  ${r.tool?`<div class="note" style="margin-top:8px">${t('colTool')}: ${esc(r.tool)}</div>`:''}
+  <div class="row-btns"><button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);}
+function chkItemForm(i){const cl=curChk()[CHKSUB];const r=(i!=null)?cl.items[i]:{name:'',crits:[],tool:'',desc:''};
   modal(`<h3>${(i!=null)?t('edit'):t('addChkItem')} — ${esc(cl.title)}</h3>
   <label class="inl">${t('colItem')} *</label><input id="ci-name" value="${esc(r.name)}">
   <label class="inl">${t('critsLbl')}</label><textarea id="ci-crits" rows="5" placeholder="${t('critsPh')}">${esc((r.crits||[]).join('\n'))}</textarea>
   <label class="inl">${t('colTool')}</label><input id="ci-tool" value="${esc(r.tool)}">
+  <label class="inl">${t('descLbl')}</label><textarea id="ci-desc" rows="3">${esc(r.desc||'')}</textarea>
   <div class="row-btns"><button class="btn" onclick="saveChkItem(${i==null?'null':i})">${t('save')}</button>
   <button class="btn sec" onclick="closeModal()">${t('cancel')}</button></div>`);}
-function chkCopy(){return curChk().map(c=>({title:c.title,items:c.items.map(x=>({name:x.name,crits:x.crits.slice(),tool:x.tool||''}))}));}
+function chkCopy(){return curChk().map(c=>({title:c.title,items:c.items.map(x=>({name:x.name,crits:x.crits.slice(),tool:x.tool||'',desc:x.desc||''}))}));}
 function saveChkItem(i){const name=$('ci-name').value.trim();if(!name)return toast(t('enterItemName'));
   const crits=$('ci-crits').value.split('\n').map(s=>s.trim()).filter(Boolean);
-  const lists=chkCopy();const item={name,crits,tool:$('ci-tool').value.trim()};
+  const lists=chkCopy();const item={name,crits,tool:$('ci-tool').value.trim(),desc:$('ci-desc').value.trim()};
   if(i==null)lists[CHKSUB].items.push(item);else lists[CHKSUB].items[i]=item;
   db.collection('qc_chkcfg').doc(MEMBER.wsId).set({lists}).then(()=>{closeModal();toast(t('saved'));}).catch(e=>toast(rulesHint(e)));}
 function delChkItem(i){if(!confirm(t('delItemQ')))return;
