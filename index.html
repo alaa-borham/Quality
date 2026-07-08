@@ -342,6 +342,7 @@ aqlInfocrit:'العيوب الحرجة هي الخطرة على السلامة (
 addChkItem:'➕ بند جديد',enterItemName:'أدخل اسم البند',delItemQ:'حذف هذا البند من القائمة؟',
 critsCol:'المعايير',critsLbl:'معايير القبول (كل معيار في سطر مستقل — يُحكم على كل واحد على حدة)',
 critsPh:'مثال:\nضمن التسامح ± 2 ملم\nحواف نظيفة بلا شقوق\nمطابقة الباترون',descLbl:'شرح البند (يظهر عند الضغط على ℹ️)',
+foundPh:'نتيجة الفحص / القيمة المقاسة',foundCol:'النتيجة',
 inspSaved:'تم حفظ الفحص',dhuShort:'DHU',acBig:'حد قبول كبير',acSmall:'صغير',sampleShort:'العينة',
 photosLbl:'الصور (اختياري)',addPhoto:'📷 إضافة صورة',maxPhotos:'الحد الأقصى 4 صور',reportBtn:'تقرير',exportCsv:'⬇ تصدير Excel',printBtn:'🖨 طباعة / حفظ PDF',
 repTitle:'تقرير فحص الجودة',repDecision:'القرار النهائي',repNotes:'ملاحظات',repInspector:'المفتش',repDate:'التاريخ',repPhotos:'الصور',repClose:'إغلاق',compressing:'جارٍ معالجة الصورة…',
@@ -436,6 +437,7 @@ aqlInfocrit:'Critical defects are safety hazards (e.g. a broken needle inside a 
 addChkItem:'➕ New item',enterItemName:'Enter the item name',delItemQ:'Delete this item from the checklist?',
 critsCol:'Criteria',critsLbl:'Acceptance criteria (one per line — each is judged separately)',
 critsPh:'Example:\nWithin tolerance ± 2mm\nClean edges, no nicks\nMatches the pattern',descLbl:'Item description (shown when tapping ℹ️)',
+foundPh:'Inspection finding / measured value',foundCol:'Finding',
 inspSaved:'Inspection saved',dhuShort:'DHU',acBig:'Major Ac',acSmall:'Minor',sampleShort:'Sample',
 photosLbl:'Photos (optional)',addPhoto:'📷 Add photo',maxPhotos:'Max 4 photos',reportBtn:'Report',exportCsv:'⬇ Export Excel',printBtn:'🖨 Print / save PDF',
 repTitle:'Quality Inspection Report',repDecision:'Final decision',repNotes:'Notes',repInspector:'Inspector',repDate:'Date',repPhotos:'Photos',repClose:'Close',compressing:'Processing image…',
@@ -862,20 +864,24 @@ function renderInspChkItems(type){const cl=curChk().find(c=>c.title===type);if(!
   $('chk-items').innerHTML=cl.items.map(it=>{
     const crits=it.crits.length?it.crits:[''];
     const p=prev[it.name]||{};
-    const stOf=txt=>{if(p.crits){const f=p.crits.find(c=>c.text===txt);if(f)return f.status;}return p.status||'pass';};
+    const critOf=txt=>(p.crits&&p.crits.find(c=>c.text===txt))||{};
+    const stOf=txt=>critOf(txt).status||p.status||'pass';
     return `<div class="chk-itemblock" data-name="${esc(it.name)}" data-tool="${esc(it.tool||'')}" style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;background:#fff">
       <b>${esc(it.name)}</b>${it.tool?` <span class="note">· ${esc(it.tool)}</span>`:''}${it.desc?` <span style="cursor:pointer" onclick="this.parentNode.querySelector('.chk-desc').classList.toggle('hide')">ℹ️</span>
       <div class="chk-desc note hide" style="margin-top:6px;background:#eef6f6;padding:8px;border-radius:8px;line-height:1.7">${esc(it.desc)}</div>`:''}
-      ${crits.map(c=>`<div class="grid2" style="align-items:center;margin-top:6px">
-        <div class="note">${esc(c||'—')}</div>
-        <select class="chk-crit" onchange="previewDecision()" data-text="${esc(c)}">
-          <option value="pass" ${stOf(c)!=='fail'&&stOf(c)!=='na'?'selected':''}>${t('statusPass')}</option>
-          <option value="fail" ${stOf(c)==='fail'?'selected':''}>${t('statusFail')}</option>
-          <option value="na" ${stOf(c)==='na'?'selected':''}>${t('statusNA')}</option>
-        </select></div>`).join('')}
+      ${crits.map(c=>`<div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)">
+        <div class="note" style="margin-bottom:5px">📏 ${esc(c||'—')}</div>
+        <div class="grid2" style="align-items:center">
+          <input class="chk-val" placeholder="${t('foundPh')}" value="${esc(critOf(c).val||'')}">
+          <select class="chk-crit" onchange="previewDecision()" data-text="${esc(c)}">
+            <option value="pass" ${stOf(c)!=='fail'&&stOf(c)!=='na'?'selected':''}>${t('statusPass')}</option>
+            <option value="fail" ${stOf(c)==='fail'?'selected':''}>${t('statusFail')}</option>
+            <option value="na" ${stOf(c)==='na'?'selected':''}>${t('statusNA')}</option>
+          </select></div></div>`).join('')}
     </div>`;}).join('');}
 function readChkItems(){return [...document.querySelectorAll('.chk-itemblock')].map(b=>{
-  const crits=[...b.querySelectorAll('.chk-crit')].map(s=>({text:s.dataset.text,status:s.value}));
+  const vals=[...b.querySelectorAll('.chk-val')];
+  const crits=[...b.querySelectorAll('.chk-crit')].map((s,i)=>({text:s.dataset.text,val:(vals[i]?vals[i].value.trim():''),status:s.value}));
   const anyFail=crits.some(c=>c.status==='fail');const allNa=crits.length>0&&crits.every(c=>c.status==='na');
   return {name:b.dataset.name,tool:b.dataset.tool||'',crits,status:anyFail?'fail':(allNa?'na':'pass')};});}
 function stageOptions(sel){let out='',cur='';curSeq().filter(r=>r.cat!=='تجهيز'&&r.cat!=='نهاية الخط').forEach(r=>{if(r.cat!==cur){if(cur)out+='</optgroup>';out+=`<optgroup label="${esc(r.cat)}">`;cur=r.cat;}
@@ -991,10 +997,10 @@ function printInsp(id){const i=INSP.find(x=>x.id===id);if(!i)return;const a=aqlF
     ${isChk?(()=>{const st=s=>s==='fail'?t('statusFail'):(s==='na'?t('statusNA'):t('statusPass'));
       const cc=s=>s==='fail'?'#b02a26':(s==='na'?'#666':'#1e7e40');
       return `<table style="width:100%;border-collapse:collapse;margin-top:14px;font-size:14px" border="1" cellpadding="8">
-      <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>م</td><td>${t('colItem')}</td><td>${t('critsCol')}</td><td>${t('colTool')}</td><td>${t('colCheck')}</td></tr>
+      <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>م</td><td>${t('colItem')}</td><td>${t('critsCol')}</td><td>${t('foundCol')}</td><td>${t('colTool')}</td><td>${t('colCheck')}</td></tr>
       ${i.checklist.map((x,n)=>{const crits=(x.crits&&x.crits.length)?x.crits:[{text:x.std||'',status:x.status}];
         return crits.map((c,k)=>`<tr>${k===0?`<td rowspan="${crits.length}">${n+1}</td><td rowspan="${crits.length}">${esc(x.name)}</td>`:''}
-          <td>${esc(c.text||'')}</td>${k===0?`<td rowspan="${crits.length}">${esc(x.tool||'')}</td>`:''}
+          <td>${esc(c.text||'')}</td><td>${esc(c.val||'—')}</td>${k===0?`<td rowspan="${crits.length}">${esc(x.tool||'')}</td>`:''}
           <td style="font-weight:700;color:${cc(c.status)}">${st(c.status)}</td></tr>`).join('');}).join('')}</table>`;})():''}
     <div style="margin-top:14px;padding:12px;border:2px solid ${dcol};border-radius:10px;text-align:center">
       <span style="font-size:13px;color:#555">${t('repDecision')}: </span>
