@@ -58,6 +58,14 @@ match /qc_defects/{id} {
   allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
 }
 
+// موديلات المقاسات والاستهلاك (لحاسبة الماركر)
+match /qc_models/{id} {
+  allow read:   if qcIsMember() && resource.data.wsId == qcWs();
+  allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
+  allow update: if qcIsMember() && resource.data.wsId == qcWs();
+  allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
+}
+
 // تسلسل الخياطة القابل للتخصيص: مستند واحد لكل مساحة عمل (معرّفه = wsId)
 match /qc_seqcfg/{wsId} {
   allow read, write: if qcIsMember() && wsId == qcWs();

@@ -209,6 +209,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <button class="on" onclick="goTool('fp',this)" oncontextmenu="return toolInfo('fp',event)" data-i18n="fpTitle">حاسبة نظام النقاط الأربع (فحص القماش)</button>
         <button onclick="goTool('sh',this)" oncontextmenu="return toolInfo('sh',event)" data-i18n="shTitle">حاسبة انكماش القماش</button>
         <button onclick="goTool('aq',this)" oncontextmenu="return toolInfo('aq',event)" data-i18n="aqlTitle">جدول AQL التفاعلي (مستوى II)</button>
+        <button onclick="goTool('mk',this)" oncontextmenu="return toolInfo('mk',event)" data-i18n="mkTitle">حاسبة الماركر والاستهلاك</button>
         <button onclick="goTool('all',this)" oncontextmenu="return toolInfo('all',event)" data-i18n="allTitle">فحص شامل (الثلاث عمليات)</button>
       </div>
       <div id="tool-all" class="card hide">
@@ -253,6 +254,19 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div class="row-btns"><button class="btn" onclick="calcAQL()" data-i18n="calc">احسب</button>
         <button class="btn sec" id="aq-save" onclick="saveToolCheck('aq')" data-i18n="saveCheck">💾 حفظ</button></div>
         <div class="res-box" id="aq-res"></div>
+      </div>
+      <div id="tool-mk" class="card hide">
+        <div class="grid2" id="mk-factrow"><div><label class="inl" data-i18n="factoryLbl2">المصنع</label><select id="mk-fact"></select></div>
+          <div><label class="inl" data-i18n="dateLbl">التاريخ</label><input id="mk-date" type="date"></div></div>
+        <div class="grid2"><div><label class="inl" data-i18n="mkModelLbl">الموديل</label><select id="mk-model" onchange="renderMkSizes()"></select></div>
+          <div style="display:flex;align-items:flex-end"><button type="button" class="mini" onclick="modelsManager()" data-i18n="mkManage">⚙️ إدارة الموديلات والمقاسات</button></div></div>
+        <label class="inl" data-i18n="mkCounts">عدد القطع لكل مقاس في الماركر</label>
+        <div id="mk-sizes"></div>
+        <div class="grid2"><div><label class="inl" data-i18n="mkActual">طول الماركر الفعلي (متر)</label><input id="mk-actual" type="number" step="0.01"></div>
+          <div><label class="inl" data-i18n="mkTol">التسامح %</label><input id="mk-tol" type="number" value="2"></div></div>
+        <div class="row-btns"><button class="btn" onclick="calcMK()" data-i18n="calc">احسب</button>
+        <button class="btn sec" id="mk-save" onclick="saveToolCheck('mk')" data-i18n="saveCheck">💾 حفظ</button></div>
+        <div class="res-box" id="mk-res"></div>
       </div>
     </div>
     <div id="p-ref" class="hide">
@@ -343,6 +357,13 @@ addChkItem:'➕ بند جديد',enterItemName:'أدخل اسم البند',delI
 critsCol:'المعايير',critsLbl:'معايير القبول (كل معيار في سطر مستقل — يُحكم على كل واحد على حدة)',
 critsPh:'مثال:\nضمن التسامح ± 2 ملم\nحواف نظيفة بلا شقوق\nمطابقة الباترون',descLbl:'شرح البند (يظهر عند الضغط على ℹ️)',
 foundPh:'نتيجة الفحص / القيمة المقاسة',foundCol:'النتيجة',
+mkTitle:'حاسبة الماركر والاستهلاك',mkModelLbl:'الموديل',mkManage:'⚙️ إدارة الموديلات والمقاسات',
+mkCounts:'عدد القطع لكل مقاس في الماركر',mkActual:'طول الماركر الفعلي (متر)',mkActual2:'فعلي',mkTol:'التسامح %',
+mkExpected:'الطول المتوقع',mkDeviation:'الانحراف',mkPerPiece:'استهلاك القطعة الفعلي',totalPieces:'إجمالي القطع',mUnit:'م',
+mkNeed:'اختر الموديل وأدخل عدد القطع وطول الماركر الفعلي',selectModel:'— اختر الموديل —',noModels:'لا موديلات بعد — أضفها من زر إدارة الموديلات',
+modelNew:'➕ موديل جديد',modelName:'اسم الموديل *',modelSizes:'المقاسات والاستهلاك المعتمد (كل سطر: المقاس ثم الاستهلاك بالمتر)',
+enterModel:'أدخل اسم الموديل ومقاساً واحداً على الأقل',badSizeLine:'سطر غير صحيح — الصيغة: المقاس مسافة ثم الرقم (مثال: L 3.20)',delModelQ:'حذف هذا الموديل؟',
+toolDescmk:'حاسبة الماركر: تسجل لكل موديل مقاساته والاستهلاك المعتمد لكل مقاس، ثم عند فحص أي ماركر تدخل عدد القطع من كل مقاس فيحسب النظام الطول المتوقع تلقائياً ويقارنه بالطول الفعلي المقاس ويعطيك نسبة الانحراف وقرار القبول حسب التسامح.',
 inspSaved:'تم حفظ الفحص',dhuShort:'DHU',acBig:'حد قبول كبير',acSmall:'صغير',sampleShort:'العينة',
 photosLbl:'الصور (اختياري)',addPhoto:'📷 إضافة صورة',maxPhotos:'الحد الأقصى 4 صور',reportBtn:'تقرير',exportCsv:'⬇ تصدير Excel',printBtn:'🖨 طباعة / حفظ PDF',
 repTitle:'تقرير فحص الجودة',repDecision:'القرار النهائي',repNotes:'ملاحظات',repInspector:'المفتش',repDate:'التاريخ',repPhotos:'الصور',repClose:'إغلاق',compressing:'جارٍ معالجة الصورة…',
@@ -438,6 +459,13 @@ addChkItem:'➕ New item',enterItemName:'Enter the item name',delItemQ:'Delete t
 critsCol:'Criteria',critsLbl:'Acceptance criteria (one per line — each is judged separately)',
 critsPh:'Example:\nWithin tolerance ± 2mm\nClean edges, no nicks\nMatches the pattern',descLbl:'Item description (shown when tapping ℹ️)',
 foundPh:'Inspection finding / measured value',foundCol:'Finding',
+mkTitle:'Marker & consumption calculator',mkModelLbl:'Model',mkManage:'⚙️ Manage models & sizes',
+mkCounts:'Pieces per size in the marker',mkActual:'Actual marker length (m)',mkActual2:'actual',mkTol:'Tolerance %',
+mkExpected:'Expected length',mkDeviation:'Deviation',mkPerPiece:'Actual consumption per piece',totalPieces:'Total pieces',mUnit:'m',
+mkNeed:'Select a model and enter piece counts and the actual marker length',selectModel:'— select model —',noModels:'No models yet — add them via the manage button',
+modelNew:'➕ New model',modelName:'Model name *',modelSizes:'Sizes & approved consumption (one line each: size then meters)',
+enterModel:'Enter the model name and at least one size',badSizeLine:'Invalid line — format: size space number (e.g. L 3.20)',delModelQ:'Delete this model?',
+toolDescmk:'Marker calculator: store each model\'s sizes with the approved consumption per size; when checking a marker, enter the piece count per size and the system computes the expected length, compares it with the measured actual length, and gives the deviation and an accept decision per your tolerance.',
 inspSaved:'Inspection saved',dhuShort:'DHU',acBig:'Major Ac',acSmall:'Minor',sampleShort:'Sample',
 photosLbl:'Photos (optional)',addPhoto:'📷 Add photo',maxPhotos:'Max 4 photos',reportBtn:'Report',exportCsv:'⬇ Export Excel',printBtn:'🖨 Print / save PDF',
 repTitle:'Quality Inspection Report',repDecision:'Final decision',repNotes:'Notes',repInspector:'Inspector',repDate:'Date',repPhotos:'Photos',repClose:'Close',compressing:'Processing image…',
@@ -501,7 +529,7 @@ function isOwner(){return !!(MEMBER&&MEMBER.role==='owner');}
 function can(p){return isOwner()||!!(MEMBER&&MEMBER.perms&&MEMBER.perms[p]);}
 
 /* ============ State ============ */
-let ME=null,MEMBER=null,TAB='fact',FACT=[],ORDERS=[],INSP=[],ITEMS=[],WSCODE='—',unsub=[],AUTHMODE='login',CUSTDEF=[],WSEQ=null,TOOLCHK=[],WSAQL=null,WSCRIT=0,WSCHK=null;
+let ME=null,MEMBER=null,TAB='fact',FACT=[],ORDERS=[],INSP=[],ITEMS=[],WSCODE='—',unsub=[],AUTHMODE='login',CUSTDEF=[],WSEQ=null,TOOLCHK=[],WSAQL=null,WSCRIT=0,WSCHK=null,MODELS=[];
 
 /* ============ AQL logic ============ */
 const AQLTAB=[[2,20,1,2,2,3],[151,32,2,3,3,4],[281,50,3,4,5,6],[501,80,5,6,7,8],
@@ -568,6 +596,7 @@ function listen(){unsub.forEach(u=>u&&u());unsub=[];const ws=MEMBER.wsId;
   unsub.push(db.collection('qc_defects').where('wsId','==',ws).onSnapshot(s=>{CUSTDEF=s.docs.map(d=>({id:d.id,...d.data()}));if(REFSUB==='def')renderRef();},console.error));
   unsub.push(db.collection('qc_seqcfg').doc(ws).onSnapshot(d=>{WSEQ=(d.exists&&d.data().list)?d.data().list:null;if(REFSUB==='seq')renderRef();},console.error));
   unsub.push(db.collection('qc_chkcfg').doc(ws).onSnapshot(d=>{WSCHK=(d.exists&&d.data().lists)?d.data().lists:null;if(REFSUB==='chk')renderRef();},console.error));
+  unsub.push(db.collection('qc_models').where('wsId','==',ws).onSnapshot(s=>{MODELS=s.docs.map(d=>({id:d.id,...d.data()}));if(TAB==='tools')renderMkModels();},console.error));
   unsub.push(db.collection('qc_toolchecks').where('wsId','==',ws).onSnapshot(s=>{TOOLCHK=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));if(TAB==='toolchk')renderToolChk();if(TAB==='dash')renderDash();},console.error));}
 
 /* ============ NAV ============ */
@@ -1035,18 +1064,68 @@ function renderDash(){if(!$('kpis'))return;
 
 /* ============ TOOLS ============ */
 function goTool(id,btn){const all=id==='all';
-  ['fp','sh','aq'].forEach(x=>{$('tool-'+x).classList.toggle('hide',!all&&x!==id);
+  ['fp','sh','aq','mk'].forEach(x=>{$('tool-'+x).classList.toggle('hide',all?x==='mk':x!==id);
     const fr=$(x+'-factrow');if(fr)fr.classList.toggle('hide',all);
     const sv=$(x+'-save');if(sv)sv.classList.toggle('hide',all);});
   $('tool-all').classList.toggle('hide',!all);
   document.querySelectorAll('#tools-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');}
-function toolInfo(id,e){e.preventDefault();modal(`<h3>${esc(t(id==='fp'?'fpTitle':(id==='sh'?'shTitle':(id==='aq'?'aqlTitle':'allTitle'))))}</h3>
+const TOOL_TITLES={fp:'fpTitle',sh:'shTitle',aq:'aqlTitle',mk:'mkTitle',all:'allTitle'};
+function toolInfo(id,e){e.preventDefault();modal(`<h3>${esc(t(TOOL_TITLES[id]))}</h3>
   <p style="line-height:1.7;color:var(--mut)">${esc(t('toolDesc'+id))}</p>
   <div class="row-btns"><button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);return false;}
 function renderToolFactSelects(){
   const opts=`<option value="">${t('selectFactory')}</option>`+FACT.map(f=>`<option value="${f.id}">${esc(f.name)}</option>`).join('');
-  ['fp-fact','sh-fact','aq-fact','all-fact'].forEach(id=>{const el=$(id);if(el){const cur=el.value;el.innerHTML=opts;if(cur)el.value=cur;
-    if(!$(id.replace('-fact','-date')).value)$(id.replace('-fact','-date')).value=today();}});}
+  ['fp-fact','sh-fact','aq-fact','mk-fact','all-fact'].forEach(id=>{const el=$(id);if(el){const cur=el.value;el.innerHTML=opts;if(cur)el.value=cur;
+    if(!$(id.replace('-fact','-date')).value)$(id.replace('-fact','-date')).value=today();}});
+  renderMkModels();}
+function renderMkModels(){const el=$('mk-model');if(!el)return;const cur=el.value;
+  el.innerHTML=`<option value="">${t('selectModel')}</option>`+MODELS.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('');
+  if(cur)el.value=cur;renderMkSizes();}
+function renderMkSizes(){const el=$('mk-sizes');if(!el)return;const m=MODELS.find(x=>x.id===$('mk-model').value);
+  if(!m){el.innerHTML=`<span class="note">${MODELS.length?t('selectModel'):t('noModels')}</span>`;return;}
+  el.innerHTML=(m.sizes||[]).map(s=>`<div class="grid2" style="align-items:center;margin-bottom:6px">
+    <div><b>${esc(s.size)}</b> <span class="note">(${s.cons} ${t('mUnit')})</span></div>
+    <input class="mk-cnt" type="number" min="0" value="0" data-size="${esc(s.size)}" data-cons="${s.cons}" oninput="calcMK()"></div>`).join('');}
+function computeMK(quiet){const m=MODELS.find(x=>x.id===$('mk-model').value);
+  const cnts=[...document.querySelectorAll('.mk-cnt')].map(i=>({size:i.dataset.size,cons:+i.dataset.cons,n:+i.value||0})).filter(x=>x.n>0);
+  const pieces=cnts.reduce((s,x)=>s+x.n,0);
+  const actual=+$('mk-actual').value||0;const tol=+$('mk-tol').value||0;
+  if(!m||!pieces||!actual){if(!quiet)toast(t('mkNeed'));return null;}
+  const expected=Math.round(cnts.reduce((s,x)=>s+x.n*x.cons,0)*100)/100;
+  const dev=Math.round((actual-expected)/expected*10000)/100;
+  const perPiece=Math.round(actual/pieces*1000)/1000;
+  return{model:m.name,mix:cnts.map(x=>x.size+'×'+x.n).join(' · '),pieces,expected,actual,tol,dev,perPiece,
+    decision:actual<=expected*(1+tol/100)?'PASS':'FAIL'};}
+function calcMK(){const r=computeMK(true);if(!r){$('mk-res').innerHTML=`<span class="note">${t('mkNeed')}</span>`;return;}
+  $('mk-res').innerHTML=`<div class="big" style="color:${r.decision==='PASS'?'var(--green)':'var(--red)'}">${r.decision==='PASS'?t('passMark'):t('failMark')}</div>
+    <div class="note">${t('mkExpected')}: <b>${r.expected} ${t('mUnit')}</b> · ${t('mkActual')}: ${r.actual} ${t('mUnit')} · ${t('mkDeviation')}: <b>${r.dev}%</b> (${t('limit')} ${r.tol}%)<br>
+    ${t('totalPieces')}: ${r.pieces} · ${t('mkPerPiece')}: <b>${r.perPiece} ${t('mUnit')}</b></div>`;}
+function modelsManager(){modal(`<h3>${t('mkManage')}</h3>
+  <div id="models-list">${MODELS.length?MODELS.map(m=>`<div class="item" style="margin-bottom:6px"><div class="h"><div><div class="t" style="font-size:14px">${esc(m.name)}</div>
+    <div class="s">${(m.sizes||[]).map(s=>esc(s.size)+': '+s.cons).join(' · ')}</div></div></div>
+    <div class="row-btns"><button class="mini g" onclick='modelForm(${esc(JSON.stringify(m)).replace(/'/g,"&#39;")})'>${t('edit')}</button>
+    ${can('del')?`<button class="mini r" onclick="delModel('${m.id}')">${t('del')}</button>`:''}</div></div>`).join(''):`<span class="note">${t('noModels')}</span>`}</div>
+  <div class="row-btns"><button class="btn" onclick="modelForm()">${t('modelNew')}</button>
+  <button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);}
+function modelForm(m){m=m||{};
+  modal(`<h3>${m.id?t('edit'):t('modelNew')}</h3>
+  <label class="inl">${t('modelName')}</label><input id="md-name" value="${esc(m.name||'')}">
+  <label class="inl">${t('modelSizes')}</label>
+  <textarea id="md-sizes" rows="5" placeholder="S 3.00&#10;M 3.10&#10;L 3.20&#10;XL 3.35" style="direction:ltr;text-align:left">${esc((m.sizes||[]).map(s=>s.size+' '+s.cons).join('\n'))}</textarea>
+  <div class="row-btns"><button class="btn" onclick="saveModel('${m.id||''}')">${t('save')}</button>
+  <button class="btn sec" onclick="modelsManager()">${t('cancel')}</button></div>`);}
+function saveModel(id){const name=$('md-name').value.trim();
+  const sizes=[];let bad=false;
+  $('md-sizes').value.split('\n').map(s=>s.trim()).filter(Boolean).forEach(line=>{
+    const mm=line.match(/^(\S+)\s+([\d.]+)$/);if(!mm||!(+mm[2]>0)){bad=true;return;}
+    sizes.push({size:mm[1],cons:+mm[2]});});
+  if(!name||!sizes.length)return toast(t('enterModel'));
+  if(bad)return toast(t('badSizeLine'));
+  const data={wsId:MEMBER.wsId,name,sizes};
+  const p=id?db.collection('qc_models').doc(id).update(data):db.collection('qc_models').add({...data,createdAt:FV.serverTimestamp()});
+  p.then(()=>{toast(t('saved'));modelsManager();}).catch(e=>toast(rulesHint(e)));}
+function delModel(id){if(!confirm(t('delModelQ')))return;
+  db.collection('qc_models').doc(id).delete().then(()=>{toast(t('deleted'));modelsManager();}).catch(e=>toast(rulesHint(e)));}
 function calcAll(){calcFP();calcSH();calcAQL();}
 function computeFP(){const Ln=+$('fp-len').value,W=+$('fp-wid').value,lim=+$('fp-lim').value||40;
   const pts=(+$('fp-1').value||0)*1+(+$('fp-2').value||0)*2+(+$('fp-3').value||0)*3+(+$('fp-4').value||0)*4;
@@ -1066,16 +1145,18 @@ function saveToolCheck(type){const factId=$(type+'-fact').value;if(!factId)retur
   if(type==='fp')result=computeFP();
   else if(type==='sh')result=computeSH();
   else if(type==='aq')result=computeAQ();
+  else if(type==='mk')result=computeMK();
   else{const fp=computeFP();if(!fp)return;const sh=computeSH();if(!sh)return;const aq=computeAQ();if(!aq)return;
     result={fp,sh,aq,decision:(fp.decision==='PASS'&&sh.decision==='PASS'&&aq.decision==='PASS')?'PASS':'FAIL'};}
   if(!result)return;
   const data={wsId:MEMBER.wsId,type,factoryId:factId,factoryName:fact?fact.name:'',date,inspector:MEMBER.name||ME.email,result};
   db.collection('qc_toolchecks').add({...data,createdAt:FV.serverTimestamp()}).then(()=>toast(t('saved'))).catch(e=>toast(rulesHint(e)));}
-function toolTypeLabel(type){return type==='fp'?t('fpTitle'):(type==='sh'?t('shTitle'):(type==='aq'?t('aqlTitle'):t('allTitle')));}
+function toolTypeLabel(type){return t(TOOL_TITLES[type]||'allTitle');}
 function toolResultSummary(c){const r=c.result;const mk=d=>d.decision==='PASS'?'✔':'✘';
   if(c.type==='fp')return `${r.points} ${t('fpUnit')} (${t('limit')} ${r.lim})`;
   if(c.type==='sh')return `${t('shrLen')} ${r.shrLen}% · ${t('shrWid')} ${r.shrWid}% (${t('limit')} ${r.lim}%)`;
   if(c.type==='aq')return `${t('aqlSample')}: ${r.sample} · ${t('majorLbl')} ${r.maj}/${r.re25} · ${t('minorLbl')} ${r.min}/${r.re40}`;
+  if(c.type==='mk')return `${esc(r.model)} (${esc(r.mix)}) · ${t('mkExpected')} ${r.expected} · ${t('mkActual2')} ${r.actual} · ${t('mkDeviation')} ${r.dev}%`;
   return `${t('fpShort')} ${mk(r.fp)} · ${t('shShort')} ${mk(r.sh)} · AQL ${mk(r.aq)}`;}
 function renderToolChk(){const el=$('toolchk-list');if(!el)return;if(!TOOLCHK.length){el.innerHTML=empty(t('noToolChk'));return;}
   const bar=`<div style="display:flex;gap:8px;margin-bottom:10px"><button class="mini g" onclick="exportToolChk()">${t('exportCsv')}</button></div>`;
@@ -1097,6 +1178,9 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
   if(c.type==='fp')rows=fpRows(r);
   else if(c.type==='sh')rows=shRows(r);
   else if(c.type==='aq')rows=aqRows(r);
+  else if(c.type==='mk')rows=row(t('mkModelLbl'),r.model)+row(t('mkCounts'),r.mix)+row(t('totalPieces'),r.pieces)
+    +row(t('mkExpected'),r.expected+' '+t('mUnit'))+row(t('mkActual'),r.actual+' '+t('mUnit'))
+    +row(t('mkPerPiece'),r.perPiece+' '+t('mUnit'))+row(t('mkDeviation'),r.dev+'% ('+t('limit')+' '+r.tol+'%)');
   else rows=sec(t('fpTitle'),r.fp.decision)+fpRows(r.fp)+sec(t('shTitle'),r.sh.decision)+shRows(r.sh)+sec(t('aqlTitle'),r.aq.decision)+aqRows(r.aq);
   $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:720px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
