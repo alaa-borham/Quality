@@ -264,6 +264,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div id="mk-sizes"></div>
         <div class="grid2"><div><label class="inl" data-i18n="mkActual">طول الماركر الفعلي (متر)</label><input id="mk-actual" type="number" step="0.01"></div>
           <div><label class="inl" data-i18n="mkTol">التسامح %</label><input id="mk-tol" type="number" value="2"></div></div>
+        <div class="grid2"><div><label class="inl" data-i18n="mkQty">الكمية المطلوبة (قطعة)</label><input id="mk-qty" type="number" oninput="calcMK()"></div>
+          <div><label class="inl" data-i18n="mkMaxPly">أقصى عدد طبقات (اختياري)</label><input id="mk-maxply" type="number" oninput="calcMK()"></div></div>
         <div class="row-btns"><button class="btn" onclick="calcMK()" data-i18n="calc">احسب</button>
         <button class="btn sec" id="mk-save" onclick="saveToolCheck('mk')" data-i18n="saveCheck">💾 حفظ</button></div>
         <div class="res-box" id="mk-res"></div>
@@ -361,6 +363,8 @@ mkTitle:'حاسبة الماركر والاستهلاك',mkModelLbl:'المود�
 mkCounts:'عدد القطع لكل مقاس في الماركر',mkActual:'طول الماركر الفعلي (متر)',mkActual2:'فعلي',mkTol:'التسامح %',
 mkExpected:'الطول المتوقع',mkDeviation:'الانحراف',mkPerPiece:'استهلاك القطعة الفعلي',totalPieces:'إجمالي القطع',mUnit:'م',
 mkNeed:'اختر الموديل وأدخل عدد القطع وطول الماركر الفعلي',selectModel:'— اختر الموديل —',noModels:'لا موديلات بعد — أضفها من زر إدارة الموديلات',
+mkQty:'الكمية المطلوبة (قطعة)',mkMaxPly:'أقصى عدد طبقات (اختياري)',mkPlies:'عدد الطبقات المطلوب',plyUnit:'طبقة',
+mkFabric:'القماش المطلوب للفرش',mkExtra:'قطع زائدة',mkSpreads:'عدد الفرشات',
 modelNew:'➕ موديل جديد',modelName:'اسم الموديل *',modelSizes:'المقاسات والاستهلاك المعتمد (كل سطر: المقاس ثم الاستهلاك بالمتر)',
 enterModel:'أدخل اسم الموديل ومقاساً واحداً على الأقل',badSizeLine:'سطر غير صحيح — الصيغة: المقاس مسافة ثم الرقم (مثال: L 3.20)',delModelQ:'حذف هذا الموديل؟',
 toolDescmk:'حاسبة الماركر: تسجل لكل موديل مقاساته والاستهلاك المعتمد لكل مقاس، ثم عند فحص أي ماركر تدخل عدد القطع من كل مقاس فيحسب النظام الطول المتوقع تلقائياً ويقارنه بالطول الفعلي المقاس ويعطيك نسبة الانحراف وقرار القبول حسب التسامح.',
@@ -463,6 +467,8 @@ mkTitle:'Marker & consumption calculator',mkModelLbl:'Model',mkManage:'⚙️ Ma
 mkCounts:'Pieces per size in the marker',mkActual:'Actual marker length (m)',mkActual2:'actual',mkTol:'Tolerance %',
 mkExpected:'Expected length',mkDeviation:'Deviation',mkPerPiece:'Actual consumption per piece',totalPieces:'Total pieces',mUnit:'m',
 mkNeed:'Select a model and enter piece counts and the actual marker length',selectModel:'— select model —',noModels:'No models yet — add them via the manage button',
+mkQty:'Required quantity (pcs)',mkMaxPly:'Max plies (optional)',mkPlies:'Plies needed',plyUnit:'plies',
+mkFabric:'Fabric needed for spreading',mkExtra:'extra pieces',mkSpreads:'Number of spreads',
 modelNew:'➕ New model',modelName:'Model name *',modelSizes:'Sizes & approved consumption (one line each: size then meters)',
 enterModel:'Enter the model name and at least one size',badSizeLine:'Invalid line — format: size space number (e.g. L 3.20)',delModelQ:'Delete this model?',
 toolDescmk:'Marker calculator: store each model\'s sizes with the approved consumption per size; when checking a marker, enter the piece count per size and the system computes the expected length, compares it with the measured actual length, and gives the deviation and an accept decision per your tolerance.',
@@ -1094,12 +1100,18 @@ function computeMK(quiet){const m=MODELS.find(x=>x.id===$('mk-model').value);
   const expected=Math.round(cnts.reduce((s,x)=>s+x.n*x.cons,0)*100)/100;
   const dev=Math.round((actual-expected)/expected*10000)/100;
   const perPiece=Math.round(actual/pieces*1000)/1000;
-  return{model:m.name,mix:cnts.map(x=>x.size+'×'+x.n).join(' · '),pieces,expected,actual,tol,dev,perPiece,
-    decision:actual<=expected*(1+tol/100)?'PASS':'FAIL'};}
+  const r={model:m.name,mix:cnts.map(x=>x.size+'×'+x.n).join(' · '),pieces,expected,actual,tol,dev,perPiece,
+    decision:actual<=expected*(1+tol/100)?'PASS':'FAIL'};
+  const qty=+$('mk-qty').value||0,maxply=+$('mk-maxply').value||0;
+  if(qty>0){r.qty=qty;r.plies=Math.ceil(qty/pieces);r.extra=r.plies*pieces-qty;
+    r.fabric=Math.round(r.plies*actual*100)/100;
+    if(maxply>0){r.maxply=maxply;r.spreads=Math.ceil(r.plies/maxply);}}
+  return r;}
 function calcMK(){const r=computeMK(true);if(!r){$('mk-res').innerHTML=`<span class="note">${t('mkNeed')}</span>`;return;}
+  const spread=r.qty?`<br>🧵 ${t('mkPlies')}: <b>${r.plies} ${t('plyUnit')}</b> (${r.qty} ÷ ${r.pieces}) · ${t('mkFabric')}: <b>${r.fabric} ${t('mUnit')}</b>${r.extra?` · ${t('mkExtra')}: ${r.extra}`:''}${r.spreads?`<br>📚 ${t('mkSpreads')}: <b>${r.spreads}</b> (${t('mkMaxPly').replace(' (اختياري)','').replace(' (optional)','')}: ${r.maxply})`:''}`:'';
   $('mk-res').innerHTML=`<div class="big" style="color:${r.decision==='PASS'?'var(--green)':'var(--red)'}">${r.decision==='PASS'?t('passMark'):t('failMark')}</div>
     <div class="note">${t('mkExpected')}: <b>${r.expected} ${t('mUnit')}</b> · ${t('mkActual')}: ${r.actual} ${t('mUnit')} · ${t('mkDeviation')}: <b>${r.dev}%</b> (${t('limit')} ${r.tol}%)<br>
-    ${t('totalPieces')}: ${r.pieces} · ${t('mkPerPiece')}: <b>${r.perPiece} ${t('mUnit')}</b></div>`;}
+    ${t('totalPieces')}: ${r.pieces} · ${t('mkPerPiece')}: <b>${r.perPiece} ${t('mUnit')}</b>${spread}</div>`;}
 function modelsManager(){modal(`<h3>${t('mkManage')}</h3>
   <div id="models-list">${MODELS.length?MODELS.map(m=>`<div class="item" style="margin-bottom:6px"><div class="h"><div><div class="t" style="font-size:14px">${esc(m.name)}</div>
     <div class="s">${(m.sizes||[]).map(s=>esc(s.size)+': '+s.cons).join(' · ')}</div></div></div>
@@ -1180,7 +1192,9 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
   else if(c.type==='aq')rows=aqRows(r);
   else if(c.type==='mk')rows=row(t('mkModelLbl'),r.model)+row(t('mkCounts'),r.mix)+row(t('totalPieces'),r.pieces)
     +row(t('mkExpected'),r.expected+' '+t('mUnit'))+row(t('mkActual'),r.actual+' '+t('mUnit'))
-    +row(t('mkPerPiece'),r.perPiece+' '+t('mUnit'))+row(t('mkDeviation'),r.dev+'% ('+t('limit')+' '+r.tol+'%)');
+    +row(t('mkPerPiece'),r.perPiece+' '+t('mUnit'))+row(t('mkDeviation'),r.dev+'% ('+t('limit')+' '+r.tol+'%)')
+    +(r.qty?row(t('mkQty'),r.qty)+row(t('mkPlies'),r.plies+' '+t('plyUnit')+(r.extra?' (+'+r.extra+')':''))
+      +row(t('mkFabric'),r.fabric+' '+t('mUnit'))+(r.spreads?row(t('mkSpreads'),r.spreads):''):'');
   else rows=sec(t('fpTitle'),r.fp.decision)+fpRows(r.fp)+sec(t('shTitle'),r.sh.decision)+shRows(r.sh)+sec(t('aqlTitle'),r.aq.decision)+aqRows(r.aq);
   $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:720px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
