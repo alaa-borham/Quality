@@ -265,11 +265,14 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <tr><th data-i18n="sizeName">المقاس</th><th data-i18n="sizeCons">استهلاك القطعة</th><th data-i18n="mkQtyInMarker">الكمية في الماركر</th><th data-i18n="colorLbl">اللون</th><th></th></tr>
           <tbody id="mk-rows"></tbody></table></div>
         <button type="button" class="mini" style="margin-top:6px" onclick="addMkRow()">➕ <span data-i18n="mkAddRow">إضافة مقاس</span></button>
+        <div class="note" style="margin-top:4px" data-i18n="mkQtyHint">💡 «الكمية في الماركر» = عدد قطع كل مقاس في ماركر واحد (عادةً 1–2)، وليست كمية الأوردر. كمية الأوردر تُدخل بالأسفل لكل لون.</div>
         <div class="grid3" style="margin-top:10px"><div><label class="inl" data-i18n="mkActual">طول الماركر الفعلي</label><input id="mk-actual" type="number" step="0.01" oninput="calcMK()"></div>
           <div><label class="inl" data-i18n="mkTol">التسامح %</label><input id="mk-tol" type="number" value="2" oninput="calcMK()"></div>
           <div><label class="inl" data-i18n="unitLbl">الوحدة</label><select id="mk-unit" onchange="onMkUnitChange()">
             <option value="متر">متر</option><option value="ياردة">ياردة</option><option value="كجم">كيلو</option><option value="حبة">حبة</option></select></div></div>
-        <div class="grid2"><div><label class="inl" data-i18n="mkQty">الكمية المطلوبة (قطعة)</label><input id="mk-qty" type="number" oninput="calcMK()"></div>
+        <label class="inl" data-i18n="mkColorQtyLbl">كمية الأوردر المطلوبة لكل لون</label>
+        <div id="mk-colqty"><span class="note" data-i18n="mkColorQtyEmpty">أضف الألوان في جدول الماركر بالأعلى لتظهر هنا</span></div>
+        <div class="grid2" style="margin-top:8px"><div><label class="inl" data-i18n="mkQty">الكمية المطلوبة (بدون تحديد لون)</label><input id="mk-qty" type="number" oninput="calcMK()"></div>
           <div><label class="inl" data-i18n="mkMaxPly">أقصى عدد طبقات (اختياري)</label><input id="mk-maxply" type="number" oninput="calcMK()"></div></div>
         <div class="row-btns" style="margin-top:10px"><button class="btn" onclick="calcMK()" data-i18n="calc">احسب</button>
         <button class="btn sec" id="mk-save" onclick="saveToolCheck('mk')" data-i18n="saveCheck">💾 حفظ</button></div>
@@ -372,6 +375,8 @@ mkQty:'الكمية المطلوبة (قطعة)',mkMaxPly:'أقصى عدد طب�
 mkFabric:'القماش المطلوب للفرش',mkExtra:'قطع زائدة',mkSpreads:'عدد الفرشات',
 mkColorsLbl:'توزيعة الأوردر بالألوان (اختياري)',mkColorAdd:'إضافة لون',total:'الإجمالي',mkColorFabric:'استهلاك قماش اللون',
 mkTableLbl:'بيانات الماركر',mkQtyInMarker:'الكمية في الماركر',mkAddRow:'إضافة مقاس',mkColorPieces:'قطع في الماركر',mkColorLen:'استهلاك اللون في الماركر',mkProduced:'القطع المنتجة',
+mkQtyHint:'💡 «الكمية في الماركر» = عدد قطع كل مقاس في ماركر واحد (عادةً 1–2)، وليست كمية الأوردر. كمية الأوردر تُدخل بالأسفل لكل لون.',
+mkColorQtyLbl:'كمية الأوردر المطلوبة لكل لون',mkColorQtyEmpty:'أضف الألوان في جدول الماركر بالأعلى لتظهر هنا',
 backupTitle:'النسخ الاحتياطي',backupBtn:'⬇ تنزيل نسخة',restoreBtn:'⬆ استعادة نسخة',
 backupHint:'تنزيل كل بيانات مساحة العمل في ملف واحد. احفظه دورياً — الاستعادة تكتب فوق السجلات بنفس المعرّفات.',
 backupWorking:'جارٍ المعالجة…',backupDone:'تم تنزيل النسخة',backupBad:'ملف نسخة غير صالح',
@@ -484,6 +489,8 @@ mkQty:'Required quantity (pcs)',mkMaxPly:'Max plies (optional)',mkPlies:'Plies n
 mkFabric:'Fabric needed for spreading',mkExtra:'extra pieces',mkSpreads:'Number of spreads',
 mkColorsLbl:'Order breakdown by color (optional)',mkColorAdd:'Add color',total:'Total',mkColorFabric:'Color fabric consumption',
 mkTableLbl:'Marker data',mkQtyInMarker:'Qty in marker',mkAddRow:'Add size',mkColorPieces:'Pieces in marker',mkColorLen:'Color length in marker',mkProduced:'Pieces produced',
+mkQtyHint:'💡 "Qty in marker" = pieces of each size in ONE marker (usually 1-2), not the order quantity. Enter the order quantity per color below.',
+mkColorQtyLbl:'Required order quantity per color',mkColorQtyEmpty:'Add colors in the marker table above to show them here',
 backupTitle:'Backup',backupBtn:'⬇ Download backup',restoreBtn:'⬆ Restore backup',
 backupHint:'Download all workspace data in one file. Save it periodically — restoring overwrites records with the same IDs.',
 backupWorking:'Working…',backupDone:'Backup downloaded',backupBad:'Invalid backup file',
@@ -1156,6 +1163,14 @@ function loadMkModel(){const m=MODELS.find(x=>x.id===$('mk-model').value);if(!m)
 function readMkRows(){return [...document.querySelectorAll('.mk-row')].map(tr=>({
   size:tr.querySelector('.mkr-size').value.trim(),cons:+tr.querySelector('.mkr-cons').value||0,
   qty:+tr.querySelector('.mkr-qty').value||0,color:tr.querySelector('.mkr-color').value.trim()})).filter(r=>r.qty>0&&r.cons>0);}
+function distinctColors(){const set=[];readMkRows().forEach(r=>{if(r.color&&!set.includes(r.color))set.push(r.color);});return set;}
+function syncColorQtyInputs(){const el=$('mk-colqty');if(!el)return;const cols=distinctColors();
+  const existing=[...el.querySelectorAll('.mkcq')].map(i=>i.dataset.color);
+  if(JSON.stringify(existing)===JSON.stringify(cols))return;
+  const vals={};el.querySelectorAll('.mkcq').forEach(i=>vals[i.dataset.color]=i.value);
+  el.innerHTML=cols.length?cols.map(c=>`<div class="grid2" style="align-items:center;margin-bottom:6px"><div><b>🎨 ${esc(c)}</b></div>
+    <input class="mkcq" type="number" min="0" value="${vals[c]!=null?vals[c]:''}" data-color="${esc(c)}" placeholder="${t('qtyShort')}" oninput="calcMK()"></div>`).join(''):`<span class="note">${t('mkColorQtyEmpty')}</span>`;}
+function readColorQty(){const m={};[...document.querySelectorAll('.mkcq')].forEach(i=>{const q=+i.value||0;if(q>0)m[i.dataset.color]=q;});return m;}
 function computeMK(quiet){const rows=readMkRows();
   const pieces=rows.reduce((s,x)=>s+x.qty,0);
   const actual=+$('mk-actual').value||0;const tol=+$('mk-tol').value||0;
@@ -1177,21 +1192,29 @@ function computeMK(quiet){const rows=readMkRows();
   if(qty>0){r.qty=qty;r.plies=Math.ceil(qty/pieces);r.extra=r.plies*pieces-qty;
     r.fabric=Math.round(r.plies*actual*100)/100;
     if(maxply>0)r.spreads=Math.ceil(r.plies/maxply);}
+  const cq=readColorQty();
   if(groups.length>1||(groups.length===1&&groups[0].color!=='—')){
+    let anyPly=false;
     r.colors=groups.map(g=>{const o={color:g.color,cpieces:g.cpieces,clen:Math.round(g.clen*100)/100};
-      if(r.plies){o.produced=r.plies*g.cpieces;o.fabric=Math.round(r.plies*actual*(g.clen/expected)*100)/100;}
+      const req=cq[g.color]||0;
+      if(req>0&&g.cpieces>0){anyPly=true;o.req=req;o.plies=Math.ceil(req/g.cpieces);o.extra=o.plies*g.cpieces-req;
+        o.fabric=Math.round(o.plies*actual*(g.clen/expected)*100)/100;
+        if(maxply>0)o.spreads=Math.ceil(o.plies/maxply);}
       return o;});
+    r.hasColorReq=anyPly;
     r.colTotalPieces=pieces;r.colTotalLen=expected;
-    if(r.plies){r.colTotalProduced=r.plies*pieces;r.colTotalFabric=r.fabric;}}
+    if(anyPly){r.colTotalReq=r.colors.reduce((s,c)=>s+(c.req||0),0);
+      r.colTotalPlies=r.colors.reduce((s,c)=>s+(c.plies||0),0);
+      r.colTotalFabric=Math.round(r.colors.reduce((s,c)=>s+(c.fabric||0),0)*100)/100;}}
   return r;}
-function calcMK(){const r=computeMK(true);if(!r){$('mk-res').innerHTML=`<span class="note">${t('mkNeed')}</span>`;return;}
+function calcMK(){syncColorQtyInputs();const r=computeMK(true);if(!r){$('mk-res').innerHTML=`<span class="note">${t('mkNeed')}</span>`;return;}
   const u=r.unit||t('mUnit');
   const spread=r.qty?`<br>🧵 ${t('mkPlies')}: <b>${r.plies} ${t('plyUnit')}</b> (${r.qty} ÷ ${r.pieces}) · ${t('mkFabric')}: <b>${r.fabric} ${u}</b>${r.extra?` · ${t('mkExtra')}: ${r.extra}`:''}${r.spreads?` · 📚 ${t('mkSpreads')}: <b>${r.spreads}</b>`:''}`:'';
   let colTbl='';
-  if(r.colors){const showProd=r.plies!=null;
-    colTbl=`<table class="rtbl" style="margin-top:10px;min-width:340px"><tr><th>${t('colorLbl')}</th><th>${t('mkColorPieces')}</th><th>${t('mkColorLen')} (${u})</th>${showProd?`<th>${t('mkProduced')}</th><th>${t('mkColorFabric')} (${u})</th>`:''}</tr>
-    ${r.colors.map(c=>`<tr><td>${esc(c.color||'—')}</td><td>${c.cpieces}</td><td>${c.clen}</td>${showProd?`<td>${c.produced}</td><td>${c.fabric}</td>`:''}</tr>`).join('')}
-    <tr style="font-weight:800;background:#eef6f6"><td>${t('total')}</td><td>${r.colTotalPieces}</td><td>${r.colTotalLen}</td>${showProd?`<td>${r.colTotalProduced}</td><td>${r.colTotalFabric}</td>`:''}</tr></table>`;}
+  if(r.colors){const sp=r.hasColorReq;
+    colTbl=`<table class="rtbl" style="margin-top:10px;min-width:360px"><tr><th>${t('colorLbl')}</th><th>${t('mkColorPieces')}</th><th>${t('mkColorLen')} (${u})</th>${sp?`<th>${t('mkQty')}</th><th>${t('mkPlies')}</th><th>${t('mkColorFabric')} (${u})</th>`:''}</tr>
+    ${r.colors.map(c=>`<tr><td>${esc(c.color||'—')}</td><td>${c.cpieces}</td><td>${c.clen}</td>${sp?`<td>${c.req!=null?c.req:'—'}</td><td>${c.plies!=null?c.plies+' '+t('plyUnit')+(c.extra?' (+'+c.extra+')':''):'—'}</td><td>${c.fabric!=null?c.fabric:'—'}</td>`:''}</tr>`).join('')}
+    ${sp?`<tr style="font-weight:800;background:#eef6f6"><td>${t('total')}</td><td>${r.colTotalPieces}</td><td>${r.colTotalLen}</td><td>${r.colTotalReq}</td><td>${r.colTotalPlies} ${t('plyUnit')}</td><td>${r.colTotalFabric}</td></tr>`:''}</table>`;}
   $('mk-res').innerHTML=`<div class="big" style="color:${r.decision==='PASS'?'var(--green)':'var(--red)'}">${r.decision==='PASS'?t('passMark'):t('failMark')}</div>
     <div class="note">${t('mkExpected')}: <b>${r.expected} ${u}</b> · ${t('mkActual')}: ${r.actual} ${u} · ${t('mkDeviation')}: <b>${r.dev}%</b> (${t('limit')} ${r.tol}%)<br>
     ${t('totalPieces')}: ${r.pieces} · ${t('mkPerPiece')}: <b>${r.perPiece} ${u}</b>${spread}</div>${colTbl}`;}
@@ -1292,10 +1315,10 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
     +row(t('mkPerPiece'),r.perPiece+' '+u)+row(t('mkDeviation'),r.dev+'% ('+t('limit')+' '+r.tol+'%)')
     +(r.qty?row(t('mkQty'),r.qty)+row(t('mkPlies'),r.plies+' '+t('plyUnit')+(r.extra?' (+'+r.extra+')':''))
       +row(t('mkFabric'),r.fabric+' '+u)+(r.spreads?row(t('mkSpreads'),r.spreads):''):'');
-    if(r.colors){const sp=r.plies!=null;rows+=`<tr><td colspan="2" style="padding:0"><table style="width:100%;border-collapse:collapse" border="1" cellpadding="6">
-      <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('colorLbl')}</td><td>${t('mkColorPieces')}</td><td>${t('mkColorLen')} (${u})</td>${sp?`<td>${t('mkProduced')}</td><td>${t('mkColorFabric')} (${u})</td>`:''}</tr>
-      ${r.colors.map(x=>`<tr><td>${esc(x.color||'—')}</td><td>${x.cpieces}</td><td>${x.clen}</td>${sp?`<td>${x.produced}</td><td>${x.fabric}</td>`:''}</tr>`).join('')}
-      <tr style="font-weight:800"><td>${t('total')}</td><td>${r.colTotalPieces}</td><td>${r.colTotalLen}</td>${sp?`<td>${r.colTotalProduced}</td><td>${r.colTotalFabric}</td>`:''}</tr></table></td></tr>`;}}
+    if(r.colors){const sp=r.hasColorReq;rows+=`<tr><td colspan="2" style="padding:0"><table style="width:100%;border-collapse:collapse" border="1" cellpadding="6">
+      <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('colorLbl')}</td><td>${t('mkColorPieces')}</td><td>${t('mkColorLen')} (${u})</td>${sp?`<td>${t('mkQty')}</td><td>${t('mkPlies')}</td><td>${t('mkColorFabric')} (${u})</td>`:''}</tr>
+      ${r.colors.map(x=>`<tr><td>${esc(x.color||'—')}</td><td>${x.cpieces}</td><td>${x.clen}</td>${sp?`<td>${x.req!=null?x.req:'—'}</td><td>${x.plies!=null?x.plies+(x.extra?' (+'+x.extra+')':''):'—'}</td><td>${x.fabric!=null?x.fabric:'—'}</td>`:''}</tr>`).join('')}
+      ${sp?`<tr style="font-weight:800"><td>${t('total')}</td><td>${r.colTotalPieces}</td><td>${r.colTotalLen}</td><td>${r.colTotalReq}</td><td>${r.colTotalPlies}</td><td>${r.colTotalFabric}</td></tr>`:''}</table></td></tr>`;}}
   else rows=sec(t('fpTitle'),r.fp.decision)+fpRows(r.fp)+sec(t('shTitle'),r.sh.decision)+shRows(r.sh)+sec(t('aqlTitle'),r.aq.decision)+aqRows(r.aq);
   $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:720px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
