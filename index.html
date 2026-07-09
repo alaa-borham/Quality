@@ -371,6 +371,10 @@ mkNeed:'اختر الموديل وأدخل عدد القطع وطول المار
 mkQty:'الكمية المطلوبة (قطعة)',mkMaxPly:'أقصى عدد طبقات (اختياري)',mkPlies:'عدد الطبقات المطلوب',plyUnit:'طبقة',
 mkFabric:'القماش المطلوب للفرش',mkExtra:'قطع زائدة',mkSpreads:'عدد الفرشات',
 mkColorsLbl:'توزيعة الأوردر بالألوان (اختياري)',mkColorAdd:'إضافة لون',total:'الإجمالي',mkColorFabric:'استهلاك قماش اللون',
+backupTitle:'النسخ الاحتياطي',backupBtn:'⬇ تنزيل نسخة',restoreBtn:'⬆ استعادة نسخة',
+backupHint:'تنزيل كل بيانات مساحة العمل في ملف واحد. احفظه دورياً — الاستعادة تكتب فوق السجلات بنفس المعرّفات.',
+backupWorking:'جارٍ المعالجة…',backupDone:'تم تنزيل النسخة',backupBad:'ملف نسخة غير صالح',
+restoreConfirm:'استعادة {n} سجلاً؟ سيُكتب فوق أي سجل بنفس المعرّف (لا يُحذف ما ليس في النسخة).',restoreDone:'تمت استعادة {n} عنصراً',
 modelNew:'➕ موديل جديد',modelName:'اسم الموديل *',modelSizes:'المقاسات والاستهلاك المعتمد',
 sizeName:'اسم المقاس',sizeLen:'طول المقاس',sizeCons:'استهلاك القطعة',sizeAdd:'إضافة مقاس',
 enterModel:'أدخل اسم الموديل ومقاساً واحداً على الأقل',badSizeRow:'كل صف يحتاج اسم المقاس واستهلاكاً أكبر من صفر',delModelQ:'حذف هذا الموديل؟',
@@ -478,6 +482,10 @@ mkNeed:'Select a model and enter piece counts and the actual marker length',sele
 mkQty:'Required quantity (pcs)',mkMaxPly:'Max plies (optional)',mkPlies:'Plies needed',plyUnit:'plies',
 mkFabric:'Fabric needed for spreading',mkExtra:'extra pieces',mkSpreads:'Number of spreads',
 mkColorsLbl:'Order breakdown by color (optional)',mkColorAdd:'Add color',total:'Total',mkColorFabric:'Color fabric consumption',
+backupTitle:'Backup',backupBtn:'⬇ Download backup',restoreBtn:'⬆ Restore backup',
+backupHint:'Download all workspace data in one file. Save it periodically — restoring overwrites records with the same IDs.',
+backupWorking:'Working…',backupDone:'Backup downloaded',backupBad:'Invalid backup file',
+restoreConfirm:'Restore {n} records? Records with the same ID are overwritten (nothing outside the backup is deleted).',restoreDone:'{n} items restored',
 modelNew:'➕ New model',modelName:'Model name *',modelSizes:'Sizes & approved consumption',
 sizeName:'Size',sizeLen:'Size length',sizeCons:'Consumption',sizeAdd:'Add size',
 enterModel:'Enter the model name and at least one size',badSizeRow:'Each row needs a size name and consumption greater than zero',delModelQ:'Delete this model?',
@@ -649,9 +657,38 @@ function openMenu(){const owner=MEMBER.role==='owner';modal(`<h3>${t('settings')
       <button class="mini" onclick="copyWsCode()">${t('copyCodeBtn')}</button>
       ${owner?`<button class="mini g" onclick="regenWsCode()">${t('newCodeBtn')}</button>
       <button class="mini" onclick="customWsCode()">${t('customCodeBtn')}</button>`:''}</div></div>
-  <button class="btn red" onclick="logout();closeModal()">${t('logout')}</button>
+  ${owner?`<label class="inl">${t('backupTitle')}</label>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="mini" onclick="exportBackup()">${t('backupBtn')}</button>
+    <button class="mini g" onclick="document.getElementById('backup-file').click()">${t('restoreBtn')}</button></div>
+  <input id="backup-file" type="file" accept="application/json" style="display:none" onchange="restoreBackup(event)">
+  <div class="note" style="margin-top:4px">${t('backupHint')}</div>`:''}
+  <button class="btn red" style="margin-top:12px" onclick="logout();closeModal()">${t('logout')}</button>
   <button class="btn sec" style="margin-top:8px" onclick="closeModal()">${t('close')}</button>`);
   if(owner){renderItemsManager();renderEmps();}}
+const BK_WSCOLS=['qc_factories','qc_orders','qc_inspections','qc_defects','qc_models','qc_toolchecks'];
+const BK_DOCS=['qc_seqcfg','qc_chkcfg'];
+function exportBackup(){if(!isOwner())return;toast(t('backupWorking'));
+  const ws=MEMBER.wsId;const out={app:'qc-tracking',version:1,exportedAt:new Date().toISOString(),wsId:ws,wsName:MEMBER.wsName||'',collections:{},docs:{}};
+  const jobs=BK_WSCOLS.map(col=>db.collection(col).where('wsId','==',ws).get().then(s=>{out.collections[col]=s.docs.map(d=>({id:d.id,data:d.data()}));}))
+    .concat(BK_DOCS.map(col=>db.collection(col).doc(ws).get().then(d=>{if(d.exists)out.docs[col]=d.data();})))
+    .concat([db.collection('qc_workspaces').doc(ws).get().then(d=>{if(d.exists)out.workspace=d.data();})]);
+  Promise.all(jobs).then(()=>{
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:'application/json'}));
+    a.download='qc_backup_'+(MEMBER.wsName||'ws').replace(/\s+/g,'_')+'_'+today()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    toast(t('backupDone'));
+  }).catch(e=>toast(rulesHint(e)));}
+function restoreBackup(ev){const f=ev.target.files&&ev.target.files[0];ev.target.value='';if(!f||!isOwner())return;
+  const r=new FileReader();r.onload=()=>{let bk;try{bk=JSON.parse(r.result);}catch(_){return toast(t('backupBad'));}
+    if(!bk||bk.app!=='qc-tracking'||!bk.collections)return toast(t('backupBad'));
+    const n=BK_WSCOLS.reduce((s,c)=>s+((bk.collections[c]||[]).length),0);
+    if(!confirm(tf('restoreConfirm',{n})))return;
+    const ws=MEMBER.wsId;let ops=[];
+    BK_WSCOLS.forEach(col=>(bk.collections[col]||[]).forEach(rec=>{
+      ops.push(db.collection(col).doc(rec.id).set({...rec.data,wsId:ws}));}));
+    BK_DOCS.forEach(col=>{if(bk.docs&&bk.docs[col])ops.push(db.collection(col).doc(ws).set(bk.docs[col]));});
+    toast(t('backupWorking'));
+    Promise.all(ops).then(()=>{toast(tf('restoreDone',{n:ops.length}));}).catch(e=>toast(rulesHint(e)));
+  };r.readAsText(f);}
 let EMPS=[];
 function renderEmps(){const el=$('emp-list');if(!el)return;
   db.collection('qc_members').where('wsId','==',MEMBER.wsId).get().then(qs=>{
