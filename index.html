@@ -1198,27 +1198,25 @@ function modelForm(m){m=m||{};
   modal(`<h3>${m.id?t('edit'):t('modelNew')}</h3>
   <label class="inl">${t('modelName')}</label><input id="md-name" value="${esc(m.name||'')}">
   <label class="inl">${t('modelSizes')}</label>
-  <div style="overflow-x:auto"><table class="rtbl" style="min-width:340px" id="md-tbl">
-    <tr><th>${t('sizeName')}</th><th>${t('sizeLen')}</th><th>${t('sizeCons')}</th><th></th></tr>
+  <div style="overflow-x:auto"><table class="rtbl" style="min-width:300px" id="md-tbl">
+    <tr><th>${t('sizeName')}</th><th>${t('sizeCons')}</th><th></th></tr>
     <tbody id="md-rows">${rows.map(s=>mdRow(s)).join('')}</tbody></table></div>
   <button type="button" class="mini" style="margin-top:6px" onclick="addModelRow()">➕ ${t('sizeAdd')}</button>
   <div class="row-btns"><button class="btn" onclick="saveModel('${m.id||''}')">${t('save')}</button>
   <button class="btn sec" onclick="modelsManager()">${t('cancel')}</button></div>`);}
 function mdRow(s){s=s||{};return `<tr>
-  <td><input class="md-size" value="${esc(s.size||'')}" placeholder="L" style="min-width:70px;padding:6px"></td>
-  <td><input class="md-len" type="number" step="0.01" value="${s.len!=null?s.len:''}" placeholder="—" style="min-width:70px;padding:6px"></td>
-  <td><input class="md-cons" type="number" step="0.01" value="${s.cons!=null?s.cons:''}" placeholder="3.20" style="min-width:70px;padding:6px"></td>
+  <td><input class="md-size" value="${esc(s.size||'')}" placeholder="L" style="min-width:80px;padding:6px"></td>
+  <td><input class="md-cons" type="number" step="0.01" value="${s.cons!=null?s.cons:''}" placeholder="3.20" style="min-width:80px;padding:6px"></td>
   <td><button type="button" class="mini r" onclick="this.closest('tr').remove()">✕</button></td></tr>`;}
 function addModelRow(){$('md-rows').insertAdjacentHTML('beforeend',mdRow());}
 function saveModel(id){const name=$('md-name').value.trim();
   const sizes=[];let bad=false;
   document.querySelectorAll('#md-rows tr').forEach(tr=>{
     const size=tr.querySelector('.md-size').value.trim();
-    const len=tr.querySelector('.md-len').value.trim();
     const cons=tr.querySelector('.md-cons').value.trim();
-    if(!size&&!cons&&!len)return;
+    if(!size&&!cons)return;
     if(!size||!(+cons>0)){bad=true;return;}
-    const o={size,cons:+cons};if(len!==''&&+len>0)o.len=+len;sizes.push(o);});
+    sizes.push({size,cons:+cons});});
   if(!name||!sizes.length)return toast(t('enterModel'));
   if(bad)return toast(t('badSizeRow'));
   const data={wsId:MEMBER.wsId,name,sizes};
