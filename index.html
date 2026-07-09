@@ -265,9 +265,11 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <tr><th data-i18n="sizeName">المقاس</th><th data-i18n="sizeCons">استهلاك القطعة</th><th data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="colorLbl">اللون</th><th></th></tr>
           <tbody id="mk-rows"></tbody></table></div>
         <button type="button" class="mini" style="margin-top:6px" onclick="addMkRow()">➕ <span data-i18n="mkAddRow">إضافة مقاس</span></button>
-        <div class="grid2" style="margin-top:10px"><div><label class="inl" data-i18n="unitLbl">الوحدة</label><select id="mk-unit" onchange="onMkUnitChange()">
+        <div class="grid3" style="margin-top:10px"><div><label class="inl" data-i18n="unitLbl">الوحدة</label><select id="mk-unit" onchange="onMkUnitChange()">
             <option value="متر">متر</option><option value="ياردة">ياردة</option><option value="كجم">كيلو</option><option value="حبة">حبة</option></select></div>
+          <div><label class="inl" data-i18n="mkMkLen">طول الماركر (طول الطبقة الواحدة)</label><input id="mk-mklen" type="number" step="0.01" oninput="calcMK()"></div>
           <div><label class="inl" data-i18n="mkAvail">القماش المتاح (اختياري)</label><input id="mk-avail" type="number" step="0.01" oninput="calcMK()"></div></div>
+        <label class="inl" data-i18n="mkMaxPly">أقصى عدد طبقات في الفرشة (اختياري)</label><input id="mk-maxply" type="number" oninput="calcMK()">
         <div class="row-btns" style="margin-top:10px"><button class="btn" onclick="calcMK()" data-i18n="calc">احسب</button>
         <button class="btn sec" id="mk-save" onclick="saveToolCheck('mk')" data-i18n="saveCheck">💾 حفظ</button></div>
         <div class="res-box" id="mk-res"></div>
@@ -370,6 +372,7 @@ mkFabric:'القماش المطلوب للفرش',mkExtra:'قطع زائدة',mk
 mkColorsLbl:'توزيعة الأوردر بالألوان (اختياري)',mkColorAdd:'إضافة لون',total:'الإجمالي',mkColorFabric:'استهلاك قماش اللون',
 mkTableLbl:'بيانات الأوردر',mkQtyOrder:'الكمية المطلوبة',mkAddRow:'إضافة مقاس',mkColorPieces2:'إجمالي القطع',mkTotalFabric:'إجمالي القماش',
 mkAvail:'القماش المتاح (اختياري)',mkEnough:'القماش المتاح يكفي',mkShort:'ينقص',
+mkMkLen:'طول الماركر',mkTotalPlies:'إجمالي الطبقات',mkSpreadsShort:'فرشة',
 backupTitle:'النسخ الاحتياطي',backupBtn:'⬇ تنزيل نسخة',restoreBtn:'⬆ استعادة نسخة',
 backupHint:'تنزيل كل بيانات مساحة العمل في ملف واحد. احفظه دورياً — الاستعادة تكتب فوق السجلات بنفس المعرّفات.',
 backupWorking:'جارٍ المعالجة…',backupDone:'تم تنزيل النسخة',backupBad:'ملف نسخة غير صالح',
@@ -483,6 +486,7 @@ mkFabric:'Fabric needed for spreading',mkExtra:'extra pieces',mkSpreads:'Number 
 mkColorsLbl:'Order breakdown by color (optional)',mkColorAdd:'Add color',total:'Total',mkColorFabric:'Color fabric consumption',
 mkTableLbl:'Order data',mkQtyOrder:'Quantity',mkAddRow:'Add size',mkColorPieces2:'Total pieces',mkTotalFabric:'Total fabric',
 mkAvail:'Available fabric (optional)',mkEnough:'Available fabric is enough',mkShort:'short by',
+mkMkLen:'Marker length',mkTotalPlies:'Total plies',mkSpreadsShort:'spreads',
 backupTitle:'Backup',backupBtn:'⬇ Download backup',restoreBtn:'⬆ Restore backup',
 backupHint:'Download all workspace data in one file. Save it periodically — restoring overwrites records with the same IDs.',
 backupWorking:'Working…',backupDone:'Backup downloaded',backupBad:'Invalid backup file',
@@ -1136,7 +1140,7 @@ function renderToolFactSelects(){
 let MK_UNIT='متر';const UNIT_M={'متر':1,'ياردة':0.9144};
 function onMkUnitChange(){const nu=$('mk-unit').value,ou=MK_UNIT;
   if(UNIT_M[ou]&&UNIT_M[nu]&&ou!==nu){const f=UNIT_M[ou]/UNIT_M[nu];
-    const av=$('mk-avail');if(av&&av.value)av.value=Math.round(+av.value*f*100)/100;
+    ['mk-avail','mk-mklen'].forEach(id=>{const e=$(id);if(e&&e.value)e.value=Math.round(+e.value*f*100)/100;});
     document.querySelectorAll('.mkr-cons').forEach(el=>{if(el.value)el.value=Math.round(+el.value*f*1000)/1000;});}
   MK_UNIT=nu;calcMK();}
 function renderMkModels(){const el=$('mk-model');if(!el)return;const cur=el.value;
@@ -1159,25 +1163,29 @@ function computeMK(quiet){const rows=readMkRows();
   const pieces=rows.reduce((s,x)=>s+x.qty,0);
   if(!rows.length){if(!quiet)toast(t('mkNeed'));return null;}
   const unit=($('mk-unit')&&$('mk-unit').value)||'متر';
-  const avail=+$('mk-avail').value||0;
+  const avail=+$('mk-avail').value||0;const mklen=+$('mk-mklen').value||0;const maxply=+$('mk-maxply').value||0;
   const mdl=MODELS.find(x=>x.id===$('mk-model').value);
   const totalFabric=Math.round(rows.reduce((s,x)=>s+x.qty*x.cons,0)*100)/100;
   // تجميع حسب اللون: إجمالي القطع + إجمالي القماش لكل لون
   const byColor={};rows.forEach(x=>{const k=x.color||'—';if(!byColor[k])byColor[k]={color:k,pcs:0,fabric:0};
     byColor[k].pcs+=x.qty;byColor[k].fabric+=x.qty*x.cons;});
-  const colors=Object.values(byColor).map(g=>({color:g.color,pcs:g.pcs,fabric:Math.round(g.fabric*100)/100}));
+  const colors=Object.values(byColor).map(g=>{const o={color:g.color,pcs:g.pcs,fabric:Math.round(g.fabric*100)/100};
+    if(mklen>0){o.plies=Math.ceil(o.fabric/mklen);if(maxply>0)o.spreads=Math.ceil(o.plies/maxply);}return o;});
   const r={model:mdl?mdl.name:'',unit,mix:rows.map(x=>x.size+'×'+x.qty).join(' · '),pieces,totalFabric,colors,
     avail:avail||null,decision:(avail>0&&totalFabric>avail)?'FAIL':'PASS'};
+  if(mklen>0){r.mklen=mklen;r.totalPlies=colors.reduce((s,c)=>s+(c.plies||0),0);}
   return r;}
 function calcMK(){const r=computeMK(true);if(!r){$('mk-res').innerHTML=`<span class="note">${t('mkNeed')}</span>`;return;}
   const u=r.unit||t('mUnit');
   const multi=r.colors.length>1||(r.colors.length===1&&r.colors[0].color!=='—');
-  const colTbl=multi?`<table class="rtbl" style="margin-top:10px;min-width:300px"><tr><th>${t('colorLbl')}</th><th>${t('mkColorPieces2')}</th><th>${t('mkColorFabric')} (${u})</th></tr>
-    ${r.colors.map(c=>`<tr><td>${esc(c.color||'—')}</td><td>${c.pcs}</td><td>${c.fabric}</td></tr>`).join('')}
-    <tr style="font-weight:800;background:#eef6f6"><td>${t('total')}</td><td>${r.pieces}</td><td>${r.totalFabric}</td></tr></table>`:'';
+  const sp=r.mklen!=null;
+  const colTbl=multi?`<table class="rtbl" style="margin-top:10px;min-width:320px"><tr><th>${t('colorLbl')}</th><th>${t('mkColorPieces2')}</th><th>${t('mkColorFabric')} (${u})</th>${sp?`<th>${t('mkPlies')}</th>`:''}</tr>
+    ${r.colors.map(c=>`<tr><td>${esc(c.color||'—')}</td><td>${c.pcs}</td><td>${c.fabric}</td>${sp?`<td>${c.plies} ${t('plyUnit')}${c.spreads?' / '+c.spreads+' '+t('mkSpreadsShort'):''}</td>`:''}</tr>`).join('')}
+    <tr style="font-weight:800;background:#eef6f6"><td>${t('total')}</td><td>${r.pieces}</td><td>${r.totalFabric}</td>${sp?`<td>${r.totalPlies} ${t('plyUnit')}</td>`:''}</tr></table>`:'';
+  const plyLine=r.mklen!=null?` · 🧵 ${t('mkTotalPlies')}: <b>${r.totalPlies} ${t('plyUnit')}</b> (${t('mkMkLen')} ${r.mklen} ${u})`:'';
   const availLine=r.avail!=null?`<br>${t('mkAvail')}: ${r.avail} ${u} · ${r.decision==='PASS'?'✔ '+t('mkEnough'):'✘ '+t('mkShort')+' '+Math.round((r.totalFabric-r.avail)*100)/100+' '+u}`:'';
   $('mk-res').innerHTML=`<div class="big" style="color:${r.decision==='PASS'?'var(--green)':'var(--red)'}">${r.decision==='PASS'?t('passMark'):t('failMark')}</div>
-    <div class="note">${t('totalPieces')}: <b>${r.pieces}</b> · ${t('mkTotalFabric')}: <b>${r.totalFabric} ${u}</b>${availLine}</div>${colTbl}`;}
+    <div class="note">${t('totalPieces')}: <b>${r.pieces}</b> · ${t('mkTotalFabric')}: <b>${r.totalFabric} ${u}</b>${plyLine}${availLine}</div>${colTbl}`;}
 function modelsManager(){modal(`<h3>${t('mkManage')}</h3>
   <div id="models-list">${MODELS.length?MODELS.map(m=>`<div class="item" style="margin-bottom:6px"><div class="h"><div><div class="t" style="font-size:14px">${esc(m.name)}</div>
     <div class="s">${(m.sizes||[]).map(s=>esc(s.size)+': '+s.cons).join(' · ')}</div></div></div>
@@ -1270,14 +1278,14 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
   if(c.type==='fp')rows=fpRows(r);
   else if(c.type==='sh')rows=shRows(r);
   else if(c.type==='aq')rows=aqRows(r);
-  else if(c.type==='mk'){const u=r.unit||t('mUnit');
+  else if(c.type==='mk'){const u=r.unit||t('mUnit');const sp=r.mklen!=null;
     rows=(r.model?row(t('mkModelLbl'),r.model):'')+row(t('mkCounts'),r.mix)+row(t('totalPieces'),r.pieces)
-      +row(t('mkTotalFabric'),r.totalFabric+' '+u)+(r.avail!=null?row(t('mkAvail'),r.avail+' '+u):'');
+      +row(t('mkTotalFabric'),r.totalFabric+' '+u)+(sp?row(t('mkMkLen'),r.mklen+' '+u)+row(t('mkTotalPlies'),r.totalPlies+' '+t('plyUnit')):'')+(r.avail!=null?row(t('mkAvail'),r.avail+' '+u):'');
     const multi=r.colors&&(r.colors.length>1||(r.colors.length===1&&r.colors[0].color!=='—'));
     if(multi){rows+=`<tr><td colspan="2" style="padding:0"><table style="width:100%;border-collapse:collapse" border="1" cellpadding="6">
-      <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('colorLbl')}</td><td>${t('mkColorPieces2')}</td><td>${t('mkColorFabric')} (${u})</td></tr>
-      ${r.colors.map(x=>`<tr><td>${esc(x.color||'—')}</td><td>${x.pcs}</td><td>${x.fabric}</td></tr>`).join('')}
-      <tr style="font-weight:800"><td>${t('total')}</td><td>${r.pieces}</td><td>${r.totalFabric}</td></tr></table></td></tr>`;}}
+      <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('colorLbl')}</td><td>${t('mkColorPieces2')}</td><td>${t('mkColorFabric')} (${u})</td>${sp?`<td>${t('mkPlies')}</td>`:''}</tr>
+      ${r.colors.map(x=>`<tr><td>${esc(x.color||'—')}</td><td>${x.pcs}</td><td>${x.fabric}</td>${sp?`<td>${x.plies}</td>`:''}</tr>`).join('')}
+      <tr style="font-weight:800"><td>${t('total')}</td><td>${r.pieces}</td><td>${r.totalFabric}</td>${sp?`<td>${r.totalPlies}</td>`:''}</tr></table></td></tr>`;}}
   else rows=sec(t('fpTitle'),r.fp.decision)+fpRows(r.fp)+sec(t('shTitle'),r.sh.decision)+shRows(r.sh)+sec(t('aqlTitle'),r.aq.decision)+aqRows(r.aq);
   $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:720px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
