@@ -258,19 +258,19 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
       <div id="tool-mk" class="card hide">
         <div class="grid2" id="mk-factrow"><div><label class="inl" data-i18n="factOpt">المصنع (اختياري)</label><select id="mk-fact"></select></div>
           <div><label class="inl" data-i18n="dateLbl">التاريخ</label><input id="mk-date" type="date"></div></div>
-        <div class="grid2"><div><label class="inl" data-i18n="mkModelLbl">الموديل</label><select id="mk-model" onchange="renderMkSizes()"></select></div>
+        <div class="grid2"><div><label class="inl" data-i18n="mkModelLbl">الموديل (اختياري)</label><select id="mk-model" onchange="loadMkModel()"></select></div>
           <div style="display:flex;align-items:flex-end"><button type="button" class="mini" onclick="modelsManager()" data-i18n="mkManage">⚙️ إدارة الموديلات والمقاسات</button></div></div>
-        <label class="inl" data-i18n="mkCounts">عدد القطع لكل مقاس في الماركر</label>
-        <div id="mk-sizes"></div>
-        <div class="grid3"><div><label class="inl" data-i18n="mkActual">طول الماركر الفعلي</label><input id="mk-actual" type="number" step="0.01"></div>
-          <div><label class="inl" data-i18n="mkTol">التسامح %</label><input id="mk-tol" type="number" value="2"></div>
+        <label class="inl" data-i18n="mkTableLbl">بيانات الماركر</label>
+        <div style="overflow-x:auto"><table class="rtbl" style="min-width:440px" id="mk-tbl">
+          <tr><th data-i18n="sizeName">المقاس</th><th data-i18n="sizeCons">استهلاك القطعة</th><th data-i18n="mkQtyInMarker">الكمية في الماركر</th><th data-i18n="colorLbl">اللون</th><th></th></tr>
+          <tbody id="mk-rows"></tbody></table></div>
+        <button type="button" class="mini" style="margin-top:6px" onclick="addMkRow()">➕ <span data-i18n="mkAddRow">إضافة مقاس</span></button>
+        <div class="grid3" style="margin-top:10px"><div><label class="inl" data-i18n="mkActual">طول الماركر الفعلي</label><input id="mk-actual" type="number" step="0.01" oninput="calcMK()"></div>
+          <div><label class="inl" data-i18n="mkTol">التسامح %</label><input id="mk-tol" type="number" value="2" oninput="calcMK()"></div>
           <div><label class="inl" data-i18n="unitLbl">الوحدة</label><select id="mk-unit" onchange="calcMK()">
             <option value="متر">متر</option><option value="ياردة">ياردة</option><option value="كجم">كيلو</option><option value="حبة">حبة</option></select></div></div>
         <div class="grid2"><div><label class="inl" data-i18n="mkQty">الكمية المطلوبة (قطعة)</label><input id="mk-qty" type="number" oninput="calcMK()"></div>
           <div><label class="inl" data-i18n="mkMaxPly">أقصى عدد طبقات (اختياري)</label><input id="mk-maxply" type="number" oninput="calcMK()"></div></div>
-        <label class="inl" data-i18n="mkColorsLbl">توزيعة الأوردر بالألوان (اختياري)</label>
-        <div id="mk-colors"></div>
-        <button type="button" class="mini" onclick="addColorRow()">➕ <span data-i18n="mkColorAdd">إضافة لون</span></button>
         <div class="row-btns" style="margin-top:10px"><button class="btn" onclick="calcMK()" data-i18n="calc">احسب</button>
         <button class="btn sec" id="mk-save" onclick="saveToolCheck('mk')" data-i18n="saveCheck">💾 حفظ</button></div>
         <div class="res-box" id="mk-res"></div>
@@ -371,6 +371,7 @@ mkNeed:'اختر الموديل وأدخل عدد القطع وطول المار
 mkQty:'الكمية المطلوبة (قطعة)',mkMaxPly:'أقصى عدد طبقات (اختياري)',mkPlies:'عدد الطبقات المطلوب',plyUnit:'طبقة',
 mkFabric:'القماش المطلوب للفرش',mkExtra:'قطع زائدة',mkSpreads:'عدد الفرشات',
 mkColorsLbl:'توزيعة الأوردر بالألوان (اختياري)',mkColorAdd:'إضافة لون',total:'الإجمالي',mkColorFabric:'استهلاك قماش اللون',
+mkTableLbl:'بيانات الماركر',mkQtyInMarker:'الكمية في الماركر',mkAddRow:'إضافة مقاس',mkColorPieces:'قطع في الماركر',mkColorLen:'استهلاك اللون في الماركر',mkProduced:'القطع المنتجة',
 backupTitle:'النسخ الاحتياطي',backupBtn:'⬇ تنزيل نسخة',restoreBtn:'⬆ استعادة نسخة',
 backupHint:'تنزيل كل بيانات مساحة العمل في ملف واحد. احفظه دورياً — الاستعادة تكتب فوق السجلات بنفس المعرّفات.',
 backupWorking:'جارٍ المعالجة…',backupDone:'تم تنزيل النسخة',backupBad:'ملف نسخة غير صالح',
@@ -482,6 +483,7 @@ mkNeed:'Select a model and enter piece counts and the actual marker length',sele
 mkQty:'Required quantity (pcs)',mkMaxPly:'Max plies (optional)',mkPlies:'Plies needed',plyUnit:'plies',
 mkFabric:'Fabric needed for spreading',mkExtra:'extra pieces',mkSpreads:'Number of spreads',
 mkColorsLbl:'Order breakdown by color (optional)',mkColorAdd:'Add color',total:'Total',mkColorFabric:'Color fabric consumption',
+mkTableLbl:'Marker data',mkQtyInMarker:'Qty in marker',mkAddRow:'Add size',mkColorPieces:'Pieces in marker',mkColorLen:'Color length in marker',mkProduced:'Pieces produced',
 backupTitle:'Backup',backupBtn:'⬇ Download backup',restoreBtn:'⬆ Restore backup',
 backupHint:'Download all workspace data in one file. Save it periodically — restoring overwrites records with the same IDs.',
 backupWorking:'Working…',backupDone:'Backup downloaded',backupBad:'Invalid backup file',
@@ -1133,51 +1135,56 @@ function renderToolFactSelects(){
     if(!$(id.replace('-fact','-date')).value)$(id.replace('-fact','-date')).value=today();}});
   renderMkModels();}
 function renderMkModels(){const el=$('mk-model');if(!el)return;const cur=el.value;
-  el.innerHTML=`<option value="">${t('selectModel')}</option>`+MODELS.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('');
-  if(cur)el.value=cur;renderMkSizes();}
-function renderMkSizes(){const el=$('mk-sizes');if(!el)return;const m=MODELS.find(x=>x.id===$('mk-model').value);
-  if(!m){el.innerHTML=`<span class="note">${MODELS.length?t('selectModel'):t('noModels')}</span>`;return;}
-  el.innerHTML=(m.sizes||[]).map(s=>`<div class="grid2" style="align-items:center;margin-bottom:6px">
-    <div><b>${esc(s.size)}</b> <span class="note">(${s.cons} ${t('mUnit')})</span></div>
-    <input class="mk-cnt" type="number" min="0" value="0" data-size="${esc(s.size)}" data-cons="${s.cons}" oninput="calcMK()"></div>`).join('');}
-function mkColorRow(c){c=c||{};return `<div class="mk-colorrow grid2" style="align-items:center;margin-bottom:6px">
-  <input class="mkc-name" value="${esc(c.name||'')}" placeholder="${t('colorLbl')}" oninput="calcMK()">
-  <div style="display:flex;gap:6px"><input class="mkc-qty" type="number" min="0" value="${c.qty!=null?c.qty:''}" placeholder="${t('qtyShort')}" oninput="calcMK()">
-    <button type="button" class="mini r" onclick="this.closest('.mk-colorrow').remove();calcMK()">✕</button></div></div>`;}
-function addColorRow(c){$('mk-colors').insertAdjacentHTML('beforeend',mkColorRow(c));}
-function readColorRows(){return [...document.querySelectorAll('.mk-colorrow')].map(r=>({
-  name:r.querySelector('.mkc-name').value.trim(),qty:+r.querySelector('.mkc-qty').value||0})).filter(c=>c.qty>0);}
-function computeMK(quiet){const m=MODELS.find(x=>x.id===$('mk-model').value);
-  const cnts=[...document.querySelectorAll('.mk-cnt')].map(i=>({size:i.dataset.size,cons:+i.dataset.cons,n:+i.value||0})).filter(x=>x.n>0);
-  const pieces=cnts.reduce((s,x)=>s+x.n,0);
+  el.innerHTML=`<option value="">${MODELS.length?t('selectModel'):t('noModels')}</option>`+MODELS.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('');
+  if(cur)el.value=cur;if($('mk-rows')&&!$('mk-rows').children.length)addMkRow();}
+function mkRowHtml(r){r=r||{};return `<tr class="mk-row">
+  <td><input class="mkr-size" value="${esc(r.size||'')}" placeholder="L" style="min-width:64px;padding:6px"></td>
+  <td><input class="mkr-cons" type="number" step="0.01" value="${r.cons!=null?r.cons:''}" placeholder="3.20" style="min-width:64px;padding:6px" oninput="calcMK()"></td>
+  <td><input class="mkr-qty" type="number" min="0" value="${r.qty!=null?r.qty:''}" placeholder="1" style="min-width:56px;padding:6px" oninput="calcMK()"></td>
+  <td><input class="mkr-color" value="${esc(r.color||'')}" placeholder="${t('colorLbl')}" style="min-width:70px;padding:6px" oninput="calcMK()"></td>
+  <td><button type="button" class="mini r" onclick="this.closest('tr').remove();calcMK()">✕</button></td></tr>`;}
+function addMkRow(r){$('mk-rows').insertAdjacentHTML('beforeend',mkRowHtml(r));}
+function loadMkModel(){const m=MODELS.find(x=>x.id===$('mk-model').value);if(!m)return;
+  $('mk-rows').innerHTML=(m.sizes||[]).map(s=>mkRowHtml({size:s.size,cons:s.cons})).join('')||mkRowHtml();calcMK();}
+function readMkRows(){return [...document.querySelectorAll('.mk-row')].map(tr=>({
+  size:tr.querySelector('.mkr-size').value.trim(),cons:+tr.querySelector('.mkr-cons').value||0,
+  qty:+tr.querySelector('.mkr-qty').value||0,color:tr.querySelector('.mkr-color').value.trim()})).filter(r=>r.qty>0&&r.cons>0);}
+function computeMK(quiet){const rows=readMkRows();
+  const pieces=rows.reduce((s,x)=>s+x.qty,0);
   const actual=+$('mk-actual').value||0;const tol=+$('mk-tol').value||0;
-  if(!m||!pieces||!actual){if(!quiet)toast(t('mkNeed'));return null;}
-  const expected=Math.round(cnts.reduce((s,x)=>s+x.n*x.cons,0)*100)/100;
+  if(!rows.length||!actual){if(!quiet)toast(t('mkNeed'));return null;}
+  const expected=Math.round(rows.reduce((s,x)=>s+x.qty*x.cons,0)*100)/100;
   const dev=Math.round((actual-expected)/expected*10000)/100;
   const perPiece=Math.round(actual/pieces*1000)/1000;
   const unit=($('mk-unit')&&$('mk-unit').value)||'متر';
   const maxply=+$('mk-maxply').value||0;
-  const r={model:m.name,unit,mix:cnts.map(x=>x.size+'×'+x.n).join(' · '),pieces,expected,actual,tol,dev,perPiece,
+  const mdl=MODELS.find(x=>x.id===$('mk-model').value);
+  const r={model:mdl?mdl.name:'',unit,mix:rows.map(x=>x.size+'×'+x.qty).join(' · '),pieces,expected,actual,tol,dev,perPiece,
     decision:actual<=expected*(1+tol/100)?'PASS':'FAIL'};
   if(maxply>0)r.maxply=maxply;
-  const colors=readColorRows();
-  if(colors.length){r.colors=colors.map(c=>{const pl=Math.ceil(c.qty/pieces);
-      return {name:c.name,qty:c.qty,plies:pl,extra:pl*pieces-c.qty,fabric:Math.round(pl*actual*100)/100,spreads:maxply>0?Math.ceil(pl/maxply):null};});
-    r.colTotalQty=colors.reduce((s,c)=>s+c.qty,0);
-    r.colTotalPlies=r.colors.reduce((s,c)=>s+c.plies,0);
-    r.colTotalFabric=Math.round(r.colors.reduce((s,c)=>s+c.fabric,0)*100)/100;}
+  // تجميع حسب اللون داخل الماركر
+  const byColor={};rows.forEach(x=>{const k=x.color||'—';if(!byColor[k])byColor[k]={color:k,cpieces:0,clen:0};
+    byColor[k].cpieces+=x.qty;byColor[k].clen+=x.qty*x.cons;});
+  const groups=Object.values(byColor);
   const qty=+$('mk-qty').value||0;
   if(qty>0){r.qty=qty;r.plies=Math.ceil(qty/pieces);r.extra=r.plies*pieces-qty;
     r.fabric=Math.round(r.plies*actual*100)/100;
     if(maxply>0)r.spreads=Math.ceil(r.plies/maxply);}
+  if(groups.length>1||(groups.length===1&&groups[0].color!=='—')){
+    r.colors=groups.map(g=>{const o={color:g.color,cpieces:g.cpieces,clen:Math.round(g.clen*100)/100};
+      if(r.plies){o.produced=r.plies*g.cpieces;o.fabric=Math.round(r.plies*actual*(g.clen/expected)*100)/100;}
+      return o;});
+    r.colTotalPieces=pieces;r.colTotalLen=expected;
+    if(r.plies){r.colTotalProduced=r.plies*pieces;r.colTotalFabric=r.fabric;}}
   return r;}
 function calcMK(){const r=computeMK(true);if(!r){$('mk-res').innerHTML=`<span class="note">${t('mkNeed')}</span>`;return;}
   const u=r.unit||t('mUnit');
   const spread=r.qty?`<br>🧵 ${t('mkPlies')}: <b>${r.plies} ${t('plyUnit')}</b> (${r.qty} ÷ ${r.pieces}) · ${t('mkFabric')}: <b>${r.fabric} ${u}</b>${r.extra?` · ${t('mkExtra')}: ${r.extra}`:''}${r.spreads?` · 📚 ${t('mkSpreads')}: <b>${r.spreads}</b>`:''}`:'';
   let colTbl='';
-  if(r.colors){colTbl=`<table class="rtbl" style="margin-top:10px;min-width:320px"><tr><th>${t('colorLbl')}</th><th>${t('qtyShort')}</th><th>${t('mkPlies')}</th><th>${t('mkColorFabric')} (${u})</th>${r.maxply?`<th>${t('mkSpreads')}</th>`:''}</tr>
-    ${r.colors.map(c=>`<tr><td>${esc(c.name||'—')}</td><td>${c.qty}</td><td>${c.plies}${c.extra?` <span class="note">(+${c.extra})</span>`:''}</td><td>${c.fabric}</td>${r.maxply?`<td>${c.spreads}</td>`:''}</tr>`).join('')}
-    <tr style="font-weight:800;background:#eef6f6"><td>${t('total')}</td><td>${r.colTotalQty}</td><td>${r.colTotalPlies}</td><td>${r.colTotalFabric}</td>${r.maxply?'<td></td>':''}</tr></table>`;}
+  if(r.colors){const showProd=r.plies!=null;
+    colTbl=`<table class="rtbl" style="margin-top:10px;min-width:340px"><tr><th>${t('colorLbl')}</th><th>${t('mkColorPieces')}</th><th>${t('mkColorLen')} (${u})</th>${showProd?`<th>${t('mkProduced')}</th><th>${t('mkColorFabric')} (${u})</th>`:''}</tr>
+    ${r.colors.map(c=>`<tr><td>${esc(c.color||'—')}</td><td>${c.cpieces}</td><td>${c.clen}</td>${showProd?`<td>${c.produced}</td><td>${c.fabric}</td>`:''}</tr>`).join('')}
+    <tr style="font-weight:800;background:#eef6f6"><td>${t('total')}</td><td>${r.colTotalPieces}</td><td>${r.colTotalLen}</td>${showProd?`<td>${r.colTotalProduced}</td><td>${r.colTotalFabric}</td>`:''}</tr></table>`;}
   $('mk-res').innerHTML=`<div class="big" style="color:${r.decision==='PASS'?'var(--green)':'var(--red)'}">${r.decision==='PASS'?t('passMark'):t('failMark')}</div>
     <div class="note">${t('mkExpected')}: <b>${r.expected} ${u}</b> · ${t('mkActual')}: ${r.actual} ${u} · ${t('mkDeviation')}: <b>${r.dev}%</b> (${t('limit')} ${r.tol}%)<br>
     ${t('totalPieces')}: ${r.pieces} · ${t('mkPerPiece')}: <b>${r.perPiece} ${u}</b>${spread}</div>${colTbl}`;}
@@ -1278,10 +1285,10 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
     +row(t('mkPerPiece'),r.perPiece+' '+u)+row(t('mkDeviation'),r.dev+'% ('+t('limit')+' '+r.tol+'%)')
     +(r.qty?row(t('mkQty'),r.qty)+row(t('mkPlies'),r.plies+' '+t('plyUnit')+(r.extra?' (+'+r.extra+')':''))
       +row(t('mkFabric'),r.fabric+' '+u)+(r.spreads?row(t('mkSpreads'),r.spreads):''):'');
-    if(r.colors){rows+=`<tr><td colspan="2" style="padding:0"><table style="width:100%;border-collapse:collapse" border="1" cellpadding="6">
-      <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('colorLbl')}</td><td>${t('qtyShort')}</td><td>${t('mkPlies')}</td><td>${t('mkColorFabric')} (${u})</td></tr>
-      ${r.colors.map(x=>`<tr><td>${esc(x.name||'—')}</td><td>${x.qty}</td><td>${x.plies}${x.extra?' (+'+x.extra+')':''}</td><td>${x.fabric}</td></tr>`).join('')}
-      <tr style="font-weight:800"><td>${t('total')}</td><td>${r.colTotalQty}</td><td>${r.colTotalPlies}</td><td>${r.colTotalFabric}</td></tr></table></td></tr>`;}}
+    if(r.colors){const sp=r.plies!=null;rows+=`<tr><td colspan="2" style="padding:0"><table style="width:100%;border-collapse:collapse" border="1" cellpadding="6">
+      <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('colorLbl')}</td><td>${t('mkColorPieces')}</td><td>${t('mkColorLen')} (${u})</td>${sp?`<td>${t('mkProduced')}</td><td>${t('mkColorFabric')} (${u})</td>`:''}</tr>
+      ${r.colors.map(x=>`<tr><td>${esc(x.color||'—')}</td><td>${x.cpieces}</td><td>${x.clen}</td>${sp?`<td>${x.produced}</td><td>${x.fabric}</td>`:''}</tr>`).join('')}
+      <tr style="font-weight:800"><td>${t('total')}</td><td>${r.colTotalPieces}</td><td>${r.colTotalLen}</td>${sp?`<td>${r.colTotalProduced}</td><td>${r.colTotalFabric}</td>`:''}</tr></table></td></tr>`;}}
   else rows=sec(t('fpTitle'),r.fp.decision)+fpRows(r.fp)+sec(t('shTitle'),r.sh.decision)+shRows(r.sh)+sec(t('aqlTitle'),r.aq.decision)+aqRows(r.aq);
   $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:720px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
