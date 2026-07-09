@@ -268,7 +268,10 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
             <option value="متر">متر</option><option value="ياردة">ياردة</option><option value="كجم">كيلو</option><option value="حبة">حبة</option></select></div></div>
         <div class="grid2"><div><label class="inl" data-i18n="mkQty">الكمية المطلوبة (قطعة)</label><input id="mk-qty" type="number" oninput="calcMK()"></div>
           <div><label class="inl" data-i18n="mkMaxPly">أقصى عدد طبقات (اختياري)</label><input id="mk-maxply" type="number" oninput="calcMK()"></div></div>
-        <div class="row-btns"><button class="btn" onclick="calcMK()" data-i18n="calc">احسب</button>
+        <label class="inl" data-i18n="mkColorsLbl">توزيعة الأوردر بالألوان (اختياري)</label>
+        <div id="mk-colors"></div>
+        <button type="button" class="mini" onclick="addColorRow()">➕ <span data-i18n="mkColorAdd">إضافة لون</span></button>
+        <div class="row-btns" style="margin-top:10px"><button class="btn" onclick="calcMK()" data-i18n="calc">احسب</button>
         <button class="btn sec" id="mk-save" onclick="saveToolCheck('mk')" data-i18n="saveCheck">💾 حفظ</button></div>
         <div class="res-box" id="mk-res"></div>
       </div>
@@ -367,6 +370,7 @@ mkExpected:'الطول المتوقع',mkDeviation:'الانحراف',mkPerPiece
 mkNeed:'اختر الموديل وأدخل عدد القطع وطول الماركر الفعلي',selectModel:'— اختر الموديل —',noModels:'لا موديلات بعد — أضفها من زر إدارة الموديلات',
 mkQty:'الكمية المطلوبة (قطعة)',mkMaxPly:'أقصى عدد طبقات (اختياري)',mkPlies:'عدد الطبقات المطلوب',plyUnit:'طبقة',
 mkFabric:'القماش المطلوب للفرش',mkExtra:'قطع زائدة',mkSpreads:'عدد الفرشات',
+mkColorsLbl:'توزيعة الأوردر بالألوان (اختياري)',mkColorAdd:'إضافة لون',total:'الإجمالي',
 modelNew:'➕ موديل جديد',modelName:'اسم الموديل *',modelSizes:'المقاسات والاستهلاك المعتمد',
 sizeName:'اسم المقاس',sizeLen:'طول المقاس',sizeCons:'استهلاك القطعة',sizeAdd:'إضافة مقاس',
 enterModel:'أدخل اسم الموديل ومقاساً واحداً على الأقل',badSizeRow:'كل صف يحتاج اسم المقاس واستهلاكاً أكبر من صفر',delModelQ:'حذف هذا الموديل؟',
@@ -473,6 +477,7 @@ mkExpected:'Expected length',mkDeviation:'Deviation',mkPerPiece:'Actual consumpt
 mkNeed:'Select a model and enter piece counts and the actual marker length',selectModel:'— select model —',noModels:'No models yet — add them via the manage button',
 mkQty:'Required quantity (pcs)',mkMaxPly:'Max plies (optional)',mkPlies:'Plies needed',plyUnit:'plies',
 mkFabric:'Fabric needed for spreading',mkExtra:'extra pieces',mkSpreads:'Number of spreads',
+mkColorsLbl:'Order breakdown by color (optional)',mkColorAdd:'Add color',total:'Total',
 modelNew:'➕ New model',modelName:'Model name *',modelSizes:'Sizes & approved consumption',
 sizeName:'Size',sizeLen:'Size length',sizeCons:'Consumption',sizeAdd:'Add size',
 enterModel:'Enter the model name and at least one size',badSizeRow:'Each row needs a size name and consumption greater than zero',delModelQ:'Delete this model?',
@@ -1098,6 +1103,13 @@ function renderMkSizes(){const el=$('mk-sizes');if(!el)return;const m=MODELS.fin
   el.innerHTML=(m.sizes||[]).map(s=>`<div class="grid2" style="align-items:center;margin-bottom:6px">
     <div><b>${esc(s.size)}</b> <span class="note">(${s.cons} ${t('mUnit')})</span></div>
     <input class="mk-cnt" type="number" min="0" value="0" data-size="${esc(s.size)}" data-cons="${s.cons}" oninput="calcMK()"></div>`).join('');}
+function mkColorRow(c){c=c||{};return `<div class="mk-colorrow grid2" style="align-items:center;margin-bottom:6px">
+  <input class="mkc-name" value="${esc(c.name||'')}" placeholder="${t('colorLbl')}" oninput="calcMK()">
+  <div style="display:flex;gap:6px"><input class="mkc-qty" type="number" min="0" value="${c.qty!=null?c.qty:''}" placeholder="${t('qtyShort')}" oninput="calcMK()">
+    <button type="button" class="mini r" onclick="this.closest('.mk-colorrow').remove();calcMK()">✕</button></div></div>`;}
+function addColorRow(c){$('mk-colors').insertAdjacentHTML('beforeend',mkColorRow(c));}
+function readColorRows(){return [...document.querySelectorAll('.mk-colorrow')].map(r=>({
+  name:r.querySelector('.mkc-name').value.trim(),qty:+r.querySelector('.mkc-qty').value||0})).filter(c=>c.qty>0);}
 function computeMK(quiet){const m=MODELS.find(x=>x.id===$('mk-model').value);
   const cnts=[...document.querySelectorAll('.mk-cnt')].map(i=>({size:i.dataset.size,cons:+i.dataset.cons,n:+i.value||0})).filter(x=>x.n>0);
   const pieces=cnts.reduce((s,x)=>s+x.n,0);
@@ -1107,19 +1119,31 @@ function computeMK(quiet){const m=MODELS.find(x=>x.id===$('mk-model').value);
   const dev=Math.round((actual-expected)/expected*10000)/100;
   const perPiece=Math.round(actual/pieces*1000)/1000;
   const unit=($('mk-unit')&&$('mk-unit').value)||'متر';
+  const maxply=+$('mk-maxply').value||0;
   const r={model:m.name,unit,mix:cnts.map(x=>x.size+'×'+x.n).join(' · '),pieces,expected,actual,tol,dev,perPiece,
     decision:actual<=expected*(1+tol/100)?'PASS':'FAIL'};
-  const qty=+$('mk-qty').value||0,maxply=+$('mk-maxply').value||0;
+  if(maxply>0)r.maxply=maxply;
+  const colors=readColorRows();
+  if(colors.length){r.colors=colors.map(c=>{const pl=Math.ceil(c.qty/pieces);
+      return {name:c.name,qty:c.qty,plies:pl,extra:pl*pieces-c.qty,fabric:Math.round(pl*actual*100)/100,spreads:maxply>0?Math.ceil(pl/maxply):null};});
+    r.colTotalQty=colors.reduce((s,c)=>s+c.qty,0);
+    r.colTotalPlies=r.colors.reduce((s,c)=>s+c.plies,0);
+    r.colTotalFabric=Math.round(r.colors.reduce((s,c)=>s+c.fabric,0)*100)/100;}
+  const qty=+$('mk-qty').value||0;
   if(qty>0){r.qty=qty;r.plies=Math.ceil(qty/pieces);r.extra=r.plies*pieces-qty;
     r.fabric=Math.round(r.plies*actual*100)/100;
-    if(maxply>0){r.maxply=maxply;r.spreads=Math.ceil(r.plies/maxply);}}
+    if(maxply>0)r.spreads=Math.ceil(r.plies/maxply);}
   return r;}
 function calcMK(){const r=computeMK(true);if(!r){$('mk-res').innerHTML=`<span class="note">${t('mkNeed')}</span>`;return;}
   const u=r.unit||t('mUnit');
-  const spread=r.qty?`<br>🧵 ${t('mkPlies')}: <b>${r.plies} ${t('plyUnit')}</b> (${r.qty} ÷ ${r.pieces}) · ${t('mkFabric')}: <b>${r.fabric} ${u}</b>${r.extra?` · ${t('mkExtra')}: ${r.extra}`:''}${r.spreads?`<br>📚 ${t('mkSpreads')}: <b>${r.spreads}</b> (${t('mkMaxPly').replace(' (اختياري)','').replace(' (optional)','')}: ${r.maxply})`:''}`:'';
+  const spread=r.qty?`<br>🧵 ${t('mkPlies')}: <b>${r.plies} ${t('plyUnit')}</b> (${r.qty} ÷ ${r.pieces}) · ${t('mkFabric')}: <b>${r.fabric} ${u}</b>${r.extra?` · ${t('mkExtra')}: ${r.extra}`:''}${r.spreads?` · 📚 ${t('mkSpreads')}: <b>${r.spreads}</b>`:''}`:'';
+  let colTbl='';
+  if(r.colors){colTbl=`<table class="rtbl" style="margin-top:10px;min-width:320px"><tr><th>${t('colorLbl')}</th><th>${t('qtyShort')}</th><th>${t('mkPlies')}</th><th>${t('mkFabric')} (${u})</th>${r.maxply?`<th>${t('mkSpreads')}</th>`:''}</tr>
+    ${r.colors.map(c=>`<tr><td>${esc(c.name||'—')}</td><td>${c.qty}</td><td>${c.plies}${c.extra?` <span class="note">(+${c.extra})</span>`:''}</td><td>${c.fabric}</td>${r.maxply?`<td>${c.spreads}</td>`:''}</tr>`).join('')}
+    <tr style="font-weight:800;background:#eef6f6"><td>${t('total')}</td><td>${r.colTotalQty}</td><td>${r.colTotalPlies}</td><td>${r.colTotalFabric}</td>${r.maxply?'<td></td>':''}</tr></table>`;}
   $('mk-res').innerHTML=`<div class="big" style="color:${r.decision==='PASS'?'var(--green)':'var(--red)'}">${r.decision==='PASS'?t('passMark'):t('failMark')}</div>
     <div class="note">${t('mkExpected')}: <b>${r.expected} ${u}</b> · ${t('mkActual')}: ${r.actual} ${u} · ${t('mkDeviation')}: <b>${r.dev}%</b> (${t('limit')} ${r.tol}%)<br>
-    ${t('totalPieces')}: ${r.pieces} · ${t('mkPerPiece')}: <b>${r.perPiece} ${u}</b>${spread}</div>`;}
+    ${t('totalPieces')}: ${r.pieces} · ${t('mkPerPiece')}: <b>${r.perPiece} ${u}</b>${spread}</div>${colTbl}`;}
 function modelsManager(){modal(`<h3>${t('mkManage')}</h3>
   <div id="models-list">${MODELS.length?MODELS.map(m=>`<div class="item" style="margin-bottom:6px"><div class="h"><div><div class="t" style="font-size:14px">${esc(m.name)}</div>
     <div class="s">${(m.sizes||[]).map(s=>esc(s.size)+': '+s.cons).join(' · ')}</div></div></div>
@@ -1216,7 +1240,11 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
     +row(t('mkExpected'),r.expected+' '+u)+row(t('mkActual'),r.actual+' '+u)
     +row(t('mkPerPiece'),r.perPiece+' '+u)+row(t('mkDeviation'),r.dev+'% ('+t('limit')+' '+r.tol+'%)')
     +(r.qty?row(t('mkQty'),r.qty)+row(t('mkPlies'),r.plies+' '+t('plyUnit')+(r.extra?' (+'+r.extra+')':''))
-      +row(t('mkFabric'),r.fabric+' '+u)+(r.spreads?row(t('mkSpreads'),r.spreads):''):'');}
+      +row(t('mkFabric'),r.fabric+' '+u)+(r.spreads?row(t('mkSpreads'),r.spreads):''):'');
+    if(r.colors){rows+=`<tr><td colspan="2" style="padding:0"><table style="width:100%;border-collapse:collapse" border="1" cellpadding="6">
+      <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('colorLbl')}</td><td>${t('qtyShort')}</td><td>${t('mkPlies')}</td><td>${t('mkFabric')} (${u})</td></tr>
+      ${r.colors.map(x=>`<tr><td>${esc(x.name||'—')}</td><td>${x.qty}</td><td>${x.plies}${x.extra?' (+'+x.extra+')':''}</td><td>${x.fabric}</td></tr>`).join('')}
+      <tr style="font-weight:800"><td>${t('total')}</td><td>${r.colTotalQty}</td><td>${r.colTotalPlies}</td><td>${r.colTotalFabric}</td></tr></table></td></tr>`;}}
   else rows=sec(t('fpTitle'),r.fp.decision)+fpRows(r.fp)+sec(t('shTitle'),r.sh.decision)+shRows(r.sh)+sec(t('aqlTitle'),r.aq.decision)+aqRows(r.aq);
   $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:720px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
