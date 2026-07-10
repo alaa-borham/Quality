@@ -1,0 +1,120 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // السوبر أدمن
+    function isAdmin() {
+      return request.auth != null && request.auth.uid == 'I2Stgz5hPVM6qeG19NCmgj4GCck1';
+    }
+    // هل المستخدم الحالي موظف تابع للمنشأة المطلوبة؟
+    function isMemberOf(tid) {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/members/$(request.auth.uid))
+        && get(/databases/$(database)/documents/members/$(request.auth.uid)).data.tenantId == tid;
+    }
+    // ملفات المنشآت: المالك وموظفوه يقرؤون، والبيانات التشغيلية فقط قابلة للتعديل
+    match /accounts/{uid} {
+      allow read, write: if isAdmin();
+      allow get: if request.auth != null && (request.auth.uid == uid || isMemberOf(uid));
+      allow create: if request.auth != null && request.auth.uid == uid;
+      allow update: if request.auth != null && (request.auth.uid == uid || isMemberOf(uid))
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['data', 'updatedAt']);
+      // النسخ الاحتياطية اليومية: تُنشأ ولا تُعدّل — وحذف القديم منها للمالك فقط
+      match /backups/{day} {
+        allow read, write: if isAdmin();
+        allow read, create, delete: if request.auth != null
+          && (request.auth.uid == uid || isMemberOf(uid));
+      }
+    }
+    // موظفو المنشآت: المالك يدير موظفيه — والموظف يقرأ سجله فقط
+    match /members/{empUid} {
+      allow get: if request.auth != null
+        && (request.auth.uid == empUid || request.auth.uid == resource.data.tenantId || isAdmin());
+      allow list: if request.auth != null
+        && (request.auth.uid == resource.data.tenantId || isAdmin());
+      allow create: if request.auth != null && request.resource.data.tenantId == request.auth.uid;
+      allow update, delete: if request.auth != null
+        && (resource.data.tenantId == request.auth.uid || isAdmin());
+    }
+    // فهرس أسماء المستخدمين: قراءة فردية فقط (للدخول بالاسم) — سرد القائمة ممنوع
+    // المالك ينشئ ويحذف أسماء دخول موظفيه (يُتحقق من عضويتهم لديه)
+    match /usernames/{uname} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if request.auth != null && (
+        request.resource.data.uid == request.auth.uid
+        || (exists(/databases/$(database)/documents/members/$(request.resource.data.uid))
+            && get(/databases/$(database)/documents/members/$(request.resource.data.uid)).data.tenantId == request.auth.uid));
+      allow delete: if isAdmin() || (request.auth != null
+        && exists(/databases/$(database)/documents/members/$(resource.data.uid))
+        && get(/databases/$(database)/documents/members/$(resource.data.uid)).data.tenantId == request.auth.uid);
+      allow update: if isAdmin();
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // نظام متابعة الجودة (qc_*) — أُضيف دون المساس بما سبق
+    // ═══════════════════════════════════════════════════════════
+    function qcWs() {
+      return get(/databases/$(database)/documents/qc_members/$(request.auth.uid)).data.wsId;
+    }
+    function qcIsMember() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/qc_members/$(request.auth.uid));
+    }
+    function qcIsOwner() {
+      return qcIsMember()
+        && get(/databases/$(database)/documents/qc_members/$(request.auth.uid)).data.role == 'owner';
+    }
+    match /qc_members/{uid} {
+      allow read:  if request.auth != null;
+      allow create, update, delete: if request.auth != null && request.auth.uid == uid;
+      allow update, delete: if qcIsOwner() && resource.data.wsId == qcWs();
+    }
+    match /qc_workspaces/{wsId} {
+      allow read:   if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.ownerUid == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.ownerUid == request.auth.uid;
+    }
+    // إدارة المصانع للمالك فقط — والحذف عموماً للمالك فقط
+    match /qc_factories/{id} {
+      allow read:   if qcIsMember() && resource.data.wsId == qcWs();
+      allow create: if qcIsOwner() && request.resource.data.wsId == qcWs();
+      allow update, delete: if qcIsOwner() && resource.data.wsId == qcWs();
+    }
+    match /qc_orders/{id} {
+      allow read:   if qcIsMember() && resource.data.wsId == qcWs();
+      allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
+      allow update: if qcIsMember() && resource.data.wsId == qcWs();
+      allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
+    }
+    match /qc_inspections/{id} {
+      allow read:   if qcIsMember() && resource.data.wsId == qcWs();
+      allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
+      allow update: if qcIsMember() && resource.data.wsId == qcWs();
+      allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
+    }
+    match /qc_defects/{id} {
+      allow read:   if qcIsMember() && resource.data.wsId == qcWs();
+      allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
+      allow update: if qcIsMember() && resource.data.wsId == qcWs();
+      allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
+    }
+    match /qc_models/{id} {
+      allow read:   if qcIsMember() && resource.data.wsId == qcWs();
+      allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
+      allow update: if qcIsMember() && resource.data.wsId == qcWs();
+      allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
+    }
+    match /qc_seqcfg/{wsId} {
+      allow read, write: if qcIsMember() && wsId == qcWs();
+    }
+    match /qc_chkcfg/{wsId} {
+      allow read, write: if qcIsMember() && wsId == qcWs();
+    }
+    match /qc_toolchecks/{id} {
+      allow read:   if qcIsMember() && resource.data.wsId == qcWs();
+      allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
+      allow update: if qcIsMember() && resource.data.wsId == qcWs();
+      allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
+    }
+  }
+}
