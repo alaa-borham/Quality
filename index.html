@@ -381,7 +381,7 @@ modelNew:'➕ موديل جديد',modelName:'اسم الموديل *',modelSize
 sizeName:'اسم المقاس',sizeLen:'طول المقاس',sizeCons:'استهلاك القطعة',sizeAdd:'إضافة مقاس',
 enterModel:'أدخل اسم الموديل ومقاساً واحداً على الأقل',badSizeRow:'كل صف يحتاج اسم المقاس واستهلاكاً أكبر من صفر',delModelQ:'حذف هذا الموديل؟',
 factOpt:'المصنع (اختياري)',unitLbl:'الوحدة',
-sizesListLbl:'قائمة المقاسات المشتركة (لكل الموديلات)',sizePh:'مثال: M أو 54',addSizeBtn:'أضف',noSizes:'لا مقاسات بعد — أضِفها لتظهر في كل الموديلات',modelsListLbl:'الموديلات',
+sizesListLbl:'قائمة المقاسات والاستهلاك المشتركة (لكل الموديلات)',sizePh:'المقاس (M أو 54)',sizeConsPh:'الاستهلاك',addSizeBtn:'أضف',noSizes:'لا مقاسات بعد — أضِف المقاس واستهلاكه لتظهر في كل الموديلات',modelsListLbl:'الموديلات',
 toolDescmk:'حاسبة استهلاك الأوردر: تُدخل مقاسات الأوردر (المقاس · استهلاك القطعة · الكمية · اللون) في جدول واحد، فيحسب النظام لكل لون إجمالي القطع وإجمالي القماش المطلوب، ومجموع القماش الكلي. ويمكنك إدخال القماش المتاح لمعرفة هل يكفي أم ينقص. الموديل المحفوظ اختياري يملأ المقاسات والاستهلاك تلقائياً.',
 inspSaved:'تم حفظ الفحص',dhuShort:'DHU',acBig:'حد قبول كبير',acSmall:'صغير',sampleShort:'العينة',
 photosLbl:'الصور (اختياري)',addPhoto:'📷 إضافة صورة',maxPhotos:'الحد الأقصى 4 صور',reportBtn:'تقرير',exportCsv:'⬇ تصدير Excel',printBtn:'🖨 طباعة / حفظ PDF',
@@ -496,7 +496,7 @@ modelNew:'➕ New model',modelName:'Model name *',modelSizes:'Sizes & approved c
 sizeName:'Size',sizeLen:'Size length',sizeCons:'Consumption',sizeAdd:'Add size',
 enterModel:'Enter the model name and at least one size',badSizeRow:'Each row needs a size name and consumption greater than zero',delModelQ:'Delete this model?',
 factOpt:'Factory (optional)',unitLbl:'Unit',
-sizesListLbl:'Shared sizes list (for all models)',sizePh:'e.g. M or 54',addSizeBtn:'Add',noSizes:'No sizes yet — add them to appear in every model',modelsListLbl:'Models',
+sizesListLbl:'Shared sizes & consumption list (for all models)',sizePh:'Size (M or 54)',sizeConsPh:'Consumption',addSizeBtn:'Add',noSizes:'No sizes yet — add a size and its consumption to appear in every model',modelsListLbl:'Models',
 toolDescmk:'Order consumption calculator: enter the order lines (size, per-piece consumption, quantity, color) in one table; the system totals pieces and fabric per color and overall. Enter available fabric to see if it is enough or short. A saved model optionally fills sizes and consumption.',
 inspSaved:'Inspection saved',dhuShort:'DHU',acBig:'Major Ac',acSmall:'Minor',sampleShort:'Sample',
 photosLbl:'Photos (optional)',addPhoto:'📷 Add photo',maxPhotos:'Max 4 photos',reportBtn:'Report',exportCsv:'⬇ Export Excel',printBtn:'🖨 Print / save PDF',
@@ -1204,7 +1204,8 @@ function calcMK(){const r=computeMK(true);if(!r){$('mk-res').innerHTML=`<span cl
     <div class="note">${t('totalPieces')}: <b>${r.pieces}</b> · ${t('mkTotalFabric')}: <b>${r.totalFabric} ${u}</b>${plyLine}${availLine}</div>${colTbl}`;}
 function modelsManager(){modal(`<h3>${t('mkManage')}</h3>
   <label class="inl">${t('sizesListLbl')}</label>
-  <div style="display:flex;gap:8px"><input id="new-size" placeholder="${t('sizePh')}" onkeydown="if(event.key==='Enter')addSize()">
+  <div style="display:flex;gap:8px"><input id="new-size" placeholder="${t('sizePh')}" style="flex:2">
+    <input id="new-size-cons" type="number" step="0.01" placeholder="${t('sizeConsPh')}" style="flex:1" onkeydown="if(event.key==='Enter')addSize()">
     <button class="mini" onclick="addSize()">${t('addSizeBtn')}</button></div>
   <div id="sizes-list" style="margin-top:8px"></div>
   <label class="inl" style="margin-top:12px">${t('modelsListLbl')}</label>
@@ -1214,12 +1215,16 @@ function modelsManager(){modal(`<h3>${t('mkManage')}</h3>
     ${can('del')?`<button class="mini r" onclick="delModel('${m.id}')">${t('del')}</button>`:''}</div></div>`).join(''):`<span class="note">${t('noModels')}</span>`}</div>
   <div class="row-btns"><button class="btn" onclick="modelForm()">${t('modelNew')}</button>
   <button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);renderSizesManager();}
-function renderSizesManager(){const el=$('sizes-list');if(!el)return;
-  el.innerHTML=SIZES.length?SIZES.map(s=>`<span class="chip" style="font-size:13px;padding:5px 10px;margin:0 0 6px 6px;display:inline-flex;align-items:center;gap:6px">${esc(s)}
-    <b style="cursor:pointer;color:var(--red)" onclick="delSize('${esc(s).replace(/'/g,"&#39;")}')">✕</b></span>`).join(''):`<span class="note">${t('noSizes')}</span>`;}
-function addSize(){const v=$('new-size').value.trim();if(!v)return;
-  db.collection('qc_workspaces').doc(MEMBER.wsId).update({sizeList:FV.arrayUnion(v)}).then(()=>{$('new-size').value='';}).catch(e=>toast(rulesHint(e)));}
-function delSize(v){db.collection('qc_workspaces').doc(MEMBER.wsId).update({sizeList:FV.arrayRemove(v)}).catch(e=>toast(rulesHint(e)));}
+function sizeList(){return (SIZES||[]).map(s=>typeof s==='string'?{size:s,cons:0}:{size:s.size,cons:s.cons||0});}
+function sizeCons(name){const f=sizeList().find(s=>s.size===name);return f?f.cons:0;}
+function renderSizesManager(){const el=$('sizes-list');if(!el)return;const list=sizeList();
+  el.innerHTML=list.length?list.map(s=>`<span class="chip" style="font-size:13px;padding:5px 10px;margin:0 0 6px 6px;display:inline-flex;align-items:center;gap:6px">${esc(s.size)}${s.cons?': '+s.cons:''}
+    <b style="cursor:pointer;color:var(--red)" onclick="delSize('${esc(s.size).replace(/'/g,"&#39;")}')">✕</b></span>`).join(''):`<span class="note">${t('noSizes')}</span>`;}
+function addSize(){const name=$('new-size').value.trim();if(!name)return;const cons=+$('new-size-cons').value||0;
+  const nl=sizeList().filter(s=>s.size!==name).concat([{size:name,cons}]);
+  db.collection('qc_workspaces').doc(MEMBER.wsId).update({sizeList:nl}).then(()=>{$('new-size').value='';$('new-size-cons').value='';}).catch(e=>toast(rulesHint(e)));}
+function delSize(name){const nl=sizeList().filter(s=>s.size!==name);
+  db.collection('qc_workspaces').doc(MEMBER.wsId).update({sizeList:nl}).catch(e=>toast(rulesHint(e)));}
 function modelForm(m){m=m||{};
   const rows=(m.sizes&&m.sizes.length?m.sizes:[{},{}]);
   modal(`<h3>${m.id?t('edit'):t('modelNew')}</h3>
@@ -1231,14 +1236,16 @@ function modelForm(m){m=m||{};
   <button type="button" class="mini" style="margin-top:6px" onclick="addModelRow()">➕ ${t('sizeAdd')}</button>
   <div class="row-btns"><button class="btn" onclick="saveModel('${m.id||''}')">${t('save')}</button>
   <button class="btn sec" onclick="modelsManager()">${t('cancel')}</button></div>`);}
-function mdRow(s){s=s||{};
-  const sizeCell=SIZES.length
-    ?`<select class="md-size" style="min-width:90px;padding:6px"><option value="">—</option>${SIZES.map(x=>`<option ${s.size===x?'selected':''}>${esc(x)}</option>`).join('')}${(s.size&&!SIZES.includes(s.size))?`<option selected>${esc(s.size)}</option>`:''}</select>`
+function mdRow(s){s=s||{};const list=sizeList();const names=list.map(x=>x.size);
+  const sizeCell=list.length
+    ?`<select class="md-size" onchange="mdPickSize(this)" style="min-width:90px;padding:6px"><option value="">—</option>${list.map(x=>`<option data-cons="${x.cons}" ${s.size===x.size?'selected':''}>${esc(x.size)}</option>`).join('')}${(s.size&&!names.includes(s.size))?`<option data-cons="${s.cons||0}" selected>${esc(s.size)}</option>`:''}</select>`
     :`<input class="md-size" value="${esc(s.size||'')}" placeholder="L" style="min-width:90px;padding:6px">`;
   return `<tr>
   <td>${sizeCell}</td>
-  <td><input class="md-cons" type="number" step="0.01" value="${s.cons!=null?s.cons:''}" placeholder="3.20" style="min-width:80px;padding:6px"></td>
+  <td><input class="md-cons" type="number" step="0.01" value="${s.cons!=null?s.cons:''}" placeholder="3.20" style="min-width:80px;padding:6px${list.length?';background:#f4f6f8;color:#6b7683':''}" ${list.length?'readonly':''}></td>
   <td><button type="button" class="mini r" onclick="this.closest('tr').remove()">✕</button></td></tr>`;}
+function mdPickSize(sel){const opt=sel.selectedOptions[0],cons=opt?opt.dataset.cons:'';
+  const c=sel.closest('tr').querySelector('.md-cons');if(cons!=null&&cons!=='')c.value=cons;}
 function addModelRow(){$('md-rows').insertAdjacentHTML('beforeend',mdRow());}
 function saveModel(id){const name=$('md-name').value.trim();
   const sizes=[];let bad=false;
