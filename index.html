@@ -1149,9 +1149,9 @@ function renderMkModels(){const el=$('mk-model');if(!el)return;const cur=el.valu
   if($('mk-unit'))MK_UNIT=$('mk-unit').value;}
 function mkModel(){return MODELS.find(x=>x.id===$('mk-model').value);}
 function mkEnter(e,el){if(e.key!=='Enter')return;e.preventDefault();
-  const tr=el.closest('tr');const cls=[...el.classList].find(c=>c.indexOf('mkr-')===0);
-  let next=tr.nextElementSibling;if(!next){addMkRow();next=tr.nextElementSibling;}
-  const tgt=next&&next.querySelector('.'+cls);if(tgt){tgt.focus();if(tgt.select)tgt.select();}}
+  const tr=el.closest('tr'),next=tr.nextElementSibling;if(!next)return;
+  const cls=[...el.classList].find(c=>c.indexOf('mkr-')===0);
+  const tgt=next.querySelector('.'+cls);if(tgt){tgt.focus();if(tgt.select)tgt.select();}}
 function mkRowHtml(r){r=r||{};const m=mkModel();const ke='onkeydown="mkEnter(event,this)"';
   const sizeCell=m
     ?`<select class="mkr-size" onchange="mkPickSize(this)" ${ke} style="min-width:80px;padding:6px"><option value="">—</option>`+(m.sizes||[]).map(s=>`<option value="${esc(s.size)}" data-cons="${s.cons}" ${r.size===s.size?'selected':''}>${esc(s.size)}</option>`).join('')+`</select>`
