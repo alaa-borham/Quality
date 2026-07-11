@@ -1320,6 +1320,11 @@ function renderToolChk(){const el=$('toolchk-list');if(!el)return;if(!TOOLCHK.le
 function delToolChk(id){if(!confirm(t('delInspQ')))return;db.collection('qc_toolchecks').doc(id).delete().catch(e=>toast(rulesHint(e)));}
 function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
   const row=(l,v)=>`<tr><td style="font-weight:700;background:#f2f6f6;width:38%">${l}</td><td>${esc(v)}</td></tr>`;
+  const rowH=(l,v)=>`<tr><td style="font-weight:700;background:#f2f6f6;width:38%">${l}</td><td>${v}</td></tr>`;
+  const sizeChips=mix=>(mix||'').split(' · ').filter(Boolean).map(s=>{const i=s.lastIndexOf('×');
+    const nm=i>=0?s.slice(0,i):s,q=i>=0?s.slice(i+1):'';
+    return `<span style="display:inline-block;border:1px solid #cfe0df;background:#eef5f4;border-radius:6px;padding:1px 8px;margin:2px 3px 2px 0;white-space:nowrap"><b>${esc(nm)}</b>${q?` <span style="color:#14504f">×${esc(q)}</span>`:''}</span>`;
+  }).join('');
   const dec=c.result.decision==='PASS'?t('passMark'):t('failMark');const dcol=c.result.decision==='PASS'?'#1e7e40':'#b02a26';
   let rows='';const r=c.result;
   const fpRows=x=>row(t('fpLen'),x.len)+row(t('fpWid'),x.wid)+row(t('fpTotal')+' / '+t('fpUnit'),x.points)+row(t('limit'),x.lim);
@@ -1330,7 +1335,7 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
   else if(c.type==='sh')rows=shRows(r);
   else if(c.type==='aq')rows=aqRows(r);
   else if(c.type==='mk'){const u=r.unit||t('mUnit');const sp=r.mklen!=null;
-    rows=(r.model?row(t('mkModelLbl'),r.model):'')+row(t('mkCounts'),r.mix)+row(t('totalPieces'),r.pieces)
+    rows=(r.model?row(t('mkModelLbl'),r.model):'')+rowH(t('mkCounts'),sizeChips(r.mix))+row(t('totalPieces'),r.pieces)
       +row(t('mkTotalFabric'),r.totalFabric+' '+u)+(sp?row(t('mkMkLen'),r.mklen+' '+u)+row(t('mkTotalPlies'),r.totalPlies+' '+t('plyUnit')):'')+(r.avail!=null?row(t('mkAvail'),r.avail+' '+u):'');
     const multi=r.colors&&(r.colors.length>1||(r.colors.length===1&&r.colors[0].color!=='—'));
     if(multi){rows+=`<tr><td colspan="2" style="padding:0"><table style="width:100%;border-collapse:collapse" border="1" cellpadding="6">
