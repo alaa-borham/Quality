@@ -262,7 +262,9 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <button class="on" onclick="goMarker('mk',this)" data-i18n="mkTitle">حاسبة الماركر والاستهلاك</button>
       </div>
       <div id="tool-mk" class="card">
-        <div class="grid2" id="mk-factrow"><div><label class="inl" data-i18n="factOpt">المصنع (اختياري)</label><select id="mk-fact"></select></div>
+        <label class="inl" data-i18n="mkReportName">اسم التقرير (اختياري)</label>
+        <input id="mk-title" data-i18n-ph="mkReportNamePh" placeholder="مثال: أوردر رمضان — العميل أحمد">
+        <div class="grid2" id="mk-factrow" style="margin-top:8px"><div><label class="inl" data-i18n="factOpt">المصنع (اختياري)</label><select id="mk-fact"></select></div>
           <div><label class="inl" data-i18n="dateLbl">التاريخ</label><input id="mk-date" type="date"></div></div>
         <div class="grid2"><div><label class="inl" data-i18n="mkModelLbl">الموديل (اختياري)</label><select id="mk-model" onchange="loadMkModel()"></select></div>
           <div style="display:flex;align-items:flex-end"><button type="button" class="mini" onclick="modelsManager()" data-i18n="mkManage">⚙️ إدارة الموديلات والمقاسات</button></div></div>
@@ -378,6 +380,7 @@ mkQty:'الكمية المطلوبة (قطعة)',mkMaxPly:'أقصى عدد طب�
 mkFabric:'القماش المطلوب للفرش',mkExtra:'قطع زائدة',mkSpreads:'عدد الفرشات',
 mkColorsLbl:'توزيعة الأوردر بالألوان (اختياري)',mkColorAdd:'إضافة لون',total:'الإجمالي',mkColorFabric:'استهلاك قماش اللون',
 mkTableLbl:'بيانات الأوردر',mkQtyOrder:'الكمية المطلوبة',mkAddRow:'إضافة مقاس',mkColorPieces2:'إجمالي القطع',mkTotalFabric:'إجمالي القماش',
+mkReportName:'اسم التقرير (اختياري)',mkReportNamePh:'مثال: أوردر رمضان — العميل أحمد',reportNameLbl:'اسم التقرير',
 mkAvail:'القماش المتاح (اختياري)',mkEnough:'القماش المتاح يكفي',mkShort:'ينقص',
 mkMkLen:'طول الماركر',mkTotalPlies:'إجمالي الطبقات',mkSpreadsShort:'فرشة',
 backupTitle:'النسخ الاحتياطي',backupBtn:'⬇ تنزيل نسخة',restoreBtn:'⬆ استعادة نسخة',
@@ -494,6 +497,7 @@ mkQty:'Required quantity (pcs)',mkMaxPly:'Max plies (optional)',mkPlies:'Plies n
 mkFabric:'Fabric needed for spreading',mkExtra:'extra pieces',mkSpreads:'Number of spreads',
 mkColorsLbl:'Order breakdown by color (optional)',mkColorAdd:'Add color',total:'Total',mkColorFabric:'Color fabric consumption',
 mkTableLbl:'Order data',mkQtyOrder:'Quantity',mkAddRow:'Add size',mkColorPieces2:'Total pieces',mkTotalFabric:'Total fabric',
+mkReportName:'Report name (optional)',mkReportNamePh:'e.g. Ramadan order — client Ahmed',reportNameLbl:'Report name',
 mkAvail:'Available fabric (optional)',mkEnough:'Available fabric is enough',mkShort:'short by',
 mkMkLen:'Marker length',mkTotalPlies:'Total plies',mkSpreadsShort:'spreads',
 backupTitle:'Backup',backupBtn:'⬇ Download backup',restoreBtn:'⬆ Restore backup',
@@ -1070,8 +1074,8 @@ function exportCSV(){const list=filteredInsp();if(!list.length)return toast(t('n
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
   a.download='inspections_'+today()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
 function exportToolChk(){if(!TOOLCHK.length)return;
-  const head=['التاريخ / Date','النوع / Type','المصنع / Factory','النتيجة / Result','القرار / Decision','المفتش / Inspector'];
-  const rows=TOOLCHK.map(c=>[c.date,toolTypeLabel(c.type),c.factoryName,toolResultSummary(c),c.result.decision,c.inspector]);
+  const head=['التاريخ / Date','اسم التقرير / Report','النوع / Type','المصنع / Factory','النتيجة / Result','القرار / Decision','المفتش / Inspector'];
+  const rows=TOOLCHK.map(c=>[c.date,c.title||'',toolTypeLabel(c.type),c.factoryName,toolResultSummary(c),c.result.decision,c.inspector]);
   const csv='﻿'+[head,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
   a.download='tool_checks_'+today()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
@@ -1210,8 +1214,8 @@ function calcMK(){const r=computeMK(true);if(!r){$('mk-res').innerHTML=`<span cl
     <tr style="font-weight:800;background:#eef6f6"><td>${t('total')}</td><td>${r.pieces}</td><td>${r.totalFabric}</td>${sp?`<td>${r.totalPlies} ${t('plyUnit')}</td>`:''}</tr></table>`:'';
   const plyLine=r.mklen!=null?` · 🧵 ${t('mkTotalPlies')}: <b>${r.totalPlies} ${t('plyUnit')}</b> (${t('mkMkLen')} ${r.mklen} ${u})`:'';
   const availLine=r.avail!=null?`<br>${t('mkAvail')}: ${r.avail} ${u} · ${r.decision==='PASS'?'✔ '+t('mkEnough'):'✘ '+t('mkShort')+' '+Math.round((r.totalFabric-r.avail)*100)/100+' '+u}`:'';
-  $('mk-res').innerHTML=`<div class="big" style="color:${r.decision==='PASS'?'var(--green)':'var(--red)'}">${r.decision==='PASS'?t('passMark'):t('failMark')}</div>
-    <div class="note">${t('totalPieces')}: <b>${r.pieces}</b> · ${t('mkTotalFabric')}: <b>${r.totalFabric} ${u}</b>${plyLine}${availLine}</div>${colTbl}`;}
+  const badge=r.avail!=null?`<div class="big" style="color:${r.decision==='PASS'?'var(--green)':'var(--red)'}">${r.decision==='PASS'?t('passMark'):t('failMark')}</div>`:'';
+  $('mk-res').innerHTML=`${badge}<div class="note">${t('totalPieces')}: <b>${r.pieces}</b> · ${t('mkTotalFabric')}: <b>${r.totalFabric} ${u}</b>${plyLine}${availLine}</div>${colTbl}`;}
 function modelsManager(){modal(`<h3>${t('mkManage')}</h3>
   <label class="inl">${t('sizesListLbl')}</label>
   <div style="display:flex;gap:8px"><input id="new-size" placeholder="${t('sizePh')}" style="flex:2">
@@ -1295,7 +1299,8 @@ function saveToolCheck(type){const factId=$(type+'-fact').value;if(!factId&&type
   else{const fp=computeFP();if(!fp)return;const sh=computeSH();if(!sh)return;const aq=computeAQ();if(!aq)return;
     result={fp,sh,aq,decision:(fp.decision==='PASS'&&sh.decision==='PASS'&&aq.decision==='PASS')?'PASS':'FAIL'};}
   if(!result)return;
-  const data={wsId:MEMBER.wsId,type,factoryId:factId,factoryName:fact?fact.name:'',date,inspector:MEMBER.name||ME.email,result};
+  const titleEl=$(type+'-title');const title=titleEl?titleEl.value.trim():'';
+  const data={wsId:MEMBER.wsId,type,title,factoryId:factId,factoryName:fact?fact.name:'',date,inspector:MEMBER.name||ME.email,result};
   db.collection('qc_toolchecks').add({...data,createdAt:FV.serverTimestamp()}).then(()=>toast(t('saved'))).catch(e=>toast(rulesHint(e)));}
 function toolTypeLabel(type){return t(TOOL_TITLES[type]||'allTitle');}
 function toolResultSummary(c){const r=c.result;const mk=d=>d.decision==='PASS'?'✔':'✘';
@@ -1307,8 +1312,8 @@ function toolResultSummary(c){const r=c.result;const mk=d=>d.decision==='PASS'?'
 function renderToolChk(){const el=$('toolchk-list');if(!el)return;if(!TOOLCHK.length){el.innerHTML=empty(t('noToolChk'));return;}
   const bar=`<div style="display:flex;gap:8px;margin-bottom:10px"><button class="mini g" onclick="exportToolChk()">${t('exportCsv')}</button></div>`;
   el.innerHTML=bar+'<div class="cards">'+TOOLCHK.map(c=>{const b=c.result.decision==='PASS'?'b-pass':'b-fail';
-    return `<div class="item"><div class="h"><div><div class="t">${esc(toolTypeLabel(c.type))}</div>
-    <div class="s">🏭 ${esc(c.factoryName||'')} · ${fmtDate(c.date)}<br>${esc(toolResultSummary(c))}</div></div>
+    return `<div class="item"><div class="h"><div><div class="t">${c.title?esc(c.title):esc(toolTypeLabel(c.type))}</div>
+    <div class="s">${c.title?esc(toolTypeLabel(c.type))+' · ':''}🏭 ${esc(c.factoryName||'')} · ${fmtDate(c.date)}<br>${esc(toolResultSummary(c))}</div></div>
     <span class="badge ${b}">${c.result.decision==='PASS'?t('pass'):t('fail')}</span></div>
     <div class="row-btns"><button class="mini" onclick="printToolChk('${c.id}')">${t('reportBtn')}</button>
     ${can('del')?`<button class="mini r" onclick="delToolChk('${c.id}')">${t('del')}</button>`:''}</div></div>`;}).join('')+'</div>';}
@@ -1336,7 +1341,7 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
   $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:720px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
       <div><div style="font-size:22px;font-weight:800;color:#14504f">🧵 ${esc(MEMBER.wsName||'')}</div>
-      <div style="font-size:15px;color:#555">${esc(toolTypeLabel(c.type))}</div></div>
+      <div style="font-size:15px;color:#555">${esc(toolTypeLabel(c.type))}${c.title?' — <b>'+esc(c.title)+'</b>':''}</div></div>
       <div style="text-align:${LANG==='ar'?'left':'right'};font-size:12px;color:#666">${fmtDate(c.date)}</div></div>
     <table style="width:100%;border-collapse:collapse;margin-top:14px;font-size:14px" border="1" cellpadding="8">
       ${row(t('factoryLbl').replace(' *',''),c.factoryName)}${row(t('repInspector'),c.inspector)}${rows}</table>
