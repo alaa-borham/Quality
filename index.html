@@ -274,13 +274,16 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <tr><th data-i18n="sizeName">المقاس</th><th data-i18n="sizeCons">استهلاك القطعة</th><th data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="colorLbl">اللون</th><th></th></tr>
           <tbody id="mk-rows"></tbody></table></div>
         <button type="button" class="mini" style="margin-top:6px" onclick="addMkRow()">➕ <span data-i18n="mkAddRow">إضافة مقاس</span></button>
+        <button type="button" class="mini g" style="margin-top:6px" onclick="fillModelSizes()">📋 <span data-i18n="fillModelBtn">تعبئة مقاسات الموديل</span></button>
         <div class="grid3" style="margin-top:10px"><div><label class="inl" data-i18n="unitLbl">الوحدة</label><select id="mk-unit" onchange="onMkUnitChange()">
             <option value="متر">متر</option><option value="ياردة">ياردة</option><option value="كجم">كيلو</option><option value="حبة">حبة</option></select></div>
           <div><label class="inl" data-i18n="mkMkLen">طول الماركر (طول الطبقة الواحدة)</label><input id="mk-mklen" type="number" step="0.01" oninput="calcMK()"></div>
           <div><label class="inl" data-i18n="mkAvail">القماش المتاح (اختياري)</label><input id="mk-avail" type="number" step="0.01" oninput="calcMK()"></div></div>
-        <label class="inl" data-i18n="mkMaxPly">أقصى عدد طبقات في الفرشة (اختياري)</label><input id="mk-maxply" type="number" oninput="calcMK()">
+        <div class="grid2"><div><label class="inl" data-i18n="mkMaxPly">أقصى عدد طبقات في الفرشة (اختياري)</label><input id="mk-maxply" type="number" oninput="calcMK()"></div>
+          <div><label class="inl" data-i18n="mkActual">القماش الفعلي بعد القص (اختياري)</label><input id="mk-actual" type="number" step="0.01" oninput="calcMK()"></div></div>
         <div class="row-btns" style="margin-top:10px"><button class="btn" onclick="calcMK()" data-i18n="calc">احسب</button>
-        <button class="btn sec" id="mk-save" onclick="saveToolCheck('mk')" data-i18n="saveCheck">💾 حفظ</button></div>
+        <button class="btn sec" id="mk-save" onclick="saveToolCheck('mk')" data-i18n="saveCheck">💾 حفظ</button>
+        <button class="btn sec" onclick="printSpreadOrder()" data-i18n="spreadOrderBtn">🖨 أمر فرشة</button></div>
         <div class="res-box" id="mk-res"></div>
       </div>
     </div>
@@ -383,6 +386,9 @@ mkColorsLbl:'توزيعة الأوردر بالألوان (اختياري)',mkCo
 mkTableLbl:'بيانات الأوردر',mkQtyOrder:'الكمية المطلوبة',mkAddRow:'إضافة مقاس',mkColorPieces2:'إجمالي القطع',mkTotalFabric:'إجمالي القماش',
 mkReportName:'اسم التقرير (اختياري)',mkReportNamePh:'مثال: أوردر رمضان — العميل أحمد',reportNameLbl:'اسم التقرير',
 mkAvail:'القماش المتاح (اختياري)',mkEnough:'القماش المتاح يكفي',mkShort:'ينقص',
+fillModelBtn:'تعبئة مقاسات الموديل',selectModelFirst:'اختر الموديل أولاً',openInCalc:'📂 فتح في الحاسبة',restored:'تم التحميل في الحاسبة — عدّل واحسب من جديد',
+mkAvailCol:'المتاح',mkStateCol:'الحالة',mkOver:'فائض تقريب الطبقات',mkActual:'القماش الفعلي بعد القص (اختياري)',mkDev:'الانحراف عن المحسوب',
+spreadOrderBtn:'🖨 أمر فرشة',spreadOrder:'أمر فرشة (تشغيل الفرد)',needMkLen:'أدخل طول الماركر أولاً لحساب الطبقات',signature:'التوقيع',spreadOf:'فرشة رقم',
 mkMkLen:'طول الماركر',mkTotalPlies:'إجمالي الطبقات',mkSpreadsShort:'فرشة',
 backupTitle:'النسخ الاحتياطي',backupBtn:'⬇ تنزيل نسخة',restoreBtn:'⬆ استعادة نسخة',
 backupHint:'تنزيل كل بيانات مساحة العمل في ملف واحد. احفظه دورياً — الاستعادة تكتب فوق السجلات بنفس المعرّفات.',
@@ -502,6 +508,9 @@ mkColorsLbl:'Order breakdown by color (optional)',mkColorAdd:'Add color',total:'
 mkTableLbl:'Order data',mkQtyOrder:'Quantity',mkAddRow:'Add size',mkColorPieces2:'Total pieces',mkTotalFabric:'Total fabric',
 mkReportName:'Report name (optional)',mkReportNamePh:'e.g. Ramadan order — client Ahmed',reportNameLbl:'Report name',
 mkAvail:'Available fabric (optional)',mkEnough:'Available fabric is enough',mkShort:'short by',
+fillModelBtn:'Fill model sizes',selectModelFirst:'Select a model first',openInCalc:'📂 Open in calculator',restored:'Loaded into the calculator — edit and recalculate',
+mkAvailCol:'Available',mkStateCol:'Status',mkOver:'Ply rounding surplus',mkActual:'Actual fabric after cutting (optional)',mkDev:'Deviation from computed',
+spreadOrderBtn:'🖨 Spreading order',spreadOrder:'Spreading order',needMkLen:'Enter the marker length first to compute plies',signature:'Signature',spreadOf:'Spread #',
 mkMkLen:'Marker length',mkTotalPlies:'Total plies',mkSpreadsShort:'spreads',
 backupTitle:'Backup',backupBtn:'⬇ Download backup',restoreBtn:'⬆ Restore backup',
 backupHint:'Download all workspace data in one file. Save it periodically — restoring overwrites records with the same IDs.',
@@ -578,7 +587,7 @@ function isOwner(){return !!(MEMBER&&MEMBER.role==='owner');}
 function can(p){return isOwner()||!!(MEMBER&&MEMBER.perms&&MEMBER.perms[p]);}
 
 /* ============ State ============ */
-let ME=null,MEMBER=null,TAB='fact',FACT=[],ORDERS=[],INSP=[],ITEMS=[],WSCODE='—',unsub=[],AUTHMODE='login',CUSTDEF=[],WSEQ=null,TOOLCHK=[],WSAQL=null,WSCRIT=0,WSCHK=null,MODELS=[],SIZELS=[],SM_PROD='';
+let ME=null,MEMBER=null,TAB='fact',FACT=[],ORDERS=[],INSP=[],ITEMS=[],WSCODE='—',unsub=[],AUTHMODE='login',CUSTDEF=[],WSEQ=null,TOOLCHK=[],WSAQL=null,WSCRIT=0,WSCHK=null,MODELS=[],SIZELS=[],SM_PROD='',MK_CAVAIL={};
 
 /* ============ AQL logic ============ */
 const AQLTAB=[[2,20,1,2,2,3],[151,32,2,3,3,4],[281,50,3,4,5,6],[501,80,5,6,7,8],
@@ -1166,7 +1175,12 @@ function onMkUnitChange(){const nu=$('mk-unit').value,ou=MK_UNIT;
 function renderMkProducts(){const el=$('mk-product');if(!el)return;const cur=el.value;const ns=prodNames();
   el.innerHTML=ns.length?ns.map(n=>`<option ${n===cur?'selected':''}>${esc(n)}</option>`).join(''):`<option value="">—</option>`;
   if(cur&&ns.includes(cur))el.value=cur;}
-function loadMkProduct(){renderMkModels();$('mk-rows').innerHTML=mkRowHtml();calcMK();}
+function loadMkProduct(){MK_CAVAIL={};renderMkModels();$('mk-rows').innerHTML=mkRowHtml();calcMK();}
+function fillModelSizes(){const m=mkModel();if(!m||!(m.sizes||[]).length)return toast(t('selectModelFirst'));
+  const cur=readMkRowsRaw().filter(r=>r.size||r.qty||r.color);
+  const have=new Set(cur.map(r=>r.size));
+  const rows=cur.concat((m.sizes||[]).filter(s=>!have.has(s.size)).map(s=>({size:s.size,cons:s.cons})));
+  $('mk-rows').innerHTML=(rows.length?rows:[{}]).map(r=>mkRowHtml(r)).join('');calcMK();}
 function renderMkModels(){renderMkProducts();const el=$('mk-model');if(!el)return;const cur=el.value;
   const prod=$('mk-product')?$('mk-product').value:'';
   const list=MODELS.filter(m=>!prod||!m.product||m.product===prod);
@@ -1221,22 +1235,33 @@ function computeMK(quiet){const rows=readMkRows();
   const byColor={};rows.forEach(x=>{const k=x.color||'—';if(!byColor[k])byColor[k]={color:k,pcs:0,fabric:0};
     byColor[k].pcs+=x.qty;byColor[k].fabric+=x.qty*x.cons;});
   const colors=Object.values(byColor).map(g=>{const o={color:g.color,pcs:g.pcs,fabric:Math.round(g.fabric*100)/100};
-    if(mklen>0){o.plies=Math.ceil(o.fabric/mklen);if(maxply>0)o.spreads=Math.ceil(o.plies/maxply);}return o;});
-  const r={product:($('mk-product')&&$('mk-product').value)||'',model:mdl?mdl.name:'',unit,mix:rows.map(x=>x.size+'×'+x.qty).join(' · '),pieces,totalFabric,colors,
+    if(mklen>0){o.plies=Math.ceil(o.fabric/mklen);o.over=Math.round((o.plies*mklen-o.fabric)*100)/100;if(maxply>0)o.spreads=Math.ceil(o.plies/maxply);}
+    const cav=+MK_CAVAIL[g.color]||0;if(cav>0){o.avail=cav;o.diff=Math.round((cav-o.fabric)*100)/100;}
+    return o;});
+  const actual=+($('mk-actual')&&$('mk-actual').value)||0;
+  const r={product:($('mk-product')&&$('mk-product').value)||'',model:mdl?mdl.name:'',unit,mix:rows.map(x=>x.size+'×'+x.qty).join(' · '),pieces,totalFabric,colors,rows,
     avail:avail||null,decision:(avail>0&&totalFabric>avail)?'FAIL':'PASS'};
   if(mklen>0){r.mklen=mklen;r.totalPlies=colors.reduce((s,c)=>s+(c.plies||0),0);}
+  if(maxply>0)r.maxply=maxply;
+  if(actual>0){r.actual=actual;r.actualDev=Math.round((actual-totalFabric)/totalFabric*10000)/100;}
   return r;}
 function calcMK(){const r=computeMK(true);if(!r){$('mk-res').innerHTML=`<span class="note">${t('mkNeed')}</span>`;return;}
   const u=r.unit||t('mUnit');
   const multi=r.colors.length>1||(r.colors.length===1&&r.colors[0].color!=='—');
   const sp=r.mklen!=null;
-  const colTbl=multi?`<table class="rtbl" style="margin-top:10px;min-width:320px"><tr><th>${t('colorLbl')}</th><th>${t('mkColorPieces2')}</th><th>${t('mkColorFabric')} (${u})</th>${sp?`<th>${t('mkPlies')}</th>`:''}</tr>
-    ${r.colors.map(c=>`<tr><td>${esc(c.color||'—')}</td><td>${c.pcs}</td><td>${c.fabric}</td>${sp?`<td>${c.plies} ${t('plyUnit')}${c.spreads?' / '+c.spreads+' '+t('mkSpreadsShort'):''}</td>`:''}</tr>`).join('')}
-    <tr style="font-weight:800;background:#eef6f6"><td>${t('total')}</td><td>${r.pieces}</td><td>${r.totalFabric}</td>${sp?`<td>${r.totalPlies} ${t('plyUnit')}</td>`:''}</tr></table>`:'';
+  const cavCell=c=>{const v=MK_CAVAIL[c.color]||'';const st=c.avail!=null?(c.diff>=0?`<b style="color:var(--green)">✔</b>`:`<b style="color:var(--red)">✘ ${Math.round(-c.diff*100)/100}</b>`):'—';
+    return `<td><input type="number" step="0.01" value="${v}" data-color="${esc(c.color)}" data-fabric="${c.fabric}" oninput="mkCavailChg(this)" style="width:74px;padding:4px;text-align:center"></td><td class="cav-res">${st}</td>`;};
+  const colTbl=multi?`<table class="rtbl" style="margin-top:10px;min-width:320px"><tr><th>${t('colorLbl')}</th><th>${t('mkColorPieces2')}</th><th>${t('mkColorFabric')} (${u})</th>${sp?`<th>${t('mkPlies')}</th>`:''}<th>${t('mkAvailCol')}</th><th>${t('mkStateCol')}</th></tr>
+    ${r.colors.map(c=>`<tr><td>${esc(c.color||'—')}</td><td>${c.pcs}</td><td>${c.fabric}</td>${sp?`<td>${c.plies} ${t('plyUnit')}${c.over>0?' <span class="note">(+'+c.over+')</span>':''}${c.spreads?' / '+c.spreads+' '+t('mkSpreadsShort'):''}</td>`:''}${cavCell(c)}</tr>`).join('')}
+    <tr style="font-weight:800;background:#eef6f6"><td>${t('total')}</td><td>${r.pieces}</td><td>${r.totalFabric}</td>${sp?`<td>${r.totalPlies} ${t('plyUnit')}</td>`:''}<td colspan="2"></td></tr></table>`:'';
   const plyLine=r.mklen!=null?` · 🧵 ${t('mkTotalPlies')}: <b>${r.totalPlies} ${t('plyUnit')}</b> (${t('mkMkLen')} ${r.mklen} ${u})`:'';
   const availLine=r.avail!=null?`<br>${t('mkAvail')}: ${r.avail} ${u} · ${r.decision==='PASS'?'✔ '+t('mkEnough'):'✘ '+t('mkShort')+' '+Math.round((r.totalFabric-r.avail)*100)/100+' '+u}`:'';
+  const actLine=r.actual!=null?`<br>${t('mkActual').replace(' (اختياري)','').replace(' (optional)','')}: <b>${r.actual} ${u}</b> · ${t('mkDev')}: <b style="color:${Math.abs(r.actualDev)<=2?'var(--green)':'var(--red)'}">${r.actualDev>0?'+':''}${r.actualDev}%</b>`:'';
   const badge=r.avail!=null?`<div class="big" style="color:${r.decision==='PASS'?'var(--green)':'var(--red)'}">${r.decision==='PASS'?t('passMark'):t('failMark')}</div>`:'';
-  $('mk-res').innerHTML=`${badge}<div class="note">${t('totalPieces')}: <b>${r.pieces}</b> · ${t('mkTotalFabric')}: <b>${r.totalFabric} ${u}</b>${plyLine}${availLine}</div>${colTbl}`;}
+  $('mk-res').innerHTML=`${badge}<div class="note">${t('totalPieces')}: <b>${r.pieces}</b> · ${t('mkTotalFabric')}: <b>${r.totalFabric} ${u}</b>${plyLine}${availLine}${actLine}</div>${colTbl}`;}
+function mkCavailChg(inp){const v=+normNum(inp.value)||0;if(v>0)MK_CAVAIL[inp.dataset.color]=v;else delete MK_CAVAIL[inp.dataset.color];
+  const need=+inp.dataset.fabric,cell=inp.closest('tr').querySelector('.cav-res');
+  cell.innerHTML=v>0?(v>=need?`<b style="color:var(--green)">✔</b>`:`<b style="color:var(--red)">✘ ${Math.round((need-v)*100)/100}</b>`):'—';}
 function modelsManager(){modal(`<h3>${t('mkManage')}</h3>
   <label class="inl">${t('productLbl')}</label>
   <div id="sizes-prod-bar" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"></div>
@@ -1443,8 +1468,49 @@ function renderToolChk(){const el=$('toolchk-list');if(!el)return;if(!TOOLCHK.le
     <div class="s">${c.title?esc(toolTypeLabel(c.type))+' · ':''}🏭 ${esc(c.factoryName||'')} · ${fmtDate(c.date)}<br>${esc(toolResultSummary(c))}</div></div>
     <span class="badge ${b}">${c.result.decision==='PASS'?t('pass'):t('fail')}</span></div>
     <div class="row-btns"><button class="mini" onclick="printToolChk('${c.id}')">${t('reportBtn')}</button>
+    ${c.type==='mk'?`<button class="mini g" onclick="openMkInCalc('${c.id}')">${t('openInCalc')}</button>`:''}
     ${can('del')?`<button class="mini r" onclick="delToolChk('${c.id}')">${t('del')}</button>`:''}</div></div>`;}).join('')+'</div>';}
 function delToolChk(id){if(!confirm(t('delInspQ')))return;db.collection('qc_toolchecks').doc(id).delete().catch(e=>toast(rulesHint(e)));}
+function navBtn(tb){return [...document.querySelectorAll('.nav button')].find(b=>(b.getAttribute('onclick')||'').includes("'"+tb+"'"));}
+// فتح تقرير ماركر محفوظ في الحاسبة للتعديل وإعادة الحساب
+function openMkInCalc(id){const c=TOOLCHK.find(x=>x.id===id);if(!c||c.type!=='mk')return;const r=c.result;
+  go('marker',navBtn('marker'));
+  if($('mk-title'))$('mk-title').value=c.title||'';
+  if($('mk-fact'))$('mk-fact').value=c.factoryId||'';
+  if(c.date)$('mk-date').value=c.date;
+  if(r.product&&prodNames().includes(r.product)){$('mk-product').value=r.product;renderMkModels();}
+  if(r.unit&&$('mk-unit')){$('mk-unit').value=r.unit;MK_UNIT=r.unit;}
+  $('mk-mklen').value=r.mklen!=null?r.mklen:'';
+  $('mk-avail').value=r.avail!=null?r.avail:'';
+  $('mk-maxply').value=r.maxply!=null?r.maxply:'';
+  if($('mk-actual'))$('mk-actual').value=r.actual!=null?r.actual:'';
+  MK_CAVAIL={};(r.colors||[]).forEach(x=>{if(x.avail!=null)MK_CAVAIL[x.color]=x.avail;});
+  if(r.model){const m=MODELS.find(x=>x.name===r.model);if(m&&$('mk-model'))$('mk-model').value=m.id;}
+  let rows=r.rows&&r.rows.length?r.rows:null;
+  if(!rows){const one=(r.colors&&r.colors.length===1&&r.colors[0].color!=='—')?r.colors[0].color:'';
+    rows=String(r.mix||'').split(' · ').filter(Boolean).map(s=>{const i=s.lastIndexOf('×');const size=i>=0?s.slice(0,i):s;
+      return {size,cons:sizeCons(r.product||'',size)||'',qty:i>=0?s.slice(i+1):'',color:one};});}
+  $('mk-rows').innerHTML=(rows&&rows.length?rows:[{}]).map(x=>mkRowHtml(x)).join('');
+  calcMK();toast(t('restored'));}
+// أمر فرشة للطباعة: ورقة تشغيل لعامل الفرد
+function printSpreadOrder(){const r=computeMK();if(!r)return;
+  if(r.mklen==null)return toast(t('needMkLen'));
+  const u=r.unit||t('mUnit');const title=$('mk-title')?$('mk-title').value.trim():'';
+  const fact=FACT.find(f=>f.id===$('mk-fact').value);
+  const hdr=[r.product,r.model,title].filter(Boolean).map(esc).join(' — ');
+  $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:720px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
+      <div><div style="font-size:22px;font-weight:800;color:#14504f">🧵 ${esc(MEMBER.wsName||'')}</div>
+      <div style="font-size:15px;color:#555">${t('spreadOrder')}${hdr?' — <b>'+hdr+'</b>':''}</div></div>
+      <div style="text-align:${LANG==='ar'?'left':'right'};font-size:12px;color:#666">${fmtDate($('mk-date').value||today())}${fact?'<br>🏭 '+esc(fact.name):''}</div></div>
+    <div style="margin-top:10px;font-size:14px">${t('mkMkLen')}: <b>${r.mklen} ${u}</b>${r.maxply?' · '+t('mkMaxPly').replace(' (اختياري)','').replace(' (optional)','')+': <b>'+r.maxply+'</b>':''}</div>
+    <table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:14px" border="1" cellpadding="8">
+      <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('colorLbl')}</td><td>${t('mkColorPieces2')}</td><td>${t('mkColorFabric')} (${u})</td><td>${t('mkPlies')}</td>${r.maxply?`<td>${t('mkSpreadsShort')}</td>`:''}<td>${t('signature')}</td></tr>
+      ${r.colors.map(c=>`<tr><td style="font-weight:700">${esc(c.color||'—')}</td><td>${c.pcs}</td><td>${c.fabric}</td><td>${c.plies} ${t('plyUnit')}${c.over>0?' (+'+c.over+')':''}</td>${r.maxply?`<td>${c.spreads||1}</td>`:''}<td style="min-width:90px"></td></tr>`).join('')}
+      <tr style="font-weight:800;background:#f4f8f8"><td>${t('total')}</td><td>${r.pieces}</td><td>${r.totalFabric}</td><td>${r.totalPlies} ${t('plyUnit')}</td>${r.maxply?'<td></td>':''}<td></td></tr></table>
+    <div style="margin-top:26px;display:flex;justify-content:space-between;font-size:13px;color:#444">
+      <div>${t('repInspector')}: ${esc(MEMBER.name||'')} ______________</div><div>QC: ______________</div></div></div>`;
+  window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
   const row=(l,v)=>`<tr><td style="font-weight:700;background:#f2f6f6;width:38%">${l}</td><td>${esc(v)}</td></tr>`;
   const rowH=(l,v)=>`<tr><td style="font-weight:700;background:#f2f6f6;width:38%">${l}</td><td>${v}</td></tr>`;
@@ -1463,12 +1529,14 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
   else if(c.type==='aq')rows=aqRows(r);
   else if(c.type==='mk'){const u=r.unit||t('mUnit');const sp=r.mklen!=null;
     rows=(r.product?row(t('productLbl'),r.product):'')+(r.model?row(t('mkModelLbl'),r.model):'')+rowH(t('mkCounts'),sizeChips(r.mix))+row(t('totalPieces'),r.pieces)
-      +row(t('mkTotalFabric'),r.totalFabric+' '+u)+(sp?row(t('mkMkLen'),r.mklen+' '+u)+row(t('mkTotalPlies'),r.totalPlies+' '+t('plyUnit')):'')+(r.avail!=null?row(t('mkAvail'),r.avail+' '+u):'');
+      +row(t('mkTotalFabric'),r.totalFabric+' '+u)+(sp?row(t('mkMkLen'),r.mklen+' '+u)+row(t('mkTotalPlies'),r.totalPlies+' '+t('plyUnit')):'')+(r.avail!=null?row(t('mkAvail'),r.avail+' '+u):'')
+      +(r.actual!=null?row(t('mkActual').replace(' (اختياري)','').replace(' (optional)',''),r.actual+' '+u+' ('+(r.actualDev>0?'+':'')+r.actualDev+'%)'):'');
     const multi=r.colors&&(r.colors.length>1||(r.colors.length===1&&r.colors[0].color!=='—'));
+    const anyAv=r.colors&&r.colors.some(x=>x.avail!=null);
     if(multi){rows+=`<tr><td colspan="2" style="padding:0"><table style="width:100%;border-collapse:collapse" border="1" cellpadding="6">
-      <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('colorLbl')}</td><td>${t('mkColorPieces2')}</td><td>${t('mkColorFabric')} (${u})</td>${sp?`<td>${t('mkPlies')}</td>`:''}</tr>
-      ${r.colors.map(x=>`<tr><td>${esc(x.color||'—')}</td><td>${x.pcs}</td><td>${x.fabric}</td>${sp?`<td>${x.plies}</td>`:''}</tr>`).join('')}
-      <tr style="font-weight:800"><td>${t('total')}</td><td>${r.pieces}</td><td>${r.totalFabric}</td>${sp?`<td>${r.totalPlies}</td>`:''}</tr></table></td></tr>`;}}
+      <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('colorLbl')}</td><td>${t('mkColorPieces2')}</td><td>${t('mkColorFabric')} (${u})</td>${sp?`<td>${t('mkPlies')}</td>`:''}${anyAv?`<td>${t('mkAvailCol')}</td><td>${t('mkStateCol')}</td>`:''}</tr>
+      ${r.colors.map(x=>`<tr><td>${esc(x.color||'—')}</td><td>${x.pcs}</td><td>${x.fabric}</td>${sp?`<td>${x.plies}${x.over>0?' (+'+x.over+')':''}</td>`:''}${anyAv?`<td>${x.avail!=null?x.avail:'—'}</td><td>${x.avail!=null?(x.diff>=0?'✔':'✘ '+Math.round(-x.diff*100)/100):'—'}</td>`:''}</tr>`).join('')}
+      <tr style="font-weight:800"><td>${t('total')}</td><td>${r.pieces}</td><td>${r.totalFabric}</td>${sp?`<td>${r.totalPlies}</td>`:''}${anyAv?'<td></td><td></td>':''}</tr></table></td></tr>`;}}
   else rows=sec(t('fpTitle'),r.fp.decision)+fpRows(r.fp)+sec(t('shTitle'),r.sh.decision)+shRows(r.sh)+sec(t('aqlTitle'),r.aq.decision)+aqRows(r.aq);
   $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:720px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
