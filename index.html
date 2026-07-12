@@ -1275,8 +1275,10 @@ function sizeCatOptions(src,cat,selected,selCons){const g=sizeGroups(src).find(x
   return html;}
 function renderSizesManager(){const el=$('sizes-list');if(!el)return;const list=sizeList();
   if(!list.length){el.innerHTML=`<span class="note">${t('noSizes')}</span>`;return;}
-  const chip=s=>`<span class="chip" style="font-size:13px;padding:5px 10px;margin:0 0 6px 6px;display:inline-flex;align-items:center;gap:6px">${esc(s.size)}${s.cons?': '+s.cons:''}
-    <b style="cursor:pointer;color:var(--red)" onclick="delSize('${esc(s.size).replace(/'/g,"&#39;")}')">✕</b></span>`;
+  const chip=s=>{const nm=esc(s.size).replace(/'/g,"&#39;");
+    return `<span class="chip" style="font-size:13px;padding:4px 8px;margin:0 0 6px 6px;display:inline-flex;align-items:center;gap:5px">${esc(s.size)}
+    <input type="number" step="0.01" value="${s.cons||''}" onchange="editSizeCons('${nm}',this.value)" style="width:58px;padding:3px 5px;font-size:13px;border:1px solid #cfe0df;border-radius:6px;text-align:center">
+    <b style="cursor:pointer;color:var(--red)" onclick="delSize('${nm}')">✕</b></span>`;};
   const groups=sizeGroups(list);
   el.innerHTML=groups.length>1
     ?groups.map(g=>`<div style="margin-bottom:8px;padding:6px 8px;border:1px solid #e2eaea;border-radius:10px">
@@ -1288,6 +1290,10 @@ function addSize(){const name=$('new-size').value.trim();if(!name)return;const c
   db.collection('qc_workspaces').doc(MEMBER.wsId).update({sizeList:nl}).then(()=>{$('new-size').value='';$('new-size-cons').value='';}).catch(e=>toast(rulesHint(e)));}
 function delSize(name){const nl=sizeList().filter(s=>s.size!==name);
   db.collection('qc_workspaces').doc(MEMBER.wsId).update({sizeList:nl}).catch(e=>toast(rulesHint(e)));}
+function editSizeCons(name,val){const cons=+normNum(val);
+  if(!(cons>0)){renderSizesManager();return toast(t('badSizeRow'));}
+  const nl=sizeList().map(s=>s.size===name?{size:s.size,cons:Math.round(cons*10000)/10000}:s);
+  db.collection('qc_workspaces').doc(MEMBER.wsId).update({sizeList:nl}).then(()=>toast(t('saved'))).catch(e=>toast(rulesHint(e)));}
 // استيراد المقاسات من إكسيل: لصق (Tab) أو CSV — كل سطر: المقاس ثم الاستهلاك
 function normNum(s){return String(s).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace('٫','.');}
 function parseSizeLines(text){const ok=[];let skipped=0;
