@@ -645,7 +645,7 @@ function listen(){unsub.forEach(u=>u&&u());unsub=[];const ws=MEMBER.wsId;
   unsub.push(db.collection('qc_defects').where('wsId','==',ws).onSnapshot(s=>{CUSTDEF=s.docs.map(d=>({id:d.id,...d.data()}));if(REFSUB==='def')renderRef();},console.error));
   unsub.push(db.collection('qc_seqcfg').doc(ws).onSnapshot(d=>{WSEQ=(d.exists&&d.data().list)?d.data().list:null;if(REFSUB==='seq')renderRef();},console.error));
   unsub.push(db.collection('qc_chkcfg').doc(ws).onSnapshot(d=>{WSCHK=(d.exists&&d.data().lists)?d.data().lists:null;if(REFSUB==='chk')renderRef();},console.error));
-  unsub.push(db.collection('qc_models').where('wsId','==',ws).onSnapshot(s=>{MODELS=s.docs.map(d=>({id:d.id,...d.data()}));if(TAB==='tools')renderMkModels();},console.error));
+  unsub.push(db.collection('qc_models').where('wsId','==',ws).onSnapshot(s=>{MODELS=s.docs.map(d=>({id:d.id,...d.data()}));if(TAB==='tools'||TAB==='marker')renderMkModels();if($('models-list'))renderModelsList();},console.error));
   unsub.push(db.collection('qc_toolchecks').where('wsId','==',ws).onSnapshot(s=>{TOOLCHK=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));if(TAB==='toolchk')renderToolChk();if(TAB==='dash')renderDash();},console.error));}
 
 /* ============ NAV ============ */
@@ -1254,12 +1254,15 @@ function modelsManager(){modal(`<h3>${t('mkManage')}</h3>
   </div>
   <div id="sizes-list" style="margin-top:8px"></div>
   <label class="inl" style="margin-top:12px">${t('modelsListLbl')}</label>
-  <div id="models-list">${MODELS.length?MODELS.map(m=>`<div class="item" style="margin-bottom:6px"><div class="h"><div><div class="t" style="font-size:14px">${esc(m.name)}${m.product?` <span class="note" style="font-weight:400">📦 ${esc(m.product)}</span>`:''}</div>
-    <div class="s">${(m.sizes||[]).map(s=>esc(s.size)+': '+s.cons).join(' · ')}</div></div></div>
-    <div class="row-btns"><button class="mini g" onclick='modelForm(${esc(JSON.stringify(m)).replace(/'/g,"&#39;")})'>${t('edit')}</button>
-    ${can('del')?`<button class="mini r" onclick="delModel('${m.id}')">${t('del')}</button>`:''}</div></div>`).join(''):`<span class="note">${t('noModels')}</span>`}</div>
+  <div id="models-list"></div>
   <div class="row-btns"><button class="btn" onclick="modelForm()">${t('modelNew')}</button>
   <button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);renderSizesManager();}
+function renderModelsList(){const el=$('models-list');if(!el)return;
+  const list=MODELS.filter(m=>!SM_PROD||!m.product||m.product===SM_PROD);
+  el.innerHTML=list.length?list.map(m=>`<div class="item" style="margin-bottom:6px"><div class="h"><div><div class="t" style="font-size:14px">${esc(m.name)}${m.product?` <span class="note" style="font-weight:400">📦 ${esc(m.product)}</span>`:''}</div>
+    <div class="s">${(m.sizes||[]).map(s=>esc(s.size)+': '+s.cons).join(' · ')}</div></div></div>
+    <div class="row-btns"><button class="mini g" onclick='modelForm(${esc(JSON.stringify(m)).replace(/'/g,"&#39;")})'>${t('edit')}</button>
+    ${can('del')?`<button class="mini r" onclick="delModel('${m.id}')">${t('del')}</button>`:''}</div></div>`).join(''):`<span class="note">${t('noModels')}</span>`;}
 // قوائم المقاسات حسب المنتج (ثوب، قميص، عباية...) — لكل منتج مقاساته واستهلاكه
 function sizeListsN(){return (SIZELS||[]).map(p=>({name:p.name,sizes:(p.sizes||[]).map(s=>typeof s==='string'?{size:s,cons:0}:{size:s.size,cons:s.cons||0})}));}
 function prodNames(){return sizeListsN().map(p=>p.name);}
@@ -1295,6 +1298,7 @@ function sizeCatOptions(src,cat,selected,selCons){const g=sizeGroups(src).find(x
   return html;}
 function renderSizesManager(){const el=$('sizes-list');if(!el)return;
   const ps=sizeListsN();if(!ps.some(p=>p.name===SM_PROD))SM_PROD=ps.length?ps[0].name:'';
+  renderModelsList();
   const bar=$('sizes-prod-bar');
   if(bar)bar.innerHTML=`<select onchange="SM_PROD=this.value;renderSizesManager()" style="flex:1;min-width:110px;padding:8px">${ps.length?ps.map(p=>`<option ${p.name===SM_PROD?'selected':''}>${esc(p.name)}</option>`).join(''):`<option value="">—</option>`}</select>
     <input id="new-prod" placeholder="${t('productPh')}" style="flex:1;min-width:120px" onkeydown="if(event.key==='Enter')addProduct()">
