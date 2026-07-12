@@ -1172,7 +1172,7 @@ function mkEnter(e,el){if(e.key!=='Enter')return;e.preventDefault();
   const tgt=next.querySelector('.'+cls);if(tgt){tgt.focus();if(tgt.select)tgt.select();}}
 function mkRowHtml(r){r=r||{};const src=mkSizeSource();const locked=src.length>0;const ke='onkeydown="mkEnter(event,this)"';
   const sizeCell=locked
-    ?`<select class="mkr-size" onchange="mkPickSize(this)" ${ke} style="min-width:80px;padding:6px"><option value="">—</option>`+src.map(s=>`<option value="${esc(s.size)}" data-cons="${s.cons}" ${r.size===s.size?'selected':''}>${esc(s.size)}</option>`).join('')+`${(r.size&&!src.some(s=>s.size===r.size))?`<option value="${esc(r.size)}" data-cons="${r.cons||0}" selected>${esc(r.size)}</option>`:''}</select>`
+    ?`<select class="mkr-size" onchange="mkPickSize(this)" ${ke} style="min-width:80px;padding:6px"><option value="">—</option>${sizeOptionsHtml(src,r.size,r.cons)}</select>`
     :`<input class="mkr-size" value="${esc(r.size||'')}" placeholder="L" ${ke} style="min-width:64px;padding:6px">`;
   return `<tr class="mk-row">
   <td>${sizeCell}</td>
@@ -1241,9 +1241,33 @@ function modelsManager(){modal(`<h3>${t('mkManage')}</h3>
   <button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);renderSizesManager();}
 function sizeList(){return (SIZES||[]).map(s=>typeof s==='string'?{size:s,cons:0}:{size:s.size,cons:s.cons||0});}
 function sizeCons(name){const f=sizeList().find(s=>s.size===name);return f?f.cons:0;}
+// تصنيف القياسات حسب الفئة (M-50 → فئة M) وترتيبها
+const SIZE_ORDER=['XXS','XS','S','M','L','XL','XXL','2XL','3XL','4XL','5XL','6XL','7XL','8XL','9XL','10XL'];
+function sizeGroupKey(n){n=String(n);const i=n.indexOf('-');return (i>0?n.slice(0,i):n).trim();}
+function sizeGroups(list){list=list||sizeList();const g={};
+  list.forEach(s=>{const k=sizeGroupKey(s.size);(g[k]=g[k]||[]).push(s);});
+  const keys=Object.keys(g).sort((a,b)=>{const ia=SIZE_ORDER.indexOf(a.toUpperCase()),ib=SIZE_ORDER.indexOf(b.toUpperCase());
+    if(ia>=0&&ib>=0)return ia-ib;if(ia>=0)return -1;if(ib>=0)return 1;return a.localeCompare(b,'ar',{numeric:true});});
+  const suf=s=>{const i=s.size.indexOf('-');const v=parseFloat(i>0?s.size.slice(i+1):'');return isNaN(v)?Infinity:v;};
+  return keys.map(k=>({label:k,items:g[k].slice().sort((a,b)=>{const d=suf(a)-suf(b);
+    return d||a.size.localeCompare(b.size,'ar',{numeric:true});})}));}
+function sizeOptionsHtml(src,selected,selCons){const groups=sizeGroups(src);
+  const opt=s=>`<option value="${esc(s.size)}" data-cons="${s.cons}" ${selected===s.size?'selected':''}>${esc(s.size)}</option>`;
+  let html=groups.length>1
+    ?groups.map(gr=>`<optgroup label="${esc(gr.label)}">${gr.items.map(opt).join('')}</optgroup>`).join('')
+    :groups.map(gr=>gr.items.map(opt).join('')).join('');
+  if(selected&&!src.some(s=>s.size===selected))html+=`<option value="${esc(selected)}" data-cons="${selCons||0}" selected>${esc(selected)}</option>`;
+  return html;}
 function renderSizesManager(){const el=$('sizes-list');if(!el)return;const list=sizeList();
-  el.innerHTML=list.length?list.map(s=>`<span class="chip" style="font-size:13px;padding:5px 10px;margin:0 0 6px 6px;display:inline-flex;align-items:center;gap:6px">${esc(s.size)}${s.cons?': '+s.cons:''}
-    <b style="cursor:pointer;color:var(--red)" onclick="delSize('${esc(s.size).replace(/'/g,"&#39;")}')">✕</b></span>`).join(''):`<span class="note">${t('noSizes')}</span>`;}
+  if(!list.length){el.innerHTML=`<span class="note">${t('noSizes')}</span>`;return;}
+  const chip=s=>`<span class="chip" style="font-size:13px;padding:5px 10px;margin:0 0 6px 6px;display:inline-flex;align-items:center;gap:6px">${esc(s.size)}${s.cons?': '+s.cons:''}
+    <b style="cursor:pointer;color:var(--red)" onclick="delSize('${esc(s.size).replace(/'/g,"&#39;")}')">✕</b></span>`;
+  const groups=sizeGroups(list);
+  el.innerHTML=groups.length>1
+    ?groups.map(g=>`<div style="margin-bottom:8px;padding:6px 8px;border:1px solid #e2eaea;border-radius:10px">
+      <div style="font-weight:800;font-size:13px;color:#14504f;margin-bottom:4px">${esc(g.label)} <span class="note" style="font-weight:400">(${g.items.length})</span></div>
+      ${g.items.map(chip).join('')}</div>`).join('')
+    :groups.map(g=>g.items.map(chip).join('')).join('');}
 function addSize(){const name=$('new-size').value.trim();if(!name)return;const cons=+$('new-size-cons').value||0;
   const nl=sizeList().filter(s=>s.size!==name).concat([{size:name,cons}]);
   db.collection('qc_workspaces').doc(MEMBER.wsId).update({sizeList:nl}).then(()=>{$('new-size').value='';$('new-size-cons').value='';}).catch(e=>toast(rulesHint(e)));}
@@ -1280,9 +1304,9 @@ function modelForm(m){m=m||{};
   <button type="button" class="mini" style="margin-top:6px" onclick="addModelRow()">➕ ${t('sizeAdd')}</button>
   <div class="row-btns"><button class="btn" onclick="saveModel('${m.id||''}')">${t('save')}</button>
   <button class="btn sec" onclick="modelsManager()">${t('cancel')}</button></div>`);}
-function mdRow(s){s=s||{};const list=sizeList();const names=list.map(x=>x.size);
+function mdRow(s){s=s||{};const list=sizeList();
   const sizeCell=list.length
-    ?`<select class="md-size" onchange="mdPickSize(this)" style="min-width:90px;padding:6px"><option value="">—</option>${list.map(x=>`<option data-cons="${x.cons}" ${s.size===x.size?'selected':''}>${esc(x.size)}</option>`).join('')}${(s.size&&!names.includes(s.size))?`<option data-cons="${s.cons||0}" selected>${esc(s.size)}</option>`:''}</select>`
+    ?`<select class="md-size" onchange="mdPickSize(this)" style="min-width:90px;padding:6px"><option value="">—</option>${sizeOptionsHtml(list,s.size,s.cons)}</select>`
     :`<input class="md-size" value="${esc(s.size||'')}" placeholder="L" style="min-width:90px;padding:6px">`;
   return `<tr>
   <td>${sizeCell}</td>
