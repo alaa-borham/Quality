@@ -182,7 +182,6 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
     <button onclick="go('tools',this)" oncontextmenu="return navInfo('tools',event)">🧮 <span data-i18n="navTools">الأدوات</span></button>
     <button onclick="go('marker',this)" oncontextmenu="return navInfo('marker',event)">📐 <span data-i18n="navMarker">الماركر</span></button>
     <button onclick="go('ref',this)" oncontextmenu="return navInfo('ref',event)">📋 <span data-i18n="navRef">المراجع</span></button>
-    <button onclick="go('toolchk',this)" oncontextmenu="return navInfo('toolchk',event)">🧪 <span data-i18n="navToolChk">سجل فحص القماش</span></button>
   </div>
   <div class="wrap">
     <div id="p-dash" class="hide">
@@ -196,12 +195,18 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
       <div class="card"><div style="font-weight:700;margin-bottom:10px" data-i18n="cmpTitle">مقارنة الموردين</div><div id="factcmp"></div></div>
     </div>
     <div id="p-insp" class="hide"><div class="sec-h">✅ <span data-i18n="inspTitle">الفحوصات</span></div>
+      <div class="subnav" id="insp-subnav">
+        <button class="on" onclick="goInsp('list',this)">✅ <span data-i18n="inspProd">فحوصات الإنتاج</span></button>
+        <button onclick="goInsp('toolchk',this)">🧪 <span data-i18n="navToolChk">سجل فحص القماش</span></button>
+      </div>
+      <div id="insp-wrap-list">
       <div class="card" style="padding:12px"><div class="grid3">
         <div><label class="inl" data-i18n="searchLbl">بحث</label><input id="q-search" data-i18n-ph="searchPh" placeholder="رقم الطلبية / المصنع / ملاحظات..." oninput="INSPQ=this.value;renderInsp()"></div>
         <div><label class="inl" data-i18n="fromLbl">من تاريخ</label><input id="q-from" type="date" onchange="INSPFROM=this.value;renderInsp()"></div>
         <div><label class="inl" data-i18n="toLbl">إلى تاريخ</label><input id="q-to" type="date" onchange="INSPTO=this.value;renderInsp()"></div>
       </div></div>
       <div id="insp-list"></div></div>
+      <div id="insp-wrap-toolchk" class="hide"><div id="toolchk-list"></div></div></div>
     <div id="p-orders" class="hide"><div class="sec-h">📦 <span data-i18n="ordersTitle">الطلبيات</span></div><div id="orders-list"></div></div>
     <div id="p-fact" class="hide"><div class="sec-h">🏭 <span data-i18n="factTitle">المصانع / الموردون</span></div><div id="fact-list"></div></div>
     <div id="p-tools" class="hide">
@@ -297,7 +302,6 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
       </div>
       <div id="ref-body"></div>
     </div>
-    <div id="p-toolchk" class="hide"><div class="sec-h">🧪 <span data-i18n="navToolChk">سجل فحص القماش</span></div><div id="toolchk-list"></div></div>
   </div>
   <button class="fab" id="fab" onclick="fabAction()">＋</button>
 </div>
@@ -321,7 +325,7 @@ appTitle:'نظام متابعة الجودة',login:'تسجيل الدخول',si
 name:'الاسم',namePh:'اسمك الكامل',loginBtn:'دخول',createAccBtn:'إنشاء الحساب',forgot:'نسيت كلمة المرور؟',
 wsTitle:'مساحة العمل',wsSub:'أنشئ مساحة جديدة أو انضم بكود',createTab:'إنشاء مساحة',joinTab:'انضمام بكود',
 wsNameLbl:'اسم مساحة العمل (الشركة/القسم)',wsNamePh:'مثال: جودة الشياكة',createBtn:'إنشاء',codeLbl:'كود مساحة العمل',joinBtn:'انضمام',logout:'تسجيل الخروج',
-appName:'متابعة الجودة',navDash:'المؤشرات',navInsp:'الفحوصات',navOrders:'الطلبيات',navFact:'المصانع',navTools:'الأدوات',navMarker:'الماركر',navRef:'المراجع',navToolChk:'سجل فحص القماش',
+appName:'متابعة الجودة',navDash:'المؤشرات',navInsp:'الفحوصات',inspProd:'فحوصات الإنتاج',navOrders:'الطلبيات',navFact:'المصانع',navTools:'الأدوات',navMarker:'الماركر',navRef:'المراجع',navToolChk:'سجل فحص القماش',
 navDescmarker:'حاسبة الماركر والاستهلاك: تدخل بيانات الأوردر (المقاس · الاستهلاك · الكمية · اللون) فتحسب إجمالي القطع والقماش وعدد الطبقات لكل لون. مكان مستقل ستُضاف بجانبه لاحقاً حاسبة الإنتاج الكمي.',
 navDescfact:'إدارة قائمة المصانع والموردين الذين تتعامل معهم: إضافة مصنع جديد باسمه ودولته وجهة الاتصال، وتعديل أو حذف المصانع الحالية. كل طلبية وكل فحص يُربط بمصنع من هذه القائمة.',
 navDescorders:'تسجيل طلبيات الإنتاج (PO): ربط كل طلبية بمصنع مع رقمها والموديل والصنف والكمية واللون. الكمية تُستخدم تلقائياً لتحديد حجم عينة الفحص حسب جدول AQL.',
@@ -443,7 +447,7 @@ appTitle:'QC Tracking System',login:'Login',signup:'Sign up',email:'Email',passw
 name:'Name',namePh:'Your full name',loginBtn:'Login',createAccBtn:'Create account',forgot:'Forgot password?',
 wsTitle:'Workspace',wsSub:'Create a new workspace or join by code',createTab:'Create',joinTab:'Join by code',
 wsNameLbl:'Workspace name (company/dept)',wsNamePh:'e.g. Shiaka QC',createBtn:'Create',codeLbl:'Workspace code',joinBtn:'Join',logout:'Sign out',
-appName:'QC Tracking',navDash:'Dashboard',navInsp:'Inspections',navOrders:'Orders',navFact:'Factories',navTools:'Tools',navMarker:'Marker',navRef:'Reference',navToolChk:'Fabric Test Log',
+appName:'QC Tracking',navDash:'Dashboard',navInsp:'Inspections',inspProd:'Production inspections',navOrders:'Orders',navFact:'Factories',navTools:'Tools',navMarker:'Marker',navRef:'Reference',navToolChk:'Fabric Test Log',
 navDescmarker:'Marker & consumption calculator: enter the order lines (size, consumption, quantity, color) to get total pieces, fabric, and plies per color. A standalone place where a bulk-production calculator will be added later.',
 navDescfact:'Manage the list of factories and suppliers you work with: add a factory with its name, country, and contact, and edit or delete existing ones. Every order and inspection is linked to a factory from this list.',
 navDescorders:'Register production orders (POs): link each order to a factory with its number, model, item, quantity, and color. The quantity automatically determines the inspection sample size per the AQL table.',
@@ -655,13 +659,17 @@ function listen(){unsub.forEach(u=>u&&u());unsub=[];const ws=MEMBER.wsId;
   unsub.push(db.collection('qc_seqcfg').doc(ws).onSnapshot(d=>{WSEQ=(d.exists&&d.data().list)?d.data().list:null;if(REFSUB==='seq')renderRef();},console.error));
   unsub.push(db.collection('qc_chkcfg').doc(ws).onSnapshot(d=>{WSCHK=(d.exists&&d.data().lists)?d.data().lists:null;if(REFSUB==='chk')renderRef();},console.error));
   unsub.push(db.collection('qc_models').where('wsId','==',ws).onSnapshot(s=>{MODELS=s.docs.map(d=>({id:d.id,...d.data()}));if(TAB==='tools'||TAB==='marker')renderMkModels();if($('models-list'))renderModelsList();},console.error));
-  unsub.push(db.collection('qc_toolchecks').where('wsId','==',ws).onSnapshot(s=>{TOOLCHK=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));if(TAB==='toolchk')renderToolChk();if(TAB==='dash')renderDash();},console.error));}
+  unsub.push(db.collection('qc_toolchecks').where('wsId','==',ws).onSnapshot(s=>{TOOLCHK=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));if($('toolchk-list'))renderToolChk();if(TAB==='dash')renderDash();},console.error));}
 
 /* ============ NAV ============ */
-function go(tb,btn){TAB=tb;['dash','insp','orders','fact','tools','marker','ref','toolchk'].forEach(x=>$('p-'+x).classList.toggle('hide',x!==tb));
+function go(tb,btn){TAB=tb;['dash','insp','orders','fact','tools','marker','ref'].forEach(x=>$('p-'+x).classList.toggle('hide',x!==tb));
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');
   $('fab').style.display=(['insp','orders'].includes(tb)||(tb==='fact'&&can('fact')))?'flex':'none';if(tb==='dash')renderDash();if(tb==='ref')renderRef();
-  if(tb==='tools'||tb==='marker'){renderToolFactSelects();if(!$('mk-rows').children.length)addMkRow();}if(tb==='toolchk')renderToolChk();}
+  if(tb==='tools'||tb==='marker'){renderToolFactSelects();if(!$('mk-rows').children.length)addMkRow();}
+  if(tb==='insp')goInsp('list',document.querySelector('#insp-subnav button'));}
+function goInsp(v,btn){['list','toolchk'].forEach(x=>$('insp-wrap-'+x).classList.toggle('hide',x!==v));
+  document.querySelectorAll('#insp-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');
+  if(v==='toolchk'){renderToolChk();$('fab').style.display='none';}else $('fab').style.display='flex';}
 function fabAction(){if(TAB==='fact')factForm();else if(TAB==='orders')orderForm();else if(TAB==='insp')inspForm();}
 const NAV_TITLE={fact:'navFact',orders:'navOrders',insp:'navInsp',dash:'navDash',tools:'navTools',marker:'navMarker',ref:'navRef',toolchk:'navToolChk'};
 function navInfo(id,e){e.preventDefault();modal(`<h3>${esc(t(NAV_TITLE[id]))}</h3>
