@@ -266,7 +266,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <input id="mk-title" data-i18n-ph="mkReportNamePh" placeholder="مثال: أوردر رمضان — العميل أحمد">
         <div class="grid2" id="mk-factrow" style="margin-top:8px"><div><label class="inl" data-i18n="factOpt">المصنع (اختياري)</label><select id="mk-fact"></select></div>
           <div><label class="inl" data-i18n="dateLbl">التاريخ</label><input id="mk-date" type="date"></div></div>
-        <div class="grid2"><div><label class="inl" data-i18n="mkModelLbl">الموديل (اختياري)</label><select id="mk-model" onchange="loadMkModel()"></select></div>
+        <div class="grid3"><div><label class="inl" data-i18n="productLbl">المنتج</label><select id="mk-product" onchange="loadMkProduct()"></select></div>
+          <div><label class="inl" data-i18n="mkModelLbl">الموديل (اختياري)</label><select id="mk-model" onchange="loadMkModel()"></select></div>
           <div style="display:flex;align-items:flex-end"><button type="button" class="mini" onclick="modelsManager()" data-i18n="mkManage">⚙️ إدارة الموديلات والمقاسات</button></div></div>
         <label class="inl" data-i18n="mkTableLbl">بيانات الأوردر</label>
         <div style="overflow-x:auto"><table class="rtbl" style="min-width:440px" id="mk-tbl">
@@ -392,6 +393,7 @@ sizeName:'اسم المقاس',sizeLen:'طول المقاس',sizeCons:'استه�
 enterModel:'أدخل اسم الموديل ومقاساً واحداً على الأقل',badSizeRow:'كل صف يحتاج اسم المقاس واستهلاكاً أكبر من صفر',delModelQ:'حذف هذا الموديل؟',
 factOpt:'المصنع (اختياري)',unitLbl:'الوحدة',
 sizesListLbl:'قائمة المقاسات والاستهلاك المشتركة (لكل الموديلات)',sizePh:'المقاس (M أو 54)',sizeConsPh:'الاستهلاك',addSizeBtn:'أضف',noSizes:'لا مقاسات بعد — أضِف المقاس واستهلاكه لتظهر في كل الموديلات',modelsListLbl:'الموديلات',
+productLbl:'المنتج',productPh:'منتج جديد (قميص، عباية، بنطلون...)',addProductBtn:'أضف منتج',noProducts:'أضِف منتجاً أولاً (ثوب، قميص، عباية...) ثم أضِف مقاساته واستهلاكها',delProductQ:'حذف هذا المنتج وكل مقاساته؟',
 sizesImportBtn:'📥 استيراد من إكسيل',sizesImportHint:'انسخ عمودَي المقاس والاستهلاك من الإكسيل والصقهما هنا، أو ارفع ملف CSV. كل سطر: المقاس ثم الاستهلاك.',sizesImportPh:'M\t3.10\nL\t3.20\nXL\t3.35',importApply:'استيراد القائمة',importedN:'تم استيراد {n} قياس',importSkipped:' (تم تجاهل {n} سطر غير صالح)',importNone:'لم يتم التعرف على أي سطر صالح — تأكد أن كل سطر يحتوي المقاس ثم رقم الاستهلاك',importFileBtn:'📄 ملف CSV',
 toolDescmk:'حاسبة استهلاك الأوردر: تُدخل مقاسات الأوردر (المقاس · استهلاك القطعة · الكمية · اللون) في جدول واحد، فيحسب النظام لكل لون إجمالي القطع وإجمالي القماش المطلوب، ومجموع القماش الكلي. ويمكنك إدخال القماش المتاح لمعرفة هل يكفي أم ينقص. الموديل المحفوظ اختياري يملأ المقاسات والاستهلاك تلقائياً.',
 inspSaved:'تم حفظ الفحص',dhuShort:'DHU',acBig:'حد قبول كبير',acSmall:'صغير',sampleShort:'العينة',
@@ -510,6 +512,7 @@ sizeName:'Size',sizeLen:'Size length',sizeCons:'Consumption',sizeAdd:'Add size',
 enterModel:'Enter the model name and at least one size',badSizeRow:'Each row needs a size name and consumption greater than zero',delModelQ:'Delete this model?',
 factOpt:'Factory (optional)',unitLbl:'Unit',
 sizesListLbl:'Shared sizes & consumption list (for all models)',sizePh:'Size (M or 54)',sizeConsPh:'Consumption',addSizeBtn:'Add',noSizes:'No sizes yet — add a size and its consumption to appear in every model',modelsListLbl:'Models',
+productLbl:'Product',productPh:'New product (shirt, abaya, trousers...)',addProductBtn:'Add product',noProducts:'Add a product first (thobe, shirt, abaya...) then add its sizes',delProductQ:'Delete this product and all its sizes?',
 sizesImportBtn:'📥 Import from Excel',sizesImportHint:'Copy the size & consumption columns from Excel and paste here, or upload a CSV file. Each line: size then consumption.',sizesImportPh:'M\t3.10\nL\t3.20\nXL\t3.35',importApply:'Import list',importedN:'{n} sizes imported',importSkipped:' ({n} invalid lines skipped)',importNone:'No valid lines found — each line must have the size then a consumption number',importFileBtn:'📄 CSV file',
 toolDescmk:'Order consumption calculator: enter the order lines (size, per-piece consumption, quantity, color) in one table; the system totals pieces and fabric per color and overall. Enter available fabric to see if it is enough or short. A saved model optionally fills sizes and consumption.',
 inspSaved:'Inspection saved',dhuShort:'DHU',acBig:'Major Ac',acSmall:'Minor',sampleShort:'Sample',
@@ -575,7 +578,7 @@ function isOwner(){return !!(MEMBER&&MEMBER.role==='owner');}
 function can(p){return isOwner()||!!(MEMBER&&MEMBER.perms&&MEMBER.perms[p]);}
 
 /* ============ State ============ */
-let ME=null,MEMBER=null,TAB='fact',FACT=[],ORDERS=[],INSP=[],ITEMS=[],WSCODE='—',unsub=[],AUTHMODE='login',CUSTDEF=[],WSEQ=null,TOOLCHK=[],WSAQL=null,WSCRIT=0,WSCHK=null,MODELS=[],SIZES=[];
+let ME=null,MEMBER=null,TAB='fact',FACT=[],ORDERS=[],INSP=[],ITEMS=[],WSCODE='—',unsub=[],AUTHMODE='login',CUSTDEF=[],WSEQ=null,TOOLCHK=[],WSAQL=null,WSCRIT=0,WSCHK=null,MODELS=[],SIZELS=[],SM_PROD='';
 
 /* ============ AQL logic ============ */
 const AQLTAB=[[2,20,1,2,2,3],[151,32,2,3,3,4],[281,50,3,4,5,6],[501,80,5,6,7,8],
@@ -635,7 +638,7 @@ function updateWsLabel(){if($('ws-label'))$('ws-label').textContent=(MEMBER.wsNa
 
 /* ============ Listeners ============ */
 function listen(){unsub.forEach(u=>u&&u());unsub=[];const ws=MEMBER.wsId;
-  unsub.push(db.collection('qc_workspaces').doc(ws).onSnapshot(d=>{if(d.exists){ITEMS=d.data().items||[];SIZES=d.data().sizeList||[];WSCODE=d.data().code||'—';WSAQL=d.data().aqlTab||null;WSCRIT=d.data().critMax||0;if($('items-list'))renderItemsManager();if($('ws-code'))$('ws-code').textContent=WSCODE;if($('sizes-list'))renderSizesManager();}},console.error));
+  unsub.push(db.collection('qc_workspaces').doc(ws).onSnapshot(d=>{if(d.exists){ITEMS=d.data().items||[];SIZELS=d.data().sizeLists||((d.data().sizeList&&d.data().sizeList.length)?[{name:'ثوب سعودي',sizes:d.data().sizeList}]:[]);WSCODE=d.data().code||'—';WSAQL=d.data().aqlTab||null;WSCRIT=d.data().critMax||0;if($('items-list'))renderItemsManager();if($('ws-code'))$('ws-code').textContent=WSCODE;if($('sizes-list'))renderSizesManager();if($('mk-product'))renderMkProducts();}},console.error));
   unsub.push(db.collection('qc_factories').where('wsId','==',ws).onSnapshot(s=>{FACT=s.docs.map(d=>({id:d.id,...d.data()}));renderFact();if(TAB==='dash')renderDash();if(TAB==='tools')renderToolFactSelects();},console.error));
   unsub.push(db.collection('qc_orders').where('wsId','==',ws).onSnapshot(s=>{ORDERS=s.docs.map(d=>({id:d.id,...d.data()}));renderOrders();if(TAB==='dash')renderDash();},console.error));
   unsub.push(db.collection('qc_inspections').where('wsId','==',ws).onSnapshot(s=>{INSP=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));renderInsp();renderDash();},console.error));
@@ -1160,12 +1163,17 @@ function onMkUnitChange(){const nu=$('mk-unit').value,ou=MK_UNIT;
     ['mk-avail','mk-mklen'].forEach(id=>{const e=$(id);if(e&&e.value)e.value=Math.round(+e.value*f*100)/100;});
     document.querySelectorAll('.mkr-cons').forEach(el=>{if(el.value)el.value=Math.round(+el.value*f*1000)/1000;});}
   MK_UNIT=nu;calcMK();}
-function renderMkModels(){const el=$('mk-model');if(!el)return;const cur=el.value;
+function renderMkProducts(){const el=$('mk-product');if(!el)return;const cur=el.value;const ns=prodNames();
+  el.innerHTML=ns.length?ns.map(n=>`<option ${n===cur?'selected':''}>${esc(n)}</option>`).join(''):`<option value="">—</option>`;
+  if(cur&&ns.includes(cur))el.value=cur;}
+function loadMkProduct(){$('mk-rows').innerHTML=mkRowHtml();calcMK();}
+function renderMkModels(){renderMkProducts();const el=$('mk-model');if(!el)return;const cur=el.value;
   el.innerHTML=`<option value="">${MODELS.length?t('selectModel'):t('noModels')}</option>`+MODELS.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('');
   if(cur)el.value=cur;if($('mk-rows')&&!$('mk-rows').children.length)addMkRow();
   if($('mk-unit'))MK_UNIT=$('mk-unit').value;}
 function mkModel(){return MODELS.find(x=>x.id===$('mk-model').value);}
-function mkSizeSource(){const shared=sizeList();if(shared.length)return shared;const m=mkModel();return m?(m.sizes||[]):[];}
+function mkSizeSource(){const prod=$('mk-product')?$('mk-product').value:'';
+  const shared=sizeList(prod);if(shared.length)return shared;const m=mkModel();return m?(m.sizes||[]):[];}
 function mkEnter(e,el){if(e.key!=='Enter')return;e.preventDefault();
   const tr=el.closest('tr'),next=tr.nextElementSibling;if(!next)return;
   const cls=[...el.classList].find(c=>c.indexOf('mkr-')===0);
@@ -1192,7 +1200,9 @@ function mkPickCat(sel){const tr=sel.closest('tr'),sz=tr.querySelector('.mkr-siz
 function readMkRowsRaw(){return [...document.querySelectorAll('.mk-row')].map(tr=>({
   size:tr.querySelector('.mkr-size').value.trim(),cons:tr.querySelector('.mkr-cons').value,
   qty:tr.querySelector('.mkr-qty').value,color:tr.querySelector('.mkr-color').value.trim()}));}
-function loadMkModel(){const raw=readMkRowsRaw();
+function loadMkModel(){const m=mkModel();
+  if(m&&m.product&&$('mk-product')&&prodNames().includes(m.product))$('mk-product').value=m.product;
+  const raw=readMkRowsRaw();
   $('mk-rows').innerHTML=(raw.length?raw:[{}]).map(r=>mkRowHtml(r)).join('');calcMK();}
 function readMkRows(){return [...document.querySelectorAll('.mk-row')].map(tr=>({
   size:tr.querySelector('.mkr-size').value.trim(),cons:+tr.querySelector('.mkr-cons').value||0,
@@ -1209,7 +1219,7 @@ function computeMK(quiet){const rows=readMkRows();
     byColor[k].pcs+=x.qty;byColor[k].fabric+=x.qty*x.cons;});
   const colors=Object.values(byColor).map(g=>{const o={color:g.color,pcs:g.pcs,fabric:Math.round(g.fabric*100)/100};
     if(mklen>0){o.plies=Math.ceil(o.fabric/mklen);if(maxply>0)o.spreads=Math.ceil(o.plies/maxply);}return o;});
-  const r={model:mdl?mdl.name:'',unit,mix:rows.map(x=>x.size+'×'+x.qty).join(' · '),pieces,totalFabric,colors,
+  const r={product:($('mk-product')&&$('mk-product').value)||'',model:mdl?mdl.name:'',unit,mix:rows.map(x=>x.size+'×'+x.qty).join(' · '),pieces,totalFabric,colors,
     avail:avail||null,decision:(avail>0&&totalFabric>avail)?'FAIL':'PASS'};
   if(mklen>0){r.mklen=mklen;r.totalPlies=colors.reduce((s,c)=>s+(c.plies||0),0);}
   return r;}
@@ -1225,7 +1235,9 @@ function calcMK(){const r=computeMK(true);if(!r){$('mk-res').innerHTML=`<span cl
   const badge=r.avail!=null?`<div class="big" style="color:${r.decision==='PASS'?'var(--green)':'var(--red)'}">${r.decision==='PASS'?t('passMark'):t('failMark')}</div>`:'';
   $('mk-res').innerHTML=`${badge}<div class="note">${t('totalPieces')}: <b>${r.pieces}</b> · ${t('mkTotalFabric')}: <b>${r.totalFabric} ${u}</b>${plyLine}${availLine}</div>${colTbl}`;}
 function modelsManager(){modal(`<h3>${t('mkManage')}</h3>
-  <label class="inl">${t('sizesListLbl')}</label>
+  <label class="inl">${t('productLbl')}</label>
+  <div id="sizes-prod-bar" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"></div>
+  <label class="inl" style="margin-top:10px">${t('sizesListLbl')}</label>
   <div style="display:flex;gap:8px"><input id="new-size" placeholder="${t('sizePh')}" style="flex:2">
     <input id="new-size-cons" type="number" step="0.01" placeholder="${t('sizeConsPh')}" style="flex:1" onkeydown="if(event.key==='Enter')addSize()">
     <button class="mini" onclick="addSize()">${t('addSizeBtn')}</button></div>
@@ -1239,18 +1251,23 @@ function modelsManager(){modal(`<h3>${t('mkManage')}</h3>
   </div>
   <div id="sizes-list" style="margin-top:8px"></div>
   <label class="inl" style="margin-top:12px">${t('modelsListLbl')}</label>
-  <div id="models-list">${MODELS.length?MODELS.map(m=>`<div class="item" style="margin-bottom:6px"><div class="h"><div><div class="t" style="font-size:14px">${esc(m.name)}</div>
+  <div id="models-list">${MODELS.length?MODELS.map(m=>`<div class="item" style="margin-bottom:6px"><div class="h"><div><div class="t" style="font-size:14px">${esc(m.name)}${m.product?` <span class="note" style="font-weight:400">📦 ${esc(m.product)}</span>`:''}</div>
     <div class="s">${(m.sizes||[]).map(s=>esc(s.size)+': '+s.cons).join(' · ')}</div></div></div>
     <div class="row-btns"><button class="mini g" onclick='modelForm(${esc(JSON.stringify(m)).replace(/'/g,"&#39;")})'>${t('edit')}</button>
     ${can('del')?`<button class="mini r" onclick="delModel('${m.id}')">${t('del')}</button>`:''}</div></div>`).join(''):`<span class="note">${t('noModels')}</span>`}</div>
   <div class="row-btns"><button class="btn" onclick="modelForm()">${t('modelNew')}</button>
   <button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);renderSizesManager();}
-function sizeList(){return (SIZES||[]).map(s=>typeof s==='string'?{size:s,cons:0}:{size:s.size,cons:s.cons||0});}
-function sizeCons(name){const f=sizeList().find(s=>s.size===name);return f?f.cons:0;}
+// قوائم المقاسات حسب المنتج (ثوب، قميص، عباية...) — لكل منتج مقاساته واستهلاكه
+function sizeListsN(){return (SIZELS||[]).map(p=>({name:p.name,sizes:(p.sizes||[]).map(s=>typeof s==='string'?{size:s,cons:0}:{size:s.size,cons:s.cons||0})}));}
+function prodNames(){return sizeListsN().map(p=>p.name);}
+function sizeList(prod){const p=sizeListsN().find(x=>x.name===prod);return p?p.sizes:[];}
+function sizeCons(prod,name){const f=sizeList(prod).find(s=>s.size===name);return f?f.cons:0;}
+function setProdSizes(prod,sizes){const nl=sizeListsN().map(p=>p.name===prod?{name:p.name,sizes}:p);
+  return db.collection('qc_workspaces').doc(MEMBER.wsId).update({sizeLists:nl});}
 // تصنيف القياسات حسب الفئة (M-50 → فئة M) وترتيبها
 const SIZE_ORDER=['XXS','XS','S','M','L','XL','XXL','2XL','3XL','4XL','5XL','6XL','7XL','8XL','9XL','10XL'];
 function sizeGroupKey(n){n=String(n);const i=n.indexOf('-');return (i>0?n.slice(0,i):n).trim();}
-function sizeGroups(list){list=list||sizeList();const g={};
+function sizeGroups(list){list=list||[];const g={};
   list.forEach(s=>{const k=sizeGroupKey(s.size);(g[k]=g[k]||[]).push(s);});
   const keys=Object.keys(g).sort((a,b)=>{const ia=SIZE_ORDER.indexOf(a.toUpperCase()),ib=SIZE_ORDER.indexOf(b.toUpperCase());
     if(ia>=0&&ib>=0)return ia-ib;if(ia>=0)return -1;if(ib>=0)return 1;return a.localeCompare(b,'ar',{numeric:true});});
@@ -1273,7 +1290,15 @@ function sizeCatOptions(src,cat,selected,selCons){const g=sizeGroups(src).find(x
   let html=`<option value="">—</option>`+(g?g.items.map(opt).join(''):'');
   if(selected&&!src.some(s=>s.size===selected))html+=`<option value="${esc(selected)}" data-cons="${selCons||0}" selected>${esc(selected)}</option>`;
   return html;}
-function renderSizesManager(){const el=$('sizes-list');if(!el)return;const list=sizeList();
+function renderSizesManager(){const el=$('sizes-list');if(!el)return;
+  const ps=sizeListsN();if(!ps.some(p=>p.name===SM_PROD))SM_PROD=ps.length?ps[0].name:'';
+  const bar=$('sizes-prod-bar');
+  if(bar)bar.innerHTML=`<select onchange="SM_PROD=this.value;renderSizesManager()" style="flex:1;min-width:110px;padding:8px">${ps.length?ps.map(p=>`<option ${p.name===SM_PROD?'selected':''}>${esc(p.name)}</option>`).join(''):`<option value="">—</option>`}</select>
+    <input id="new-prod" placeholder="${t('productPh')}" style="flex:1;min-width:120px" onkeydown="if(event.key==='Enter')addProduct()">
+    <button class="mini" onclick="addProduct()">${t('addProductBtn')}</button>
+    ${SM_PROD&&can('del')?`<button class="mini r" onclick="delProduct()">🗑</button>`:''}`;
+  if(!SM_PROD){el.innerHTML=`<span class="note">${t('noProducts')}</span>`;return;}
+  const list=sizeList(SM_PROD);
   if(!list.length){el.innerHTML=`<span class="note">${t('noSizes')}</span>`;return;}
   const chip=s=>{const nm=esc(s.size).replace(/'/g,"&#39;");
     return `<span class="chip" style="font-size:13px;padding:4px 8px;margin:0 0 6px 6px;display:inline-flex;align-items:center;gap:5px">${esc(s.size)}
@@ -1285,15 +1310,24 @@ function renderSizesManager(){const el=$('sizes-list');if(!el)return;const list=
       <div style="font-weight:800;font-size:13px;color:#14504f;margin-bottom:4px">${esc(g.label)} <span class="note" style="font-weight:400">(${g.items.length})</span></div>
       ${g.items.map(chip).join('')}</div>`).join('')
     :groups.map(g=>g.items.map(chip).join('')).join('');}
-function addSize(){const name=$('new-size').value.trim();if(!name)return;const cons=+$('new-size-cons').value||0;
-  const nl=sizeList().filter(s=>s.size!==name).concat([{size:name,cons}]);
-  db.collection('qc_workspaces').doc(MEMBER.wsId).update({sizeList:nl}).then(()=>{$('new-size').value='';$('new-size-cons').value='';}).catch(e=>toast(rulesHint(e)));}
-function delSize(name){const nl=sizeList().filter(s=>s.size!==name);
-  db.collection('qc_workspaces').doc(MEMBER.wsId).update({sizeList:nl}).catch(e=>toast(rulesHint(e)));}
+function addProduct(){const name=$('new-prod').value.trim();if(!name)return;
+  const nl=sizeListsN();if(!nl.some(p=>p.name===name))nl.push({name,sizes:[]});
+  SM_PROD=name;
+  db.collection('qc_workspaces').doc(MEMBER.wsId).update({sizeLists:nl}).then(()=>{const e=$('new-prod');if(e)e.value='';renderSizesManager();}).catch(e=>toast(rulesHint(e)));}
+function delProduct(){if(!SM_PROD||!confirm(t('delProductQ')))return;
+  const nl=sizeListsN().filter(p=>p.name!==SM_PROD);SM_PROD='';
+  db.collection('qc_workspaces').doc(MEMBER.wsId).update({sizeLists:nl}).then(()=>renderSizesManager()).catch(e=>toast(rulesHint(e)));}
+function addSize(){const name=$('new-size').value.trim();if(!name)return;
+  if(!SM_PROD)return toast(t('noProducts'));
+  const cons=+$('new-size-cons').value||0;
+  const nl=sizeList(SM_PROD).filter(s=>s.size!==name).concat([{size:name,cons}]);
+  setProdSizes(SM_PROD,nl).then(()=>{$('new-size').value='';$('new-size-cons').value='';}).catch(e=>toast(rulesHint(e)));}
+function delSize(name){if(!SM_PROD)return;
+  setProdSizes(SM_PROD,sizeList(SM_PROD).filter(s=>s.size!==name)).catch(e=>toast(rulesHint(e)));}
 function editSizeCons(name,val){const cons=+normNum(val);
   if(!(cons>0)){renderSizesManager();return toast(t('badSizeRow'));}
-  const nl=sizeList().map(s=>s.size===name?{size:s.size,cons:Math.round(cons*10000)/10000}:s);
-  db.collection('qc_workspaces').doc(MEMBER.wsId).update({sizeList:nl}).then(()=>toast(t('saved'))).catch(e=>toast(rulesHint(e)));}
+  const nl=sizeList(SM_PROD).map(s=>s.size===name?{size:s.size,cons:Math.round(cons*10000)/10000}:s);
+  setProdSizes(SM_PROD,nl).then(()=>toast(t('saved'))).catch(e=>toast(rulesHint(e)));}
 // استيراد المقاسات من إكسيل: لصق (Tab) أو CSV — كل سطر: المقاس ثم الاستهلاك
 function normNum(s){return String(s).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace('٫','.');}
 function parseSizeLines(text){const ok=[];let skipped=0;
@@ -1304,28 +1338,33 @@ function parseSizeLines(text){const ok=[];let skipped=0;
     if(ci<1||!size){skipped++;return;}
     ok.push({size,cons:Math.round(+normNum(toks[ci])*10000)/10000});});
   return {ok,skipped};}
-function importSizes(text){const {ok,skipped}=parseSizeLines(text);
+function importSizes(text){if(!SM_PROD)return toast(t('noProducts'));
+  const {ok,skipped}=parseSizeLines(text);
   if(!ok.length)return toast(t('importNone'));
   const names=new Set(ok.map(s=>s.size));
-  const nl=sizeList().filter(s=>!names.has(s.size));
+  const nl=sizeList(SM_PROD).filter(s=>!names.has(s.size));
   const seen={};ok.forEach(s=>seen[s.size]=s);nl.push(...Object.values(seen));
-  db.collection('qc_workspaces').doc(MEMBER.wsId).update({sizeList:nl}).then(()=>{
+  setProdSizes(SM_PROD,nl).then(()=>{
     $('sizes-paste').value='';toast(tf('importedN',{n:Object.keys(seen).length})+(skipped?tf('importSkipped',{n:skipped}):''));
   }).catch(e=>toast(rulesHint(e)));}
 function importSizesFile(inp){const f=inp.files&&inp.files[0];if(!f)return;
   const rd=new FileReader();rd.onload=()=>{importSizes(rd.result);inp.value='';};rd.readAsText(f);}
-function modelForm(m){m=m||{};
+function modelForm(m){m=m||{};const ns=prodNames();
+  const prod=(m.product&&ns.includes(m.product))?m.product:(SM_PROD&&ns.includes(SM_PROD)?SM_PROD:(ns[0]||''));
   const rows=(m.sizes&&m.sizes.length?m.sizes:[{},{}]);
   modal(`<h3>${m.id?t('edit'):t('modelNew')}</h3>
   <label class="inl">${t('modelName')}</label><input id="md-name" value="${esc(m.name||'')}">
+  ${ns.length?`<label class="inl">${t('productLbl')}</label><select id="md-product" onchange="mdProductChanged()">${ns.map(n=>`<option ${n===prod?'selected':''}>${esc(n)}</option>`).join('')}</select>`:''}
   <label class="inl">${t('modelSizes')}</label>
   <div style="overflow-x:auto"><table class="rtbl" style="min-width:300px" id="md-tbl">
     <tr><th>${t('sizeName')}</th><th>${t('sizeCons')}</th><th></th></tr>
-    <tbody id="md-rows">${rows.map(s=>mdRow(s)).join('')}</tbody></table></div>
+    <tbody id="md-rows">${rows.map(s=>mdRow(s,prod)).join('')}</tbody></table></div>
   <button type="button" class="mini" style="margin-top:6px" onclick="addModelRow()">➕ ${t('sizeAdd')}</button>
   <div class="row-btns"><button class="btn" onclick="saveModel('${m.id||''}')">${t('save')}</button>
   <button class="btn sec" onclick="modelsManager()">${t('cancel')}</button></div>`);}
-function mdRow(s){s=s||{};const list=sizeList();
+function mdProduct(){return $('md-product')?$('md-product').value:'';}
+function mdProductChanged(){$('md-rows').innerHTML=[{},{}].map(s=>mdRow(s,mdProduct())).join('');}
+function mdRow(s,prod){s=s||{};const list=sizeList(prod!==undefined?prod:mdProduct());
   const groups=sizeGroups(list);const cat=s.size?sizeGroupKey(s.size):'';
   const sizeCell=list.length&&groups.length>1
     ?`<div style="display:flex;gap:4px"><select class="md-cat" onchange="mdPickCat(this)" style="min-width:64px;padding:6px">${sizeCatListHtml(list,cat)}</select><select class="md-size" onchange="mdPickSize(this)" style="min-width:80px;padding:6px">${sizeCatOptions(list,cat,s.size,s.cons)}</select></div>`
@@ -1339,9 +1378,9 @@ function mdRow(s){s=s||{};const list=sizeList();
 function mdPickSize(sel){const opt=sel.selectedOptions[0],cons=opt?opt.dataset.cons:'';
   const c=sel.closest('tr').querySelector('.md-cons');if(cons!=null&&cons!=='')c.value=cons;}
 function mdPickCat(sel){const tr=sel.closest('tr'),sz=tr.querySelector('.md-size');
-  sz.innerHTML=sizeCatOptions(sizeList(),sel.value,'',0);
+  sz.innerHTML=sizeCatOptions(sizeList(mdProduct()),sel.value,'',0);
   tr.querySelector('.md-cons').value='';sz.focus();}
-function addModelRow(){$('md-rows').insertAdjacentHTML('beforeend',mdRow());}
+function addModelRow(){$('md-rows').insertAdjacentHTML('beforeend',mdRow({},mdProduct()));}
 function saveModel(id){const name=$('md-name').value.trim();
   const sizes=[];let bad=false;
   document.querySelectorAll('#md-rows tr').forEach(tr=>{
@@ -1352,7 +1391,7 @@ function saveModel(id){const name=$('md-name').value.trim();
     sizes.push({size,cons:+cons});});
   if(!name||!sizes.length)return toast(t('enterModel'));
   if(bad)return toast(t('badSizeRow'));
-  const data={wsId:MEMBER.wsId,name,sizes};
+  const data={wsId:MEMBER.wsId,name,product:mdProduct(),sizes};
   const p=id?db.collection('qc_models').doc(id).update(data):db.collection('qc_models').add({...data,createdAt:FV.serverTimestamp()});
   p.then(()=>{toast(t('saved'));modelsManager();}).catch(e=>toast(rulesHint(e)));}
 function delModel(id){if(!confirm(t('delModelQ')))return;
@@ -1388,7 +1427,7 @@ function toolResultSummary(c){const r=c.result;const mk=d=>d.decision==='PASS'?'
   if(c.type==='fp')return `${r.points} ${t('fpUnit')} (${t('limit')} ${r.lim})`;
   if(c.type==='sh')return `${t('shrLen')} ${r.shrLen}% · ${t('shrWid')} ${r.shrWid}% (${t('limit')} ${r.lim}%)`;
   if(c.type==='aq')return `${t('aqlSample')}: ${r.sample} · ${t('majorLbl')} ${r.maj}/${r.re25} · ${t('minorLbl')} ${r.min}/${r.re40}`;
-  if(c.type==='mk')return `${r.model?esc(r.model)+' · ':''}${t('totalPieces')} ${r.pieces} · ${t('mkTotalFabric')} ${r.totalFabric} ${r.unit||''}`;
+  if(c.type==='mk')return `${r.product?esc(r.product)+' · ':''}${r.model?esc(r.model)+' · ':''}${t('totalPieces')} ${r.pieces} · ${t('mkTotalFabric')} ${r.totalFabric} ${r.unit||''}`;
   return `${t('fpShort')} ${mk(r.fp)} · ${t('shShort')} ${mk(r.sh)} · AQL ${mk(r.aq)}`;}
 function renderToolChk(){const el=$('toolchk-list');if(!el)return;if(!TOOLCHK.length){el.innerHTML=empty(t('noToolChk'));return;}
   const bar=`<div style="display:flex;gap:8px;margin-bottom:10px"><button class="mini g" onclick="exportToolChk()">${t('exportCsv')}</button></div>`;
@@ -1416,7 +1455,7 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
   else if(c.type==='sh')rows=shRows(r);
   else if(c.type==='aq')rows=aqRows(r);
   else if(c.type==='mk'){const u=r.unit||t('mUnit');const sp=r.mklen!=null;
-    rows=(r.model?row(t('mkModelLbl'),r.model):'')+rowH(t('mkCounts'),sizeChips(r.mix))+row(t('totalPieces'),r.pieces)
+    rows=(r.product?row(t('productLbl'),r.product):'')+(r.model?row(t('mkModelLbl'),r.model):'')+rowH(t('mkCounts'),sizeChips(r.mix))+row(t('totalPieces'),r.pieces)
       +row(t('mkTotalFabric'),r.totalFabric+' '+u)+(sp?row(t('mkMkLen'),r.mklen+' '+u)+row(t('mkTotalPlies'),r.totalPlies+' '+t('plyUnit')):'')+(r.avail!=null?row(t('mkAvail'),r.avail+' '+u):'');
     const multi=r.colors&&(r.colors.length>1||(r.colors.length===1&&r.colors[0].color!=='—'));
     if(multi){rows+=`<tr><td colspan="2" style="padding:0"><table style="width:100%;border-collapse:collapse" border="1" cellpadding="6">
