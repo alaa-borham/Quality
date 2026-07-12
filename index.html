@@ -1166,9 +1166,11 @@ function onMkUnitChange(){const nu=$('mk-unit').value,ou=MK_UNIT;
 function renderMkProducts(){const el=$('mk-product');if(!el)return;const cur=el.value;const ns=prodNames();
   el.innerHTML=ns.length?ns.map(n=>`<option ${n===cur?'selected':''}>${esc(n)}</option>`).join(''):`<option value="">—</option>`;
   if(cur&&ns.includes(cur))el.value=cur;}
-function loadMkProduct(){$('mk-rows').innerHTML=mkRowHtml();calcMK();}
+function loadMkProduct(){renderMkModels();$('mk-rows').innerHTML=mkRowHtml();calcMK();}
 function renderMkModels(){renderMkProducts();const el=$('mk-model');if(!el)return;const cur=el.value;
-  el.innerHTML=`<option value="">${MODELS.length?t('selectModel'):t('noModels')}</option>`+MODELS.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('');
+  const prod=$('mk-product')?$('mk-product').value:'';
+  const list=MODELS.filter(m=>!prod||!m.product||m.product===prod);
+  el.innerHTML=`<option value="">${list.length?t('selectModel'):t('noModels')}</option>`+list.map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('');
   if(cur)el.value=cur;if($('mk-rows')&&!$('mk-rows').children.length)addMkRow();
   if($('mk-unit'))MK_UNIT=$('mk-unit').value;}
 function mkModel(){return MODELS.find(x=>x.id===$('mk-model').value);}
@@ -1201,7 +1203,8 @@ function readMkRowsRaw(){return [...document.querySelectorAll('.mk-row')].map(tr
   size:tr.querySelector('.mkr-size').value.trim(),cons:tr.querySelector('.mkr-cons').value,
   qty:tr.querySelector('.mkr-qty').value,color:tr.querySelector('.mkr-color').value.trim()}));}
 function loadMkModel(){const m=mkModel();
-  if(m&&m.product&&$('mk-product')&&prodNames().includes(m.product))$('mk-product').value=m.product;
+  if(m&&m.product&&$('mk-product')&&prodNames().includes(m.product)&&$('mk-product').value!==m.product){
+    $('mk-product').value=m.product;renderMkModels();$('mk-model').value=m.id;}
   const raw=readMkRowsRaw();
   $('mk-rows').innerHTML=(raw.length?raw:[{}]).map(r=>mkRowHtml(r)).join('');calcMK();}
 function readMkRows(){return [...document.querySelectorAll('.mk-row')].map(tr=>({
