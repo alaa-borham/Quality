@@ -1171,7 +1171,10 @@ function mkEnter(e,el){if(e.key!=='Enter')return;e.preventDefault();
   const cls=[...el.classList].find(c=>c.indexOf('mkr-')===0);
   const tgt=next.querySelector('.'+cls);if(tgt){tgt.focus();if(tgt.select)tgt.select();}}
 function mkRowHtml(r){r=r||{};const src=mkSizeSource();const locked=src.length>0;const ke='onkeydown="mkEnter(event,this)"';
-  const sizeCell=locked
+  const groups=sizeGroups(src);const cat=r.size?sizeGroupKey(r.size):'';
+  const sizeCell=locked&&groups.length>1
+    ?`<div style="display:flex;gap:4px"><select class="mkr-cat" onchange="mkPickCat(this)" ${ke} style="min-width:60px;padding:6px">${sizeCatListHtml(src,cat)}</select><select class="mkr-size" onchange="mkPickSize(this)" ${ke} style="min-width:72px;padding:6px">${sizeCatOptions(src,cat,r.size,r.cons)}</select></div>`
+    :locked
     ?`<select class="mkr-size" onchange="mkPickSize(this)" ${ke} style="min-width:80px;padding:6px"><option value="">—</option>${sizeOptionsHtml(src,r.size,r.cons)}</select>`
     :`<input class="mkr-size" value="${esc(r.size||'')}" placeholder="L" ${ke} style="min-width:64px;padding:6px">`;
   return `<tr class="mk-row">
@@ -1183,6 +1186,9 @@ function mkRowHtml(r){r=r||{};const src=mkSizeSource();const locked=src.length>0
 function addMkRow(r){$('mk-rows').insertAdjacentHTML('beforeend',mkRowHtml(r));}
 function mkPickSize(sel){const opt=sel.selectedOptions[0],cons=opt?opt.dataset.cons:'';
   if(cons)sel.closest('tr').querySelector('.mkr-cons').value=cons;calcMK();}
+function mkPickCat(sel){const tr=sel.closest('tr'),sz=tr.querySelector('.mkr-size');
+  sz.innerHTML=sizeCatOptions(mkSizeSource(),sel.value,'',0);
+  tr.querySelector('.mkr-cons').value='';sz.focus();calcMK();}
 function readMkRowsRaw(){return [...document.querySelectorAll('.mk-row')].map(tr=>({
   size:tr.querySelector('.mkr-size').value.trim(),cons:tr.querySelector('.mkr-cons').value,
   qty:tr.querySelector('.mkr-qty').value,color:tr.querySelector('.mkr-color').value.trim()}));}
@@ -1258,6 +1264,15 @@ function sizeOptionsHtml(src,selected,selCons){const groups=sizeGroups(src);
     :groups.map(gr=>gr.items.map(opt).join('')).join('');
   if(selected&&!src.some(s=>s.size===selected))html+=`<option value="${esc(selected)}" data-cons="${selCons||0}" selected>${esc(selected)}</option>`;
   return html;}
+// اختيار على خطوتين: قائمة الفئة ثم قائمة قياسات الفئة فقط (سكرول قصير)
+function sizeCatListHtml(src,cat){const groups=sizeGroups(src);
+  return `<option value="">—</option>`+groups.map(g=>`<option ${cat===g.label?'selected':''}>${esc(g.label)}</option>`).join('')
+    +((cat&&!groups.some(g=>g.label===cat))?`<option selected>${esc(cat)}</option>`:'');}
+function sizeCatOptions(src,cat,selected,selCons){const g=sizeGroups(src).find(x=>x.label===cat);
+  const opt=s=>`<option value="${esc(s.size)}" data-cons="${s.cons}" ${selected===s.size?'selected':''}>${esc(s.size)}</option>`;
+  let html=`<option value="">—</option>`+(g?g.items.map(opt).join(''):'');
+  if(selected&&!src.some(s=>s.size===selected))html+=`<option value="${esc(selected)}" data-cons="${selCons||0}" selected>${esc(selected)}</option>`;
+  return html;}
 function renderSizesManager(){const el=$('sizes-list');if(!el)return;const list=sizeList();
   if(!list.length){el.innerHTML=`<span class="note">${t('noSizes')}</span>`;return;}
   const chip=s=>`<span class="chip" style="font-size:13px;padding:5px 10px;margin:0 0 6px 6px;display:inline-flex;align-items:center;gap:6px">${esc(s.size)}${s.cons?': '+s.cons:''}
@@ -1305,7 +1320,10 @@ function modelForm(m){m=m||{};
   <div class="row-btns"><button class="btn" onclick="saveModel('${m.id||''}')">${t('save')}</button>
   <button class="btn sec" onclick="modelsManager()">${t('cancel')}</button></div>`);}
 function mdRow(s){s=s||{};const list=sizeList();
-  const sizeCell=list.length
+  const groups=sizeGroups(list);const cat=s.size?sizeGroupKey(s.size):'';
+  const sizeCell=list.length&&groups.length>1
+    ?`<div style="display:flex;gap:4px"><select class="md-cat" onchange="mdPickCat(this)" style="min-width:64px;padding:6px">${sizeCatListHtml(list,cat)}</select><select class="md-size" onchange="mdPickSize(this)" style="min-width:80px;padding:6px">${sizeCatOptions(list,cat,s.size,s.cons)}</select></div>`
+    :list.length
     ?`<select class="md-size" onchange="mdPickSize(this)" style="min-width:90px;padding:6px"><option value="">—</option>${sizeOptionsHtml(list,s.size,s.cons)}</select>`
     :`<input class="md-size" value="${esc(s.size||'')}" placeholder="L" style="min-width:90px;padding:6px">`;
   return `<tr>
@@ -1314,6 +1332,9 @@ function mdRow(s){s=s||{};const list=sizeList();
   <td><button type="button" class="mini r" onclick="this.closest('tr').remove()">✕</button></td></tr>`;}
 function mdPickSize(sel){const opt=sel.selectedOptions[0],cons=opt?opt.dataset.cons:'';
   const c=sel.closest('tr').querySelector('.md-cons');if(cons!=null&&cons!=='')c.value=cons;}
+function mdPickCat(sel){const tr=sel.closest('tr'),sz=tr.querySelector('.md-size');
+  sz.innerHTML=sizeCatOptions(sizeList(),sel.value,'',0);
+  tr.querySelector('.md-cons').value='';sz.focus();}
 function addModelRow(){$('md-rows').insertAdjacentHTML('beforeend',mdRow());}
 function saveModel(id){const name=$('md-name').value.trim();
   const sizes=[];let bad=false;
