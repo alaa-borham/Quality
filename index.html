@@ -132,13 +132,11 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
   <div class="auth-card">
     <button class="langbtn" onclick="toggleLang()">🌐 <span id="lang-name">EN</span></button>
     <div class="brand"><div class="logo">🧵</div><h1 data-i18n="appTitle">نظام متابعة الجودة</h1><p>QC Tracking · الشياكة</p></div>
-    <div class="tabs"><button id="tb-login" class="on" onclick="authTab('login')" data-i18n="login">تسجيل الدخول</button>
-      <button id="tb-signup" onclick="authTab('signup')" data-i18n="signup">حساب جديد</button></div>
     <div id="auth-msg"></div>
-    <div class="field"><label id="a-email-lbl" data-i18n="email">البريد الإلكتروني</label><input id="a-email" type="text" autocomplete="username" placeholder="you@example.com"></div>
-    <div class="field"><label data-i18n="password">كلمة المرور</label><input id="a-pass" type="password" autocomplete="current-password" placeholder="••••••"></div>
-    <div class="field" id="a-name-f"><label data-i18n="name">الاسم</label><input id="a-name" data-i18n-ph="namePh" placeholder="اسمك الكامل"></div>
-    <button class="btn" id="a-btn" onclick="doAuth()">دخول</button>
+    <div class="field"><label id="a-email-lbl" data-i18n="loginIdLbl">البريد الإلكتروني أو اسم المستخدم</label><input id="a-email" type="text" autocomplete="username" data-i18n-ph="loginIdPh" placeholder="you@example.com أو اسم المستخدم"></div>
+    <div class="field"><label data-i18n="password">كلمة المرور</label><input id="a-pass" type="password" autocomplete="current-password" placeholder="••••••" onkeydown="if(event.key==='Enter')doAuth()"></div>
+    <div class="field hide" id="a-name-f"><label data-i18n="name">الاسم</label><input id="a-name" data-i18n-ph="namePh" placeholder="اسمك الكامل"></div>
+    <button class="btn" id="a-btn" onclick="doAuth()" data-i18n="loginBtn">دخول</button>
     <div id="a-forgot" style="text-align:center;margin-top:12px">
       <a onclick="resetPass()" style="color:var(--teal);cursor:pointer;font-size:13px;font-weight:600" data-i18n="forgot">نسيت كلمة المرور؟</a>
     </div>
