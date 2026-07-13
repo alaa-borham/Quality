@@ -64,53 +64,66 @@ service cloud.firestore {
       return qcIsMember()
         && get(/databases/$(database)/documents/qc_members/$(request.auth.uid)).data.role == 'owner';
     }
+    // السوبر أدمن لنظام الجودة: تحكم كامل في كل مساحات العمل
+    function qcIsAdmin() {
+      return request.auth != null && request.auth.uid == 'I2Stgz5hPVM6qeG19NCmgj4GCck1';
+    }
     match /qc_members/{uid} {
+      allow read, write: if qcIsAdmin();
       allow read:  if request.auth != null;
       allow create, update, delete: if request.auth != null && request.auth.uid == uid;
       allow update, delete: if qcIsOwner() && resource.data.wsId == qcWs();
     }
     match /qc_workspaces/{wsId} {
+      allow read, write: if qcIsAdmin();
       allow read:   if request.auth != null;
-      allow create: if request.auth != null && request.resource.data.ownerUid == request.auth.uid;
-      allow update, delete: if request.auth != null && resource.data.ownerUid == request.auth.uid;
+      allow update: if request.auth != null && resource.data.ownerUid == request.auth.uid;
     }
     // إدارة المصانع للمالك فقط — والحذف عموماً للمالك فقط
     match /qc_factories/{id} {
+      allow read, write: if qcIsAdmin();
       allow read:   if qcIsMember() && resource.data.wsId == qcWs();
       allow create: if qcIsOwner() && request.resource.data.wsId == qcWs();
       allow update, delete: if qcIsOwner() && resource.data.wsId == qcWs();
     }
     match /qc_orders/{id} {
+      allow read, write: if qcIsAdmin();
       allow read:   if qcIsMember() && resource.data.wsId == qcWs();
       allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
       allow update: if qcIsMember() && resource.data.wsId == qcWs();
       allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
     }
     match /qc_inspections/{id} {
+      allow read, write: if qcIsAdmin();
       allow read:   if qcIsMember() && resource.data.wsId == qcWs();
       allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
       allow update: if qcIsMember() && resource.data.wsId == qcWs();
       allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
     }
     match /qc_defects/{id} {
+      allow read, write: if qcIsAdmin();
       allow read:   if qcIsMember() && resource.data.wsId == qcWs();
       allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
       allow update: if qcIsMember() && resource.data.wsId == qcWs();
       allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
     }
     match /qc_models/{id} {
+      allow read, write: if qcIsAdmin();
       allow read:   if qcIsMember() && resource.data.wsId == qcWs();
       allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
       allow update: if qcIsMember() && resource.data.wsId == qcWs();
       allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
     }
     match /qc_seqcfg/{wsId} {
+      allow read, write: if qcIsAdmin();
       allow read, write: if qcIsMember() && wsId == qcWs();
     }
     match /qc_chkcfg/{wsId} {
+      allow read, write: if qcIsAdmin();
       allow read, write: if qcIsMember() && wsId == qcWs();
     }
     match /qc_toolchecks/{id} {
+      allow read, write: if qcIsAdmin();
       allow read:   if qcIsMember() && resource.data.wsId == qcWs();
       allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
       allow update: if qcIsMember() && resource.data.wsId == qcWs();

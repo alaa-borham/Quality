@@ -342,7 +342,9 @@ kTotal:'إجمالي الفحوصات',kDhu:'متوسط DHU',kRft:'نسبة ال
 pass:'مقبول',fail:'مرفوض',passMark:'مقبول ✔',failMark:'مرفوض ✘',noData:'لا بيانات بعد',
 settings:'الإعدادات',yourName:'اسمك',wsNameSet:'اسم مساحة العمل',save:'حفظ',inviteCode:'كود دعوة مساحة العمل (شاركه مع المفتشين)',close:'إغلاق',
 itemsTitle:'الأصناف (ضبط مسبق)',addItemBtn:'أضف',itemPh:'مثال: ثوب',selectItemPh:'— اختر صنفاً —',noItemsHint:'لا أصناف بعد — أضِفها من الإعدادات ☰',itemAdded:'تمت الإضافة',
-roleOwner:'مالك',roleInspector:'مفتش',
+roleOwner:'مالك',roleInspector:'مفتش',roleAdmin:'سوبر أدمن',
+adminTitle:'لوحة السوبر أدمن',adminNewWs:'إنشاء مساحة عمل جديدة',adminWsList:'كل مساحات العمل',adminEnter:'دخول',adminCurrent:'الحالية',adminEntered:'دخلت مساحة: {w}',
+adminOnlyWs:'إنشاء مساحات العمل يتم عن طريق إدارة النظام فقط — انضم بكود مساحتك',delWsQ:'حذف مساحة «{w}» وكل بياناتها (طلبيات، فحوصات، موديلات، أعضاء) نهائياً؟',delWsQ2:'تأكيد أخير: الحذف نهائي ولا يمكن التراجع عنه!',
 factNew:'مصنع جديد',factEdit:'تعديل مصنع',factNameLbl:'اسم المصنع/المورد *',countryLbl:'الدولة',contactLbl:'جهة الاتصال',
 cancel:'إلغاء',saved:'تم الحفظ',deleted:'تم الحذف',enterFactName:'أدخل اسم المصنع',delFactQ:'حذف المصنع؟',
 noFact:'لا توجد مصانع. أضف أول مصنع بزر ＋',edit:'تعديل',del:'حذف',
@@ -464,7 +466,9 @@ kTotal:'Total inspections',kDhu:'Avg DHU',kRft:'Pass rate',kOrders:'Orders',
 pass:'Pass',fail:'Fail',passMark:'Pass ✔',failMark:'Fail ✘',noData:'No data yet',
 settings:'Settings',yourName:'Your name',wsNameSet:'Workspace name',save:'Save',inviteCode:'Workspace invite code (share with inspectors)',close:'Close',
 itemsTitle:'Items (preset)',addItemBtn:'Add',itemPh:'e.g. Thobe',selectItemPh:'— select item —',noItemsHint:'No items yet — add them in Settings ☰',itemAdded:'Added',
-roleOwner:'Owner',roleInspector:'Inspector',
+roleOwner:'Owner',roleInspector:'Inspector',roleAdmin:'Super admin',
+adminTitle:'Super admin panel',adminNewWs:'Create new workspace',adminWsList:'All workspaces',adminEnter:'Enter',adminCurrent:'current',adminEntered:'Entered workspace: {w}',
+adminOnlyWs:'Workspaces are created by the system admin only — join with your workspace code',delWsQ:'Delete workspace “{w}” and ALL its data (orders, inspections, models, members) permanently?',delWsQ2:'Final confirmation: this cannot be undone!',
 factNew:'New factory',factEdit:'Edit factory',factNameLbl:'Factory / supplier name *',countryLbl:'Country',contactLbl:'Contact',
 cancel:'Cancel',saved:'Saved',deleted:'Deleted',enterFactName:'Enter factory name',delFactQ:'Delete factory?',
 noFact:'No factories yet. Add one with ＋',edit:'Edit',del:'Delete',
@@ -586,8 +590,10 @@ const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 function fmtDate(d){if(!d)return'';const x=d.toDate?d.toDate():new Date(d);return x.toLocaleDateString(LANG==='ar'?'ar-EG':'en-GB',{day:'2-digit',month:'2-digit',year:'numeric'});}
 function today(){return new Date().toISOString().slice(0,10);}
-function roleTxt(){return MEMBER.role==='owner'?t('roleOwner'):t('roleInspector');}
-function isOwner(){return !!(MEMBER&&MEMBER.role==='owner');}
+const QC_ADMIN_UID='I2Stgz5hPVM6qeG19NCmgj4GCck1';
+function isQcAdmin(){return !!(ME&&ME.uid===QC_ADMIN_UID);}
+function roleTxt(){return isQcAdmin()?t('roleAdmin'):MEMBER.role==='owner'?t('roleOwner'):t('roleInspector');}
+function isOwner(){return isQcAdmin()||!!(MEMBER&&MEMBER.role==='owner');}
 function can(p){return isOwner()||!!(MEMBER&&MEMBER.perms&&MEMBER.perms[p]);}
 
 /* ============ State ============ */
@@ -628,7 +634,8 @@ function resetPass(){const e=$('a-email').value.trim();if(!e)return authMsg(t('e
 function obTab(m){$('tb-create').classList.toggle('on',m==='create');$('tb-join').classList.toggle('on',m==='join');
   $('ob-create').classList.toggle('hide',m!=='create');$('ob-join').classList.toggle('hide',m!=='join');$('ob-msg').innerHTML='';}
 function obMsg(txt,ok){$('ob-msg').innerHTML=`<div class="msg ${ok?'ok':'err'}">${esc(txt)}</div>`;}
-function createWs(){const name=$('ob-wsname').value.trim();if(!name)return obMsg(t('enterWsName2'));
+function createWs(){if(!isQcAdmin())return obMsg(t('adminOnlyWs'));
+  const name=$('ob-wsname').value.trim();if(!name)return obMsg(t('enterWsName2'));
   const code='QC-'+Math.floor(1000+Math.random()*9000);const ref=db.collection('qc_workspaces').doc();
   ref.set({name,code,ownerUid:ME.uid,createdAt:FV.serverTimestamp()}).then(()=>
     db.collection('qc_members').doc(ME.uid).set({wsId:ref.id,wsName:name,name:ME.displayName||'',email:ME.email,role:'owner',createdAt:FV.serverTimestamp()})
@@ -644,8 +651,12 @@ function rulesHint(e){console.error(e);return (e&&e.code==='permission-denied')?
 /* ============ BOOT ============ */
 auth.onAuthStateChanged(u=>{ME=u;if(!u){show('auth');return;}boot();});
 function boot(){db.collection('qc_members').doc(ME.uid).get().then(d=>{
-  if(!d.exists){show('onboard');return;}MEMBER=d.data();updateWsLabel();show('app');listen();applyI18n();
-}).catch(e=>{show('onboard');obMsg(rulesHint(e));});}
+  if(!d.exists){show('onboard');obGate();return;}MEMBER=d.data();updateWsLabel();show('app');listen();applyI18n();
+}).catch(e=>{show('onboard');obGate();obMsg(rulesHint(e));});}
+// إنشاء المساحات للسوبر أدمن فقط — غير الأدمن يرى الانضمام بكود فقط
+function obGate(){const adm=isQcAdmin();
+  if($('tb-create'))$('tb-create').style.display=adm?'':'none';
+  if(!adm)obTab('join');}
 function show(s){['auth','onboard','app'].forEach(x=>$('s-'+x).classList.toggle('hide',x!==s));}
 function updateWsLabel(){if($('ws-label'))$('ws-label').textContent=(MEMBER.wsName||'')+' · '+roleTxt();}
 
@@ -675,8 +686,9 @@ const NAV_TITLE={fact:'navFact',orders:'navOrders',insp:'navInsp',dash:'navDash'
 function navInfo(id,e){e.preventDefault();modal(`<h3>${esc(t(NAV_TITLE[id]))}</h3>
   <p style="line-height:1.7;color:var(--mut)">${esc(t('navDesc'+id))}</p>
   <div class="row-btns"><button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);return false;}
-function openMenu(){const owner=MEMBER.role==='owner';modal(`<h3>${t('settings')}</h3>
+function openMenu(){const owner=isOwner();modal(`<h3>${t('settings')}</h3>
   <div class="item"><div class="s">${esc(ME.email)} · ${roleTxt()}</div></div>
+  ${isQcAdmin()?`<button class="btn" style="margin-top:8px" onclick="adminPanel()">🛡 ${t('adminTitle')}</button>`:''}
   <label class="inl">${t('yourName')}</label>
   <div style="display:flex;gap:8px"><input id="set-name" value="${esc(MEMBER.name||'')}" placeholder="${t('namePh')}">
     <button class="mini" onclick="saveMyName()">${t('save')}</button></div>
@@ -706,6 +718,39 @@ function openMenu(){const owner=MEMBER.role==='owner';modal(`<h3>${t('settings')
   <button class="btn red" style="margin-top:12px" onclick="logout();closeModal()">${t('logout')}</button>
   <button class="btn sec" style="margin-top:8px" onclick="closeModal()">${t('close')}</button>`);
   if(owner){renderItemsManager();renderEmps();}}
+/* ============ Super Admin ============ */
+function adminPanel(){if(!isQcAdmin())return;
+  db.collection('qc_workspaces').get().then(qs=>{
+    const list=qs.docs.map(d=>({id:d.id,...d.data()}));
+    modal(`<h3>🛡 ${t('adminTitle')}</h3>
+    <label class="inl">${t('adminNewWs')}</label>
+    <div style="display:flex;gap:8px"><input id="adm-wsname" placeholder="${t('wsNamePh')}" onkeydown="if(event.key==='Enter')adminCreateWs()">
+      <button class="mini" onclick="adminCreateWs()">${t('createBtn')}</button></div>
+    <label class="inl" style="margin-top:10px">${t('adminWsList')}</label>
+    <div>${list.map(w=>`<div class="item" style="margin-bottom:6px"><div class="h"><div><div class="t" style="font-size:14px">${esc(w.name||'—')}</div>
+      <div class="s">${t('codeLbl')}: <b>${esc(w.code||'—')}</b>${MEMBER&&w.id===MEMBER.wsId?' · <b style="color:var(--teal)">✓ '+t('adminCurrent')+'</b>':''}</div></div></div>
+      <div class="row-btns">${MEMBER&&w.id===MEMBER.wsId?'':`<button class="mini g" onclick="adminEnterWs('${w.id}')">${t('adminEnter')}</button>`}
+      <button class="mini r" onclick="adminDelWs('${w.id}','${esc(w.name||'').replace(/'/g,"&#39;")}')">${t('del')}</button></div></div>`).join('')||`<span class="note">${t('noWs')}</span>`}</div>
+    <button class="btn sec" style="margin-top:8px" onclick="closeModal()">${t('close')}</button>`);
+  }).catch(e=>toast(rulesHint(e)));}
+function adminEnterWs(id){if(!isQcAdmin())return;
+  db.collection('qc_workspaces').doc(id).get().then(d=>{if(!d.exists)return toast(t('noWs'));
+    MEMBER={...(MEMBER||{}),wsId:id,wsName:d.data().name||'',role:'owner',name:(MEMBER&&MEMBER.name)||ME.displayName||'Admin'};
+    closeModal();updateWsLabel();show('app');listen();go('fact',navBtn('fact'));
+    toast(tf('adminEntered',{w:d.data().name||''}));}).catch(e=>toast(rulesHint(e)));}
+function adminCreateWs(){if(!isQcAdmin())return;const name=$('adm-wsname').value.trim();if(!name)return;
+  const code='QC-'+Math.floor(1000+Math.random()*9000);const ref=db.collection('qc_workspaces').doc();
+  ref.set({name,code,ownerUid:ME.uid,createdAt:FV.serverTimestamp()})
+    .then(()=>{toast(tf('wsCreated',{c:code}));adminPanel();}).catch(e=>toast(rulesHint(e)));}
+function adminDelWs(id,name){if(!isQcAdmin())return;
+  if(!confirm(tf('delWsQ',{w:name})))return;if(!confirm(t('delWsQ2')))return;
+  const jobs=BK_WSCOLS.concat(['qc_members']).map(col=>db.collection(col).where('wsId','==',id).get()
+    .then(qs=>Promise.all(qs.docs.map(d=>d.ref.delete()))));
+  jobs.push(db.collection('qc_seqcfg').doc(id).delete().catch(()=>{}));
+  jobs.push(db.collection('qc_chkcfg').doc(id).delete().catch(()=>{}));
+  Promise.all(jobs).then(()=>db.collection('qc_workspaces').doc(id).delete())
+    .then(()=>{toast(t('deleted'));adminPanel();}).catch(e=>toast(rulesHint(e)));}
+
 const BK_WSCOLS=['qc_factories','qc_orders','qc_inspections','qc_defects','qc_models','qc_toolchecks'];
 const BK_DOCS=['qc_seqcfg','qc_chkcfg'];
 function exportBackup(){if(!isOwner())return;toast(t('backupWorking'));
