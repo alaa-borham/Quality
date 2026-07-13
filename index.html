@@ -323,7 +323,7 @@ const FV=firebase.firestore.FieldValue;
 const L={ar:{
 appTitle:'نظام متابعة الجودة',login:'تسجيل الدخول',signup:'حساب جديد',email:'البريد الإلكتروني',password:'كلمة المرور',
 name:'الاسم',namePh:'اسمك الكامل',loginBtn:'دخول',createAccBtn:'إنشاء الحساب',forgot:'نسيت كلمة المرور؟',
-wsTitle:'مساحة العمل',wsSub:'أنشئ مساحة جديدة أو انضم بكود',createTab:'إنشاء مساحة',joinTab:'انضمام بكود',
+wsTitle:'مساحة العمل',wsSub:'أنشئ مساحة جديدة أو انضم بكود',wsSubJoin:'انضم بكود مساحة العمل الذي يعطيك إياه مدير النظام',createTab:'إنشاء مساحة',joinTab:'انضمام بكود',
 wsNameLbl:'اسم مساحة العمل (الشركة/القسم)',wsNamePh:'مثال: جودة الشياكة',createBtn:'إنشاء',codeLbl:'كود مساحة العمل',joinBtn:'انضمام',logout:'تسجيل الخروج',
 appName:'متابعة الجودة',navDash:'المؤشرات',navInsp:'الفحوصات',inspProd:'فحوصات الإنتاج',navOrders:'الطلبيات',navFact:'المصانع',navTools:'الأدوات',navMarker:'الماركر',navRef:'المراجع',navToolChk:'سجل فحص القماش',
 navDescmarker:'حاسبة الماركر والاستهلاك: تدخل بيانات الأوردر (المقاس · الاستهلاك · الكمية · اللون) فتحسب إجمالي القطع والقماش وعدد الطبقات لكل لون. مكان مستقل ستُضاف بجانبه لاحقاً حاسبة الإنتاج الكمي.',
@@ -447,7 +447,7 @@ e_email:'بريد غير صحيح',e_nouser:'المستخدم غير موجود'
 },en:{
 appTitle:'QC Tracking System',login:'Login',signup:'Sign up',email:'Email',password:'Password',
 name:'Name',namePh:'Your full name',loginBtn:'Login',createAccBtn:'Create account',forgot:'Forgot password?',
-wsTitle:'Workspace',wsSub:'Create a new workspace or join by code',createTab:'Create',joinTab:'Join by code',
+wsTitle:'Workspace',wsSub:'Create a new workspace or join by code',wsSubJoin:'Join with the workspace code given to you by the system admin',createTab:'Create',joinTab:'Join by code',
 wsNameLbl:'Workspace name (company/dept)',wsNamePh:'e.g. Shiaka QC',createBtn:'Create',codeLbl:'Workspace code',joinBtn:'Join',logout:'Sign out',
 appName:'QC Tracking',navDash:'Dashboard',navInsp:'Inspections',inspProd:'Production inspections',navOrders:'Orders',navFact:'Factories',navTools:'Tools',navMarker:'Marker',navRef:'Reference',navToolChk:'Fabric Test Log',
 navDescmarker:'Marker & consumption calculator: enter the order lines (size, consumption, quantity, color) to get total pieces, fabric, and plies per color. A standalone place where a bulk-production calculator will be added later.',
@@ -656,6 +656,8 @@ function boot(){db.collection('qc_members').doc(ME.uid).get().then(d=>{
 // إنشاء المساحات للسوبر أدمن فقط — غير الأدمن يرى الانضمام بكود فقط
 function obGate(){const adm=isQcAdmin();
   if($('tb-create'))$('tb-create').style.display=adm?'':'none';
+  const sub=document.querySelector('#s-onboard [data-i18n="wsSub"]');
+  if(sub&&!adm)sub.textContent=t('wsSubJoin');
   if(!adm)obTab('join');}
 function show(s){['auth','onboard','app'].forEach(x=>$('s-'+x).classList.toggle('hide',x!==s));}
 function updateWsLabel(){if($('ws-label'))$('ws-label').textContent=(MEMBER.wsName||'')+' · '+roleTxt();}
