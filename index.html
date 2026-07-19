@@ -120,6 +120,18 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
   #print-area,#print-area *{visibility:visible}
   #print-area{display:block;position:absolute;inset:0;padding:0 6mm}
 }
+/* الريشو — تصميم مطابق للإكسيل */
+.xtbl{width:100%;border-collapse:collapse;font-size:13px}
+.xtbl th,.xtbl td{border:1px solid #9db8b8;padding:6px;text-align:center;vertical-align:middle}
+.xtbl th{background:#ffc000;color:#1c1c1c;font-weight:800;white-space:nowrap}
+.xtbl th.or{background:#f0a13c}
+.xtbl tr.tot td{background:#17696b;color:#fff;font-weight:800}
+.xtbl .red{color:#c00000;font-weight:800}
+.xtbl input,.xtbl select{font-family:inherit;font-size:13px}
+.xsum{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:6px;margin:10px 0}
+.xsum>div{display:flex;border-radius:8px;overflow:hidden;border:1px solid #d8c27a}
+.xsum .lbl{background:#ffc000;padding:8px 10px;font-weight:800;flex:1;min-width:110px;font-size:13px}
+.xsum .val{background:#fdf6e3;padding:8px 12px;font-weight:800;min-width:72px;text-align:center;display:flex;align-items:center;justify-content:center}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -300,15 +312,21 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <div><label class="inl" data-i18n="rsMaxPcs">أقصى عدد قطع في الماركر</label><input id="rs-maxpcs" type="number" value="5" oninput="rsCalc()"></div></div>
         <div id="rs-summary" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0"></div>
         <label class="inl" data-i18n="rsQtyTbl">جدول الكميات المطلوبة</label>
-        <div style="overflow-x:auto"><table class="rtbl" style="min-width:460px">
-          <tr><th data-i18n="sizeName">المقاس</th><th data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="sizeCons">استهلاك القطعة</th><th data-i18n="rsRatio">النسبة</th><th data-i18n="rsQtyCons">استهلاك الكمية</th><th></th></tr>
+        <div style="overflow-x:auto"><table class="xtbl" style="min-width:520px">
+          <tr><th data-i18n="sizeName">المقاس</th><th class="or" data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="sizeCons">استهلاك القطعة</th><th data-i18n="rsRatio">النسبة</th><th class="or" data-i18n="rsQtyCons">استهلاك الكمية</th><th></th></tr>
           <tbody id="rs-qty-rows"></tbody>
-          <tr style="font-weight:800;background:#eef6f6"><td data-i18n="total">الإجمالي</td><td id="rs-qt-q">—</td><td>—</td><td id="rs-qt-r">—</td><td id="rs-qt-c">—</td><td></td></tr></table></div>
+          <tr class="tot"><td data-i18n="total">الإجمالي</td><td id="rs-qt-q">—</td><td>—</td><td id="rs-qt-r">—</td><td id="rs-qt-c">—</td><td></td></tr></table></div>
         <button type="button" class="mini" style="margin-top:6px" onclick="rsAddQtyRow()">➕ <span data-i18n="mkAddRow">إضافة مقاس</span></button>
         <button type="button" class="mini g" style="margin-top:6px" onclick="rsFillProduct()">📋 <span data-i18n="rsFillProd">تعبئة مقاسات المنتج</span></button>
-        <label class="inl" style="margin-top:12px" data-i18n="rsMarkers">الماركرات</label>
-        <div id="rs-markers"></div>
-        <div id="rs-mktbl"></div>
+        <label class="inl" style="margin-top:12px" data-i18n="rsMarkersTbl">القياسات والكميات داخل الماركر</label>
+        <div style="overflow-x:auto"><table class="xtbl" style="min-width:900px">
+          <tr><th data-i18n="rsCode">الكود</th><th data-i18n="rsDesc">البيان</th>
+            <th>مقاس١</th><th>مقاس٢</th><th>مقاس٣</th><th>مقاس٤</th><th>مقاس٥</th><th>مقاس٦</th>
+            <th class="or" data-i18n="rsPcsLbl">إجمالي القطع في الماركر</th><th data-i18n="rsPlies">عدد الطبقات</th>
+            <th class="or" data-i18n="rsPcsRun">إجمالي القطع في التشغيل</th><th data-i18n="rsMkStatus">حالة الماركر وسبب عدم الصلاحية</th>
+            <th data-i18n="rsMkPerPly">استهلاك الماركر/طبقة</th><th class="or" data-i18n="rsSumFab">إجمالي استهلاك التشغيل</th><th></th></tr>
+          <tbody id="rs-markers"></tbody>
+          <tr class="tot"><td colspan="8" data-i18n="total">الإجمالي</td><td id="rs-mt-pcs">—</td><td id="rs-mt-plies">—</td><td id="rs-mt-run">—</td><td></td><td>—</td><td id="rs-mt-fab">—</td><td></td></tr></table></div>
         <button type="button" class="mini" style="margin-top:6px" onclick="rsAddMarker()">➕ <span data-i18n="rsAddMarker">إضافة ماركر</span></button>
         <button type="button" class="btn g" style="margin-top:6px" onclick="rsSuggest()">💡 <span data-i18n="rsSuggestBtn">اقترح باقي الماركرات</span></button>
         <div id="rs-sug"></div>
@@ -432,6 +450,8 @@ st_ok:'صالح',st_empty:'فارغ',st_dup:'غير صالح: مقاس مكرر'
 rsLeftoverNote:'كمية {n} قطعة لا يمكن تغطيتها ضمن القيود (قطع الماركر أقل من الحد الأدنى)',rsSugAfter:'المتبقي بعد الاقتراحات: {n} قطعة',
 rsSumReq:'إجمالي كمية الطلب',rsSumProd:'إجمالي إنتاج الخطة',rsSumRem:'إجمالي المتبقي من الأوردر',rsSumFab:'إجمالي استهلاك التشغيل',
 rsMkPerPly:'استهلاك الماركر/طبقة',rsPcsRun:'إجمالي القطع في التشغيل',rsRemAfter:'المتبقي بعد التشغيل',rsOrderCons:'إجمالي استهلاك الأوردر',
+rsMarkersTbl:'القياسات والكميات داخل الماركر',rsCode:'الكود',rsDesc:'البيان',rsSizesRow:'المقاسات',rsQtyRow:'الكميات',
+rsMkStatus:'حالة الماركر وسبب عدم الصلاحية',rsSugPliesCol:'الطبقات المقترحة',rsEditPliesCol:'تعديل الطبقات (اختياري)',
 mkMkLen:'طول الماركر',mkTotalPlies:'إجمالي الطبقات',mkSpreadsShort:'فرشة',
 backupTitle:'النسخ الاحتياطي',backupBtn:'⬇ تنزيل نسخة',restoreBtn:'⬆ استعادة نسخة',
 backupHint:'تنزيل كل بيانات مساحة العمل في ملف واحد. احفظه دورياً — الاستعادة تكتب فوق السجلات بنفس المعرّفات.',
@@ -565,6 +585,8 @@ st_ok:'valid',st_empty:'empty',st_dup:'invalid: duplicate size',st_badqty:'inval
 rsLeftoverNote:'{n} pieces cannot be covered within limits (below min marker pieces)',rsSugAfter:'Remaining after suggestions: {n} pieces',
 rsSumReq:'Total order qty',rsSumProd:'Plan production',rsSumRem:'Order remaining',rsSumFab:'Total run consumption',
 rsMkPerPly:'Marker cons/ply',rsPcsRun:'Total run pieces',rsRemAfter:'Remaining after run',rsOrderCons:'Total order consumption',
+rsMarkersTbl:'Sizes & quantities per marker',rsCode:'Code',rsDesc:'Item',rsSizesRow:'Sizes',rsQtyRow:'Quantities',
+rsMkStatus:'Marker status & invalid reason',rsSugPliesCol:'Suggested plies',rsEditPliesCol:'Adjust plies (optional)',
 mkMkLen:'Marker length',mkTotalPlies:'Total plies',mkSpreadsShort:'spreads',
 backupTitle:'Backup',backupBtn:'⬇ Download backup',restoreBtn:'⬆ Restore backup',
 backupHint:'Download all workspace data in one file. Save it periodically — restoring overwrites records with the same IDs.',
@@ -1670,10 +1692,10 @@ function rsAddQtyRow(r){r=r||{};const src=rsSizeSrc();const locked=src.length>0;
     ?`<select class="rsq-size" onchange="rsPickSize(this)" style="min-width:90px;padding:6px"><option value="">—</option>${sizeOptionsHtml(src,r.size,r.cons)}</select>`
     :`<input class="rsq-size" value="${esc(r.size||'')}" placeholder="L" style="min-width:70px;padding:6px" oninput="rsCalc()">`;
   $('rs-qty-rows').insertAdjacentHTML('beforeend',`<tr class="rsq-row">
-   <td>${cell}</td>
-   <td><input class="rsq-qty" type="number" min="0" value="${r.qty!=null?r.qty:''}" style="min-width:70px;padding:6px" oninput="rsCalc()"></td>
-   <td><input class="rsq-cons" type="number" step="0.01" value="${r.cons!=null?r.cons:''}" style="min-width:70px;padding:6px${locked?';background:#f4f6f8;color:#6b7683':''}" ${locked?'readonly':'oninput="rsCalc()"'}></td>
-   <td class="rsq-ratio note">—</td><td class="rsq-tot note">—</td>
+   <td style="font-weight:800">${cell}</td>
+   <td><input class="rsq-qty" type="number" min="0" value="${r.qty!=null?r.qty:''}" style="min-width:70px;padding:6px;text-align:center;font-weight:700" oninput="rsCalc()"></td>
+   <td><input class="rsq-cons" type="number" step="0.01" value="${r.cons!=null?r.cons:''}" style="min-width:70px;padding:6px;text-align:center;color:#c00000;font-weight:800${locked?';background:#fbf3f3;border:none':''}" ${locked?'readonly':'oninput="rsCalc()"'}></td>
+   <td class="rsq-ratio" style="font-weight:700">—</td><td class="rsq-tot red">—</td>
    <td><button type="button" class="mini r" onclick="this.closest('tr').remove();rsCalc()">✕</button></td></tr>`);}
 function rsPickSize(sel){const o=sel.selectedOptions[0];const c=o?o.dataset.cons:'';
   if(c)sel.closest('tr').querySelector('.rsq-cons').value=c;rsCalc();}
@@ -1686,30 +1708,35 @@ function rsReadQty(){return [...document.querySelectorAll('.rsq-row')].map(tr=>(
   size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0,
   cons:+tr.querySelector('.rsq-cons').value||0})).filter(r=>r.size&&r.qty>0&&r.cons>0);}
 function rsSettings(){return {unit:$('rs-unit').value,f:$('rs-unit').value==='ياردة'?1.0936133:1,
-  maxlen:+$('rs-maxlen').value||0,maxsizes:Math.max(1,+$('rs-maxsizes').value||6),maxpcs:Math.max(1,+$('rs-maxpcs').value||5)};}
+  maxlen:+$('rs-maxlen').value||0,maxsizes:Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs:Math.max(1,+$('rs-maxpcs').value||5)};}
 let RS_SEQ=0;
+const RS_COLORS=['#d9e8f7','#d9f0d5','#f7d9ec','#f9e0cb','#d5eef4','#eaf4cf','#e6e0f7','#f7f3cf'];
 function rsAddMarker(m){m=m||{};RS_SEQ++;const id='rsm'+RS_SEQ;
-  const pairs=(m.pairs&&m.pairs.length?m.pairs:[{},{}]);
-  $('rs-markers').insertAdjacentHTML('beforeend',`<div class="item rs-marker" id="${id}" style="margin-bottom:8px">
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-      <b class="rsm-code" style="color:var(--teal,#14504f)"></b>
-      <div class="rsm-pairs" style="display:flex;gap:6px;flex-wrap:wrap">${pairs.map(p=>rsPairHtml(p)).join('')}</div>
-      <button type="button" class="mini" onclick="rsAddPair('${id}')">➕ ${t('rsAddPair')}</button>
-      <label class="inl" style="margin:0">${t('rsPlies')}</label>
-      <input class="rsm-plies" type="number" min="1" value="${m.plies!=null?m.plies:''}" style="width:80px;padding:6px" oninput="rsCalc()">
-      <button type="button" class="mini r" onclick="this.closest('.rs-marker').remove();rsCalc()">✕</button></div>
-    <div class="note rsm-info" style="margin-top:6px">—</div></div>`);rsCalc();}
-function rsPairHtml(p){p=p||{};const sizes=rsReadQty().map(r=>r.size);
-  const cell=sizes.length
-    ?`<select class="rsp-size" onchange="rsCalc()" style="min-width:76px;padding:6px"><option value="">—</option>${sizes.map(s=>`<option ${p.size===s?'selected':''}>${esc(s)}</option>`).join('')}${(p.size&&!sizes.includes(p.size))?`<option selected>${esc(p.size)}</option>`:''}</select>`
-    :`<input class="rsp-size" value="${esc(p.size||'')}" placeholder="L" style="width:70px;padding:6px" oninput="rsCalc()">`;
-  return `<span style="display:inline-flex;gap:3px;align-items:center;border:1px solid #e2eaea;border-radius:8px;padding:3px 5px">${cell}
-    <input class="rsp-cnt" type="number" min="1" value="${p.cnt!=null?p.cnt:''}" placeholder="1" style="width:56px;padding:6px" oninput="rsCalc()">
-    <b style="cursor:pointer;color:var(--red)" onclick="this.closest('span').remove();rsCalc()">✕</b></span>`;}
-function rsAddPair(id){document.querySelector('#'+id+' .rsm-pairs').insertAdjacentHTML('beforeend',rsPairHtml());}
-function rsReadMarkers(){return [...document.querySelectorAll('.rs-marker')].map(div=>({
-  pairs:[...div.querySelectorAll('.rsm-pairs > span')].map(sp=>({size:sp.querySelector('.rsp-size').value.trim(),cnt:+sp.querySelector('.rsp-cnt').value||0})).filter(p=>p.size||p.cnt),
-  plies:div.querySelector('.rsm-plies').value}));}
+  const pairs=m.pairs||[];const sizes=rsReadQty().map(r=>r.size);
+  const selCell=p=>`<td>${sizes.length
+    ?`<select class="rsp-size" onchange="rsCalc()" style="width:100%;min-width:62px;padding:4px;border:none;background:transparent;text-align:center;font-weight:700"><option value=""></option>${sizes.map(s=>`<option ${p&&p.size===s?'selected':''}>${esc(s)}</option>`).join('')}${(p&&p.size&&!sizes.includes(p.size))?`<option selected>${esc(p.size)}</option>`:''}</select>`
+    :`<input class="rsp-size" value="${esc((p&&p.size)||'')}" style="width:100%;min-width:56px;border:none;background:transparent;text-align:center;font-weight:700" oninput="rsCalc()">`}</td>`;
+  const cntCell=p=>`<td><input class="rsp-cnt" type="number" min="1" value="${p&&p.cnt!=null?p.cnt:''}" style="width:100%;min-width:48px;border:none;background:transparent;text-align:center;font-weight:700" oninput="rsCalc()"></td>`;
+  $('rs-markers').insertAdjacentHTML('beforeend',
+   `<tr class="rs-mrow1" data-mid="${id}">
+     <td rowspan="2" class="rsm-code" style="font-weight:800">—</td>
+     <td style="font-weight:700">${t('rsSizesRow')}</td>${[0,1,2,3,4,5].map(i=>selCell(pairs[i])).join('')}
+     <td rowspan="2" class="rsm-pcs" style="font-weight:800">0</td>
+     <td rowspan="2"><input class="rsm-plies" type="number" min="1" value="${m.plies!=null?m.plies:''}" style="width:62px;padding:4px;text-align:center;font-weight:800;border:1px solid #9db8b8;border-radius:6px" oninput="rsCalc()"></td>
+     <td rowspan="2" class="rsm-run" style="font-weight:800">0</td>
+     <td rowspan="2" class="rsm-st" style="max-width:170px">—</td>
+     <td rowspan="2" class="rsm-len red">0</td>
+     <td rowspan="2" class="rsm-fab red">0</td>
+     <td rowspan="2"><button type="button" class="mini r" onclick="rsDelMarker('${id}')">✕</button></td></tr>
+    <tr class="rs-mrow2" data-mid="${id}"><td style="font-weight:700">${t('rsQtyRow')}</td>${[0,1,2,3,4,5].map(i=>cntCell(pairs[i])).join('')}</tr>`);
+  rsCalc();}
+function rsDelMarker(id){document.querySelectorAll('tr[data-mid="'+id+'"]').forEach(tr=>tr.remove());rsCalc();}
+function rsReadMarkers(){return [...document.querySelectorAll('.rs-mrow1')].map(tr1=>{
+  const tr2=tr1.nextElementSibling;
+  const ss=[...tr1.querySelectorAll('.rsp-size')].map(e=>e.value.trim());
+  const cs=tr2?[...tr2.querySelectorAll('.rsp-cnt')].map(e=>+e.value||0):[];
+  const pairs=ss.map((s,i)=>({size:s,cnt:cs[i]||0})).filter(p=>p.size||p.cnt);
+  return {pairs,plies:tr1.querySelector('.rsm-plies').value};});}
 function rsCompute(){const st=rsSettings();const qty=rsReadQty();
   const cons={};qty.forEach(r=>cons[r.size]=r.cons);
   const markers=rsReadMarkers().map(m=>{
@@ -1749,33 +1776,41 @@ function rsCalc(){if(!$('rs-qty-rows'))return;const r=rsCompute();
   if($('rs-qt-q'))$('rs-qt-q').textContent=r.totalReq||'—';
   if($('rs-qt-r'))$('rs-qt-r').textContent=ratioSum?Math.round(ratioSum*100)/100:'—';
   if($('rs-qt-c'))$('rs-qt-c').textContent=consSum?Math.round(consSum*100)/100+' '+r.st.unit:'—';
-  document.querySelectorAll('.rs-marker').forEach((div,i)=>{const m=r.markers[i];if(!m)return;
-    div.querySelector('.rsm-code').textContent='M'+String(i+1).padStart(2,'0');
-    const ok=m.status==='st_ok';
-    div.querySelector('.rsm-info').innerHTML=`<b style="color:${ok?'var(--green)':(m.status==='st_empty'?'#889':'var(--red)')}">${t(m.status)}</b>
-     · ${t('rsPcsLbl')}: <b>${m.pcs}</b> · ${t('rsMkLen')}: <b>${Math.round(m.len*100)/100} ${r.st.unit}</b>
-     · ${t('rsProduced')}: <b>${m.produced}</b> · ${t('mkTotalFabric')}: <b>${Math.round(m.fabric*100)/100} ${r.st.unit}</b>`;});
-  // لوحة الملخص
-  const chip=(l,v,col)=>`<div style="flex:1;min-width:130px;background:#f6f9f9;border:1px solid #e2eaea;border-radius:10px;padding:8px 6px;text-align:center"><div class="note">${l}</div><div style="font-weight:800;font-size:17px;color:${col||'var(--teal,#14504f)'}">${v}</div></div>`;
+  // صفوف الماركرات: ألوان متناوبة + الخلايا المحسوبة
+  let sumPlies=0;
+  [...document.querySelectorAll('.rs-mrow1')].forEach((tr1,i)=>{const m=r.markers[i];if(!m)return;
+    const tr2=tr1.nextElementSibling;const bg=RS_COLORS[i%RS_COLORS.length];
+    tr1.querySelectorAll('td').forEach(td=>td.style.background=bg);
+    if(tr2)tr2.querySelectorAll('td').forEach(td=>td.style.background=bg);
+    tr1.querySelector('.rsm-code').textContent='M'+String(i+1).padStart(2,'0');
+    tr1.querySelector('.rsm-pcs').textContent=m.pcs;
+    tr1.querySelector('.rsm-run').textContent=m.produced;
+    tr1.querySelector('.rsm-len').textContent=Math.round(m.len*100)/100;
+    tr1.querySelector('.rsm-fab').textContent=Math.round(m.fabric*100)/100;
+    const stc=tr1.querySelector('.rsm-st');const ok=m.status==='st_ok';
+    stc.textContent=t(m.status);
+    stc.style.cssText='max-width:170px;font-weight:800;background:'+(ok?'#e2f2e2':(m.status==='st_empty'?bg:'#fbe3e3'))+';color:'+(ok?'#1e7e40':(m.status==='st_empty'?'#667':'#c00000'));
+    if(m.status==='st_ok')sumPlies+=m.plies;});
+  if($('rs-mt-pcs')){const nz=r.markers.filter(m=>m.status==='st_ok');
+    $('rs-mt-pcs').textContent=nz.reduce((s,m)=>s+m.pcs,0)||'—';
+    $('rs-mt-plies').textContent=sumPlies||'—';
+    $('rs-mt-run').textContent=r.totalMade;
+    $('rs-mt-fab').textContent=Math.round(r.totFab*100)/100;}
+  // لوحة الملخص بنمط الإكسيل (خلية صفراء + قيمة)
+  const cell2=(l,v,col)=>`<div><div class="lbl">${l}</div><div class="val" style="color:${col||'#1c1c1c'}">${v}</div></div>`;
+  $('rs-summary').className='xsum';
   $('rs-summary').innerHTML=r.qty.length?
-    chip(t('rsSumReq'),r.totalReq)+chip(t('rsSumProd'),r.totalMade)
-    +chip(t('rsSumRem'),r.totRem,r.totRem===0?'var(--green)':'var(--red)')
-    +chip(t('rsMarkersCount'),r.valid)
-    +chip(t('rsSumFab'),Math.round(r.totFab*100)/100+' '+r.st.unit)
-    +chip(t('rsPlanState'),r.ready?t('rsReady'):t('rsReview'),r.ready?'var(--green)':'var(--red)'):'';
-  // جدول الماركرات التفصيلي
-  const okC=c=>c==='st_ok';const nz=r.markers.filter(m=>m.status!=='st_empty');
-  $('rs-mktbl').innerHTML=nz.length?`<div style="overflow-x:auto;margin-top:8px"><table class="rtbl" style="min-width:640px">
-    <tr><th>#</th><th>${t('rsMarkers')}</th><th>${t('rsPcsLbl')}</th><th>${t('rsPlies')}</th><th>${t('rsPcsRun')}</th><th>${t('mkStateCol')}</th><th>${t('rsMkPerPly')} (${r.st.unit})</th><th>${t('rsSumFab')} (${r.st.unit})</th></tr>
-    ${r.markers.map((m,i)=>m.status==='st_empty'?'':`<tr><td>M${String(i+1).padStart(2,'0')}</td><td>${m.pairs.map(p=>esc(p.size)+'×'+p.cnt).join(' · ')||'—'}</td><td>${m.pcs}</td><td>${m.plies||'—'}</td><td>${m.produced}</td>
-      <td style="color:${okC(m.status)?'var(--green)':'var(--red)'};font-weight:700">${t(m.status)}</td><td>${Math.round(m.len*100)/100}</td><td>${Math.round(m.fabric*100)/100}</td></tr>`).join('')}
-    <tr style="font-weight:800;background:#eef6f6"><td colspan="4">${t('total')}</td><td>${r.totalMade}</td><td></td><td></td><td>${Math.round(r.totFab*100)/100}</td></tr></table></div>`:'';
-  $('rs-cover').innerHTML=r.qty.length?`<div style="overflow-x:auto"><table class="rtbl" style="min-width:520px">
-    <tr><th>${t('sizeName')}</th><th>${t('mkQtyOrder')}</th><th>${t('rsProduced')}</th><th>${t('rsRemaining')}</th><th>${t('mkStateCol')}</th><th>${t('sizeCons')}</th><th>${t('rsOrderCons')} (${r.st.unit})</th></tr>
-    ${r.cover.map(c=>`<tr><td>${esc(c.size)}</td><td>${c.req}</td><td>${c.made}</td><td>${c.rem}</td>
-      <td>${c.rem===0?`<b style="color:var(--green)">${t('rsMatch')}</b>`:c.rem>0?`<b style="color:var(--red)">${t('mkShort')} ${c.rem}</b>`:`<b style="color:var(--red)">${t('rsSurplus')} ${-c.rem}</b>`}</td>
-      <td>${c.cons}</td><td>${Math.round(c.req*c.cons*r.st.f*100)/100}</td></tr>`).join('')}
-    <tr style="font-weight:800;background:#eef6f6"><td>${t('total')}</td><td>${r.totalReq}</td><td>${r.totalMade}</td><td>${r.totRem}</td><td></td><td>—</td><td>${Math.round(r.cover.reduce((s,c)=>s+c.req*c.cons*r.st.f,0)*100)/100}</td></tr></table></div>`:'';
+    cell2(t('rsSumReq'),r.totalReq)+cell2(t('rsSumProd'),r.totalMade)
+    +cell2(t('rsSumRem'),r.totRem,r.totRem===0?'#1e7e40':'#c00000')
+    +cell2(t('rsMarkersCount'),r.valid)
+    +cell2(t('rsSumFab'),Math.round(r.totFab*100)/100+' '+r.st.unit,'#c00000')
+    +cell2(t('rsPlanState'),r.ready?t('rsReady'):t('rsReview'),r.ready?'#1e7e40':'#c00000'):'';
+  $('rs-cover').innerHTML=r.qty.length?`<div style="overflow-x:auto"><table class="xtbl" style="min-width:560px">
+    <tr><th>${t('sizeName')}</th><th class="or">${t('mkQtyOrder')}</th><th>${t('rsProduced')}</th><th class="or">${t('rsRemaining')}</th><th>${t('mkStateCol')}</th><th>${t('sizeCons')}</th><th class="or">${t('rsOrderCons')} (${r.st.unit})</th></tr>
+    ${r.cover.map(c=>`<tr><td style="font-weight:800">${esc(c.size)}</td><td style="font-weight:700">${c.req}</td><td style="font-weight:700">${c.made}</td><td style="font-weight:800">${c.rem}</td>
+      <td style="font-weight:800;${c.rem===0?'background:#e2f2e2;color:#1e7e40':'background:#fbe3e3;color:#c00000'}">${c.rem===0?t('rsMatch'):c.rem>0?t('mkShort')+' '+c.rem:t('rsSurplus')+' '+(-c.rem)}</td>
+      <td class="red">${c.cons}</td><td class="red">${Math.round(c.req*c.cons*r.st.f*100)/100}</td></tr>`).join('')}
+    <tr class="tot"><td>${t('total')}</td><td>${r.totalReq}</td><td>${r.totalMade}</td><td>${r.totRem}</td><td></td><td>—</td><td>${Math.round(r.cover.reduce((s,c)=>s+c.req*c.cons*r.st.f,0)*100)/100}</td></tr></table></div>`:'';
   $('rs-res').innerHTML=r.qty.length?`<div class="big" style="color:${r.ready?'var(--green)':'var(--red)'}">${r.ready?t('rsReady'):t('rsReview')}</div>
    <div class="note">${t('rsTotalReq')}: <b>${r.totalReq}</b> · ${t('rsTotalProd')}: <b>${r.totalMade}</b> · ${t('rsRemaining')}: <b>${r.totRem}</b>
    · ${t('rsMarkersCount')}: <b>${r.valid}</b> · ${t('mkTotalFabric')}: <b>${Math.round(r.totFab*100)/100} ${r.st.unit}</b></div>`:`<span class="note">${t('mkNeed')}</span>`;}
@@ -1802,27 +1837,40 @@ function rsSuggest(){const r=rsCompute();if(!r.qty.length)return toast(t('mkNeed
       const score=covered+pcs*0.01-len*0.0001;
       if(!best||score>best.score)best={combo:combo.map(p=>({size:p.size,cnt:p.cnt})),plies,len,pcs,covered,fabric:len*plies,score};}
     if(!best)break;
+    best.sug=best.plies;
     sugs.push(best);best.combo.forEach(p=>rem[p.size]-=p.cnt*best.plies);}
   window.RS_SUGS=sugs;
   window.RS_SUGREM0={};r.cover.forEach(c=>window.RS_SUGREM0[c.size]=Math.max(0,c.rem));
   rsRenderSugs();}
 function rsRenderSugs(){const sugs=window.RS_SUGS||[];const st=rsSettings();
   if(!sugs.length){$('rs-sug').innerHTML=`<span class="note" style="display:block;margin-top:6px">${t('rsNoSug')}</span>`;return;}
-  const rem={...(window.RS_SUGREM0||{})};let html='';
+  const rem={...(window.RS_SUGREM0||{})};let rowsHtml='';
   sugs.forEach((s,i)=>{const covered=s.plies*s.pcs,fabric=s.len*s.plies;
     s.combo.forEach(p=>rem[p.size]=(rem[p.size]||0)-p.cnt*s.plies);
     const left=Object.values(rem).reduce((a,b)=>a+Math.max(0,b),0);
     const over=Object.values(rem).some(v=>v<0);
-    html+=`<div class="item" style="margin-bottom:6px"><div class="h"><div>
-    <div class="t" style="font-size:14px">💡 S${String(i+1).padStart(2,'0')}: ${s.combo.map(p=>esc(p.size)+'×'+p.cnt).join(' · ')}</div>
-    <div class="s">${t('rsPlies')}: <input type="number" min="1" value="${s.plies}" style="width:66px;padding:3px;text-align:center" onchange="rsSugPlies(${i},this.value)">
-     · ${t('rsPcsLbl')}: ${s.pcs} · ${t('rsPcsRun')}: <b>${covered}</b> · ${t('rsMkPerPly')}: ${Math.round(s.len*100)/100} ${st.unit} · ${t('rsSumFab')}: <b>${Math.round(fabric*100)/100} ${st.unit}</b><br>
-     ${t('rsRemAfter')}: <b style="color:${left===0&&!over?'var(--green)':'inherit'}">${left}</b>${over?` <b style="color:var(--red)">(${t('rsSurplus')}!)</b>`:''}</div></div></div>
-    <div class="row-btns"><button class="mini g" onclick="rsApplySug(${i})">${t('rsApply')}</button></div></div>`;});
+    const bg=RS_COLORS[i%RS_COLORS.length];
+    const sz=[0,1,2,3,4,5].map(j=>`<td style="background:${bg};font-weight:700">${s.combo[j]?esc(s.combo[j].size):''}</td>`).join('');
+    const ct=[0,1,2,3,4,5].map(j=>`<td style="background:${bg};font-weight:700">${s.combo[j]?s.combo[j].cnt:''}</td>`).join('');
+    rowsHtml+=`<tr>
+      <td rowspan="2" style="background:${bg};font-weight:800">S${String(i+1).padStart(2,'0')}</td>
+      <td style="background:${bg};font-weight:700">${t('rsSizesRow')}</td>${sz}
+      <td rowspan="2" style="background:${bg};font-weight:800">${s.pcs}</td>
+      <td rowspan="2" style="background:${bg};font-weight:800">${s.sug!=null?s.sug:s.plies}</td>
+      <td rowspan="2" style="background:#fff8dc"><input type="number" min="1" value="${s.plies}" style="width:62px;padding:4px;text-align:center;font-weight:800;border:1px solid #d8c27a;border-radius:6px;background:#fffbe8" onchange="rsSugPlies(${i},this.value)"></td>
+      <td rowspan="2" style="background:${bg};font-weight:800">${covered}</td>
+      <td rowspan="2" class="red" style="background:${bg}">${Math.round(s.len*100)/100}</td>
+      <td rowspan="2" class="red" style="background:${bg}">${Math.round(fabric*100)/100}</td>
+      <td rowspan="2" style="background:${bg};font-weight:800;${over?'color:#c00000':left===0?'color:#1e7e40':''}">${left}${over?' ⚠':''}</td>
+      <td rowspan="2" style="background:${bg}"><button type="button" class="mini g" onclick="rsApplySug(${i})">${t('rsApply')}</button></td></tr>
+     <tr><td style="background:${bg};font-weight:700">${t('rsQtyRow')}</td>${ct}</tr>`;});
   const finalLeft=Object.values(rem).reduce((a,b)=>a+Math.max(0,b),0);
-  html+=`<button class="mini g" onclick="rsApplyAll()">✔ ${t('rsApplyAll')}</button>
-    ${finalLeft>0?`<div class="note" style="margin-top:4px">${tf('rsSugAfter',{n:finalLeft})}</div>`:''}`;
-  $('rs-sug').innerHTML=`<div style="margin-top:8px">${html}</div>`;}
+  $('rs-sug').innerHTML=`<div style="overflow-x:auto;margin-top:8px"><table class="xtbl" style="min-width:900px">
+    <tr><th>${t('rsCode')}</th><th>${t('rsDesc')}</th><th>مقاس١</th><th>مقاس٢</th><th>مقاس٣</th><th>مقاس٤</th><th>مقاس٥</th><th>مقاس٦</th>
+    <th class="or">${t('rsPcsLbl')}</th><th>${t('rsSugPliesCol')}</th><th>${t('rsEditPliesCol')}</th><th class="or">${t('rsPcsRun')}</th>
+    <th>${t('rsMkPerPly')}</th><th class="or">${t('rsSumFab')}</th><th>${t('rsRemAfter')}</th><th></th></tr>${rowsHtml}</table></div>
+    <button class="mini g" style="margin-top:6px" onclick="rsApplyAll()">✔ ${t('rsApplyAll')}</button>
+    ${finalLeft>0?`<div class="note" style="margin-top:4px">${tf('rsSugAfter',{n:finalLeft})}</div>`:''}`;}
 function rsSugPlies(i,v){const s=(window.RS_SUGS||[])[i];if(!s)return;
   s.plies=Math.max(1,Math.round(+normNum(v)||1));rsRenderSugs();}
 function rsApplySug(i){const s=(window.RS_SUGS||[])[i];if(!s)return;
