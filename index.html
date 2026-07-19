@@ -447,7 +447,7 @@ fillModelBtn:'تعبئة مقاسات الموديل',selectModelFirst:'اختر
 mkAvailCol:'المتاح',mkStateCol:'الحالة',mkOver:'فائض تقريب الطبقات',mkActual:'القماش الفعلي بعد القص (اختياري)',mkDev:'الانحراف عن المحسوب',
 spreadOrderBtn:'🖨 أمر فرشة',spreadOrder:'أمر فرشة (تشغيل الفرد)',needMkLen:'أدخل طول الماركر أولاً لحساب الطبقات',signature:'التوقيع',spreadOf:'فرشة رقم',
 rsTitle:'الريشو — خطة الماركرات',rsMaxLen:'حد طول الماركر',rsMaxSizes:'أقصى عدد قياسات في الماركر',rsMaxPcs:'أقصى عدد قطع في الماركر',
-rsQtyTbl:'جدول الكميات المطلوبة',rsRatio:'النسبة',rsQtyCons:'استهلاك الكمية',rsFillProd:'تعبئة مقاسات المنتج',
+rsQtyTbl:'جدول الكميات المطلوبة',rsRatio:'نسبة بحسب الموديل',rsQtyCons:'استهلاك الكمية',rsFillProd:'تعبئة مقاسات المنتج',
 rsMarkers:'الماركرات',rsAddMarker:'إضافة ماركر',rsAddPair:'مقاس',rsPlies:'الطبقات',rsPcsLbl:'قطع الماركر',rsProduced:'المنتَج',rsMkLen:'طول الماركر',
 rsCover:'جدول التغطية',rsRemaining:'المتبقي',rsSuggestBtn:'اقترح باقي الماركرات',rsApply:'اعتماد',rsApplyAll:'اعتماد الكل',rsNoSug:'لا اقتراحات ممكنة ضمن القيود الحالية',rsPrint:'🖨 طباعة الخطة',
 rsPlanState:'حالة الخطة',rsReady:'مطابقة وجاهزة',rsReview:'تحتاج مراجعة',rsSurplus:'زيادة',rsMatch:'مطابق',rsMarkersCount:'عدد الماركرات الصالحة',rsTotalReq:'إجمالي المطلوب',rsTotalProd:'إجمالي المنتَج',
@@ -583,7 +583,7 @@ fillModelBtn:'Fill model sizes',selectModelFirst:'Select a model first',openInCa
 mkAvailCol:'Available',mkStateCol:'Status',mkOver:'Ply rounding surplus',mkActual:'Actual fabric after cutting (optional)',mkDev:'Deviation from computed',
 spreadOrderBtn:'🖨 Spreading order',spreadOrder:'Spreading order',needMkLen:'Enter the marker length first to compute plies',signature:'Signature',spreadOf:'Spread #',
 rsTitle:'Ratio — marker plan',rsMaxLen:'Marker length limit',rsMaxSizes:'Max sizes per marker',rsMaxPcs:'Max pieces per marker',
-rsQtyTbl:'Required quantities',rsRatio:'Ratio',rsQtyCons:'Qty consumption',rsFillProd:'Fill product sizes',
+rsQtyTbl:'Required quantities',rsRatio:'Ratio per model',rsQtyCons:'Qty consumption',rsFillProd:'Fill product sizes',
 rsMarkers:'Markers',rsAddMarker:'Add marker',rsAddPair:'size',rsPlies:'Plies',rsPcsLbl:'Marker pieces',rsProduced:'Produced',rsMkLen:'Marker length',
 rsCover:'Coverage table',rsRemaining:'Remaining',rsSuggestBtn:'Suggest remaining markers',rsApply:'Apply',rsApplyAll:'Apply all',rsNoSug:'No suggestions possible within current limits',rsPrint:'🖨 Print plan',
 rsPlanState:'Plan status',rsReady:'Matched & ready',rsReview:'Needs review',rsSurplus:'surplus',rsMatch:'matched',rsMarkersCount:'Valid markers',rsTotalReq:'Total required',rsTotalProd:'Total produced',
@@ -1702,7 +1702,7 @@ function rsAddQtyRow(r){r=r||{};const src=rsSizeSrc();const locked=src.length>0;
    <td style="font-weight:800">${cell}</td>
    <td><input class="rsq-qty" type="number" min="0" value="${r.qty!=null?r.qty:''}" style="min-width:70px;padding:6px;text-align:center;font-weight:700" oninput="rsCalc()"></td>
    <td><input class="rsq-cons" type="number" step="0.01" value="${r.cons!=null?r.cons:''}" style="min-width:70px;padding:6px;text-align:center;color:#c00000;font-weight:800${locked?';background:#fbf3f3;border:none':''}" ${locked?'readonly':'oninput="rsCalc()"'}></td>
-   <td class="rsq-ratio" style="font-weight:700">—</td><td class="rsq-tot red">—</td>
+   <td><input class="rsq-ratio" type="number" step="0.25" min="0" value="${r.ratio!=null&&r.ratio!==0?r.ratio:''}" style="min-width:56px;padding:6px;text-align:center;font-weight:700" oninput="rsCalc()"></td><td class="rsq-tot red">—</td>
    <td><button type="button" class="mini r" onclick="this.closest('tr').remove();rsCalc()">✕</button></td></tr>`);}
 function rsPickSize(sel){const o=sel.selectedOptions[0];const c=o?o.dataset.cons:'';
   if(c)sel.closest('tr').querySelector('.rsq-cons').value=c;rsCalc();}
@@ -1713,7 +1713,8 @@ function rsFillProduct(){const src=rsSizeSrc();if(!src.length)return toast(t('no
   src.filter(s=>!have.has(s.size)).forEach(s=>rsAddQtyRow({size:s.size,cons:s.cons}));rsCalc();}
 function rsReadQty(){return [...document.querySelectorAll('.rsq-row')].map(tr=>({
   size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0,
-  cons:+tr.querySelector('.rsq-cons').value||0})).filter(r=>r.size&&r.qty>0&&r.cons>0);}
+  cons:+tr.querySelector('.rsq-cons').value||0,
+  ratio:+(tr.querySelector('.rsq-ratio')&&tr.querySelector('.rsq-ratio').value)||0})).filter(r=>r.size&&r.qty>0&&r.cons>0);}
 function rsSettings(){return {unit:$('rs-unit').value,f:$('rs-unit').value==='ياردة'?1.0936133:1,
   maxlen:+$('rs-maxlen').value||0,maxsizes:Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs:Math.max(1,+$('rs-maxpcs').value||5)};}
 let RS_SEQ=0;
@@ -1772,12 +1773,10 @@ function rsCompute(){const st=rsSettings();const qty=rsReadQty();
     valid:markers.filter(x=>x.status==='st_ok').length,
     ready:totalReq>0&&cover.every(c=>c.rem===0)&&markers.every(x=>x.status==='st_ok'||x.status==='st_empty')};}
 function rsCalc(){if(!$('rs-qty-rows'))return;const r=rsCompute();
-  const minQty=Math.min(...r.qty.map(x=>x.qty).concat([Infinity]));
   let ratioSum=0,consSum=0;
   document.querySelectorAll('.rsq-row').forEach(tr=>{const q=+tr.querySelector('.rsq-qty').value||0;
     const c=+tr.querySelector('.rsq-cons').value||0;
-    const ratio=(q>0&&isFinite(minQty)&&minQty>0)?Math.round(q/minQty*100)/100:0;
-    tr.querySelector('.rsq-ratio').textContent=ratio||'—';
+    const ratio=+tr.querySelector('.rsq-ratio').value||0;
     tr.querySelector('.rsq-tot').textContent=(q>0&&c>0)?Math.round(q*c*r.st.f*100)/100:'—';
     ratioSum+=ratio;consSum+=q*c*r.st.f;});
   if($('rs-qt-q'))$('rs-qt-q').textContent=r.totalReq||'—';
@@ -1888,7 +1887,7 @@ function rsApplyAll(){(window.RS_SUGS||[]).forEach(s=>rsAddMarker({pairs:s.combo
   window.RS_SUGS=[];rsSuggest();}
 function rsResult(){const r=rsCompute();if(!r.qty.length)return null;
   return {product:($('rs-product')&&$('rs-product').value)||'',unit:r.st.unit,maxlen:r.st.maxlen,maxsizes:r.st.maxsizes,maxpcs:r.st.maxpcs,
-    qty:r.qty.map(x=>({size:x.size,qty:x.qty,cons:x.cons})),
+    qty:r.qty.map(x=>({size:x.size,qty:x.qty,cons:x.cons,ratio:x.ratio||0})),
     markers:r.markers.filter(m=>m.status!=='st_empty').map((m,i)=>({code:'M'+String(i+1).padStart(2,'0'),pairs:m.pairs,plies:m.plies,status:t(m.status),pcs:m.pcs,len:Math.round(m.len*100)/100,produced:m.produced,fabric:Math.round(m.fabric*100)/100})),
     cover:r.cover,totalReq:r.totalReq,totalMade:r.totalMade,totRem:r.totRem,totFab:Math.round(r.totFab*100)/100,
     valid:r.valid,decision:r.ready?'PASS':'FAIL'};}
@@ -1898,10 +1897,11 @@ function saveRsPlan(){const result=rsResult();if(!result)return toast(t('mkNeed'
   db.collection('qc_toolchecks').add({...data,createdAt:FV.serverTimestamp()}).then(()=>toast(t('saved'))).catch(e=>toast(rulesHint(e)));}
 function rsPlanTablesHtml(r){const u=r.unit;const f=u==='ياردة'?1.0936133:1;
   const qtot=(r.qty||[]).reduce((s,q)=>s+q.qty*q.cons*f,0);
+  const rsum=(r.qty||[]).reduce((s,q)=>s+(q.ratio||0),0);
   const qt=`<table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:13px" border="1" cellpadding="6">
-    <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('sizeName')}</td><td>${t('mkQtyOrder')}</td><td>${t('sizeCons')}</td><td>${t('rsQtyCons')} (${u})</td></tr>
-    ${(r.qty||[]).map(q=>`<tr><td>${esc(q.size)}</td><td>${q.qty}</td><td>${q.cons}</td><td>${Math.round(q.qty*q.cons*f*100)/100}</td></tr>`).join('')}
-    <tr style="font-weight:800;background:#f4f8f8"><td>${t('total')}</td><td>${r.totalReq}</td><td>—</td><td>${Math.round(qtot*100)/100}</td></tr></table>`;
+    <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('sizeName')}</td><td>${t('mkQtyOrder')}</td><td>${t('rsRatio')}</td><td>${t('sizeCons')}</td><td>${t('rsQtyCons')} (${u})</td></tr>
+    ${(r.qty||[]).map(q=>`<tr><td>${esc(q.size)}</td><td>${q.qty}</td><td>${q.ratio||'—'}</td><td>${q.cons}</td><td>${Math.round(q.qty*q.cons*f*100)/100}</td></tr>`).join('')}
+    <tr style="font-weight:800;background:#f4f8f8"><td>${t('total')}</td><td>${r.totalReq}</td><td>${rsum?Math.round(rsum*100)/100:'—'}</td><td>—</td><td>${Math.round(qtot*100)/100}</td></tr></table>`;
   const mk=`<table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:13px" border="1" cellpadding="6">
     <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>#</td><td>${t('rsMarkers')}</td><td>${t('rsPlies')}</td><td>${t('rsPcsLbl')}</td><td>${t('rsMkLen')} (${u})</td><td>${t('rsProduced')}</td><td>${t('mkTotalFabric')} (${u})</td></tr>
     ${(r.markers||[]).map(m=>`<tr><td>${esc(m.code||'')}</td><td>${m.pairs.map(p=>esc(p.size)+'×'+p.cnt).join(' · ')}</td><td>${m.plies}</td><td>${m.pcs}</td><td>${m.len}</td><td>${m.produced}</td><td>${m.fabric}</td></tr>`).join('')}
