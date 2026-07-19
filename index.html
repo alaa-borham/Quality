@@ -301,7 +301,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <label class="inl" data-i18n="rsQtyTbl">جدول الكميات المطلوبة</label>
         <div style="overflow-x:auto"><table class="rtbl" style="min-width:460px">
           <tr><th data-i18n="sizeName">المقاس</th><th data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="sizeCons">استهلاك القطعة</th><th data-i18n="rsRatio">النسبة</th><th data-i18n="rsQtyCons">استهلاك الكمية</th><th></th></tr>
-          <tbody id="rs-qty-rows"></tbody></table></div>
+          <tbody id="rs-qty-rows"></tbody>
+          <tr style="font-weight:800;background:#eef6f6"><td data-i18n="total">الإجمالي</td><td id="rs-qt-q">—</td><td>—</td><td id="rs-qt-r">—</td><td id="rs-qt-c">—</td><td></td></tr></table></div>
         <button type="button" class="mini" style="margin-top:6px" onclick="rsAddQtyRow()">➕ <span data-i18n="mkAddRow">إضافة مقاس</span></button>
         <button type="button" class="mini g" style="margin-top:6px" onclick="rsFillProduct()">📋 <span data-i18n="rsFillProd">تعبئة مقاسات المنتج</span></button>
         <label class="inl" style="margin-top:12px" data-i18n="rsMarkers">الماركرات</label>
@@ -1252,7 +1253,7 @@ function goTool(id,btn){const all=id==='all';
   document.querySelectorAll('#tools-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');}
 function goMarker(id,btn){document.querySelectorAll('#marker-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');
   ['mk','rs'].forEach(x=>{const el=$('tool-'+x);if(el)el.classList.toggle('hide',x!==id);});
-  if(id==='rs'){renderRsProducts();if(!$('rs-qty-rows').children.length)rsAddQtyRow();rsCalc();}}
+  if(id==='rs'){renderRsProducts();if(!$('rs-qty-rows').children.length){if(rsSizeSrc().length)rsFillProduct();else rsAddQtyRow();}rsCalc();}}
 const TOOL_TITLES={fp:'fpTitle',sh:'shTitle',aq:'aqlTitle',mk:'mkTitle',rs:'rsTitle',all:'allTitle'};
 function toolInfo(id,e){e.preventDefault();modal(`<h3>${esc(t(TOOL_TITLES[id]))}</h3>
   <p style="line-height:1.7;color:var(--mut)">${esc(t('toolDesc'+id))}</p>
@@ -1566,6 +1567,7 @@ function renderToolChk(){const el=$('toolchk-list');if(!el)return;if(!TOOLCHK.le
     <span class="badge ${b}">${c.result.decision==='PASS'?t('pass'):t('fail')}</span></div>
     <div class="row-btns"><button class="mini" onclick="printToolChk('${c.id}')">${t('reportBtn')}</button>
     ${c.type==='mk'?`<button class="mini g" onclick="openMkInCalc('${c.id}')">${t('openInCalc')}</button>`:''}
+    ${c.type==='rs'?`<button class="mini g" onclick="rsOpenInCalc('${c.id}')">${t('openInCalc')}</button>`:''}
     ${can('del')?`<button class="mini r" onclick="delToolChk('${c.id}')">${t('del')}</button>`:''}</div></div>`;}).join('')+'</div>';}
 function delToolChk(id){if(!confirm(t('delInspQ')))return;db.collection('qc_toolchecks').doc(id).delete().catch(e=>toast(rulesHint(e)));}
 function navBtn(tb){return [...document.querySelectorAll('.nav button')].find(b=>(b.getAttribute('onclick')||'').includes("'"+tb+"'"));}
@@ -1654,7 +1656,8 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
 function renderRsProducts(){const el=$('rs-product');if(!el)return;const cur=el.value;const ns=prodNames();
   el.innerHTML=ns.length?ns.map(n=>`<option ${n===cur?'selected':''}>${esc(n)}</option>`).join(''):`<option value="">—</option>`;
   if(cur&&ns.includes(cur))el.value=cur;}
-function rsProductChanged(){$('rs-qty-rows').innerHTML='';rsAddQtyRow();$('rs-markers').innerHTML='';$('rs-sug').innerHTML='';rsCalc();}
+function rsProductChanged(){$('rs-qty-rows').innerHTML='';$('rs-markers').innerHTML='';$('rs-sug').innerHTML='';
+  if(rsSizeSrc().length)rsFillProduct();else{rsAddQtyRow();rsCalc();}}
 function rsSizeSrc(){return sizeList($('rs-product')?$('rs-product').value:'');}
 function rsAddQtyRow(r){r=r||{};const src=rsSizeSrc();const locked=src.length>0;
   const cell=locked
@@ -1730,10 +1733,16 @@ function rsCompute(){const st=rsSettings();const qty=rsReadQty();
     ready:totalReq>0&&cover.every(c=>c.rem===0)&&markers.every(x=>x.status==='st_ok'||x.status==='st_empty')};}
 function rsCalc(){if(!$('rs-qty-rows'))return;const r=rsCompute();
   const minQty=Math.min(...r.qty.map(x=>x.qty).concat([Infinity]));
+  let ratioSum=0,consSum=0;
   document.querySelectorAll('.rsq-row').forEach(tr=>{const q=+tr.querySelector('.rsq-qty').value||0;
     const c=+tr.querySelector('.rsq-cons').value||0;
-    tr.querySelector('.rsq-ratio').textContent=(q>0&&isFinite(minQty)&&minQty>0)?Math.round(q/minQty*100)/100:'—';
-    tr.querySelector('.rsq-tot').textContent=(q>0&&c>0)?Math.round(q*c*r.st.f*100)/100:'—';});
+    const ratio=(q>0&&isFinite(minQty)&&minQty>0)?Math.round(q/minQty*100)/100:0;
+    tr.querySelector('.rsq-ratio').textContent=ratio||'—';
+    tr.querySelector('.rsq-tot').textContent=(q>0&&c>0)?Math.round(q*c*r.st.f*100)/100:'—';
+    ratioSum+=ratio;consSum+=q*c*r.st.f;});
+  if($('rs-qt-q'))$('rs-qt-q').textContent=r.totalReq||'—';
+  if($('rs-qt-r'))$('rs-qt-r').textContent=ratioSum?Math.round(ratioSum*100)/100:'—';
+  if($('rs-qt-c'))$('rs-qt-c').textContent=consSum?Math.round(consSum*100)/100+' '+r.st.unit:'—';
   document.querySelectorAll('.rs-marker').forEach((div,i)=>{const m=r.markers[i];if(!m)return;
     div.querySelector('.rsm-code').textContent='M'+String(i+1).padStart(2,'0');
     const ok=m.status==='st_ok';
@@ -1795,7 +1804,12 @@ function saveRsPlan(){const result=rsResult();if(!result)return toast(t('mkNeed'
   const title=$('rs-title')?$('rs-title').value.trim():'';
   const data={wsId:MEMBER.wsId,type:'rs',title,factoryId:'',factoryName:'',date:today(),inspector:MEMBER.name||ME.email,result};
   db.collection('qc_toolchecks').add({...data,createdAt:FV.serverTimestamp()}).then(()=>toast(t('saved'))).catch(e=>toast(rulesHint(e)));}
-function rsPlanTablesHtml(r){const u=r.unit;
+function rsPlanTablesHtml(r){const u=r.unit;const f=u==='ياردة'?1.0936133:1;
+  const qtot=(r.qty||[]).reduce((s,q)=>s+q.qty*q.cons*f,0);
+  const qt=`<table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:13px" border="1" cellpadding="6">
+    <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('sizeName')}</td><td>${t('mkQtyOrder')}</td><td>${t('sizeCons')}</td><td>${t('rsQtyCons')} (${u})</td></tr>
+    ${(r.qty||[]).map(q=>`<tr><td>${esc(q.size)}</td><td>${q.qty}</td><td>${q.cons}</td><td>${Math.round(q.qty*q.cons*f*100)/100}</td></tr>`).join('')}
+    <tr style="font-weight:800;background:#f4f8f8"><td>${t('total')}</td><td>${r.totalReq}</td><td>—</td><td>${Math.round(qtot*100)/100}</td></tr></table>`;
   const mk=`<table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:13px" border="1" cellpadding="6">
     <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>#</td><td>${t('rsMarkers')}</td><td>${t('rsPlies')}</td><td>${t('rsPcsLbl')}</td><td>${t('rsMkLen')} (${u})</td><td>${t('rsProduced')}</td><td>${t('mkTotalFabric')} (${u})</td></tr>
     ${(r.markers||[]).map(m=>`<tr><td>${esc(m.code||'')}</td><td>${m.pairs.map(p=>esc(p.size)+'×'+p.cnt).join(' · ')}</td><td>${m.plies}</td><td>${m.pcs}</td><td>${m.len}</td><td>${m.produced}</td><td>${m.fabric}</td></tr>`).join('')}
@@ -1804,7 +1818,17 @@ function rsPlanTablesHtml(r){const u=r.unit;
     <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('sizeName')}</td><td>${t('mkQtyOrder')}</td><td>${t('rsProduced')}</td><td>${t('rsRemaining')}</td></tr>
     ${(r.cover||[]).map(c=>`<tr><td>${esc(c.size)}</td><td>${c.req}</td><td>${c.made}</td><td style="color:${c.rem===0?'#1e7e40':'#b02a26'};font-weight:700">${c.rem}</td></tr>`).join('')}
     <tr style="font-weight:800;background:#f4f8f8"><td>${t('total')}</td><td>${r.totalReq}</td><td>${r.totalMade}</td><td>${r.totRem}</td></tr></table>`;
-  return mk+cv;}
+  return qt+mk+cv;}
+function rsOpenInCalc(id){const c=TOOLCHK.find(x=>x.id===id);if(!c||c.type!=='rs')return;const r=c.result;
+  go('marker',navBtn('marker'));goMarker('rs',document.querySelectorAll('#marker-subnav button')[1]);
+  if($('rs-title'))$('rs-title').value=c.title||'';
+  if(r.product&&prodNames().includes(r.product)){$('rs-product').value=r.product;}
+  $('rs-unit').value=r.unit||'متر';$('rs-maxlen').value=r.maxlen||'';
+  $('rs-maxsizes').value=r.maxsizes||5;$('rs-maxpcs').value=r.maxpcs||5;
+  $('rs-qty-rows').innerHTML='';(r.qty||[]).forEach(q=>rsAddQtyRow(q));
+  $('rs-markers').innerHTML='';$('rs-sug').innerHTML='';
+  (r.markers||[]).forEach(m=>rsAddMarker({pairs:m.pairs,plies:m.plies}));
+  rsCalc();toast(t('restored'));}
 function printRsPlan(){const r=rsResult();if(!r)return toast(t('mkNeed'));
   const title=$('rs-title')?$('rs-title').value.trim():'';
   const dcol=r.decision==='PASS'?'#1e7e40':'#b02a26';
