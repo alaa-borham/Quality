@@ -128,6 +128,11 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
 .xtbl tr.tot td{background:#17696b;color:#fff;font-weight:800}
 .xtbl .red{color:#c00000;font-weight:800}
 .xtbl input,.xtbl select{font-family:inherit;font-size:13px}
+.xtbl select{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:none;cursor:pointer}
+.xtbl select:hover,.xtbl select:focus{outline:2px solid #7aa7c7;background:#fff;border-radius:4px}
+.xtbl input[type=number]::-webkit-inner-spin-button{display:none}
+.xtbl input[type=number]{-moz-appearance:textfield;appearance:textfield}
+.xtbl th.ttl{background:#f0a13c;font-size:14px;padding:8px}
 .xsum{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:6px;margin:10px 0}
 .xsum>div{display:flex;border-radius:8px;overflow:hidden;border:1px solid #d8c27a}
 .xsum .lbl{background:#ffc000;padding:8px 10px;font-weight:800;flex:1;min-width:110px;font-size:13px}
@@ -311,15 +316,15 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div class="grid2"><div><label class="inl" data-i18n="rsMaxSizes">أقصى عدد قياسات في الماركر</label><input id="rs-maxsizes" type="number" value="5" oninput="rsCalc()"></div>
           <div><label class="inl" data-i18n="rsMaxPcs">أقصى عدد قطع في الماركر</label><input id="rs-maxpcs" type="number" value="5" oninput="rsCalc()"></div></div>
         <div id="rs-summary" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0"></div>
-        <label class="inl" data-i18n="rsQtyTbl">جدول الكميات المطلوبة</label>
-        <div style="overflow-x:auto"><table class="xtbl" style="min-width:520px">
+        <div style="overflow-x:auto;margin-top:10px"><table class="xtbl" style="min-width:520px">
+          <tr><th colspan="6" class="ttl" data-i18n="rsQtyTbl2">الكميات المطلوبة والاستهلاك حسب المقاس</th></tr>
           <tr><th data-i18n="sizeName">المقاس</th><th class="or" data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="sizeCons">استهلاك القطعة</th><th data-i18n="rsRatio">النسبة</th><th class="or" data-i18n="rsQtyCons">استهلاك الكمية</th><th></th></tr>
           <tbody id="rs-qty-rows"></tbody>
           <tr class="tot"><td data-i18n="total">الإجمالي</td><td id="rs-qt-q">—</td><td>—</td><td id="rs-qt-r">—</td><td id="rs-qt-c">—</td><td></td></tr></table></div>
         <button type="button" class="mini" style="margin-top:6px" onclick="rsAddQtyRow()">➕ <span data-i18n="mkAddRow">إضافة مقاس</span></button>
         <button type="button" class="mini g" style="margin-top:6px" onclick="rsFillProduct()">📋 <span data-i18n="rsFillProd">تعبئة مقاسات المنتج</span></button>
-        <label class="inl" style="margin-top:12px" data-i18n="rsMarkersTbl">القياسات والكميات داخل الماركر</label>
-        <div style="overflow-x:auto"><table class="xtbl" style="min-width:900px">
+        <div style="overflow-x:auto;margin-top:12px"><table class="xtbl" style="min-width:900px">
+          <tr><th colspan="15" class="ttl" data-i18n="rsMarkersTbl">القياسات والكميات داخل الماركر</th></tr>
           <tr><th data-i18n="rsCode">الكود</th><th data-i18n="rsDesc">البيان</th>
             <th>مقاس١</th><th>مقاس٢</th><th>مقاس٣</th><th>مقاس٤</th><th>مقاس٥</th><th>مقاس٦</th>
             <th class="or" data-i18n="rsPcsLbl">إجمالي القطع في الماركر</th><th data-i18n="rsPlies">عدد الطبقات</th>
@@ -452,6 +457,7 @@ rsSumReq:'إجمالي كمية الطلب',rsSumProd:'إجمالي إنتاج �
 rsMkPerPly:'استهلاك الماركر/طبقة',rsPcsRun:'إجمالي القطع في التشغيل',rsRemAfter:'المتبقي بعد التشغيل',rsOrderCons:'إجمالي استهلاك الأوردر',
 rsMarkersTbl:'القياسات والكميات داخل الماركر',rsCode:'الكود',rsDesc:'البيان',rsSizesRow:'المقاسات',rsQtyRow:'الكميات',
 rsMkStatus:'حالة الماركر وسبب عدم الصلاحية',rsSugPliesCol:'الطبقات المقترحة',rsEditPliesCol:'تعديل الطبقات (اختياري)',
+rsQtyTbl2:'الكميات المطلوبة والاستهلاك حسب المقاس',rsSugTitle:'الاقتراحات — أفضل دمج للقياسات حسب طول الماركر دون تكرار',
 mkMkLen:'طول الماركر',mkTotalPlies:'إجمالي الطبقات',mkSpreadsShort:'فرشة',
 backupTitle:'النسخ الاحتياطي',backupBtn:'⬇ تنزيل نسخة',restoreBtn:'⬆ استعادة نسخة',
 backupHint:'تنزيل كل بيانات مساحة العمل في ملف واحد. احفظه دورياً — الاستعادة تكتب فوق السجلات بنفس المعرّفات.',
@@ -587,6 +593,7 @@ rsSumReq:'Total order qty',rsSumProd:'Plan production',rsSumRem:'Order remaining
 rsMkPerPly:'Marker cons/ply',rsPcsRun:'Total run pieces',rsRemAfter:'Remaining after run',rsOrderCons:'Total order consumption',
 rsMarkersTbl:'Sizes & quantities per marker',rsCode:'Code',rsDesc:'Item',rsSizesRow:'Sizes',rsQtyRow:'Quantities',
 rsMkStatus:'Marker status & invalid reason',rsSugPliesCol:'Suggested plies',rsEditPliesCol:'Adjust plies (optional)',
+rsQtyTbl2:'Required quantities & consumption by size',rsSugTitle:'Suggestions — best size mix within marker length, no repeats',
 mkMkLen:'Marker length',mkTotalPlies:'Total plies',mkSpreadsShort:'spreads',
 backupTitle:'Backup',backupBtn:'⬇ Download backup',restoreBtn:'⬆ Restore backup',
 backupHint:'Download all workspace data in one file. Save it periodically — restoring overwrites records with the same IDs.',
@@ -1806,6 +1813,7 @@ function rsCalc(){if(!$('rs-qty-rows'))return;const r=rsCompute();
     +cell2(t('rsSumFab'),Math.round(r.totFab*100)/100+' '+r.st.unit,'#c00000')
     +cell2(t('rsPlanState'),r.ready?t('rsReady'):t('rsReview'),r.ready?'#1e7e40':'#c00000'):'';
   $('rs-cover').innerHTML=r.qty.length?`<div style="overflow-x:auto"><table class="xtbl" style="min-width:560px">
+    <tr><th colspan="7" class="ttl">${t('rsCover')}</th></tr>
     <tr><th>${t('sizeName')}</th><th class="or">${t('mkQtyOrder')}</th><th>${t('rsProduced')}</th><th class="or">${t('rsRemaining')}</th><th>${t('mkStateCol')}</th><th>${t('sizeCons')}</th><th class="or">${t('rsOrderCons')} (${r.st.unit})</th></tr>
     ${r.cover.map(c=>`<tr><td style="font-weight:800">${esc(c.size)}</td><td style="font-weight:700">${c.req}</td><td style="font-weight:700">${c.made}</td><td style="font-weight:800">${c.rem}</td>
       <td style="font-weight:800;${c.rem===0?'background:#e2f2e2;color:#1e7e40':'background:#fbe3e3;color:#c00000'}">${c.rem===0?t('rsMatch'):c.rem>0?t('mkShort')+' '+c.rem:t('rsSurplus')+' '+(-c.rem)}</td>
@@ -1866,6 +1874,7 @@ function rsRenderSugs(){const sugs=window.RS_SUGS||[];const st=rsSettings();
      <tr><td style="background:${bg};font-weight:700">${t('rsQtyRow')}</td>${ct}</tr>`;});
   const finalLeft=Object.values(rem).reduce((a,b)=>a+Math.max(0,b),0);
   $('rs-sug').innerHTML=`<div style="overflow-x:auto;margin-top:8px"><table class="xtbl" style="min-width:900px">
+    <tr><th colspan="16" class="ttl">${t('rsSugTitle')}</th></tr>
     <tr><th>${t('rsCode')}</th><th>${t('rsDesc')}</th><th>مقاس١</th><th>مقاس٢</th><th>مقاس٣</th><th>مقاس٤</th><th>مقاس٥</th><th>مقاس٦</th>
     <th class="or">${t('rsPcsLbl')}</th><th>${t('rsSugPliesCol')}</th><th>${t('rsEditPliesCol')}</th><th class="or">${t('rsPcsRun')}</th>
     <th>${t('rsMkPerPly')}</th><th class="or">${t('rsSumFab')}</th><th>${t('rsRemAfter')}</th><th></th></tr>${rowsHtml}</table></div>
