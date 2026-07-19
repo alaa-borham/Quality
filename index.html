@@ -315,6 +315,9 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <div><label class="inl" data-i18n="rsMaxLen">حد طول الماركر</label><input id="rs-maxlen" type="number" step="0.01" value="17" oninput="rsCalc()"></div></div>
         <div class="grid2"><div><label class="inl" data-i18n="rsMaxSizes">أقصى عدد قياسات في الماركر</label><input id="rs-maxsizes" type="number" value="5" oninput="rsCalc()"></div>
           <div><label class="inl" data-i18n="rsMaxPcs">أقصى عدد قطع في الماركر</label><input id="rs-maxpcs" type="number" value="5" oninput="rsCalc()"></div></div>
+        <div id="rs-nosizes" class="hide" style="margin:8px 0;padding:10px;border:1px dashed #d8a03c;background:#fff8e6;border-radius:10px">
+          <span data-i18n="rsNoSizes">المنتج المختار بلا مقاسات محفوظة — افتح إدارة الموديلات والمقاسات وأضف المقاسات مع الاستهلاك والنسبة</span>
+          <button type="button" class="mini g" style="margin-inline-start:8px" onclick="modelsManager()" data-i18n="mkManage">⚙️ إدارة الموديلات والمقاسات</button></div>
         <div id="rs-summary" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0"></div>
         <div style="overflow-x:auto;margin-top:10px"><table class="xtbl" style="min-width:520px">
           <tr><th colspan="6" class="ttl" data-i18n="rsQtyTbl2">الكميات المطلوبة والاستهلاك حسب المقاس</th></tr>
@@ -459,6 +462,7 @@ rsMkPerPly:'استهلاك الماركر/طبقة',rsPcsRun:'إجمالي ال�
 rsMarkersTbl:'القياسات والكميات داخل الماركر',rsCode:'الكود',rsDesc:'البيان',rsSizesRow:'المقاسات',rsQtyRow:'الكميات',
 rsMkStatus:'حالة الماركر وسبب عدم الصلاحية',rsSugPliesCol:'الطبقات المقترحة',rsEditPliesCol:'تعديل الطبقات (اختياري)',
 rsQtyTbl2:'الكميات المطلوبة والاستهلاك حسب المقاس',rsSugTitle:'الاقتراحات — أفضل دمج للقياسات حسب طول الماركر دون تكرار',
+rsNoSizes:'المنتج المختار بلا مقاسات محفوظة — افتح إدارة الموديلات والمقاسات وأضف المقاسات مع الاستهلاك والنسبة',
 mkMkLen:'طول الماركر',mkTotalPlies:'إجمالي الطبقات',mkSpreadsShort:'فرشة',
 backupTitle:'النسخ الاحتياطي',backupBtn:'⬇ تنزيل نسخة',restoreBtn:'⬆ استعادة نسخة',
 backupHint:'تنزيل كل بيانات مساحة العمل في ملف واحد. احفظه دورياً — الاستعادة تكتب فوق السجلات بنفس المعرّفات.',
@@ -596,6 +600,7 @@ rsMkPerPly:'Marker cons/ply',rsPcsRun:'Total run pieces',rsRemAfter:'Remaining a
 rsMarkersTbl:'Sizes & quantities per marker',rsCode:'Code',rsDesc:'Item',rsSizesRow:'Sizes',rsQtyRow:'Quantities',
 rsMkStatus:'Marker status & invalid reason',rsSugPliesCol:'Suggested plies',rsEditPliesCol:'Adjust plies (optional)',
 rsQtyTbl2:'Required quantities & consumption by size',rsSugTitle:'Suggestions — best size mix within marker length, no repeats',
+rsNoSizes:'The selected product has no saved sizes — open the models & sizes manager and add sizes with consumption and ratio',
 mkMkLen:'Marker length',mkTotalPlies:'Total plies',mkSpreadsShort:'spreads',
 backupTitle:'Backup',backupBtn:'⬇ Download backup',restoreBtn:'⬆ Restore backup',
 backupHint:'Download all workspace data in one file. Save it periodically — restoring overwrites records with the same IDs.',
@@ -1705,7 +1710,14 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
 /* ============ الريشو: خطة الماركرات ============ */
 function renderRsProducts(){const el=$('rs-product');if(!el)return;const cur=el.value;const ns=prodNames();
   el.innerHTML=ns.length?ns.map(n=>`<option ${n===cur?'selected':''}>${esc(n)}</option>`).join(''):`<option value="">—</option>`;
-  if(cur&&ns.includes(cur))el.value=cur;}
+  if(cur&&ns.includes(cur))el.value=cur;
+  if($('rs-nosizes'))$('rs-nosizes').classList.toggle('hide',rsSizeSrc().length>0);
+  rsMaybeRefill();}
+// وصلت بيانات المقاسات بعد فتح الصفحة؟ أعد تعبئة الجدول إن كان فارغاً بلا قوائم
+function rsMaybeRefill(){const rows=[...document.querySelectorAll('.rsq-row')];if(!rows.length)return;
+  const allEmpty=rows.every(tr=>!tr.querySelector('.rsq-size').value.trim()&&!(+tr.querySelector('.rsq-qty').value||0));
+  const hasSelect=!!rows[0].querySelector('select.rsq-size');
+  if(allEmpty&&!hasSelect&&rsSizeSrc().length)rsProductChanged();}
 function rsProductChanged(){$('rs-qty-rows').innerHTML='';$('rs-markers').innerHTML='';$('rs-sug').innerHTML='';
   if(rsSizeSrc().length)rsFillProduct();else{rsAddQtyRow();rsCalc();}}
 function rsSizeSrc(){return sizeList($('rs-product')?$('rs-product').value:'');}
