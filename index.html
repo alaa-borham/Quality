@@ -2180,31 +2180,48 @@ function rsOpenInCalc(id){const c=TOOLCHK.find(x=>x.id===id);if(!c||c.type!=='rs
   $('rs-markers').innerHTML='';(r.markers||[]).forEach(m=>rsAddMarker({pairs:m.pairs,plies:m.plies}));
   rsUpdateUnitLabels();rsCalc();toast(t('restored'));}
 function rsPlanTablesHtml(r){const uf=r.uf||1,u=r.unit||'\u0645\u062a\u0631';const R=v=>Math.round(v*uf*100)/100;
-  const qt=`<table style="width:100%;border-collapse:collapse;margin-top:8px;font-size:13px" border="1" cellpadding="6">
-    <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('sizeName')}</td><td>${t('mkQtyOrder')}</td><td>${t('rsRatio')}</td><td>${t('rsPieceConsM')}</td><td>${t('rsQtyConsM').replace('\u0645\u062a\u0631',u).replace('(m)','('+u+')')}</td></tr>
-    ${(r.qty||[]).map(x=>`<tr><td>${esc(x.size)}</td><td>${x.qty}</td><td>${x.ratio||'\u2014'}</td><td>${x.cons}</td><td>${R(x.qty*x.cons)}</td></tr>`).join('')}
-    <tr style="font-weight:800;background:#f4f8f8"><td>${t('total')}</td><td>${r.totalReq}</td><td>${(r.qty||[]).reduce((s,x)=>s+(x.ratio||0),0)||'\u2014'}</td><td>\u2014</td><td>${R((r.qty||[]).reduce((s,x)=>s+x.qty*x.cons,0))}</td></tr></table>`;
-  const mk=`<table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:13px" border="1" cellpadding="6">
-    <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('rsCode')}</td><td>${t('rsMkTbl')}</td><td>${t('rsPcsLbl')}</td><td>${t('rsPlies')}</td><td>${t('rsPcsRun')}</td><td>${t('rsMkStatus')}</td><td>${t('rsMkPerPly').replace('\u0645\u062a\u0631',u).replace('(m)','('+u+')')}</td><td>${t('rsSumFab').replace('\u0645\u062a\u0631',u).replace('(m)','('+u+')')}</td></tr>
-    ${(r.markers||[]).map(m=>`<tr><td style="font-weight:700">${esc(m.code)}</td><td>${m.pairs.map(p=>esc(p.size)+'\u00d7'+p.cnt).join(' \u00b7 ')||'\u2014'}</td><td>${m.pcs}</td><td>${m.plies}</td><td>${m.run}</td><td style="color:${m.ok?'#1e7e40':'#c00000'};font-weight:700">${esc(m.status)}</td><td>${R(m.len)}</td><td>${R(m.fab)}</td></tr>`).join('')}
-    <tr style="font-weight:800;background:#f4f8f8"><td colspan="4">${t('total')}</td><td>${r.totalMade}</td><td></td><td></td><td>${R(r.totFab)}</td></tr></table>`;
-  const cv=`<table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:13px" border="1" cellpadding="6">
-    <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('sizeName')}</td><td>${t('mkQtyOrder')}</td><td>${t('rsPcsRun')}</td><td>${t('rsRemaining')}</td></tr>
-    ${(r.cover||[]).map(c=>`<tr><td>${esc(c.size)}</td><td>${c.req}</td><td>${c.made}</td><td style="color:${c.rem===0?'#1e7e40':'#c00000'};font-weight:700">${c.rem}</td></tr>`).join('')}
-    <tr style="font-weight:800;background:#f4f8f8"><td>${t('total')}</td><td>${r.totalReq}</td><td>${r.totalMade}</td><td>${r.totRem}</td></tr></table>`;
+  const uL=s=>t(s).replace('\u0645\u062a\u0631',u).replace('(m)','('+u+')');
+  const st=(al)=>LANG==='ar'?(al==='s'?'right':al==='e'?'left':'center'):(al==='s'?'left':al==='e'?'right':'center');
+  const sec=txt=>`<div style="display:inline-block;background:#14504f;color:#fff;font-size:12.5px;font-weight:800;padding:4px 13px;border-radius:7px;margin:15px 0 7px">${txt}</div>`;
+  const open=`<table style="width:100%;border-collapse:collapse;border:1px solid #d5dee2;border-radius:10px;overflow:hidden;font-size:12.5px">`;
+  const hd=cells=>`<tr style="background:#e6efee">${cells.map(c=>`<td style="padding:8px;font-weight:800;color:#0e3f3e;border-bottom:2px solid #14504f;text-align:${st(c[1])};white-space:nowrap">${c[0]}</td>`).join('')}</tr>`;
+  const totr=cells=>`<tr style="background:#14504f;color:#fff;font-weight:800">${cells.map(c=>`<td ${c[2]?`colspan="${c[2]}"`:''} style="padding:9px 8px;text-align:${st(c[1])}">${c[0]}</td>`).join('')}</tr>`;
+  const zb=i=>i%2?'#f6faf9':'#fff';
+  const chips=pairs=>pairs.map(p=>`<span style="display:inline-block;background:#fff;border:1.5px solid #cfe0df;border-radius:999px;padding:2px 9px;margin:2px;font-weight:800;white-space:nowrap">${esc(p.size)} <span style="color:#1f6e6e">\u00d7${p.cnt}</span></span>`).join('')||'\u2014';
+  const badge=code=>`<span style="display:inline-block;background:#14504f;color:#fff;font-weight:800;padding:3px 9px;border-radius:7px">${esc(code)}</span>`;
+  const qt=sec(t('rsQtyTbl2'))+open+hd([[t('sizeName'),'s'],[t('mkQtyOrder')],[t('rsRatio')],[t('rsPieceConsM')],[uL('rsQtyConsM')]])
+    +(r.qty||[]).map((x,i)=>`<tr style="background:${zb(i)}"><td style="padding:7px 8px;font-weight:700;text-align:${st('s')}">${esc(x.size)}</td><td style="padding:7px;text-align:center;font-weight:700">${x.qty}</td><td style="padding:7px;text-align:center">${x.ratio||'\u2014'}</td><td style="padding:7px;text-align:center;color:#c00000;font-weight:700">${x.cons}</td><td style="padding:7px;text-align:center">${R(x.qty*x.cons)}</td></tr>`).join('')
+    +totr([[t('total'),'s'],[r.totalReq],[(r.qty||[]).reduce((s,x)=>s+(x.ratio||0),0)||'\u2014'],['\u2014'],[R((r.qty||[]).reduce((s,x)=>s+x.qty*x.cons,0))]])+`</table>`;
+  const mk=sec(t('rsMkTbl'))+open+hd([[t('rsCode')],[t('rsMkTbl'),'s'],[t('rsPcsLbl')],[t('rsPlies')],[t('rsPcsRun')],[t('rsMkStatus')],[uL('rsMkPerPly')],[uL('rsSumFab')]])
+    +(r.markers||[]).map((m,i)=>`<tr style="background:${zb(i)}"><td style="padding:7px;text-align:center">${badge(m.code)}</td><td style="padding:7px 8px;text-align:${st('s')}">${chips(m.pairs)}</td><td style="padding:7px;text-align:center;font-weight:700">${m.pcs}</td><td style="padding:7px;text-align:center;font-weight:800">${m.plies}</td><td style="padding:7px;text-align:center;font-weight:700">${m.run}</td><td style="padding:7px;text-align:center;color:${m.ok?'#1e7e40':'#c00000'};font-weight:700">${esc(m.status)}</td><td style="padding:7px;text-align:center">${R(m.len)}</td><td style="padding:7px;text-align:center;font-weight:700">${R(m.fab)}</td></tr>`).join('')
+    +totr([[t('total'),'s',4],[r.totalMade],[''],[''],[R(r.totFab)]])+`</table>`;
+  const cv=sec(t('rsReviewTbl'))+open+hd([[t('sizeName'),'s'],[t('mkQtyOrder')],[t('rsPcsRun')],[t('rsRemaining')]])
+    +(r.cover||[]).map((c,i)=>`<tr style="background:${zb(i)}"><td style="padding:7px 8px;font-weight:700;text-align:${st('s')}">${esc(c.size)}</td><td style="padding:7px;text-align:center;font-weight:700">${c.req}</td><td style="padding:7px;text-align:center;font-weight:700">${c.made}</td><td style="padding:7px;text-align:center;color:${c.rem===0?'#1e7e40':'#c00000'};font-weight:800">${c.rem}</td></tr>`).join('')
+    +totr([[t('total'),'s'],[r.totalReq],[r.totalMade],[r.totRem]])+`</table>`;
   return qt+mk+cv;}
 function printRsPlan(){const r=rsResult();if(!r)return toast(t('mkNeed'));
+  const uf=r.uf||1,u=r.unit||'\u0645\u062a\u0631';const R=v=>Math.round(v*uf*100)/100;
   const title=$('rs-title')?$('rs-title').value.trim():'';const dcol=r.decision==='PASS'?'#1e7e40':'#b02a26';
-  $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:780px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
-    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
-      <div><div style="font-size:22px;font-weight:800;color:#14504f">\ud83e\uddf5 ${esc(MEMBER.wsName||'')}</div>
-      <div style="font-size:15px;color:#555">${t('rsTitle')}${title?' \u2014 <b>'+esc(title)+'</b>':''}${r.product?' \u00b7 \ud83d\udce6 '+esc(r.product):''}</div></div>
-      <div style="text-align:${LANG==='ar'?'left':'right'};font-size:12px;color:#666">${fmtDate(today())}</div></div>
+  const surplus=r.totalMade-r.totalReq;
+  const card=(label,val,sub)=>`<div style="flex:1;min-width:96px;border:1px solid #dbe5e4;border-radius:11px;padding:9px 8px;text-align:center;background:#f7faf9">
+    <div style="font-size:10.5px;color:#6b7683;font-weight:700">${label}</div>
+    <div style="font-size:19px;color:#14504f;font-weight:800;line-height:1.2;margin-top:2px">${val}${sub?`<span style="font-size:11px;color:#93a0ab;font-weight:700"> ${sub}</span>`:''}</div></div>`;
+  const sigBox=lbl=>`<div style="flex:1;text-align:center"><div style="border-bottom:1.5px solid #7c8894;margin:0 14px 6px;height:40px"></div><div style="font-size:12px;color:#44515e;font-weight:700">${lbl}</div></div>`;
+  const banner=surplus>0?`<div style="margin-top:10px;background:#fbe3e3;border:1.5px solid #e6a5a2;border-radius:9px;padding:8px 12px;font-weight:800;color:#b02a26">\u26a0\ufe0f ${tf('rsOverProd',{n:surplus})}</div>`
+    :surplus<0?`<div style="margin-top:10px;background:#fff8e6;border:1.5px solid #f0dca0;border-radius:9px;padding:8px 12px;font-weight:800;color:#8a6d00">\ud83d\udfe1 ${tf('rsUnderProd',{n:-surplus})}</div>`:'';
+  $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#1c2530;max-width:840px;margin:auto;padding-top:8px" dir="${LANG==='ar'?'rtl':'ltr'}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #14504f;padding-bottom:10px">
+      <div><div style="font-size:23px;font-weight:800;color:#14504f;line-height:1.15">\ud83e\uddf5 ${esc(MEMBER.wsName||'')}</div>
+      <div style="display:inline-block;margin-top:6px;background:#14504f;color:#fff;font-size:13px;font-weight:800;padding:3px 12px;border-radius:7px">${t('rsTitle')}</div></div>
+      <div style="text-align:${LANG==='ar'?'left':'right'};font-size:12px;color:#6b7683;line-height:1.9">
+        <div>\ud83d\udcc5 ${fmtDate(today())}</div>${r.product?`<div>\ud83d\udce6 ${esc(r.product)}</div>`:''}${title?`<div>\ud83d\udcdd ${esc(title)}</div>`:''}</div></div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      ${card(t('rsSumReq'),r.totalReq)}${card(t('rsSumProd'),r.totalMade)}${card(t('rsSumValid'),r.valid)}${card(t('mkTotalFabric'),R(r.totFab),u)}</div>
+    ${banner}
     ${rsPlanTablesHtml(r)}
-    <div style="margin-top:14px;padding:12px;border:2px solid ${dcol};border-radius:10px;text-align:center">
-      <span style="font-size:20px;font-weight:800;color:${dcol}">${r.decision==='PASS'?t('rsReady'):t('rsReview')}</span></div>
-    <div style="margin-top:26px;display:flex;justify-content:space-between;font-size:13px;color:#444">
-      <div>${t('repInspector')}: ${esc(MEMBER.name||'')} ______________</div><div>QC: ______________</div></div></div>`;
+    <div style="margin-top:14px;padding:11px;border:2px solid ${dcol};border-radius:10px;text-align:center">
+      <span style="font-size:19px;font-weight:800;color:${dcol}">${r.decision==='PASS'?'\u2705 '+t('rsReady'):'\u26a0\ufe0f '+t('rsReview')}</span></div>
+    <div style="margin-top:26px;display:flex;gap:16px">${sigBox(t('repInspector')+(MEMBER.name?' \u2014 '+esc(MEMBER.name):''))}${sigBox('QC')}</div></div>`;
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 // أمر الفرد: ورقة تشغيل لعامل الفرشة — ماركر لكل صف مع الطبقات وطول الماركر وخانة توقيع
 function printRsSpread(){const r=rsResult();if(!r)return toast(t('mkNeed'));
