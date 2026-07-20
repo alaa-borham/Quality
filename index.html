@@ -1911,7 +1911,6 @@ function rsRenderSummary(d){const el=$('rs-summary');if(!el)return;
     +c(t('rsSumRem'),d.rem,d.rem===0?'#1e7e40':'#c00000')
     +c(t('rsSumValid'),d.valid||'\u2014')
     +c(t('rsSumFabT'),(d.fab||0)+' \u0645')
-    +c(t('rsMaxLen'),d.maxlen||'\u2014')
     +c(t('rsPlanState'),d.ready?t('rsReady'):t('rsReview'),d.ready?'#1e7e40':'#c00000');}
 /* ---- \u062d\u0641\u0638 / \u0637\u0628\u0627\u0639\u0629 / \u0641\u062a\u062d \u062e\u0637\u0629 \u0627\u0644\u0631\u064a\u0634\u0648 ---- */
 function rsResult(){const qty=rsReadQty();if(!qty.length)return null;
