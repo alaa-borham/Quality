@@ -363,7 +363,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div class="row-btns" style="margin-top:14px"><button class="btn sec" onclick="saveRsPlan()" data-i18n="saveCheck">💾 حفظ</button>
         <button class="btn sec" onclick="printRsPlan()" data-i18n="rsPrint">🖨 طباعة الخطة</button>
         <button class="btn sec" onclick="printRsSpread()" data-i18n="rsSpreadBtn">🧵 أمر الفرد</button>
-        <button class="btn sec" onclick="printRsRolls()" data-i18n="rsRollBtn">📦 أمر الأثواب</button></div>
+        <button class="btn sec" onclick="printRsRolls()" data-i18n="rsRollBtn">📦 أمر الأثواب</button>
+        <button class="btn sec" onclick="exportRsExcel()" data-i18n="rsExcelBtn">📊 تصدير Excel</button></div>
       </div>
     </div>
     <div id="p-ref" class="hide">
@@ -487,7 +488,7 @@ rsClearMkBtn:'امسح الماركرات',rsClearMkQ:'حذف كل المارك�
 rsSugTbl:'اقتراحات تغطية باقي كمية الأوردر (أقل استهلاك)',rsSugPliesC:'الطبقات المقترحة',rsEditPliesC:'تعديل الطبقات يدويًا (اختياري)',rsRemWithRun:'إجمالي المتبقي مع التشغيل',rsApplyAll:'✔ اعتماد كل الاقتراحات كماركر',rsSugEmpty:'لا كميات متبقية — الاقتراحات فارغة',
 rsSpreadBtn:'🧵 أمر الفرد',rsSpreadTitle:'أمر الفرد (تشغيل الفرشات)',rsMkLenH:'طول الماركر',rsNoValidMk:'لا ماركرات صالحة للفرد',
 rsSpreadJobs:'عدد الماركرات',rsSpreadDone:'تم الفرد',rsFarradSig:'توقيع الفرّاد',rsCutSupSig:'مشرف القص',rsSpreadHint:'ملاحظة: افرد كل ماركر بعدد الطبقات المذكور — راجع طول الماركر قبل القص',
-rsRollTbl:'📦 خطة الأثواب (توزيع الرولات)',rsRollTitle:'أمر الأثواب (توزيع الرولات)',rsRollBtn:'📦 أمر الأثواب',rsRollNo:'ثوب',rsRollNo2:'رقم الثوب',rsRollLenLbl:'طول الثوب',rsStoreKeeper:'أمين المخزن',rsRollNeedLen:'أدخل طول الثوب لحساب توزيع الأثواب',rsRollNoMk:'لا ماركرات صالحة بعد — أكمل الخطة أولاً',rsRollTooShort:'طول الثوب أقصر من أطول ماركر ({n}) — زِد طول الثوب',rsRollCount:'عدد الأثواب المطلوبة',rsRollTotalLen:'إجمالي طول الأثواب',rsRollWaste:'الهدر (بواقي الأثواب)',rsRollEff:'كفاءة الاستخدام',rsRollPlies:'الطبقات المفرودة (ماركر×عدد)',rsRollUsed:'الطول المستخدم',rsRollRem:'الباقي',
+rsRollTbl:'📦 خطة الأثواب (توزيع الرولات)',rsRollTitle:'أمر الأثواب (توزيع الرولات)',rsRollBtn:'📦 أمر الأثواب',rsRollNo:'ثوب',rsRollNo2:'رقم الثوب',rsRollLenLbl:'طول الثوب',rsStoreKeeper:'أمين المخزن',rsRollNeedLen:'أدخل طول الثوب لحساب توزيع الأثواب',rsRollNoMk:'لا ماركرات صالحة بعد — أكمل الخطة أولاً',rsRollTooShort:'طول الثوب أقصر من أطول ماركر ({n}) — زِد طول الثوب',rsRollCount:'عدد الأثواب المطلوبة',rsRollTotalLen:'إجمالي طول الأثواب',rsRollWaste:'الهدر (بواقي الأثواب)',rsRollEff:'كفاءة الاستخدام',rsRollPlies:'الطبقات المفرودة (ماركر×عدد)',rsRollUsed:'الطول المستخدم',rsRollRem:'الباقي',rsExcelBtn:'📊 تصدير Excel',
 rsCompareBtn:'⚖️ مقارنة السيناريوهات',rsCompareTitle:'مقارنة سيناريوهات الريشو',rsCmpPick:'اختر خطتين أو أكثر للمقارنة',rsCmpNeed2:'اختر خطتين على الأقل للمقارنة',rsCmpNone:'لا خطط ريشو محفوظة للمقارنة',rsCmpMetric:'المؤشر',rsCmpMarkers:'عدد الماركرات الصالحة',rsCmpBest:'الأفضل',rsCmpWaste:'الهدر مقابل الأقل',rsCmpDate:'التاريخ',rsCmpDo:'قارن',rsCmpPrint:'🖨 طباعة المقارنة',
 rsLenTip:'لتلائم الطول: ',rsLenReduce:'قلّل {s} بمقدار {n} قطعة',rsLenRemove:'احذف {s}',rsAddFit:'يمكن إضافة {s} (يتبقّى {r})',rsAddApply:'اضغط لإضافة هذا القياس إلى الماركر',
 st_ok:'صالح',st_empty:'فارغ',st_dup:'غير صالح: مقاس مكرر',st_badqty:'غير صالح: كمية غير صحيحة',st_maxpcs:'غير صالح: تجاوز أقصى قطع',st_maxsizes:'غير صالح: تجاوز عدد القياسات',st_len:'غير صالح: تجاوز حد الطول',st_plies:'غير صالح: عدد الطبقات غير صحيح',st_nosize:'غير صالح: كمية بلا مقاس',
@@ -634,7 +635,7 @@ rsClearMkBtn:'Clear markers',rsClearMkQ:'Delete all markers? You can then press 
 rsSugTbl:'Suggestions to cover the remaining order (least consumption)',rsSugPliesC:'Suggested plies',rsEditPliesC:'Adjust plies (optional)',rsRemWithRun:'Remaining after run',rsApplyAll:'✔ Apply all suggestions as markers',rsSugEmpty:'Nothing remaining — no suggestions',
 rsSpreadBtn:'🧵 Spreading order',rsSpreadTitle:'Spreading order',rsMkLenH:'Marker length',rsNoValidMk:'No valid markers to spread',
 rsSpreadJobs:'Markers',rsSpreadDone:'Spread done',rsFarradSig:'Spreader signature',rsCutSupSig:'Cutting supervisor',rsSpreadHint:'Note: spread each marker for the stated ply count — verify marker length before cutting',
-rsRollTbl:'📦 Fabric roll plan',rsRollTitle:'Roll pull order',rsRollBtn:'📦 Roll order',rsRollNo:'Roll',rsRollNo2:'Roll #',rsRollLenLbl:'Roll length',rsStoreKeeper:'Store keeper',rsRollNeedLen:'Enter roll length to compute allocation',rsRollNoMk:'No valid markers yet — complete the plan first',rsRollTooShort:'Roll shorter than the longest marker ({n}) — increase roll length',rsRollCount:'Rolls needed',rsRollTotalLen:'Total roll length',rsRollWaste:'End-loss (remnants)',rsRollEff:'Utilization',rsRollPlies:'Plies laid (marker×count)',rsRollUsed:'Used length',rsRollRem:'Remnant',
+rsRollTbl:'📦 Fabric roll plan',rsRollTitle:'Roll pull order',rsRollBtn:'📦 Roll order',rsRollNo:'Roll',rsRollNo2:'Roll #',rsRollLenLbl:'Roll length',rsStoreKeeper:'Store keeper',rsRollNeedLen:'Enter roll length to compute allocation',rsRollNoMk:'No valid markers yet — complete the plan first',rsRollTooShort:'Roll shorter than the longest marker ({n}) — increase roll length',rsRollCount:'Rolls needed',rsRollTotalLen:'Total roll length',rsRollWaste:'End-loss (remnants)',rsRollEff:'Utilization',rsRollPlies:'Plies laid (marker×count)',rsRollUsed:'Used length',rsRollRem:'Remnant',rsExcelBtn:'📊 Export Excel',
 rsCompareBtn:'⚖️ Compare scenarios',rsCompareTitle:'Compare ratio scenarios',rsCmpPick:'Pick two or more plans to compare',rsCmpNeed2:'Select at least two plans to compare',rsCmpNone:'No saved ratio plans to compare',rsCmpMetric:'Metric',rsCmpMarkers:'Valid markers',rsCmpBest:'Best',rsCmpWaste:'Waste vs best',rsCmpDate:'Date',rsCmpDo:'Compare',rsCmpPrint:'🖨 Print comparison',
 rsLenTip:'To fit length: ',rsLenReduce:'Reduce {s} by {n} pcs',rsLenRemove:'Remove {s}',rsAddFit:'Can add {s} ({r} left)',rsAddApply:'Click to add this size to the marker',
 st_ok:'valid',st_empty:'empty',st_dup:'invalid: duplicate size',st_badqty:'invalid: bad quantity',st_maxpcs:'invalid: exceeds max pieces',st_maxsizes:'invalid: exceeds max sizes',st_len:'invalid: exceeds length limit',st_plies:'invalid: bad ply count',st_nosize:'invalid: quantity without size',
@@ -2209,6 +2210,55 @@ function printRsRolls(){const d=rsRollCompute();
       <tbody>${rows}</tbody></table>
     <div style="margin-top:28px;display:flex;gap:16px"><div style="flex:1;text-align:center"><div style="border-bottom:1.5px solid #7c8894;margin:0 14px 6px;height:38px"></div><div style="font-size:12px;color:#44515e;font-weight:700">${t('rsFarradSig')}</div></div><div style="flex:1;text-align:center"><div style="border-bottom:1.5px solid #7c8894;margin:0 14px 6px;height:38px"></div><div style="font-size:12px;color:#44515e;font-weight:700">${t('rsStoreKeeper')}</div></div></div></div>`;
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
+/* ---- تصدير خطة الريشو كملف Excel/CSV لغرفة القص ---- */
+function exportRsExcel(){
+  const uf=rsUF(),u=rsUL();const R=v=>Math.round(v*uf*100)/100;
+  const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const title=$('rs-title')?$('rs-title').value.trim():'';const product=($('rs-product')&&$('rs-product').value)||'';
+  const objTxt=($('rs-objective')&&$('rs-objective').value==='markers')?t('rsObjMarkers'):t('rsObjPlies');
+  const produced={};let tRun=0,tFab=0,tPlies=0;const markers=[];
+  rsReadMarkers().forEach((m,i)=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
+    const ok=rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs);
+    if(!vp.length&&!plies)return;
+    const pcs=vp.reduce((a,p)=>a+p.cnt,0),len=vp.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);
+    const run=ok?pcs*plies:0,fab=ok?len*plies:0;
+    if(ok){tRun+=run;tFab+=fab;tPlies+=plies;vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);}
+    markers.push({code:'M'+String(i+1).padStart(2,'0'),mix:vp.map(p=>p.size+' ×'+p.cnt).join(' · '),pcs,plies,run,len:R(len),fab:R(fab),ok});});
+  if(!markers.length)return toast(t('rsNoValidMk'));
+  const qty=[...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0,ratio:+tr.querySelector('.rsq-ratio').value||0,cons:+tr.querySelector('.rsq-cons').value||0})).filter(x=>x.size);
+  const hasQty=qty.some(x=>x.qty>0);
+  const rows=[];
+  rows.push([t('rsTitle'),MEMBER.wsName||'']);
+  if(title)rows.push([t('mkReportName'),title]);
+  if(product)rows.push([t('productLbl'),product]);
+  rows.push([t('dateLbl'),fmtDate(today())],[t('rsDispUnit'),u],[t('rsObjective'),objTxt.replace(/^⬇️\s*/,'')]);
+  rows.push([]);
+  // الكميات
+  if(qty.length){rows.push([t('rsQtyTbl2')]);
+    rows.push([t('sizeName'),t('mkQtyOrder'),t('rsRatio'),t('rsPieceConsM'),t('rsQtyConsM').replace('متر',u).replace('(m)','('+u+')')]);
+    let sQ=0,sC=0;qty.forEach(x=>{rows.push([x.size,x.qty||'',x.ratio||'',x.cons||'',R(x.qty*x.cons)]);sQ+=x.qty;sC+=x.qty*x.cons;});
+    rows.push([t('total'),sQ,'','',R(sC)]);rows.push([]);}
+  // الماركرات
+  rows.push([t('rsMkTbl')]);
+  rows.push([t('rsCode'),t('rsDesc'),t('rsPcsLbl'),t('rsPlies'),t('rsPcsRun'),t('rsMkPerPly').replace('متر',u).replace('(m)','('+u+')'),t('rsSumFab').replace('متر',u).replace('(m)','('+u+')'),t('rsMkStatus')]);
+  markers.forEach(m=>rows.push([m.code,m.mix,m.pcs,m.plies,m.run,m.len,m.fab,m.ok?t('st_ok'):t('rsReview')]));
+  rows.push([t('total'),'','',tPlies,tRun,'',R(tFab)]);rows.push([]);
+  // المراجعة
+  if(hasQty){rows.push([t('rsReviewTbl')]);
+    rows.push([t('sizeName'),t('mkQtyOrder'),t('rsProdFromMk'),t('rsRemFromOrder')]);
+    let sr=0,sp=0;qty.forEach(x=>{const pr=produced[x.size]||0;rows.push([x.size,x.qty,pr,x.qty-pr]);sr+=x.qty;sp+=pr;});
+    rows.push([t('total'),sr,sp,sr-sp]);rows.push([]);}
+  // خطة الأثواب
+  const rp=rsRollCompute();
+  if(!rp.err){rows.push([t('rsRollTbl').replace(/^📦\s*/,'')]);
+    rows.push([t('rsRollLenLbl'),R(rp.roll),t('rsRollCount'),rp.nRolls,t('rsRollWaste'),R(rp.loss),t('rsRollEff'),rp.eff+'%']);
+    rows.push([t('rsRollNo2'),t('rsRollPlies'),t('rsPlies'),t('rsRollUsed')+' ('+u+')',t('rsRollRem')+' ('+u+')']);
+    rp.rolls.forEach((r,i)=>rows.push([t('rsRollNo')+' '+(i+1),Object.entries(r.by).map(([c,n])=>c+' ×'+n).join(' · '),r.plies,R(r.used),R(r.rem)]));}
+  const csv='﻿'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='risho_'+(title?title.replace(/[^\w؀-ۿ]+/g,'_').slice(0,30)+'_':'')+today()+'.csv';
+  a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast(t('saved'));}
 /* ---- مقارنة سيناريوهات الريشو: اختيار خطط محفوظة ومقارنتها جنبًا إلى جنب ---- */
 function rsComparePick(){const plans=TOOLCHK.filter(c=>c.type==='rs');
   if(plans.length<2)return toast(t('rsCmpNone'));
