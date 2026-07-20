@@ -496,6 +496,7 @@ rsAutoBtn:'أكمل الخطة تلقائياً (أقل استهلاك)',rsAutoD
 rsReducePliesBtn:'قلّل الطبقات',rsReduceDone:'قُلّلت الطبقات في {n} ماركر: {a} ← {b} طبقة (القماش والكمية دون تغيير)',rsReduceNone:'لا يمكن تقليل الطبقات أكثر — الماركرات مضبوطة على حدّ الطول أو أقصى قطع',
 rsSugTbl:'اقتراحات تغطية باقي كمية الأوردر (أقل استهلاك)',rsSugPliesC:'الطبقات المقترحة',rsEditPliesC:'تعديل الطبقات يدويًا (اختياري)',rsRemWithRun:'إجمالي المتبقي مع التشغيل',rsApplyAll:'✔ اعتماد كل الاقتراحات كماركرات',rsSugEmpty:'لا كميات متبقية — الاقتراحات فارغة',
 rsSpreadBtn:'🧵 أمر الفرد',rsSpreadTitle:'أمر الفرد (تشغيل الفرشات)',rsMkLenH:'طول الماركر',rsNoValidMk:'لا ماركرات صالحة للفرد',
+rsSpreadJobs:'عدد الماركرات',rsSpreadDone:'تم الفرد',rsFarradSig:'توقيع الفرّاد',rsCutSupSig:'مشرف القص',rsSpreadHint:'ملاحظة: افرد كل ماركر بعدد الطبقات المذكور — راجع طول الماركر قبل القص',
 rsCompareBtn:'⚖️ مقارنة السيناريوهات',rsCompareTitle:'مقارنة سيناريوهات الريشو',rsCmpPick:'اختر خطتين أو أكثر للمقارنة',rsCmpNeed2:'اختر خطتين على الأقل للمقارنة',rsCmpNone:'لا خطط ريشو محفوظة للمقارنة',rsCmpMetric:'المؤشر',rsCmpMarkers:'عدد الماركرات الصالحة',rsCmpBest:'الأفضل',rsCmpWaste:'الهدر مقابل الأقل',rsCmpDate:'التاريخ',rsCmpDo:'قارن',rsCmpPrint:'🖨 طباعة المقارنة',
 rsLenTip:'لتلائم الطول: ',rsLenReduce:'قلّل {s} بمقدار {n} قطعة',rsLenRemove:'احذف {s}',rsAddFit:'يمكن إضافة {s} (يتبقّى {r})',rsAddApply:'اضغط لإضافة هذا القياس إلى الماركر',
 st_ok:'صالح',st_empty:'فارغ',st_dup:'غير صالح: مقاس مكرر',st_badqty:'غير صالح: كمية غير صحيحة',st_maxpcs:'غير صالح: تجاوز أقصى قطع',st_maxsizes:'غير صالح: تجاوز عدد القياسات',st_len:'غير صالح: تجاوز حد الطول',st_plies:'غير صالح: عدد الطبقات غير صحيح',st_nosize:'غير صالح: كمية بلا مقاس',
@@ -638,6 +639,7 @@ rsAutoBtn:'Auto-complete plan (least consumption)',rsAutoDone:'Plan complete —
 rsReducePliesBtn:'Reduce plies',rsReduceDone:'Plies reduced in {n} marker(s): {a} → {b} plies (fabric & quantity unchanged)',rsReduceNone:'Cannot reduce plies further — markers are capped by length limit or max pieces',
 rsSugTbl:'Suggestions to cover the remaining order (least consumption)',rsSugPliesC:'Suggested plies',rsEditPliesC:'Adjust plies (optional)',rsRemWithRun:'Remaining after run',rsApplyAll:'✔ Apply all suggestions as markers',rsSugEmpty:'Nothing remaining — no suggestions',
 rsSpreadBtn:'🧵 Spreading order',rsSpreadTitle:'Spreading order',rsMkLenH:'Marker length',rsNoValidMk:'No valid markers to spread',
+rsSpreadJobs:'Markers',rsSpreadDone:'Spread done',rsFarradSig:'Spreader signature',rsCutSupSig:'Cutting supervisor',rsSpreadHint:'Note: spread each marker for the stated ply count — verify marker length before cutting',
 rsCompareBtn:'⚖️ Compare scenarios',rsCompareTitle:'Compare ratio scenarios',rsCmpPick:'Pick two or more plans to compare',rsCmpNeed2:'Select at least two plans to compare',rsCmpNone:'No saved ratio plans to compare',rsCmpMetric:'Metric',rsCmpMarkers:'Valid markers',rsCmpBest:'Best',rsCmpWaste:'Waste vs best',rsCmpDate:'Date',rsCmpDo:'Compare',rsCmpPrint:'🖨 Print comparison',
 rsLenTip:'To fit length: ',rsLenReduce:'Reduce {s} by {n} pcs',rsLenRemove:'Remove {s}',rsAddFit:'Can add {s} ({r} left)',rsAddApply:'Click to add this size to the marker',
 st_ok:'valid',st_empty:'empty',st_dup:'invalid: duplicate size',st_badqty:'invalid: bad quantity',st_maxpcs:'invalid: exceeds max pieces',st_maxsizes:'invalid: exceeds max sizes',st_len:'invalid: exceeds length limit',st_plies:'invalid: bad ply count',st_nosize:'invalid: quantity without size',
@@ -2182,25 +2184,38 @@ function printRsSpread(){const r=rsResult();if(!r)return toast(t('mkNeed'));
   const mk=(r.markers||[]).filter(m=>m.ok);if(!mk.length)return toast(t('rsNoValidMk'));
   const uf=r.uf||1,u=r.unit||'متر';const R=v=>Math.round(v*uf*100)/100;
   const title=$('rs-title')?$('rs-title').value.trim():'';
-  const rows=mk.map((m,i)=>`<tr>
-    <td style="font-weight:800;font-size:16px;text-align:center">${esc(m.code)}</td>
-    <td>${m.pairs.map(p=>`<span style="display:inline-block;border:1px solid #bbb;border-radius:6px;padding:2px 8px;margin:2px;font-weight:700">${esc(p.size)} <b style="color:#14504f">×${p.cnt}</b></span>`).join('')}</td>
-    <td style="text-align:center;font-weight:800;font-size:18px">${m.plies}</td>
-    <td style="text-align:center">${R(m.len)} ${u}</td>
-    <td style="text-align:center;font-weight:700">${m.run}</td>
-    <td style="min-width:120px"></td></tr>`).join('');
   const totPlies=mk.reduce((s,m)=>s+m.plies,0),totRun=mk.reduce((s,m)=>s+m.run,0),totFab=mk.reduce((s,m)=>s+m.fab,0);
-  $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:820px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
-    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
-      <div><div style="font-size:22px;font-weight:800;color:#14504f">🧵 ${esc(MEMBER.wsName||'')}</div>
-      <div style="font-size:15px;color:#555">${t('rsSpreadTitle')}${title?' — <b>'+esc(title)+'</b>':''}${r.product?' · 📦 '+esc(r.product):''}</div></div>
-      <div style="text-align:${LANG==='ar'?'left':'right'};font-size:12px;color:#666">${fmtDate(today())}</div></div>
-    <table style="width:100%;border-collapse:collapse;margin-top:12px;font-size:14px" border="1" cellpadding="8">
-      <tr style="background:#e6efee;font-weight:800;color:#14504f"><td style="text-align:center">${t('rsCode')}</td><td>${t('rsMkTbl')}</td><td style="text-align:center">${t('rsPlies')}</td><td style="text-align:center">${t('rsMkLenH')} (${u})</td><td style="text-align:center">${t('rsPcsRun')}</td><td style="text-align:center">${t('signature')}</td></tr>
-      ${rows}
-      <tr style="font-weight:800;background:#f4f8f8"><td colspan="2">${t('total')}</td><td style="text-align:center">${totPlies}</td><td></td><td style="text-align:center">${totRun}</td><td style="text-align:center">${R(totFab)} ${u}</td></tr></table>
-    <div style="margin-top:26px;display:flex;justify-content:space-between;font-size:13px;color:#444">
-      <div>${t('repInspector')}: ${esc(MEMBER.name||'')} ______________</div><div>${t('signature')}: ______________</div></div></div>`;
+  const th=(txt,al)=>`<th style="padding:9px 8px;text-align:${al||'center'};font-weight:800;font-size:12.5px;color:#0e3f3e;border-bottom:2px solid #14504f;white-space:nowrap">${txt}</th>`;
+  const rows=mk.map((m,i)=>`<tr style="background:${i%2?'#f6faf9':'#fff'}">
+    <td style="text-align:center;color:#9aa7b4;font-weight:800;font-size:12px;padding:9px 6px">${i+1}</td>
+    <td style="text-align:center;padding:9px 6px"><span style="display:inline-block;background:#14504f;color:#fff;font-weight:800;font-size:14px;padding:4px 11px;border-radius:8px;letter-spacing:.5px">${esc(m.code)}</span></td>
+    <td style="padding:9px 8px;line-height:2">${m.pairs.map(p=>`<span style="display:inline-block;background:#fff;border:1.5px solid #cfe0df;border-radius:999px;padding:3px 11px;margin:2px 3px;font-weight:800;font-size:13px;white-space:nowrap">${esc(p.size)} <span style="color:#1f6e6e">×${p.cnt}</span></span>`).join('')}</td>
+    <td style="text-align:center;padding:9px 6px"><span style="display:inline-block;min-width:32px;background:#eef5f4;border:1px solid #bcd4d2;border-radius:8px;padding:4px 9px;font-weight:800;font-size:17px;color:#14504f">${m.plies}</span></td>
+    <td style="text-align:center;padding:9px 6px;font-weight:700;font-size:13px;white-space:nowrap">${R(m.len)} <span style="color:#93a0ab;font-size:11px">${u}</span></td>
+    <td style="text-align:center;padding:9px 6px;font-weight:800;font-size:15px">${m.run}</td>
+    <td style="text-align:center;padding:9px 6px;color:#c3ccd4;font-size:19px">☐</td>
+    <td style="padding:9px 6px;border-bottom:1px solid #e2e7ec"></td></tr>`).join('');
+  const card=(label,val,sub)=>`<div style="flex:1;min-width:96px;border:1px solid #dbe5e4;border-radius:11px;padding:9px 8px;text-align:center;background:#f7faf9">
+    <div style="font-size:10.5px;color:#6b7683;font-weight:700">${label}</div>
+    <div style="font-size:19px;color:#14504f;font-weight:800;line-height:1.2;margin-top:2px">${val}${sub?`<span style="font-size:11px;color:#93a0ab;font-weight:700"> ${sub}</span>`:''}</div></div>`;
+  const sigBox=lbl=>`<div style="flex:1;text-align:center"><div style="border-bottom:1.5px solid #7c8894;margin:0 14px 6px;height:40px"></div><div style="font-size:12px;color:#44515e;font-weight:700">${lbl}</div></div>`;
+  $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#1c2530;max-width:840px;margin:auto;padding-top:8px" dir="${LANG==='ar'?'rtl':'ltr'}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #14504f;padding-bottom:10px">
+      <div><div style="font-size:23px;font-weight:800;color:#14504f;line-height:1.15">🧵 ${esc(MEMBER.wsName||'')}</div>
+      <div style="display:inline-block;margin-top:6px;background:#14504f;color:#fff;font-size:13px;font-weight:800;padding:3px 12px;border-radius:7px">${t('rsSpreadTitle')}</div></div>
+      <div style="text-align:${LANG==='ar'?'left':'right'};font-size:12px;color:#6b7683;line-height:1.9">
+        <div>📅 ${fmtDate(today())}</div>${r.product?`<div>📦 ${esc(r.product)}</div>`:''}${title?`<div>📝 ${esc(title)}</div>`:''}</div></div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      ${card(t('rsSpreadJobs'),mk.length)}${card(t('rsPlies'),totPlies)}${card(t('rsPcsRun'),totRun)}${card(t('mkTotalFabric'),R(totFab),u)}</div>
+    <table style="width:100%;border-collapse:collapse;margin-top:14px;border:1px solid #d5dee2;border-radius:10px;overflow:hidden">
+      <thead><tr style="background:#e6efee">${th('#')}${th(t('rsCode'))}${th(t('rsMkTbl'),LANG==='ar'?'right':'left')}${th(t('rsPlies'))}${th(t('rsMkLenH'))}${th(t('rsPcsRun'))}${th(t('rsSpreadDone'))}${th(t('rsFarradSig'))}</tr></thead>
+      <tbody>${rows}
+      <tr style="background:#14504f;color:#fff;font-weight:800"><td colspan="3" style="padding:10px 10px;text-align:${LANG==='ar'?'right':'left'};font-size:13px">${t('total')}</td>
+      <td style="text-align:center;padding:10px 6px;font-size:15px">${totPlies}</td>
+      <td style="text-align:center;padding:10px 6px;font-size:12px">${R(totFab)} ${u}</td>
+      <td style="text-align:center;padding:10px 6px;font-size:15px">${totRun}</td><td></td><td></td></tr></tbody></table>
+    <div style="margin-top:10px;font-size:11.5px;color:#8a6d00;background:#fff8e6;border:1px solid #f0dca0;border-radius:8px;padding:7px 11px">💡 ${t('rsSpreadHint')}</div>
+    <div style="margin-top:30px;display:flex;gap:16px">${sigBox(t('rsFarradSig'))}${sigBox(t('rsCutSupSig'))}${sigBox(t('repInspector')+(MEMBER.name?' — '+esc(MEMBER.name):''))}</div></div>`;
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 /* ---- مقارنة سيناريوهات الريشو: اختيار خطط محفوظة ومقارنتها جنبًا إلى جنب ---- */
 function rsComparePick(){const plans=TOOLCHK.filter(c=>c.type==='rs');
