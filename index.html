@@ -1839,7 +1839,8 @@ function rsAddMarker(m){m=m||{};if(!$('rs-markers'))return;RS_MSEQ++;const id='r
 // عند اختيار المقاس: الكمية الافتراضية 1 (قابلة للزيادة)
 function rsPickMkSize(sel){const tr1=sel.closest('tr');const i=[...tr1.querySelectorAll('.rsp-size')].indexOf(sel);
   const tr2=tr1.nextElementSibling;
-  if(sel.value&&tr2){const cnt=[...tr2.querySelectorAll('.rsp-cnt')][i];if(cnt&&!cnt.value)cnt.value=1;}
+  if(tr2){const cnt=[...tr2.querySelectorAll('.rsp-cnt')][i];
+    if(cnt){if(sel.value){if(!cnt.value)cnt.value=1;}else cnt.value='';}}
   rsMkCalc();}
 function rsDelMarker(id){document.querySelectorAll('tr[data-mid="'+id+'"]').forEach(tr=>tr.remove());rsMkCalc();}
 // اقتراح المقاس الذي يُقلَّل/يُحذف كي لا يتجاوز طول الماركر
