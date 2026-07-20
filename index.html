@@ -154,6 +154,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
 :root[data-theme="dark"] .msg.ok{background:#20362a;color:#a7e0bd}
 :root[data-theme="dark"] .b-pass{background:#1e3a2a;color:#7fdca0}
 :root[data-theme="dark"] .b-fail{background:#3a2422;color:#f0a09c}
+.xtbl td.cmpk{background:#f2f6f6;color:#1c2530}
+:root[data-theme="dark"] .xtbl td.cmpk{background:#243040;color:var(--txt)}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -491,6 +493,7 @@ rsReviewTbl:'مراجعة الناتج حسب المقاس',rsProdFromMk:'إجم
 rsAutoBtn:'أكمل الخطة تلقائياً (أقل استهلاك)',rsAutoDone:'الخطة مكتملة — لا كميات متبقية',rsAutoAdded:'أُضيف {n} ماركر تلقائياً',
 rsSugTbl:'اقتراحات تغطية باقي كمية الأوردر (أقل استهلاك)',rsSugPliesC:'الطبقات المقترحة',rsEditPliesC:'تعديل الطبقات يدويًا (اختياري)',rsRemWithRun:'إجمالي المتبقي مع التشغيل',rsApplyAll:'✔ اعتماد كل الاقتراحات كماركرات',rsSugEmpty:'لا كميات متبقية — الاقتراحات فارغة',
 rsSpreadBtn:'🧵 أمر الفرد',rsSpreadTitle:'أمر الفرد (تشغيل الفرشات)',rsMkLenH:'طول الماركر',rsNoValidMk:'لا ماركرات صالحة للفرد',
+rsCompareBtn:'⚖️ مقارنة السيناريوهات',rsCompareTitle:'مقارنة سيناريوهات الريشو',rsCmpPick:'اختر خطتين أو أكثر للمقارنة',rsCmpNeed2:'اختر خطتين على الأقل للمقارنة',rsCmpNone:'لا خطط ريشو محفوظة للمقارنة',rsCmpMetric:'المؤشر',rsCmpMarkers:'عدد الماركرات الصالحة',rsCmpBest:'الأفضل',rsCmpWaste:'الهدر مقابل الأقل',rsCmpDate:'التاريخ',rsCmpDo:'قارن',rsCmpPrint:'🖨 طباعة المقارنة',
 rsLenTip:'لتلائم الطول: ',rsLenReduce:'قلّل {s} بمقدار {n} قطعة',rsLenRemove:'احذف {s}',rsAddFit:'يمكن إضافة {s} (يتبقّى {r})',
 st_ok:'صالح',st_empty:'فارغ',st_dup:'غير صالح: مقاس مكرر',st_badqty:'غير صالح: كمية غير صحيحة',st_maxpcs:'غير صالح: تجاوز أقصى قطع',st_maxsizes:'غير صالح: تجاوز عدد القياسات',st_len:'غير صالح: تجاوز حد الطول',st_plies:'غير صالح: عدد الطبقات غير صحيح',st_nosize:'غير صالح: كمية بلا مقاس',
 rsNoSizes:'المنتج المختار بلا مقاسات محفوظة — افتح إدارة الموديلات والمقاسات وأضف المقاسات مع الاستهلاك والنسبة',
@@ -631,6 +634,7 @@ rsReviewTbl:'Output review by size',rsProdFromMk:'Pieces from markers',rsRemFrom
 rsAutoBtn:'Auto-complete plan (least consumption)',rsAutoDone:'Plan complete — nothing remaining',rsAutoAdded:'{n} markers added automatically',
 rsSugTbl:'Suggestions to cover the remaining order (least consumption)',rsSugPliesC:'Suggested plies',rsEditPliesC:'Adjust plies (optional)',rsRemWithRun:'Remaining after run',rsApplyAll:'✔ Apply all suggestions as markers',rsSugEmpty:'Nothing remaining — no suggestions',
 rsSpreadBtn:'🧵 Spreading order',rsSpreadTitle:'Spreading order',rsMkLenH:'Marker length',rsNoValidMk:'No valid markers to spread',
+rsCompareBtn:'⚖️ Compare scenarios',rsCompareTitle:'Compare ratio scenarios',rsCmpPick:'Pick two or more plans to compare',rsCmpNeed2:'Select at least two plans to compare',rsCmpNone:'No saved ratio plans to compare',rsCmpMetric:'Metric',rsCmpMarkers:'Valid markers',rsCmpBest:'Best',rsCmpWaste:'Waste vs best',rsCmpDate:'Date',rsCmpDo:'Compare',rsCmpPrint:'🖨 Print comparison',
 rsLenTip:'To fit length: ',rsLenReduce:'Reduce {s} by {n} pcs',rsLenRemove:'Remove {s}',rsAddFit:'Can add {s} ({r} left)',
 st_ok:'valid',st_empty:'empty',st_dup:'invalid: duplicate size',st_badqty:'invalid: bad quantity',st_maxpcs:'invalid: exceeds max pieces',st_maxsizes:'invalid: exceeds max sizes',st_len:'invalid: exceeds length limit',st_plies:'invalid: bad ply count',st_nosize:'invalid: quantity without size',
 rsNoSizes:'The selected product has no saved sizes — open the models & sizes manager and add sizes with consumption and ratio',
@@ -1667,7 +1671,8 @@ function toolResultSummary(c){const r=c.result;const mk=d=>d.decision==='PASS'?'
   if(c.type==='rs')return `${r.product?esc(r.product)+' · ':''}${t('rsPlanState')}: ${r.decision==='PASS'?t('rsReady'):t('rsReview')} · ${t('rsTotalProd')} ${r.totalMade}/${r.totalReq} · ${t('mkTotalFabric')} ${r.totFab} م`;
   return `${t('fpShort')} ${mk(r.fp)} · ${t('shShort')} ${mk(r.sh)} · AQL ${mk(r.aq)}`;}
 function renderToolChk(){const el=$('toolchk-list');if(!el)return;if(!TOOLCHK.length){el.innerHTML=empty(t('noToolChk'));return;}
-  const bar=`<div style="display:flex;gap:8px;margin-bottom:10px"><button class="mini g" onclick="exportToolChk()">${t('exportCsv')}</button></div>`;
+  const rsN=TOOLCHK.filter(c=>c.type==='rs').length;
+  const bar=`<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"><button class="mini g" onclick="exportToolChk()">${t('exportCsv')}</button>${rsN>=2?`<button class="mini g" onclick="rsComparePick()">${t('rsCompareBtn')}</button>`:''}</div>`;
   el.innerHTML=bar+'<div class="cards">'+TOOLCHK.map(c=>{const b=c.result.decision==='PASS'?'b-pass':'b-fail';
     return `<div class="item"><div class="h"><div><div class="t">${c.title?esc(c.title):esc(toolTypeLabel(c.type))}</div>
     <div class="s">${c.title?esc(toolTypeLabel(c.type))+' · ':''}🏭 ${esc(c.factoryName||'')} · ${fmtDate(c.date)}<br>${esc(toolResultSummary(c))}</div></div>
@@ -2149,6 +2154,69 @@ function printRsSpread(){const r=rsResult();if(!r)return toast(t('mkNeed'));
       <tr style="font-weight:800;background:#f4f8f8"><td colspan="2">${t('total')}</td><td style="text-align:center">${totPlies}</td><td></td><td style="text-align:center">${totRun}</td><td style="text-align:center">${R(totFab)} ${u}</td></tr></table>
     <div style="margin-top:26px;display:flex;justify-content:space-between;font-size:13px;color:#444">
       <div>${t('repInspector')}: ${esc(MEMBER.name||'')} ______________</div><div>${t('signature')}: ______________</div></div></div>`;
+  window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
+/* ---- مقارنة سيناريوهات الريشو: اختيار خطط محفوظة ومقارنتها جنبًا إلى جنب ---- */
+function rsComparePick(){const plans=TOOLCHK.filter(c=>c.type==='rs');
+  if(plans.length<2)return toast(t('rsCmpNone'));
+  const rows=plans.map(c=>`<label class="item" style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:8px">
+    <input type="checkbox" class="rs-cmp-ck" value="${c.id}" style="width:18px;height:18px">
+    <div><div class="t">${c.title?esc(c.title):esc(toolTypeLabel('rs'))}</div>
+    <div class="s">${c.result.product?'📦 '+esc(c.result.product)+' · ':''}${fmtDate(c.date)} · ${c.result.decision==='PASS'?t('rsReady'):t('rsReview')} · ${t('mkTotalFabric')} ${c.result.totFab} ${c.result.unit||'م'}</div></div></label>`).join('');
+  modal(`<h3>⚖️ ${t('rsCompareTitle')}</h3><div class="note" style="margin-bottom:10px">${t('rsCmpPick')}</div>
+    ${rows}
+    <div class="row-btns" style="margin-top:12px"><button class="btn" onclick="rsCompareShow()">${t('rsCmpDo')}</button>
+    <button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);}
+function rsCompareShow(){const ids=[...document.querySelectorAll('.rs-cmp-ck:checked')].map(x=>x.value);
+  if(ids.length<2)return toast(t('rsCmpNeed2'));
+  const sel=ids.map(id=>TOOLCHK.find(c=>c.id===id)).filter(Boolean);
+  // القماش المعروض بوحدة كل خطة، مع تحويل موحّد للمتر لإيجاد الأفضل (أقل استهلاك بين الناجحة)
+  const fabM=c=>((c.result.totFab||0)/(c.result.uf||1));
+  const passed=sel.filter(c=>c.result.decision==='PASS');
+  const bestM=passed.length?Math.min(...passed.map(fabM)):null;
+  const heads=sel.map(c=>`<th style="min-width:120px">${c.title?esc(c.title):esc(fmtDate(c.date))}</th>`).join('');
+  const rowM=(label,fn)=>`<tr><td class="cmpk" style="font-weight:800;text-align:start">${label}</td>${sel.map(fn).join('')}</tr>`;
+  const body=
+    rowM(t('rsCmpDate'),c=>`<td>${fmtDate(c.date)}</td>`)
+   +rowM(t('productLbl'),c=>`<td>${esc(c.result.product||'—')}</td>`)
+   +rowM(t('rsSumReq'),c=>`<td>${c.result.totalReq}</td>`)
+   +rowM(t('rsSumProd'),c=>`<td>${c.result.totalMade}</td>`)
+   +rowM(t('rsSumRem'),c=>`<td style="color:${c.result.totRem===0?'#1e7e40':'#c00000'};font-weight:800">${c.result.totRem}</td>`)
+   +rowM(t('rsCmpMarkers'),c=>`<td>${c.result.valid}</td>`)
+   +rowM(t('rsSumFabT'),c=>{const isBest=passed.includes(c)&&Math.abs(fabM(c)-bestM)<1e-6;
+        return `<td style="font-weight:800${isBest?';background:#e7f6ec;color:#1e7e40':''}">${c.result.totFab} ${c.result.unit||'م'}${isBest?' ★':''}</td>`;})
+   +rowM(t('rsCmpWaste'),c=>{if(bestM==null||c.result.decision!=='PASS')return`<td>—</td>`;
+        const d=Math.round((fabM(c)-bestM)*100)/100;return `<td style="font-weight:700;color:${d<1e-6?'#1e7e40':'#b5580a'}">${d<1e-6?'0':'+'+d+' م'}</td>`;})
+   +rowM(t('rsPlanState'),c=>`<td style="font-weight:800;color:${c.result.decision==='PASS'?'#1e7e40':'#c00000'}">${c.result.decision==='PASS'?t('rsReady'):t('rsReview')}</td>`);
+  window._rsCmpIds=ids;
+  modal(`<h3>⚖️ ${t('rsCompareTitle')}</h3>
+    <div style="overflow-x:auto"><table class="xtbl" style="min-width:${120+sel.length*120}px">
+      <tr><th style="text-align:start">${t('rsCmpMetric')}</th>${heads}</tr>${body}</table></div>
+    <div class="row-btns" style="margin-top:12px"><button class="btn sec" onclick="rsComparePrint()">${t('rsCmpPrint')}</button>
+    <button class="btn sec" onclick="rsComparePick()">${t('rsCompareBtn')}</button>
+    <button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);}
+function rsComparePrint(){const ids=window._rsCmpIds||[];const sel=ids.map(id=>TOOLCHK.find(c=>c.id===id)).filter(Boolean);
+  if(sel.length<2)return;
+  const fabM=c=>((c.result.totFab||0)/(c.result.uf||1));
+  const passed=sel.filter(c=>c.result.decision==='PASS');const bestM=passed.length?Math.min(...passed.map(fabM)):null;
+  const heads=sel.map(c=>`<td style="font-weight:800;text-align:center">${c.title?esc(c.title):esc(fmtDate(c.date))}</td>`).join('');
+  const rowM=(label,fn)=>`<tr><td style="font-weight:800;background:#f2f6f6">${label}</td>${sel.map(fn).join('')}</tr>`;
+  const body=
+    rowM(t('rsCmpDate'),c=>`<td style="text-align:center">${fmtDate(c.date)}</td>`)
+   +rowM(t('productLbl'),c=>`<td style="text-align:center">${esc(c.result.product||'—')}</td>`)
+   +rowM(t('rsSumReq'),c=>`<td style="text-align:center">${c.result.totalReq}</td>`)
+   +rowM(t('rsSumProd'),c=>`<td style="text-align:center">${c.result.totalMade}</td>`)
+   +rowM(t('rsSumRem'),c=>`<td style="text-align:center;color:${c.result.totRem===0?'#1e7e40':'#c00000'};font-weight:800">${c.result.totRem}</td>`)
+   +rowM(t('rsCmpMarkers'),c=>`<td style="text-align:center">${c.result.valid}</td>`)
+   +rowM(t('rsSumFabT'),c=>{const isBest=passed.includes(c)&&Math.abs(fabM(c)-bestM)<1e-6;return `<td style="text-align:center;font-weight:800${isBest?';color:#1e7e40':''}">${c.result.totFab} ${c.result.unit||'م'}${isBest?' ★':''}</td>`;})
+   +rowM(t('rsCmpWaste'),c=>{if(bestM==null||c.result.decision!=='PASS')return`<td style="text-align:center">—</td>`;const d=Math.round((fabM(c)-bestM)*100)/100;return `<td style="text-align:center;font-weight:700;color:${d<1e-6?'#1e7e40':'#b5580a'}">${d<1e-6?'0':'+'+d+' م'}</td>`;})
+   +rowM(t('rsPlanState'),c=>`<td style="text-align:center;font-weight:800;color:${c.result.decision==='PASS'?'#1e7e40':'#c00000'}">${c.result.decision==='PASS'?t('rsReady'):t('rsReview')}</td>`);
+  $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:900px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
+      <div><div style="font-size:22px;font-weight:800;color:#14504f">🧵 ${esc(MEMBER.wsName||'')}</div>
+      <div style="font-size:15px;color:#555">${t('rsCompareTitle')}</div></div>
+      <div style="text-align:${LANG==='ar'?'left':'right'};font-size:12px;color:#666">${fmtDate(today())}</div></div>
+    <table style="width:100%;border-collapse:collapse;margin-top:12px;font-size:14px" border="1" cellpadding="8">
+      <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('rsCmpMetric')}</td>${heads}</tr>${body}</table></div>`;
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 function calcFP(){const Ln=+$('fp-len').value,W=+$('fp-wid').value,lim=+$('fp-lim').value||40;
   const pts=(+$('fp-1').value||0)*1+(+$('fp-2').value||0)*2+(+$('fp-3').value||0)*3+(+$('fp-4').value||0)*4;
