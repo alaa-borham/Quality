@@ -359,7 +359,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <tr class="tot rsm-hide"><td colspan="8" data-i18n="total">الإجمالي</td><td id="rs-mt-pcs">—</td><td id="rs-mt-plies">—</td><td id="rs-mt-run">—</td><td></td><td>—</td><td id="rs-mt-fab">—</td><td></td></tr></table></div>
         <div class="rsm-hide" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
           <button type="button" class="mini" onclick="rsAddMarker()">➕ <span data-i18n="rsAddMarker">إضافة ماركر</span></button>
-          <button type="button" class="btn g" style="padding:6px 14px" onclick="rsAutoPlan()">⚡ <span data-i18n="rsAutoBtn">أكمل الخطة تلقائياً (أقل استهلاك)</span></button></div>
+          <button type="button" class="btn g" style="padding:6px 14px" onclick="rsAutoPlan()">⚡ <span data-i18n="rsAutoBtn">أكمل الخطة تلقائياً (أقل استهلاك)</span></button>
+          <button type="button" class="mini g" onclick="rsReducePlies()" title="تكرار القياسات لتقليل الطبقات دون تغيير القماش أو الكمية">🔽 <span data-i18n="rsReducePliesBtn">قلّل الطبقات</span></button></div>
         <div style="overflow-x:auto;margin-top:12px"><table class="xtbl" style="min-width:560px">
           <tr><th colspan="7" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsr-cv" onclick="rsCollapse('rsr')" title="تصغير/تكبير">–</button><span data-i18n="rsReviewTbl">مراجعة الناتج حسب المقاس</span></span></th></tr>
           <tr class="rsr-hide"><th data-i18n="sizeName">القياس</th><th class="or" data-i18n="mkQtyOrder">المطلوب</th><th data-i18n="rsProdFromMk">إجمالي القطع من الماركر</th><th class="or" data-i18n="rsRemFromOrder">المتبقي من الأوردر</th><th data-i18n="mkStateCol">الحالة</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th class="or rsu-h" data-b="إجمالي استهلاك الأوردر">إجمالي استهلاك الأوردر (متر)</th></tr>
@@ -492,6 +493,7 @@ rsPrint:'🖨 طباعة الخطة',rsPlanState:'حالة الخطة',rsReady:'
 rsSumReq:'إجمالي كمية الطلب',rsSumProd:'إجمالي إنتاج الخطة',rsSumRem:'إجمالي المتبقي',rsSumValid:'عدد الماركرات الصالحة',rsSumFabT:'إجمالي استهلاك التشغيل',rsDispUnit:'وحدة العرض',
 rsReviewTbl:'مراجعة الناتج حسب المقاس',rsProdFromMk:'إجمالي القطع من الماركر',rsRemFromOrder:'المتبقي من الأوردر',rsOrderConsM:'إجمالي استهلاك الأوردر (متر)',rsRvShort:'نقص',rsRvMatch:'مطابق',rsRvSurplus:'زيادة',
 rsAutoBtn:'أكمل الخطة تلقائياً (أقل استهلاك)',rsAutoDone:'الخطة مكتملة — لا كميات متبقية',rsAutoAdded:'أُضيف {n} ماركر تلقائياً',
+rsReducePliesBtn:'قلّل الطبقات',rsReduceDone:'قُلّلت الطبقات في {n} ماركر: {a} ← {b} طبقة (القماش والكمية دون تغيير)',rsReduceNone:'لا يمكن تقليل الطبقات أكثر — الماركرات مضبوطة على حدّ الطول أو أقصى قطع',
 rsSugTbl:'اقتراحات تغطية باقي كمية الأوردر (أقل استهلاك)',rsSugPliesC:'الطبقات المقترحة',rsEditPliesC:'تعديل الطبقات يدويًا (اختياري)',rsRemWithRun:'إجمالي المتبقي مع التشغيل',rsApplyAll:'✔ اعتماد كل الاقتراحات كماركرات',rsSugEmpty:'لا كميات متبقية — الاقتراحات فارغة',
 rsSpreadBtn:'🧵 أمر الفرد',rsSpreadTitle:'أمر الفرد (تشغيل الفرشات)',rsMkLenH:'طول الماركر',rsNoValidMk:'لا ماركرات صالحة للفرد',
 rsCompareBtn:'⚖️ مقارنة السيناريوهات',rsCompareTitle:'مقارنة سيناريوهات الريشو',rsCmpPick:'اختر خطتين أو أكثر للمقارنة',rsCmpNeed2:'اختر خطتين على الأقل للمقارنة',rsCmpNone:'لا خطط ريشو محفوظة للمقارنة',rsCmpMetric:'المؤشر',rsCmpMarkers:'عدد الماركرات الصالحة',rsCmpBest:'الأفضل',rsCmpWaste:'الهدر مقابل الأقل',rsCmpDate:'التاريخ',rsCmpDo:'قارن',rsCmpPrint:'🖨 طباعة المقارنة',
@@ -633,6 +635,7 @@ rsPrint:'🖨 Print plan',rsPlanState:'Plan status',rsReady:'Matched & ready',rs
 rsSumReq:'Total order qty',rsSumProd:'Plan production',rsSumRem:'Total remaining',rsSumValid:'Valid markers',rsSumFabT:'Total run consumption',rsDispUnit:'Display unit',
 rsReviewTbl:'Output review by size',rsProdFromMk:'Pieces from markers',rsRemFromOrder:'Remaining of order',rsOrderConsM:'Total order consumption (m)',rsRvShort:'short',rsRvMatch:'matched',rsRvSurplus:'surplus',
 rsAutoBtn:'Auto-complete plan (least consumption)',rsAutoDone:'Plan complete — nothing remaining',rsAutoAdded:'{n} markers added automatically',
+rsReducePliesBtn:'Reduce plies',rsReduceDone:'Plies reduced in {n} marker(s): {a} → {b} plies (fabric & quantity unchanged)',rsReduceNone:'Cannot reduce plies further — markers are capped by length limit or max pieces',
 rsSugTbl:'Suggestions to cover the remaining order (least consumption)',rsSugPliesC:'Suggested plies',rsEditPliesC:'Adjust plies (optional)',rsRemWithRun:'Remaining after run',rsApplyAll:'✔ Apply all suggestions as markers',rsSugEmpty:'Nothing remaining — no suggestions',
 rsSpreadBtn:'🧵 Spreading order',rsSpreadTitle:'Spreading order',rsMkLenH:'Marker length',rsNoValidMk:'No valid markers to spread',
 rsCompareBtn:'⚖️ Compare scenarios',rsCompareTitle:'Compare ratio scenarios',rsCmpPick:'Pick two or more plans to compare',rsCmpNeed2:'Select at least two plans to compare',rsCmpNone:'No saved ratio plans to compare',rsCmpMetric:'Metric',rsCmpMarkers:'Valid markers',rsCmpBest:'Best',rsCmpWaste:'Waste vs best',rsCmpDate:'Date',rsCmpDo:'Compare',rsCmpPrint:'🖨 Print comparison',
@@ -1996,6 +1999,34 @@ function rsRenderSugs(){const tb=$('rs-sug-rows');if(!tb)return;const uf=rsUF();
 function rsSugPlies(i,val){if(!RS_SUGS[i])return;RS_SUGS[i].plies=Math.max(1,Math.round(+normNum(val)||1));rsRenderSugs();}
 function rsApplySugs(){if(!RS_SUGS.length)return toast(t('rsSugEmpty'));
   const list=RS_SUGS.slice();RS_SUGS=[];list.forEach(s=>rsAddMarker({pairs:s.combo,plies:s.plies}));rsMkCalc();toast(tf('rsAutoAdded',{n:list.length}));}
+// تقليل الطبقات: تكرار قياسات كل ماركر صالح بأكبر مُعامل k يقسم عدد الطبقات ويظل ضمن حدّ الطول وأقصى قطع.
+// النتيجة: نفس القماش ونفس الكمية تماماً، لكن طبقات أقل (k×الطول، الطبقات÷k).
+function rsReducePlies(){if(!$('rs-markers'))return;
+  const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
+  const maxlen=rsMaxLenM(),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const raw=rsReadMarkers();let changed=0,before=0,after=0;
+  const next=raw.map(m=>{
+    const vp=m.pairs.filter(p=>p.size&&p.cnt>0);
+    const plies=+m.plies||0;
+    // نتخطّى الماركرات غير الصالحة أو غير الصحيحة (نتركها كما هي)
+    if(!vp.length||!(plies>0)||plies%1!==0){before+=plies||0;after+=plies||0;return m;}
+    const len=vp.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);
+    const pcs=vp.reduce((a,p)=>a+p.cnt,0);
+    if(len<=0){before+=plies;after+=plies;return m;}
+    // أقصى k مسموح به بحدّ الطول وأقصى قطع
+    let kMax=Math.floor(maxpcs/pcs);
+    if(maxlen>0)kMax=Math.min(kMax,Math.floor((maxlen+1e-9)/len));
+    kMax=Math.min(kMax,plies);
+    // أكبر قاسم لعدد الطبقات ضمن kMax (يضمن إنتاجاً مطابقاً بلا زيادة)
+    let k=1;for(let d=kMax;d>=2;d--){if(plies%d===0){k=d;break;}}
+    before+=plies;
+    if(k>1){changed++;after+=plies/k;
+      return {pairs:vp.map(p=>({size:p.size,cnt:p.cnt*k})),plies:String(plies/k)};}
+    after+=plies;return m;});
+  if(!changed)return toast(t('rsReduceNone'));
+  $('rs-markers').innerHTML='';next.forEach(m=>rsAddMarker({pairs:m.pairs,plies:+m.plies}));
+  rsMkCalc();rsSaveDraft();
+  toast(tf('rsReduceDone',{n:changed,a:before,b:after}));}
 function rsReadMarkers(){return [...document.querySelectorAll('.rs-mrow1')].map(tr1=>{
   const tr2=tr1.nextElementSibling;
   const ss=[...tr1.querySelectorAll('.rsp-size')].map(e=>e.value.trim());
