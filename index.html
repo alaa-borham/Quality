@@ -346,6 +346,14 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <tr class="rsr-hide"><th data-i18n="sizeName">القياس</th><th class="or" data-i18n="mkQtyOrder">المطلوب</th><th data-i18n="rsProdFromMk">إجمالي القطع من الماركر</th><th class="or" data-i18n="rsRemFromOrder">المتبقي من الأوردر</th><th data-i18n="mkStateCol">الحالة</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th class="or" data-i18n="rsOrderConsM">إجمالي استهلاك الأوردر (متر)</th></tr>
           <tbody id="rs-review" class="rsr-hide"></tbody>
           <tr class="tot rsr-hide"><td data-i18n="total">الإجمالي</td><td id="rs-rv-req" style="font-size:15px">—</td><td id="rs-rv-prod" style="font-size:15px">—</td><td id="rs-rv-rem">—</td><td id="rs-rv-st">—</td><td>—</td><td id="rs-rv-cons">—</td></tr></table></div>
+        <div style="overflow-x:auto;margin-top:12px"><table class="xtbl" style="min-width:820px">
+          <tr><th colspan="15" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rss-cv" onclick="rsCollapse('rss')" title="تصغير/تكبير">–</button><span data-i18n="rsSugTbl">اقتراحات تغطية باقي كمية الأوردر (أقل استهلاك)</span></span></th></tr>
+          <tr class="rss-hide"><th data-i18n="rsCode">الكود</th><th data-i18n="rsDesc">البيان</th>
+            <th class="szc">مقاس١</th><th class="szc">مقاس٢</th><th class="szc">مقاس٣</th><th class="szc">مقاس٤</th><th class="szc">مقاس٥</th><th class="szc">مقاس٦</th>
+            <th class="or" data-i18n="rsPcsLbl">إجمالي القطع في الماركر</th><th data-i18n="rsSugPliesC">الطبقات المقترحة</th><th data-i18n="rsEditPliesC">تعديل الطبقات يدويًا (اختياري)</th>
+            <th class="or" data-i18n="rsPcsRun">إجمالي القطع في التشغيل</th><th data-i18n="rsMkPerPly">استهلاك الماركر/طبقة (متر)</th><th class="or" data-i18n="rsSumFab">إجمالي استهلاك التشغيل (متر)</th><th data-i18n="rsRemWithRun">إجمالي المتبقي مع التشغيل</th></tr>
+          <tbody id="rs-sug-rows" class="rss-hide"></tbody></table></div>
+        <button type="button" class="btn g rss-hide" style="margin-top:6px" onclick="rsApplySugs()" data-i18n="rsApplyAll">✔ اعتماد كل الاقتراحات كماركرات</button>
         <div class="row-btns" style="margin-top:14px"><button class="btn sec" onclick="saveRsPlan()" data-i18n="saveCheck">💾 حفظ</button>
         <button class="btn sec" onclick="printRsPlan()" data-i18n="rsPrint">🖨 طباعة الخطة</button></div>
       </div>
@@ -464,6 +472,7 @@ rsPrint:'🖨 طباعة الخطة',rsPlanState:'حالة الخطة',rsReady:'
 rsSumReq:'إجمالي كمية الطلب',rsSumProd:'إجمالي إنتاج الخطة',rsSumRem:'إجمالي المتبقي',rsSumValid:'عدد الماركرات الصالحة',rsSumFabT:'إجمالي استهلاك التشغيل',
 rsReviewTbl:'مراجعة الناتج حسب المقاس',rsProdFromMk:'إجمالي القطع من الماركر',rsRemFromOrder:'المتبقي من الأوردر',rsOrderConsM:'إجمالي استهلاك الأوردر (متر)',rsRvShort:'نقص',rsRvMatch:'مطابق',rsRvSurplus:'زيادة',
 rsAutoBtn:'أكمل الخطة تلقائياً (أقل استهلاك)',rsAutoDone:'الخطة مكتملة — لا كميات متبقية',rsAutoAdded:'أُضيف {n} ماركر تلقائياً',
+rsSugTbl:'اقتراحات تغطية باقي كمية الأوردر (أقل استهلاك)',rsSugPliesC:'الطبقات المقترحة',rsEditPliesC:'تعديل الطبقات يدويًا (اختياري)',rsRemWithRun:'إجمالي المتبقي مع التشغيل',rsApplyAll:'✔ اعتماد كل الاقتراحات كماركرات',rsSugEmpty:'لا كميات متبقية — الاقتراحات فارغة',
 rsLenTip:'لتلائم الطول: ',rsLenReduce:'قلّل {s} بمقدار {n} قطعة',rsLenRemove:'احذف {s}',rsAddFit:'يمكن إضافة {s} (يتبقّى {r} م)',
 st_ok:'صالح',st_empty:'فارغ',st_dup:'غير صالح: مقاس مكرر',st_badqty:'غير صالح: كمية غير صحيحة',st_maxpcs:'غير صالح: تجاوز أقصى قطع',st_maxsizes:'غير صالح: تجاوز عدد القياسات',st_len:'غير صالح: تجاوز حد الطول',st_plies:'غير صالح: عدد الطبقات غير صحيح',st_nosize:'غير صالح: كمية بلا مقاس',
 rsNoSizes:'المنتج المختار بلا مقاسات محفوظة — افتح إدارة الموديلات والمقاسات وأضف المقاسات مع الاستهلاك والنسبة',
@@ -602,6 +611,7 @@ rsPrint:'🖨 Print plan',rsPlanState:'Plan status',rsReady:'Matched & ready',rs
 rsSumReq:'Total order qty',rsSumProd:'Plan production',rsSumRem:'Total remaining',rsSumValid:'Valid markers',rsSumFabT:'Total run consumption',
 rsReviewTbl:'Output review by size',rsProdFromMk:'Pieces from markers',rsRemFromOrder:'Remaining of order',rsOrderConsM:'Total order consumption (m)',rsRvShort:'short',rsRvMatch:'matched',rsRvSurplus:'surplus',
 rsAutoBtn:'Auto-complete plan (least consumption)',rsAutoDone:'Plan complete — nothing remaining',rsAutoAdded:'{n} markers added automatically',
+rsSugTbl:'Suggestions to cover the remaining order (least consumption)',rsSugPliesC:'Suggested plies',rsEditPliesC:'Adjust plies (optional)',rsRemWithRun:'Remaining after run',rsApplyAll:'✔ Apply all suggestions as markers',rsSugEmpty:'Nothing remaining — no suggestions',
 rsLenTip:'To fit length: ',rsLenReduce:'Reduce {s} by {n} pcs',rsLenRemove:'Remove {s}',rsAddFit:'Can add {s} ({r}m left)',
 st_ok:'valid',st_empty:'empty',st_dup:'invalid: duplicate size',st_badqty:'invalid: bad quantity',st_maxpcs:'invalid: exceeds max pieces',st_maxsizes:'invalid: exceeds max sizes',st_len:'invalid: exceeds length limit',st_plies:'invalid: bad ply count',st_nosize:'invalid: quantity without size',
 rsNoSizes:'The selected product has no saved sizes — open the models & sizes manager and add sizes with consumption and ratio',
@@ -1899,6 +1909,52 @@ function rsAutoPlan(){if(!$('rs-markers'))return;
   if(!added.length)return toast(t('rsNoSug'));
   added.forEach(a=>rsAddMarker({pairs:a.combo,plies:a.plies}));rsMkCalc();
   toast(tf('rsAutoAdded',{n:added.length}));}
+/* ---- جدول الاقتراحات التلقائي لباقي الكمية ---- */
+let RS_SUGS=[],RS_SUG_REM0={},RS_SUG_BT=null;
+function rsScheduleSugs(){clearTimeout(RS_SUG_BT);RS_SUG_BT=setTimeout(rsBuildSugs,250);}
+function rsBuildSugs(){if(!$('rs-sug-rows'))return;
+  const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
+  const maxlen=+$('rs-maxlen').value||0,maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const reqMap={};[...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();if(s)reqMap[s]=+tr.querySelector('.rsq-qty').value||0;});
+  const produced={};rsReadMarkers().forEach(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
+    if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs))vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);});
+  RS_SUG_REM0={};Object.keys(reqMap).forEach(s=>RS_SUG_REM0[s]=reqMap[s]-(produced[s]||0));
+  const work={};Object.keys(RS_SUG_REM0).forEach(s=>work[s]=RS_SUG_REM0[s]);
+  const sugs=[];let guard=0;const t0=Date.now();
+  while(guard++<400&&Date.now()-t0<3000){
+    const active=Object.keys(work).filter(s=>work[s]>0&&cons[s]>0);if(!active.length)break;
+    let best=null;
+    for(const combo of rsCombos(active,maxsizes,maxpcs)){
+      const len=combo.reduce((a,p)=>a+p.cnt*cons[p.size],0);if(maxlen>0&&len>maxlen+1e-9)continue;
+      const plies=Math.min(...combo.map(p=>Math.floor(work[p.size]/p.cnt)));if(plies<1)continue;
+      const covered=plies*combo.reduce((a,p)=>a+p.cnt,0);
+      if(!best||covered>best.covered||(covered===best.covered&&len<best.len))best={combo:combo.map(p=>({size:p.size,cnt:p.cnt})),plies,covered,len};}
+    if(!best)break;sugs.push({combo:best.combo,sug:best.plies,plies:best.plies,len:best.len});best.combo.forEach(p=>work[p.size]-=p.cnt*best.plies);}
+  RS_SUGS=sugs;rsRenderSugs();}
+function rsRenderSugs(){const tb=$('rs-sug-rows');if(!tb)return;
+  if(!RS_SUGS.length){tb.innerHTML=`<tr><td colspan="15" style="padding:10px;color:#667">${t('rsSugEmpty')}</td></tr>`;return;}
+  const rem={...RS_SUG_REM0};let html='';
+  RS_SUGS.forEach((s,i)=>{const pcs=s.combo.reduce((a,p)=>a+p.cnt,0);const plies=+s.plies||0;const run=plies*pcs;const fab=s.len*plies;
+    s.combo.forEach(p=>rem[p.size]=(rem[p.size]||0)-p.cnt*plies);
+    const left=Object.keys(rem).reduce((a,k)=>a+Math.max(0,rem[k]),0);const over=Object.keys(rem).some(k=>rem[k]<0);
+    const bg=RS_COLORS[i%RS_COLORS.length];
+    const sz=[0,1,2,3,4,5].map(j=>`<td class="szc" style="background:${bg};font-weight:700">${s.combo[j]?esc(s.combo[j].size):''}</td>`).join('');
+    const ct=[0,1,2,3,4,5].map(j=>`<td class="szc" style="background:${bg};font-weight:700">${s.combo[j]?s.combo[j].cnt:''}</td>`).join('');
+    html+=`<tr>
+      <td rowspan="2" style="background:${bg};font-weight:800">S${String(i+1).padStart(2,'0')}</td>
+      <td style="background:${bg};font-weight:700">${t('rsSizesRow')}</td>${sz}
+      <td rowspan="2" style="background:${bg};font-weight:800;font-size:15px">${pcs}</td>
+      <td rowspan="2" style="background:${bg};font-weight:800">${s.sug}</td>
+      <td rowspan="2" style="background:#fffbe8"><input type="number" min="1" value="${plies}" onchange="rsSugPlies(${i},this.value)" style="width:58px;padding:4px;text-align:center;font-weight:800;border:1px solid #d8c27a;border-radius:6px;background:#fffbe8"></td>
+      <td rowspan="2" style="background:${bg};font-weight:800;font-size:15px">${run}</td>
+      <td rowspan="2" class="red" style="background:${bg}">${Math.round(s.len*100)/100}</td>
+      <td rowspan="2" class="red" style="background:${bg}">${Math.round(fab*100)/100}</td>
+      <td rowspan="2" style="background:${bg};font-weight:800;color:${over?'#c00000':left===0?'#1e7e40':'#1c1c1c'}">${left}${over?' ⚠':''}</td></tr>
+     <tr><td style="background:${bg};font-weight:700">${t('rsQtyRow')}</td>${ct}</tr>`;});
+  tb.innerHTML=html;}
+function rsSugPlies(i,val){if(!RS_SUGS[i])return;RS_SUGS[i].plies=Math.max(1,Math.round(+normNum(val)||1));rsRenderSugs();}
+function rsApplySugs(){if(!RS_SUGS.length)return toast(t('rsSugEmpty'));
+  const list=RS_SUGS.slice();RS_SUGS=[];list.forEach(s=>rsAddMarker({pairs:s.combo,plies:s.plies}));rsMkCalc();toast(tf('rsAutoAdded',{n:list.length}));}
 function rsReadMarkers(){return [...document.querySelectorAll('.rs-mrow1')].map(tr1=>{
   const tr2=tr1.nextElementSibling;
   const ss=[...tr1.querySelectorAll('.rsp-size')].map(e=>e.value.trim());
@@ -1955,6 +2011,7 @@ function rsMkCalc(){if(!$('rs-markers'))return;
     $('rs-rv-req').textContent=tReq||'\u2014';$('rs-rv-prod').textContent=tProd||'\u2014';$('rs-rv-rem').textContent=srows.length?tRem:'\u2014';
     $('rs-rv-cons').textContent=tCons?Math.round(tCons*100)/100:'\u2014';
     $('rs-rv-st').textContent=!srows.length?'\u2014':tRem>0?t('rsRvShort'):tRem<0?t('rsRvSurplus'):t('rsRvMatch');}
+  rsScheduleSugs();
   if($('rs-mt-pcs')){$('rs-mt-pcs').textContent=tPcs||'\u2014';$('rs-mt-plies').textContent=tPlies||'\u2014';
     $('rs-mt-run').textContent=tRun||'\u2014';$('rs-mt-fab').textContent=tFab?Math.round(tFab*100)/100:'\u2014';}
   const totalReq=[...document.querySelectorAll('.rsq-row')].reduce((s,tr)=>s+(+tr.querySelector('.rsq-qty').value||0),0);
