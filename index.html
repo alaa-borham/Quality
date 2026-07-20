@@ -121,10 +121,11 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
 .thumbs .rm{position:absolute;top:-7px;inset-inline-end:-7px;background:var(--red);color:#fff;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:20px;text-align:center;cursor:pointer}
 #print-area{display:none}
 @media print{
-  body{background:#fff}
-  body>*{visibility:hidden}
+  html,body{background:#fff;height:auto;margin:0;padding:0}
+  /* إخفاء التطبيق كليًّا من التدفّق (display لا يترك ارتفاعًا شبحيًّا يسبب صفحة ثانية فارغة) */
+  body>*{display:none!important}
+  #print-area{display:block!important;position:static;inset:auto;padding:0 6mm}
   #print-area,#print-area *{visibility:visible}
-  #print-area{display:block;position:absolute;inset:0;padding:0 6mm}
 }
 /* الريشو — تصميم مطابق للإكسيل */
 .xtbl{width:100%;border-collapse:collapse;font-size:13px}
