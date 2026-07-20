@@ -54,6 +54,7 @@ border-bottom:3px solid transparent;border-radius:0;white-space:nowrap}
 .wrap{max-width:960px;margin:0 auto;padding:16px}
 @media(min-width:1000px){
 .wrap{max-width:1360px}
+.wrap.wide{max-width:min(97vw,1850px)}
 .kpis{grid-template-columns:repeat(4,1fr)}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:10px;align-items:start}
 .cards .item{margin-bottom:0}
@@ -761,6 +762,7 @@ function listen(){unsub.forEach(u=>u&&u());unsub=[];const ws=MEMBER.wsId;RS_LOAD
 
 /* ============ NAV ============ */
 function go(tb,btn){TAB=tb;['dash','insp','orders','fact','tools','marker','ref'].forEach(x=>$('p-'+x).classList.toggle('hide',x!==tb));
+  {const w=document.querySelector('.wrap');if(w)w.classList.toggle('wide',tb==='marker');}
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');
   $('fab').style.display=(['insp','orders'].includes(tb)||(tb==='fact'&&can('fact')))?'flex':'none';if(tb==='dash')renderDash();if(tb==='ref')renderRef();
   if(tb==='tools'||tb==='marker'){renderToolFactSelects();if(!$('mk-rows').children.length)addMkRow();}
