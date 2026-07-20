@@ -125,6 +125,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
 .xtbl th,.xtbl td{border:1px solid #9db8b8;padding:6px;text-align:center;vertical-align:middle}
 .xtbl th{background:#ffc000;color:#1c1c1c;font-weight:800;white-space:normal;line-height:1.35;overflow-wrap:break-word;max-width:104px}
 .xtbl th.ttl,.xtbl th.wide{max-width:none;white-space:normal}
+.mini-toggle{background:#fff;border:1px solid #b98;border-radius:7px;padding:2px 12px;cursor:pointer;font-weight:900;font-size:15px;color:#14504f;line-height:1.2}
+.mini-toggle:hover{background:#f4f4f4}
 .xtbl.fit{width:auto;min-width:0}
 .xtbl .szc{width:52px;max-width:52px}
 .xtbl .szc select,.xtbl .szc input{min-width:0!important;width:100%}
@@ -318,7 +320,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;margin-top:10px">
         <div style="flex:1 1 520px;min-width:0">
         <div style="overflow-x:auto"><table class="xtbl" style="min-width:520px">
-          <tr><th colspan="6" class="ttl" style="cursor:pointer;user-select:none" onclick="rsCollapse('rsq')"><span class="rsq-cv">▾</span> <span data-i18n="rsQtyTbl2">الكميات المطلوبة والاستهلاك حسب المقاس</span></th></tr>
+          <tr><th colspan="6" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsq-cv" onclick="rsCollapse('rsq')" title="تصغير/تكبير">–</button><span data-i18n="rsQtyTbl2">الكميات المطلوبة والاستهلاك حسب المقاس</span></span></th></tr>
           <tr class="rsq-hide"><th data-i18n="sizeName">المقاس</th><th class="or" data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="rsRatio">نسبة بحسب الموديل</th><th class="or" data-i18n="rsQtyConsM">استهلاك الكمية (متر)</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th></th></tr>
           <tbody id="rs-qty-rows" class="rsq-hide"></tbody>
           <tr class="tot rsq-hide"><td data-i18n="total">الإجمالي</td><td id="rs-qt-q">—</td><td id="rs-qt-r">—</td><td id="rs-qt-c">—</td><td>—</td><td></td></tr></table></div>
@@ -331,7 +333,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <div><label class="inl" data-i18n="rsMaxSizes">أقصى عدد قياسات في الماركر</label><input id="rs-maxsizes" type="number" value="6" oninput="rsMkCalc()"></div>
           <div><label class="inl" data-i18n="rsMaxPcs">أقصى عدد قطع في الماركر</label><input id="rs-maxpcs" type="number" value="5" oninput="rsMkCalc()"></div></div>
         <div style="overflow-x:auto;margin-top:10px"><table class="xtbl fit" style="min-width:760px">
-          <tr><th colspan="15" class="ttl" style="cursor:pointer;user-select:none" onclick="rsCollapse('rsm')"><span class="rsm-cv">▾</span> <span data-i18n="rsMkTbl">القياسات والكميات داخل الماركر</span></th></tr>
+          <tr><th colspan="15" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsm-cv" onclick="rsCollapse('rsm')" title="تصغير/تكبير">–</button><span data-i18n="rsMkTbl">القياسات والكميات داخل الماركر</span></span></th></tr>
           <tr class="rsm-hide"><th data-i18n="rsCode">الكود</th><th data-i18n="rsDesc">البيان</th>
             <th class="szc">مقاس١</th><th class="szc">مقاس٢</th><th class="szc">مقاس٣</th><th class="szc">مقاس٤</th><th class="szc">مقاس٥</th><th class="szc">مقاس٦</th>
             <th class="or" data-i18n="rsPcsLbl">إجمالي القطع في الماركر</th><th data-i18n="rsPlies">عدد الطبقات</th>
@@ -456,7 +458,7 @@ rsMkPerPly:'استهلاك الماركر/طبقة (متر)',rsSumFab:'إجما�
 rsMaxLen:'حد طول الماركر (متر)',rsMaxSizes:'أقصى عدد قياسات في الماركر',rsMaxPcs:'أقصى عدد قطع في الماركر',
 rsPrint:'🖨 طباعة الخطة',rsPlanState:'حالة الخطة',rsReady:'مطابقة وجاهزة',rsReview:'تحتاج مراجعة',rsRemaining:'المتبقي',rsTotalProd:'إجمالي المنتَج',
 rsSumReq:'إجمالي كمية الطلب',rsSumProd:'إجمالي إنتاج الخطة',rsSumRem:'إجمالي المتبقي',rsSumValid:'عدد الماركرات الصالحة',rsSumFabT:'إجمالي استهلاك التشغيل',
-rsLenTip:'لتلائم الطول: ',rsLenReduce:'قلّل {s} بمقدار {n} قطعة',rsLenRemove:'احذف {s}',
+rsLenTip:'لتلائم الطول: ',rsLenReduce:'قلّل {s} بمقدار {n} قطعة',rsLenRemove:'احذف {s}',rsAddFit:'يمكن إضافة {s} (يتبقّى {r} م)',
 st_ok:'صالح',st_empty:'فارغ',st_dup:'غير صالح: مقاس مكرر',st_badqty:'غير صالح: كمية غير صحيحة',st_maxpcs:'غير صالح: تجاوز أقصى قطع',st_maxsizes:'غير صالح: تجاوز عدد القياسات',st_len:'غير صالح: تجاوز حد الطول',st_plies:'غير صالح: عدد الطبقات غير صحيح',st_nosize:'غير صالح: كمية بلا مقاس',
 rsNoSizes:'المنتج المختار بلا مقاسات محفوظة — افتح إدارة الموديلات والمقاسات وأضف المقاسات مع الاستهلاك والنسبة',
 mkMkLen:'طول الماركر',mkTotalPlies:'إجمالي الطبقات',mkSpreadsShort:'فرشة',
@@ -592,7 +594,7 @@ rsMkPerPly:'Marker cons/ply (m)',rsSumFab:'Total run consumption (m)',rsAddMarke
 rsMaxLen:'Marker length limit (m)',rsMaxSizes:'Max sizes per marker',rsMaxPcs:'Max pieces per marker',
 rsPrint:'🖨 Print plan',rsPlanState:'Plan status',rsReady:'Matched & ready',rsReview:'Needs review',rsRemaining:'Remaining',rsTotalProd:'Total produced',
 rsSumReq:'Total order qty',rsSumProd:'Plan production',rsSumRem:'Total remaining',rsSumValid:'Valid markers',rsSumFabT:'Total run consumption',
-rsLenTip:'To fit length: ',rsLenReduce:'Reduce {s} by {n} pcs',rsLenRemove:'Remove {s}',
+rsLenTip:'To fit length: ',rsLenReduce:'Reduce {s} by {n} pcs',rsLenRemove:'Remove {s}',rsAddFit:'Can add {s} ({r}m left)',
 st_ok:'valid',st_empty:'empty',st_dup:'invalid: duplicate size',st_badqty:'invalid: bad quantity',st_maxpcs:'invalid: exceeds max pieces',st_maxsizes:'invalid: exceeds max sizes',st_len:'invalid: exceeds length limit',st_plies:'invalid: bad ply count',st_nosize:'invalid: quantity without size',
 rsNoSizes:'The selected product has no saved sizes — open the models & sizes manager and add sizes with consumption and ratio',
 mkMkLen:'Marker length',mkTotalPlies:'Total plies',mkSpreadsShort:'spreads',
@@ -1716,7 +1718,7 @@ let RS_DRAFT=null,RS_LOADED=false,RS_SAVE_T=null,RS_COL={};
 // طيّ/فتح جدول
 function rsCollapse(key){const on=RS_COL[key]=!RS_COL[key];
   document.querySelectorAll('.'+key+'-hide').forEach(e=>e.style.display=on?'none':'');
-  document.querySelectorAll('.'+key+'-cv').forEach(e=>e.textContent=on?'▸':'▾');}
+  document.querySelectorAll('.'+key+'-cv').forEach(e=>e.textContent=on?'+':'–');}
 function renderRsProducts(){const el=$('rs-product');if(!el)return;const cur=el.value;const ns=prodNames();
   el.innerHTML=ns.length?ns.map(n=>`<option ${n===cur?'selected':''}>${esc(n)}</option>`).join(''):`<option value="">\u2014</option>`;
   if(cur&&ns.includes(cur))el.value=cur;
@@ -1839,6 +1841,18 @@ function rsLenFix(vp,cons,len,maxlen){const excess=len-maxlen;let best=null;
   if(!best){let mx=null;vp.forEach(p=>{const w=p.cnt*(cons[p.size]||0);if(!mx||w>mx.w)mx={size:p.size,w};});if(mx)best={size:mx.size,n:0,all:true};}
   if(!best)return '';
   return t('rsLenTip')+(best.all?tf('rsLenRemove',{s:best.size}):tf('rsLenReduce',{s:best.size,n:best.n}));}
+// اقتراح مقاس يمكن إضافته دون تجاوز طول الماركر (يفضّل الأكثر احتياجاً ثم الأكفأ للمساحة)
+function rsAddFit(vp,cons,len,pcs,maxlen,maxpcs,maxsizes,rem){
+  const room=maxlen-len,availPcs=maxpcs-pcs,availSizes=maxsizes-vp.length;
+  if(room<=1e-9||availPcs<1||availSizes<1)return '';
+  const used=new Set(vp.map(p=>p.size));
+  const cands=Object.keys(cons).filter(s=>!used.has(s)&&cons[s]>0&&cons[s]<=room+1e-9);
+  if(!cands.length)return '';
+  const need=cands.filter(s=>(rem[s]||0)>0);
+  let pick;
+  if(need.length)pick=need.sort((a,b)=>(rem[b]-rem[a])||(cons[b]-cons[a]))[0]; // الأكثر احتياجاً
+  else pick=cands.sort((a,b)=>cons[b]-cons[a])[0]; // الأكفأ لملء المساحة
+  return tf('rsAddFit',{s:pick,r:Math.round((room-cons[pick])*100)/100});}
 function rsReadMarkers(){return [...document.querySelectorAll('.rs-mrow1')].map(tr1=>{
   const tr2=tr1.nextElementSibling;
   const ss=[...tr1.querySelectorAll('.rsp-size')].map(e=>e.value.trim());
@@ -1849,6 +1863,8 @@ function rsMkCalc(){if(!$('rs-markers'))return;
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const maxlen=+$('rs-maxlen').value||0,maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
   const raw=rsReadMarkers();let tRun=0,tFab=0,tPlies=0,tPcs=0;RS_VALIDN=0;
+  const reqMap={};[...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();if(s)reqMap[s]=+tr.querySelector('.rsq-qty').value||0;});
+  const produced={};const MR=[];
   [...document.querySelectorAll('.rs-mrow1')].forEach((tr1,i)=>{const m=raw[i];const tr2=tr1.nextElementSibling;
     const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;let st='',pcs=0,len=0,run=0,fab=0;
     if(!m.pairs.length&&!m.plies)st='st_empty';
@@ -1862,7 +1878,8 @@ function rsMkCalc(){if(!$('rs-markers'))return;
       else if(!(plies>0)||plies%1!==0)st='st_plies';
       else{len=vp.reduce((s,p)=>s+p.cnt*(cons[p.size]||0),0);
         if(maxlen>0&&len>maxlen+1e-9)st='st_len';else st='st_ok';}}
-    if(st==='st_ok'){run=pcs*plies;fab=len*plies;tRun+=run;tFab+=fab;tPlies+=plies;tPcs+=pcs;RS_VALIDN++;}
+    if(st==='st_ok'){run=pcs*plies;fab=len*plies;tRun+=run;tFab+=fab;tPlies+=plies;tPcs+=pcs;RS_VALIDN++;
+      vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);}
     const bg=RS_COLORS[i%RS_COLORS.length];const ok=st==='st_ok';
     tr1.querySelectorAll('td').forEach(td=>td.style.background=bg);
     if(tr2)tr2.querySelectorAll('td').forEach(td=>td.style.background=bg);
@@ -1873,8 +1890,13 @@ function rsMkCalc(){if(!$('rs-markers'))return;
     tr1.querySelector('.rsm-fab').textContent=Math.round(fab*100)/100;
     const stc=tr1.querySelector('.rsm-st');
     const tip=(st==='st_len')?rsLenFix(vp,cons,len,maxlen):'';
-    stc.innerHTML=esc(t(st))+(tip?`<div style="font-weight:700;font-size:11.5px;margin-top:3px;color:#8a4b00">\ud83d\udca1 ${esc(tip)}</div>`:'');
-    stc.style.cssText='max-width:180px;font-weight:800;background:'+(ok?'#e2f2e2':(st==='st_empty'?bg:'#fbe3e3'))+';color:'+(ok?'#1e7e40':(st==='st_empty'?'#667':'#c00000'));});
+    stc.innerHTML=esc(t(st))+(tip?`<div class="rsm-tip" style="font-weight:700;font-size:11.5px;margin-top:3px;color:#8a4b00">\ud83d\udca1 ${esc(tip)}</div>`:'');
+    stc.style.cssText='max-width:180px;font-weight:800;background:'+(ok?'#e2f2e2':(st==='st_empty'?bg:'#fbe3e3'))+';color:'+(ok?'#1e7e40':(st==='st_empty'?'#667':'#c00000'));
+    MR.push({stc,st,vp,len,pcs});});
+  // \u0627\u0642\u062a\u0631\u0627\u062d \u0625\u0636\u0627\u0641\u0629 \u0645\u0642\u0627\u0633 \u0644\u0644\u0645\u0627\u0631\u0643\u0631\u0627\u062a \u0627\u0644\u0635\u0627\u0644\u062d\u0629 \u0627\u0644\u062a\u064a \u0628\u0647\u0627 \u0645\u062a\u0633\u0651\u0639
+  const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]-(produced[s]||0));
+  MR.forEach(r=>{if(r.st!=='st_ok')return;const addTip=rsAddFit(r.vp,cons,r.len,r.pcs,maxlen,maxpcs,maxsizes,rem);
+    if(addTip)r.stc.insertAdjacentHTML('beforeend',`<div class="rsm-tip" style="font-weight:700;font-size:11.5px;margin-top:3px;color:#0a5">\u2795 ${esc(addTip)}</div>`);});
   if($('rs-mt-pcs')){$('rs-mt-pcs').textContent=tPcs||'\u2014';$('rs-mt-plies').textContent=tPlies||'\u2014';
     $('rs-mt-run').textContent=tRun||'\u2014';$('rs-mt-fab').textContent=tFab?Math.round(tFab*100)/100:'\u2014';}
   const totalReq=[...document.querySelectorAll('.rsq-row')].reduce((s,tr)=>s+(+tr.querySelector('.rsq-qty').value||0),0);
