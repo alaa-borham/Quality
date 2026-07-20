@@ -217,7 +217,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
     <button onclick="go('insp',this)" oncontextmenu="return navInfo('insp',event)">✅ <span data-i18n="navInsp">الفحوصات</span></button>
     <button onclick="go('dash',this)" oncontextmenu="return navInfo('dash',event)">📊 <span data-i18n="navDash">المؤشرات</span></button>
     <button onclick="go('tools',this)" oncontextmenu="return navInfo('tools',event)">🧮 <span data-i18n="navTools">الأدوات</span></button>
-    <button onclick="go('marker',this)" oncontextmenu="return navInfo('marker',event)">📐 <span data-i18n="navMarker">الماركر</span></button>
+    <button onclick="go('marker',this)" oncontextmenu="return navInfo('marker',event)">📊 <span data-i18n="navMarker">الريشو</span></button>
     <button onclick="go('ref',this)" oncontextmenu="return navInfo('ref',event)">📋 <span data-i18n="navRef">المراجع</span></button>
   </div>
   <div class="wrap">
@@ -299,37 +299,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
       </div>
     </div>
     <div id="p-marker" class="hide">
-      <div class="sec-h">📐 <span data-i18n="navMarker">الماركر</span></div>
-      <div class="subnav" id="marker-subnav">
-        <button class="on" onclick="goMarker('mk',this)" data-i18n="mkTitle">حاسبة الماركر والاستهلاك</button>
-        <button onclick="goMarker('rs',this)">📊 <span data-i18n="rsTitle">الريشو — خطة الماركرات</span></button>
-      </div>
-      <div id="tool-mk" class="card">
-        <label class="inl" data-i18n="mkReportName">اسم التقرير (اختياري)</label>
-        <input id="mk-title" data-i18n-ph="mkReportNamePh" placeholder="مثال: أوردر رمضان — العميل أحمد">
-        <div class="grid2" id="mk-factrow" style="margin-top:8px"><div><label class="inl" data-i18n="factOpt">المصنع (اختياري)</label><select id="mk-fact"></select></div>
-          <div><label class="inl" data-i18n="dateLbl">التاريخ</label><input id="mk-date" type="date"></div></div>
-        <div class="grid3"><div><label class="inl" data-i18n="productLbl">المنتج</label><select id="mk-product" onchange="loadMkProduct()"></select></div>
-          <div><label class="inl" data-i18n="mkModelLbl">الموديل (اختياري)</label><select id="mk-model" onchange="loadMkModel()"></select></div>
-          <div style="display:flex;align-items:flex-end"><button type="button" class="mini" onclick="modelsManager()" data-i18n="mkManage">⚙️ إدارة الموديلات والمقاسات</button></div></div>
-        <label class="inl" data-i18n="mkTableLbl">بيانات الأوردر</label>
-        <div style="overflow-x:auto"><table class="rtbl" style="min-width:440px" id="mk-tbl">
-          <tr><th data-i18n="sizeName">المقاس</th><th data-i18n="sizeCons">استهلاك القطعة</th><th data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="colorLbl">اللون</th><th></th></tr>
-          <tbody id="mk-rows"></tbody></table></div>
-        <button type="button" class="mini" style="margin-top:6px" onclick="addMkRow()">➕ <span data-i18n="mkAddRow">إضافة مقاس</span></button>
-        <button type="button" class="mini g" style="margin-top:6px" onclick="fillModelSizes()">📋 <span data-i18n="fillModelBtn">تعبئة مقاسات الموديل</span></button>
-        <div class="grid3" style="margin-top:10px"><div><label class="inl" data-i18n="unitLbl">الوحدة</label><select id="mk-unit" onchange="onMkUnitChange()">
-            <option value="متر">متر</option><option value="ياردة">ياردة</option><option value="كجم">كيلو</option><option value="حبة">حبة</option></select></div>
-          <div><label class="inl" data-i18n="mkMkLen">طول الماركر (طول الطبقة الواحدة)</label><input id="mk-mklen" type="number" step="0.01" oninput="calcMK()"></div>
-          <div><label class="inl" data-i18n="mkAvail">القماش المتاح (اختياري)</label><input id="mk-avail" type="number" step="0.01" oninput="calcMK()"></div></div>
-        <div class="grid2"><div><label class="inl" data-i18n="mkMaxPly">أقصى عدد طبقات في الفرشة (اختياري)</label><input id="mk-maxply" type="number" oninput="calcMK()"></div>
-          <div><label class="inl" data-i18n="mkActual">القماش الفعلي بعد القص (اختياري)</label><input id="mk-actual" type="number" step="0.01" oninput="calcMK()"></div></div>
-        <div class="row-btns" style="margin-top:10px"><button class="btn" onclick="calcMK()" data-i18n="calc">احسب</button>
-        <button class="btn sec" id="mk-save" onclick="saveToolCheck('mk')" data-i18n="saveCheck">💾 حفظ</button>
-        <button class="btn sec" onclick="printSpreadOrder()" data-i18n="spreadOrderBtn">🖨 أمر فرشة</button></div>
-        <div class="res-box" id="mk-res"></div>
-      </div>
-      <div id="tool-rs" class="card hide">
+      <div class="sec-h">📊 <span data-i18n="rsTitle">الريشو — خطة الماركرات</span></div>
+      <div id="tool-rs" class="card">
         <label class="inl" data-i18n="mkReportName">اسم التقرير (اختياري)</label>
         <input id="rs-title" data-i18n-ph="mkReportNamePh" placeholder="مثال: أوردر رمضان — العميل أحمد" oninput="rsSaveDraft()">
         <div class="grid3" style="margin-top:8px"><div><label class="inl" data-i18n="productLbl">المنتج</label><select id="rs-product" onchange="rsProductChanged()"></select></div>
@@ -418,7 +389,7 @@ appTitle:'نظام متابعة الجودة',login:'تسجيل الدخول',si
 name:'الاسم',namePh:'اسمك الكامل',loginBtn:'دخول',createAccBtn:'إنشاء الحساب',forgot:'نسيت كلمة المرور؟',
 wsTitle:'مساحة العمل',wsSub:'أنشئ مساحة جديدة أو انضم بكود',wsSubJoin:'انضم بكود مساحة العمل الذي يعطيك إياه مدير النظام',createTab:'إنشاء مساحة',joinTab:'انضمام بكود',
 wsNameLbl:'اسم مساحة العمل (الشركة/القسم)',wsNamePh:'مثال: جودة الشياكة',createBtn:'إنشاء',codeLbl:'كود مساحة العمل',joinBtn:'انضمام',logout:'تسجيل الخروج',
-appName:'متابعة الجودة',navDash:'المؤشرات',navInsp:'الفحوصات',inspProd:'فحوصات الإنتاج',navOrders:'الطلبيات',navFact:'المصانع',navTools:'الأدوات',navMarker:'الماركر',navRef:'المراجع',navToolChk:'سجل فحص القماش',
+appName:'متابعة الجودة',navDash:'المؤشرات',navInsp:'الفحوصات',inspProd:'فحوصات الإنتاج',navOrders:'الطلبيات',navFact:'المصانع',navTools:'الأدوات',navMarker:'الريشو',navRef:'المراجع',navToolChk:'سجل فحص القماش',
 navDescmarker:'حاسبة الماركر والاستهلاك: تدخل بيانات الأوردر (المقاس · الاستهلاك · الكمية · اللون) فتحسب إجمالي القطع والقماش وعدد الطبقات لكل لون. مكان مستقل ستُضاف بجانبه لاحقاً حاسبة الإنتاج الكمي.',
 navDescfact:'إدارة قائمة المصانع والموردين الذين تتعامل معهم: إضافة مصنع جديد باسمه ودولته وجهة الاتصال، وتعديل أو حذف المصانع الحالية. كل طلبية وكل فحص يُربط بمصنع من هذه القائمة.',
 navDescorders:'تسجيل طلبيات الإنتاج (PO): ربط كل طلبية بمصنع مع رقمها والموديل والصنف والكمية واللون. الكمية تُستخدم تلقائياً لتحديد حجم عينة الفحص حسب جدول AQL.',
@@ -564,7 +535,7 @@ appTitle:'QC Tracking System',login:'Login',signup:'Sign up',email:'Email',passw
 name:'Name',namePh:'Your full name',loginBtn:'Login',createAccBtn:'Create account',forgot:'Forgot password?',
 wsTitle:'Workspace',wsSub:'Create a new workspace or join by code',wsSubJoin:'Join with the workspace code given to you by the system admin',createTab:'Create',joinTab:'Join by code',
 wsNameLbl:'Workspace name (company/dept)',wsNamePh:'e.g. Shiaka QC',createBtn:'Create',codeLbl:'Workspace code',joinBtn:'Join',logout:'Sign out',
-appName:'QC Tracking',navDash:'Dashboard',navInsp:'Inspections',inspProd:'Production inspections',navOrders:'Orders',navFact:'Factories',navTools:'Tools',navMarker:'Marker',navRef:'Reference',navToolChk:'Fabric Test Log',
+appName:'QC Tracking',navDash:'Dashboard',navInsp:'Inspections',inspProd:'Production inspections',navOrders:'Orders',navFact:'Factories',navTools:'Tools',navMarker:'Ratio plan',navRef:'Reference',navToolChk:'Fabric Test Log',
 navDescmarker:'Marker & consumption calculator: enter the order lines (size, consumption, quantity, color) to get total pieces, fabric, and plies per color. A standalone place where a bulk-production calculator will be added later.',
 navDescfact:'Manage the list of factories and suppliers you work with: add a factory with its name, country, and contact, and edit or delete existing ones. Every order and inspection is linked to a factory from this list.',
 navDescorders:'Register production orders (POs): link each order to a factory with its number, model, item, quantity, and color. The quantity automatically determines the inspection sample size per the AQL table.',
@@ -824,7 +795,8 @@ function go(tb,btn){TAB=tb;['dash','insp','orders','fact','tools','marker','ref'
   {const w=document.querySelector('.wrap');if(w)w.classList.toggle('wide',tb==='marker');}
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');
   $('fab').style.display=(['insp','orders'].includes(tb)||(tb==='fact'&&can('fact')))?'flex':'none';if(tb==='dash')renderDash();if(tb==='ref')renderRef();
-  if(tb==='tools'||tb==='marker'){renderToolFactSelects();if(!$('mk-rows').children.length)addMkRow();}
+  if(tb==='tools')renderToolFactSelects();
+  if(tb==='marker')goMarker('rs');
   if(tb==='insp')goInsp('list',document.querySelector('#insp-subnav button'));}
 function goInsp(v,btn){['list','toolchk'].forEach(x=>$('insp-wrap-'+x).classList.toggle('hide',x!==v));
   document.querySelectorAll('#insp-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');
@@ -1047,7 +1019,7 @@ function renderFact(){const el=$('fact-list');if(!el)return;if(!FACT.length){el.
     <button class="mini r" onclick="delFact('${f.id}')">${t('del')}</button>`:''}</div></div>`).join('')+'</div>';}
 function factStats(f){const oids=ORDERS.filter(o=>o.factoryId===f.id).map(o=>o.id);
   const insp=INSP.filter(i=>oids.includes(i.orderId)||i.factoryName===f.name);
-  const checks=TOOLCHK.filter(c=>c.factoryId===f.id||c.factoryName===f.name);
+  const checks=TOOLCHK.filter(c=>c.type!=='mk'&&(c.factoryId===f.id||c.factoryName===f.name));
   const n=insp.length,pass=insp.filter(i=>i.decision==='PASS').length;
   const aql=insp.filter(i=>i.dhu!=null);
   const avgDhu=aql.length?Math.round(aql.reduce((s,i)=>s+(i.dhu||0),0)/aql.length*100)/100:null;
@@ -1288,9 +1260,9 @@ function exportCSV(){const list=filteredInsp();if(!list.length)return toast(t('n
   const csv='﻿'+[head,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
   a.download='inspections_'+today()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
-function exportToolChk(){if(!TOOLCHK.length)return;
+function exportToolChk(){const src=TOOLCHK.filter(c=>c.type!=='mk');if(!src.length)return;
   const head=['التاريخ / Date','اسم التقرير / Report','النوع / Type','المصنع / Factory','النتيجة / Result','القرار / Decision','المفتش / Inspector'];
-  const rows=TOOLCHK.map(c=>[c.date,c.title||'',toolTypeLabel(c.type),c.factoryName,toolResultSummary(c),c.result.decision,c.inspector]);
+  const rows=src.map(c=>[c.date,c.title||'',toolTypeLabel(c.type),c.factoryName,toolResultSummary(c),c.result.decision,c.inspector]);
   const csv='﻿'+[head,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
   a.download='tool_checks_'+today()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
@@ -1688,15 +1660,17 @@ function toolResultSummary(c){const r=c.result;const mk=d=>d.decision==='PASS'?'
   if(c.type==='mk')return `${r.product?esc(r.product)+' · ':''}${r.model?esc(r.model)+' · ':''}${t('totalPieces')} ${r.pieces} · ${t('mkTotalFabric')} ${r.totalFabric} ${r.unit||''}`;
   if(c.type==='rs')return `${r.product?esc(r.product)+' · ':''}${t('rsPlanState')}: ${r.decision==='PASS'?t('rsReady'):t('rsReview')} · ${t('rsTotalProd')} ${r.totalMade}/${r.totalReq} · ${t('mkTotalFabric')} ${r.totFab} م`;
   return `${t('fpShort')} ${mk(r.fp)} · ${t('shShort')} ${mk(r.sh)} · AQL ${mk(r.aq)}`;}
-function renderToolChk(){const el=$('toolchk-list');if(!el)return;if(!TOOLCHK.length){el.innerHTML=empty(t('noToolChk'));return;}
-  const rsN=TOOLCHK.filter(c=>c.type==='rs').length;
+function renderToolChk(){const el=$('toolchk-list');if(!el)return;
+  // حاسبة الماركر القديمة أُزيلت — تُخفى تقاريرها من السجل (تبقى في قاعدة البيانات)
+  const list=TOOLCHK.filter(c=>c.type!=='mk');
+  if(!list.length){el.innerHTML=empty(t('noToolChk'));return;}
+  const rsN=list.filter(c=>c.type==='rs').length;
   const bar=`<div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"><button class="mini g" onclick="exportToolChk()">${t('exportCsv')}</button>${rsN>=2?`<button class="mini g" onclick="rsComparePick()">${t('rsCompareBtn')}</button>`:''}</div>`;
-  el.innerHTML=bar+'<div class="cards">'+TOOLCHK.map(c=>{const b=c.result.decision==='PASS'?'b-pass':'b-fail';
+  el.innerHTML=bar+'<div class="cards">'+list.map(c=>{const b=c.result.decision==='PASS'?'b-pass':'b-fail';
     return `<div class="item"><div class="h"><div><div class="t">${c.title?esc(c.title):esc(toolTypeLabel(c.type))}</div>
     <div class="s">${c.title?esc(toolTypeLabel(c.type))+' · ':''}🏭 ${esc(c.factoryName||'')} · ${fmtDate(c.date)}<br>${esc(toolResultSummary(c))}</div></div>
     <span class="badge ${b}">${c.result.decision==='PASS'?t('pass'):t('fail')}</span></div>
     <div class="row-btns"><button class="mini" onclick="printToolChk('${c.id}')">${t('reportBtn')}</button>
-    ${c.type==='mk'?`<button class="mini g" onclick="openMkInCalc('${c.id}')">${t('openInCalc')}</button>`:''}
     ${c.type==='rs'?`<button class="mini g" onclick="rsOpenInCalc('${c.id}')">${t('openInCalc')}</button>`:''}
     ${can('del')?`<button class="mini r" onclick="delToolChk('${c.id}')">${t('del')}</button>`:''}</div></div>`;}).join('')+'</div>';}
 function delToolChk(id){if(!confirm(t('delInspQ')))return;db.collection('qc_toolchecks').doc(id).delete().catch(e=>toast(rulesHint(e)));}
@@ -2171,7 +2145,7 @@ function saveRsPlan(){const result=rsResult();if(!result)return toast(t('mkNeed'
   const data={wsId:MEMBER.wsId,type:'rs',title,factoryId:'',factoryName:'',date:today(),inspector:MEMBER.name||ME.email,result};
   db.collection('qc_toolchecks').add({...data,createdAt:FV.serverTimestamp()}).then(()=>toast(t('saved'))).catch(e=>toast(rulesHint(e)));}
 function rsOpenInCalc(id){const c=TOOLCHK.find(x=>x.id===id);if(!c||c.type!=='rs')return;const r=c.result;
-  go('marker',navBtn('marker'));goMarker('rs',document.querySelectorAll('#marker-subnav button')[1]);
+  go('marker',navBtn('marker'));
   if($('rs-title'))$('rs-title').value=c.title||'';
   if(r.product&&prodNames().includes(r.product))$('rs-product').value=r.product;
   if($('rs-unit')){$('rs-unit').value=r.unit||'متر';RS_PREV_UNIT=$('rs-unit').value;}
