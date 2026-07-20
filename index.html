@@ -360,7 +360,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div class="rsm-hide" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
           <button type="button" class="mini" onclick="rsAddMarker()">➕ <span data-i18n="rsAddMarker">إضافة ماركر</span></button>
           <button type="button" class="btn g" style="padding:6px 14px" onclick="rsAutoPlan()">⚡ <span data-i18n="rsAutoBtn">أكمل الخطة تلقائياً (أقل استهلاك)</span></button>
-          <button type="button" class="mini g" onclick="rsReducePlies()" title="تكرار القياسات لتقليل الطبقات دون تغيير القماش أو الكمية">🔽 <span data-i18n="rsReducePliesBtn">قلّل الطبقات</span></button></div>
+          <button type="button" class="mini g" onclick="rsReducePlies()" title="تكرار القياسات لتقليل الطبقات دون تغيير القماش أو الكمية">🔽 <span data-i18n="rsReducePliesBtn">قلّل الطبقات</span></button>
+          <button type="button" class="mini r" onclick="rsClearMarkers()" title="حذف كل الماركرات للبدء من جديد (استخدم بعدها: أكمل الخطة تلقائياً)">🧹 <span data-i18n="rsClearMkBtn">امسح الماركرات</span></button></div>
         <div style="overflow-x:auto;margin-top:12px"><table class="xtbl" style="min-width:560px">
           <tr><th colspan="7" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsr-cv" onclick="rsCollapse('rsr')" title="تصغير/تكبير">–</button><span data-i18n="rsReviewTbl">مراجعة الناتج حسب المقاس</span></span></th></tr>
           <tr class="rsr-hide"><th data-i18n="sizeName">القياس</th><th class="or" data-i18n="mkQtyOrder">المطلوب</th><th data-i18n="rsProdFromMk">إجمالي القطع من الماركر</th><th class="or" data-i18n="rsRemFromOrder">المتبقي من الأوردر</th><th data-i18n="mkStateCol">الحالة</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th class="or rsu-h" data-b="إجمالي استهلاك الأوردر">إجمالي استهلاك الأوردر (متر)</th></tr>
@@ -490,10 +491,12 @@ rsPcsLbl:'إجمالي القطع في الماركر',rsPlies:'عدد الطب�
 rsMkPerPly:'استهلاك الماركر/طبقة (متر)',rsSumFab:'إجمالي استهلاك التشغيل (متر)',rsAddMarker:'إضافة ماركر',
 rsMaxLen:'حد طول الماركر (متر)',rsMaxSizes:'أقصى عدد قياسات في الماركر',rsMaxPcs:'أقصى عدد قطع في الماركر',
 rsPrint:'🖨 طباعة الخطة',rsPlanState:'حالة الخطة',rsReady:'مطابقة وجاهزة',rsReview:'تحتاج مراجعة',rsRemaining:'المتبقي',rsTotalProd:'إجمالي المنتَج',
-rsSumReq:'إجمالي كمية الطلب',rsSumProd:'إجمالي إنتاج الخطة',rsSumRem:'إجمالي المتبقي',rsSumValid:'عدد الماركرات الصالحة',rsSumFabT:'إجمالي استهلاك التشغيل',rsDispUnit:'وحدة العرض',
+rsSumReq:'إجمالي كمية الطلب',rsSumProd:'إجمالي إنتاج الخطة',rsSumRem:'إجمالي المتبقي',rsSumSurplus:'زيادة الإنتاج',rsSumValid:'عدد الماركرات الصالحة',rsSumFabT:'إجمالي استهلاك التشغيل',rsDispUnit:'وحدة العرض',
+rsOverProd:'زيادة إنتاج: {n} قطعة فوق المطلوب — قلّل الطبقات أو احذف قياساً من الماركرات ذات «زيادة» في جدول المراجعة',rsUnderProd:'نقص إنتاج: {n} قطعة أقل من المطلوب — أكمل الخطة تلقائياً أو أضف ماركرات',
 rsReviewTbl:'مراجعة الناتج حسب المقاس',rsProdFromMk:'إجمالي القطع من الماركر',rsRemFromOrder:'المتبقي من الأوردر',rsOrderConsM:'إجمالي استهلاك الأوردر (متر)',rsRvShort:'نقص',rsRvMatch:'مطابق',rsRvSurplus:'زيادة',
 rsAutoBtn:'أكمل الخطة تلقائياً (أقل استهلاك)',rsAutoDone:'الخطة مكتملة — لا كميات متبقية',rsAutoAdded:'أُضيف {n} ماركر تلقائياً',
 rsReducePliesBtn:'قلّل الطبقات',rsReduceDone:'قُلّلت الطبقات في {n} ماركر: {a} ← {b} طبقة (القماش والكمية دون تغيير)',rsReduceNone:'لا يمكن تقليل الطبقات أكثر — الماركرات مضبوطة على حدّ الطول أو أقصى قطع',
+rsClearMkBtn:'امسح الماركرات',rsClearMkQ:'حذف كل الماركرات؟ يمكنك بعدها الضغط على «أكمل الخطة تلقائياً» لبناء خطة بلا زيادة إنتاج.',
 rsSugTbl:'اقتراحات تغطية باقي كمية الأوردر (أقل استهلاك)',rsSugPliesC:'الطبقات المقترحة',rsEditPliesC:'تعديل الطبقات يدويًا (اختياري)',rsRemWithRun:'إجمالي المتبقي مع التشغيل',rsApplyAll:'✔ اعتماد كل الاقتراحات كماركرات',rsSugEmpty:'لا كميات متبقية — الاقتراحات فارغة',
 rsSpreadBtn:'🧵 أمر الفرد',rsSpreadTitle:'أمر الفرد (تشغيل الفرشات)',rsMkLenH:'طول الماركر',rsNoValidMk:'لا ماركرات صالحة للفرد',
 rsSpreadJobs:'عدد الماركرات',rsSpreadDone:'تم الفرد',rsFarradSig:'توقيع الفرّاد',rsCutSupSig:'مشرف القص',rsSpreadHint:'ملاحظة: افرد كل ماركر بعدد الطبقات المذكور — راجع طول الماركر قبل القص',
@@ -633,10 +636,12 @@ rsPcsLbl:'Total pieces per marker',rsPlies:'Plies',rsPcsRun:'Total run pieces',r
 rsMkPerPly:'Marker cons/ply (m)',rsSumFab:'Total run consumption (m)',rsAddMarker:'Add marker',
 rsMaxLen:'Marker length limit (m)',rsMaxSizes:'Max sizes per marker',rsMaxPcs:'Max pieces per marker',
 rsPrint:'🖨 Print plan',rsPlanState:'Plan status',rsReady:'Matched & ready',rsReview:'Needs review',rsRemaining:'Remaining',rsTotalProd:'Total produced',
-rsSumReq:'Total order qty',rsSumProd:'Plan production',rsSumRem:'Total remaining',rsSumValid:'Valid markers',rsSumFabT:'Total run consumption',rsDispUnit:'Display unit',
+rsSumReq:'Total order qty',rsSumProd:'Plan production',rsSumRem:'Total remaining',rsSumSurplus:'Overproduction',rsSumValid:'Valid markers',rsSumFabT:'Total run consumption',rsDispUnit:'Display unit',
+rsOverProd:'Overproduction: {n} pcs above required — reduce plies or remove a size from the markers marked “surplus” in the review table',rsUnderProd:'Underproduction: {n} pcs below required — auto-complete the plan or add markers',
 rsReviewTbl:'Output review by size',rsProdFromMk:'Pieces from markers',rsRemFromOrder:'Remaining of order',rsOrderConsM:'Total order consumption (m)',rsRvShort:'short',rsRvMatch:'matched',rsRvSurplus:'surplus',
 rsAutoBtn:'Auto-complete plan (least consumption)',rsAutoDone:'Plan complete — nothing remaining',rsAutoAdded:'{n} markers added automatically',
 rsReducePliesBtn:'Reduce plies',rsReduceDone:'Plies reduced in {n} marker(s): {a} → {b} plies (fabric & quantity unchanged)',rsReduceNone:'Cannot reduce plies further — markers are capped by length limit or max pieces',
+rsClearMkBtn:'Clear markers',rsClearMkQ:'Delete all markers? You can then press “Auto-complete plan” to build a plan with no overproduction.',
 rsSugTbl:'Suggestions to cover the remaining order (least consumption)',rsSugPliesC:'Suggested plies',rsEditPliesC:'Adjust plies (optional)',rsRemWithRun:'Remaining after run',rsApplyAll:'✔ Apply all suggestions as markers',rsSugEmpty:'Nothing remaining — no suggestions',
 rsSpreadBtn:'🧵 Spreading order',rsSpreadTitle:'Spreading order',rsMkLenH:'Marker length',rsNoValidMk:'No valid markers to spread',
 rsSpreadJobs:'Markers',rsSpreadDone:'Spread done',rsFarradSig:'Spreader signature',rsCutSupSig:'Cutting supervisor',rsSpreadHint:'Note: spread each marker for the stated ply count — verify marker length before cutting',
@@ -1920,12 +1925,10 @@ function rsAddFit(vp,cons,len,pcs,maxlen,maxpcs,maxsizes,rem,plies){
   const cands=Object.keys(cons).filter(s=>!used.has(s)&&cons[s]>0&&cons[s]<=room+1e-9);
   if(!cands.length)return null;
   const P=plies||1;
-  const fit=cands.filter(s=>(rem[s]||0)>=P);   // إضافة قطعة واحدة تُنتج P قطعة دون تجاوز المتبقي
-  const need=cands.filter(s=>(rem[s]||0)>0);
-  let pick;
-  if(fit.length)pick=fit.sort((a,b)=>(rem[b]-rem[a])||(cons[b]-cons[a]))[0];       // مطلوب ويكفي بلا فائض
-  else if(need.length)pick=need.sort((a,b)=>(rem[b]-rem[a])||(cons[b]-cons[a]))[0]; // مطلوب (قد يُحدث فائضاً بسيطاً)
-  else pick=cands.sort((a,b)=>cons[b]-cons[a])[0];                                 // الأكفأ لملء المساحة
+  // لا نقترح إلا مقاساً كميته المتبقية تكفي عدد الطبقات — كي لا تُحدث الإضافة أي زيادة إنتاج
+  const fit=cands.filter(s=>(rem[s]||0)>=P);
+  if(!fit.length)return null;
+  const pick=fit.sort((a,b)=>(rem[b]-rem[a])||(cons[b]-cons[a]))[0];
   return {size:pick,msg:tf('rsAddFit',{s:pick,r:Math.round((room-cons[pick])*rsUF()*100)/100+' '+rsUL()})};}
 // تطبيق اقتراح الإضافة: يضع القياس المقترح (قطعة واحدة) في أول خانة قياس فارغة بالماركر
 function rsApplyAdd(i,size){const tr1=[...document.querySelectorAll('.rs-mrow1')][i];if(!tr1)return;
@@ -2044,6 +2047,11 @@ function rsReducePlies(){if(!$('rs-markers'))return;
   $('rs-markers').innerHTML='';next.forEach(m=>rsAddMarker({pairs:m.pairs,plies:+m.plies}));
   rsMkCalc();rsSaveDraft();
   toast(tf('rsReduceDone',{n:changed,a:before,b:after}));}
+// حذف كل الماركرات للبدء من جديد (تمهيداً لـ«أكمل الخطة تلقائياً» بلا زيادة إنتاج)
+function rsClearMarkers(){if(!$('rs-markers'))return;
+  if(![...document.querySelectorAll('.rs-mrow1')].length)return;
+  if(!confirm(t('rsClearMkQ')))return;
+  $('rs-markers').innerHTML='';rsMkCalc();rsSaveDraft();}
 function rsReadMarkers(){return [...document.querySelectorAll('.rs-mrow1')].map(tr1=>{
   const tr2=tr1.nextElementSibling;
   const ss=[...tr1.querySelectorAll('.rsp-size')].map(e=>e.value.trim());
@@ -2110,9 +2118,14 @@ function rsRenderSummary(d){const el=$('rs-summary');if(!el)return;
   const c=(l,v,col)=>`<div style="flex:1 1 150px;display:flex;border:1px solid #d8c27a;border-radius:8px;overflow:hidden;min-width:140px">
     <div style="background:#ffc000;padding:8px 10px;font-weight:800;flex:1;font-size:12.5px">${l}</div>
     <div style="background:#fdf6e3;padding:8px 10px;font-weight:800;min-width:56px;text-align:center;color:${col||'#1c1c1c'}">${v}</div></div>`;
-  el.innerHTML=c(t('rsSumReq'),d.totalReq||'\u2014')
+  const surplus=d.prod-d.totalReq,shortage=d.totalReq-d.prod;
+  let banner='';
+  if(surplus>0)banner=`<div style="flex:1 1 100%;background:#fbe3e3;border:1.5px solid #e6a5a2;border-radius:10px;padding:9px 13px;font-weight:800;color:#b02a26;display:flex;align-items:center;gap:8px">\u26a0\ufe0f ${tf('rsOverProd',{n:surplus})}</div>`;
+  else if(shortage>0)banner=`<div style="flex:1 1 100%;background:#fff8e6;border:1.5px solid #f0dca0;border-radius:10px;padding:9px 13px;font-weight:800;color:#8a6d00;display:flex;align-items:center;gap:8px">\ud83d\udfe1 ${tf('rsUnderProd',{n:shortage})}</div>`;
+  el.innerHTML=banner
+    +c(t('rsSumReq'),d.totalReq||'\u2014')
     +c(t('rsSumProd'),d.prod||'\u2014')
-    +c(t('rsSumRem'),d.rem,d.rem===0?'#1e7e40':'#c00000')
+    +c(surplus>0?t('rsSumSurplus'):t('rsSumRem'),surplus>0?('+'+surplus):d.rem,d.rem===0?'#1e7e40':'#c00000')
     +c(t('rsSumValid'),d.valid||'\u2014')
     +c(t('rsSumFabT'),(d.fab||0)+' '+rsUL())
     +c(t('rsPlanState'),d.ready?t('rsReady'):t('rsReview'),d.ready?'#1e7e40':'#c00000');}
