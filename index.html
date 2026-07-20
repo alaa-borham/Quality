@@ -345,7 +345,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <tr><th colspan="7" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsr-cv" onclick="rsCollapse('rsr')" title="تصغير/تكبير">–</button><span data-i18n="rsReviewTbl">مراجعة الناتج حسب المقاس</span></span></th></tr>
           <tr class="rsr-hide"><th data-i18n="sizeName">القياس</th><th class="or" data-i18n="mkQtyOrder">المطلوب</th><th data-i18n="rsProdFromMk">إجمالي القطع من الماركر</th><th class="or" data-i18n="rsRemFromOrder">المتبقي من الأوردر</th><th data-i18n="mkStateCol">الحالة</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th class="or" data-i18n="rsOrderConsM">إجمالي استهلاك الأوردر (متر)</th></tr>
           <tbody id="rs-review" class="rsr-hide"></tbody>
-          <tr class="tot rsr-hide"><td data-i18n="total">الإجمالي</td><td id="rs-rv-req">—</td><td id="rs-rv-prod">—</td><td id="rs-rv-rem">—</td><td id="rs-rv-st">—</td><td>—</td><td id="rs-rv-cons">—</td></tr></table></div>
+          <tr class="tot rsr-hide"><td data-i18n="total">الإجمالي</td><td id="rs-rv-req" style="font-size:15px">—</td><td id="rs-rv-prod" style="font-size:15px">—</td><td id="rs-rv-rem">—</td><td id="rs-rv-st">—</td><td>—</td><td id="rs-rv-cons">—</td></tr></table></div>
         <div class="row-btns" style="margin-top:14px"><button class="btn sec" onclick="saveRsPlan()" data-i18n="saveCheck">💾 حفظ</button>
         <button class="btn sec" onclick="printRsPlan()" data-i18n="rsPrint">🖨 طباعة الخطة</button></div>
       </div>
@@ -1949,7 +1949,7 @@ function rsMkCalc(){if(!$('rs-markers'))return;
     $('rs-review').innerHTML=srows.map(x=>{const req=reqMap[x.size]||0,prod=produced[x.size]||0,r=req-prod,oc=Math.round(req*x.c*100)/100;
       tReq+=req;tProd+=prod;tRem+=r;tCons+=req*x.c;
       const stW=r===0?t('rsRvMatch'):r>0?t('rsRvShort'):t('rsRvSurplus');
-      return `<tr><td style="font-weight:800">${esc(x.size)}</td><td>${req}</td><td>${prod}</td><td style="font-weight:800">${r}</td>
+      return `<tr><td style="font-weight:800">${esc(x.size)}</td><td style="font-weight:800;font-size:15px">${req}</td><td style="font-weight:800;font-size:15px">${prod}</td><td style="font-weight:800">${r}</td>
         <td style="font-weight:800;color:${r===0?'#1e7e40':'#c00000'};background:${r===0?'#e2f2e2':'#fbe3e3'}">${stW}</td>
         <td class="red">${x.c}</td><td class="red">${oc}</td></tr>`;}).join('');
     $('rs-rv-req').textContent=tReq||'\u2014';$('rs-rv-prod').textContent=tProd||'\u2014';$('rs-rv-rem').textContent=srows.length?tRem:'\u2014';
