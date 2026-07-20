@@ -328,7 +328,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
       <div id="tool-rs" class="card hide">
         <label class="inl" data-i18n="mkReportName">اسم التقرير (اختياري)</label>
         <input id="rs-title" data-i18n-ph="mkReportNamePh" placeholder="مثال: أوردر رمضان — العميل أحمد" oninput="rsSaveDraft()">
-        <div class="grid2" style="margin-top:8px"><div><label class="inl" data-i18n="productLbl">المنتج</label><select id="rs-product" onchange="rsProductChanged()"></select></div>
+        <div class="grid3" style="margin-top:8px"><div><label class="inl" data-i18n="productLbl">المنتج</label><select id="rs-product" onchange="rsProductChanged()"></select></div>
+          <div><label class="inl" data-i18n="rsDispUnit">وحدة العرض</label><select id="rs-unit" onchange="rsUnitChanged()"><option value="متر">متر</option><option value="ياردة">ياردة</option></select></div>
           <div style="display:flex;align-items:flex-end"><button type="button" class="mini g" onclick="modelsManager()" data-i18n="rsEditList">⚙️ إضافة / تعديل قائمة المقاسات</button></div></div>
         <div id="rs-nosizes" class="hide" style="margin:8px 0;padding:10px;border:1px dashed #d8a03c;background:#fff8e6;border-radius:10px">
           <span data-i18n="rsNoSizes">المنتج المختار بلا مقاسات محفوظة — افتح إدارة الموديلات والمقاسات وأضف المقاسات مع الاستهلاك والنسبة</span>
@@ -336,12 +337,12 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div id="rs-summary" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"></div>
         <div style="overflow-x:auto;margin-top:10px"><table id="rs-qty-tbl" class="xtbl" style="min-width:520px">
           <tr><th colspan="6" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsq-cv" onclick="rsCollapse('rsq')" title="تصغير/تكبير">–</button><span data-i18n="rsQtyTbl2">الكميات المطلوبة والاستهلاك حسب المقاس</span></span></th></tr>
-          <tr class="rsq-hide"><th data-i18n="sizeName">المقاس</th><th class="or" data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="rsRatio">نسبة بحسب الموديل</th><th class="or" data-i18n="rsQtyConsM">استهلاك الكمية (متر)</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th></th></tr>
+          <tr class="rsq-hide"><th data-i18n="sizeName">المقاس</th><th class="or" data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="rsRatio">نسبة بحسب الموديل</th><th class="or rsu-h" data-b="استهلاك الكمية">استهلاك الكمية (متر)</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th></th></tr>
           <tbody id="rs-qty-rows" class="rsq-hide"></tbody>
           <tr class="tot rsq-hide"><td data-i18n="total">الإجمالي</td><td id="rs-qt-q">—</td><td id="rs-qt-r">—</td><td id="rs-qt-c">—</td><td>—</td><td></td></tr></table></div>
         <button type="button" class="mini rsq-hide" style="margin-top:6px" onclick="rsAddQtyRow()">➕ <span data-i18n="mkAddRow">إضافة مقاس</span></button>
         <div class="grid3" style="margin-top:14px">
-          <div><label class="inl" data-i18n="rsMaxLen">حد طول الماركر (متر)</label><input id="rs-maxlen" type="number" step="0.01" value="17" oninput="rsMkCalc()"></div>
+          <div><label class="inl rsu-h" data-b="حد طول الماركر">حد طول الماركر (متر)</label><input id="rs-maxlen" type="number" step="0.01" value="17" oninput="rsMkCalc()"></div>
           <div><label class="inl" data-i18n="rsMaxSizes">أقصى عدد قياسات في الماركر</label><input id="rs-maxsizes" type="number" value="6" oninput="rsMkCalc()"></div>
           <div><label class="inl" data-i18n="rsMaxPcs">أقصى عدد قطع في الماركر</label><input id="rs-maxpcs" type="number" value="5" oninput="rsMkCalc()"></div></div>
         <div style="overflow-x:auto;margin-top:10px"><table class="xtbl" style="min-width:760px">
@@ -350,7 +351,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
             <th class="szc">مقاس١</th><th class="szc">مقاس٢</th><th class="szc">مقاس٣</th><th class="szc">مقاس٤</th><th class="szc">مقاس٥</th><th class="szc">مقاس٦</th>
             <th class="or" data-i18n="rsPcsLbl">إجمالي القطع في الماركر</th><th data-i18n="rsPlies">عدد الطبقات</th>
             <th class="or" data-i18n="rsPcsRun">إجمالي القطع في التشغيل</th><th data-i18n="rsMkStatus">حالة الماركر وسبب عدم الصلاحية</th>
-            <th data-i18n="rsMkPerPly">استهلاك الماركر/طبقة (متر)</th><th class="or" data-i18n="rsSumFab">إجمالي استهلاك التشغيل (متر)</th><th></th></tr>
+            <th class="rsu-h" data-b="استهلاك الماركر/طبقة">استهلاك الماركر/طبقة (متر)</th><th class="or rsu-h" data-b="إجمالي استهلاك التشغيل">إجمالي استهلاك التشغيل (متر)</th><th></th></tr>
           <tbody id="rs-markers" class="rsm-hide"></tbody>
           <tr class="tot rsm-hide"><td colspan="8" data-i18n="total">الإجمالي</td><td id="rs-mt-pcs">—</td><td id="rs-mt-plies">—</td><td id="rs-mt-run">—</td><td></td><td>—</td><td id="rs-mt-fab">—</td><td></td></tr></table></div>
         <div class="rsm-hide" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
@@ -358,7 +359,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <button type="button" class="btn g" style="padding:6px 14px" onclick="rsAutoPlan()">⚡ <span data-i18n="rsAutoBtn">أكمل الخطة تلقائياً (أقل استهلاك)</span></button></div>
         <div style="overflow-x:auto;margin-top:12px"><table class="xtbl" style="min-width:560px">
           <tr><th colspan="7" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsr-cv" onclick="rsCollapse('rsr')" title="تصغير/تكبير">–</button><span data-i18n="rsReviewTbl">مراجعة الناتج حسب المقاس</span></span></th></tr>
-          <tr class="rsr-hide"><th data-i18n="sizeName">القياس</th><th class="or" data-i18n="mkQtyOrder">المطلوب</th><th data-i18n="rsProdFromMk">إجمالي القطع من الماركر</th><th class="or" data-i18n="rsRemFromOrder">المتبقي من الأوردر</th><th data-i18n="mkStateCol">الحالة</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th class="or" data-i18n="rsOrderConsM">إجمالي استهلاك الأوردر (متر)</th></tr>
+          <tr class="rsr-hide"><th data-i18n="sizeName">القياس</th><th class="or" data-i18n="mkQtyOrder">المطلوب</th><th data-i18n="rsProdFromMk">إجمالي القطع من الماركر</th><th class="or" data-i18n="rsRemFromOrder">المتبقي من الأوردر</th><th data-i18n="mkStateCol">الحالة</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th class="or rsu-h" data-b="إجمالي استهلاك الأوردر">إجمالي استهلاك الأوردر (متر)</th></tr>
           <tbody id="rs-review" class="rsr-hide"></tbody>
           <tr class="tot rsr-hide"><td data-i18n="total">الإجمالي</td><td id="rs-rv-req" style="font-size:15px">—</td><td id="rs-rv-prod" style="font-size:15px">—</td><td id="rs-rv-rem">—</td><td id="rs-rv-st">—</td><td>—</td><td id="rs-rv-cons">—</td></tr></table></div>
         <div style="overflow-x:auto;margin-top:12px"><table class="xtbl" style="min-width:820px">
@@ -366,7 +367,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <tr class="rss-hide"><th data-i18n="rsCode">الكود</th><th data-i18n="rsDesc">البيان</th>
             <th class="szc">مقاس١</th><th class="szc">مقاس٢</th><th class="szc">مقاس٣</th><th class="szc">مقاس٤</th><th class="szc">مقاس٥</th><th class="szc">مقاس٦</th>
             <th class="or" data-i18n="rsPcsLbl">إجمالي القطع في الماركر</th><th data-i18n="rsSugPliesC">الطبقات المقترحة</th><th data-i18n="rsEditPliesC">تعديل الطبقات يدويًا (اختياري)</th>
-            <th class="or" data-i18n="rsPcsRun">إجمالي القطع في التشغيل</th><th data-i18n="rsMkPerPly">استهلاك الماركر/طبقة (متر)</th><th class="or" data-i18n="rsSumFab">إجمالي استهلاك التشغيل (متر)</th><th data-i18n="rsRemWithRun">إجمالي المتبقي مع التشغيل</th></tr>
+            <th class="or" data-i18n="rsPcsRun">إجمالي القطع في التشغيل</th><th class="rsu-h" data-b="استهلاك الماركر/طبقة">استهلاك الماركر/طبقة (متر)</th><th class="or rsu-h" data-b="إجمالي استهلاك التشغيل">إجمالي استهلاك التشغيل (متر)</th><th data-i18n="rsRemWithRun">إجمالي المتبقي مع التشغيل</th></tr>
           <tbody id="rs-sug-rows" class="rss-hide"></tbody></table></div>
         <button type="button" class="btn g rss-hide" style="margin-top:6px" onclick="rsApplySugs()" data-i18n="rsApplyAll">✔ اعتماد كل الاقتراحات كماركرات</button>
         <div class="row-btns" style="margin-top:14px"><button class="btn sec" onclick="saveRsPlan()" data-i18n="saveCheck">💾 حفظ</button>
@@ -484,11 +485,11 @@ rsPcsLbl:'إجمالي القطع في الماركر',rsPlies:'عدد الطب�
 rsMkPerPly:'استهلاك الماركر/طبقة (متر)',rsSumFab:'إجمالي استهلاك التشغيل (متر)',rsAddMarker:'إضافة ماركر',
 rsMaxLen:'حد طول الماركر (متر)',rsMaxSizes:'أقصى عدد قياسات في الماركر',rsMaxPcs:'أقصى عدد قطع في الماركر',
 rsPrint:'🖨 طباعة الخطة',rsPlanState:'حالة الخطة',rsReady:'مطابقة وجاهزة',rsReview:'تحتاج مراجعة',rsRemaining:'المتبقي',rsTotalProd:'إجمالي المنتَج',
-rsSumReq:'إجمالي كمية الطلب',rsSumProd:'إجمالي إنتاج الخطة',rsSumRem:'إجمالي المتبقي',rsSumValid:'عدد الماركرات الصالحة',rsSumFabT:'إجمالي استهلاك التشغيل',
+rsSumReq:'إجمالي كمية الطلب',rsSumProd:'إجمالي إنتاج الخطة',rsSumRem:'إجمالي المتبقي',rsSumValid:'عدد الماركرات الصالحة',rsSumFabT:'إجمالي استهلاك التشغيل',rsDispUnit:'وحدة العرض',
 rsReviewTbl:'مراجعة الناتج حسب المقاس',rsProdFromMk:'إجمالي القطع من الماركر',rsRemFromOrder:'المتبقي من الأوردر',rsOrderConsM:'إجمالي استهلاك الأوردر (متر)',rsRvShort:'نقص',rsRvMatch:'مطابق',rsRvSurplus:'زيادة',
 rsAutoBtn:'أكمل الخطة تلقائياً (أقل استهلاك)',rsAutoDone:'الخطة مكتملة — لا كميات متبقية',rsAutoAdded:'أُضيف {n} ماركر تلقائياً',
 rsSugTbl:'اقتراحات تغطية باقي كمية الأوردر (أقل استهلاك)',rsSugPliesC:'الطبقات المقترحة',rsEditPliesC:'تعديل الطبقات يدويًا (اختياري)',rsRemWithRun:'إجمالي المتبقي مع التشغيل',rsApplyAll:'✔ اعتماد كل الاقتراحات كماركرات',rsSugEmpty:'لا كميات متبقية — الاقتراحات فارغة',
-rsLenTip:'لتلائم الطول: ',rsLenReduce:'قلّل {s} بمقدار {n} قطعة',rsLenRemove:'احذف {s}',rsAddFit:'يمكن إضافة {s} (يتبقّى {r} م)',
+rsLenTip:'لتلائم الطول: ',rsLenReduce:'قلّل {s} بمقدار {n} قطعة',rsLenRemove:'احذف {s}',rsAddFit:'يمكن إضافة {s} (يتبقّى {r})',
 st_ok:'صالح',st_empty:'فارغ',st_dup:'غير صالح: مقاس مكرر',st_badqty:'غير صالح: كمية غير صحيحة',st_maxpcs:'غير صالح: تجاوز أقصى قطع',st_maxsizes:'غير صالح: تجاوز عدد القياسات',st_len:'غير صالح: تجاوز حد الطول',st_plies:'غير صالح: عدد الطبقات غير صحيح',st_nosize:'غير صالح: كمية بلا مقاس',
 rsNoSizes:'المنتج المختار بلا مقاسات محفوظة — افتح إدارة الموديلات والمقاسات وأضف المقاسات مع الاستهلاك والنسبة',
 mkMkLen:'طول الماركر',mkTotalPlies:'إجمالي الطبقات',mkSpreadsShort:'فرشة',
@@ -623,11 +624,11 @@ rsPcsLbl:'Total pieces per marker',rsPlies:'Plies',rsPcsRun:'Total run pieces',r
 rsMkPerPly:'Marker cons/ply (m)',rsSumFab:'Total run consumption (m)',rsAddMarker:'Add marker',
 rsMaxLen:'Marker length limit (m)',rsMaxSizes:'Max sizes per marker',rsMaxPcs:'Max pieces per marker',
 rsPrint:'🖨 Print plan',rsPlanState:'Plan status',rsReady:'Matched & ready',rsReview:'Needs review',rsRemaining:'Remaining',rsTotalProd:'Total produced',
-rsSumReq:'Total order qty',rsSumProd:'Plan production',rsSumRem:'Total remaining',rsSumValid:'Valid markers',rsSumFabT:'Total run consumption',
+rsSumReq:'Total order qty',rsSumProd:'Plan production',rsSumRem:'Total remaining',rsSumValid:'Valid markers',rsSumFabT:'Total run consumption',rsDispUnit:'Display unit',
 rsReviewTbl:'Output review by size',rsProdFromMk:'Pieces from markers',rsRemFromOrder:'Remaining of order',rsOrderConsM:'Total order consumption (m)',rsRvShort:'short',rsRvMatch:'matched',rsRvSurplus:'surplus',
 rsAutoBtn:'Auto-complete plan (least consumption)',rsAutoDone:'Plan complete — nothing remaining',rsAutoAdded:'{n} markers added automatically',
 rsSugTbl:'Suggestions to cover the remaining order (least consumption)',rsSugPliesC:'Suggested plies',rsEditPliesC:'Adjust plies (optional)',rsRemWithRun:'Remaining after run',rsApplyAll:'✔ Apply all suggestions as markers',rsSugEmpty:'Nothing remaining — no suggestions',
-rsLenTip:'To fit length: ',rsLenReduce:'Reduce {s} by {n} pcs',rsLenRemove:'Remove {s}',rsAddFit:'Can add {s} ({r}m left)',
+rsLenTip:'To fit length: ',rsLenReduce:'Reduce {s} by {n} pcs',rsLenRemove:'Remove {s}',rsAddFit:'Can add {s} ({r} left)',
 st_ok:'valid',st_empty:'empty',st_dup:'invalid: duplicate size',st_badqty:'invalid: bad quantity',st_maxpcs:'invalid: exceeds max pieces',st_maxsizes:'invalid: exceeds max sizes',st_len:'invalid: exceeds length limit',st_plies:'invalid: bad ply count',st_nosize:'invalid: quantity without size',
 rsNoSizes:'The selected product has no saved sizes — open the models & sizes manager and add sizes with consumption and ratio',
 mkMkLen:'Marker length',mkTotalPlies:'Total plies',mkSpreadsShort:'spreads',
@@ -1768,15 +1769,25 @@ function renderRsProducts(){const el=$('rs-product');if(!el)return;const cur=el.
   if($('rs-nosizes'))$('rs-nosizes').classList.toggle('hide',rsSizeSrc().length>0);
   rsInit();}
 function rsSizeSrc(){return sizeList($('rs-product')?$('rs-product').value:'');}
+// وحدة العرض: الإدخال دائماً بالمتر؛ العرض يتحوّل (1م = 1.0936 ياردة)
+let RS_PREV_UNIT='متر';
+function rsUF(){return ($('rs-unit')&&$('rs-unit').value==='ياردة')?1.0936133:1;}
+function rsUL(){return ($('rs-unit')&&$('rs-unit').value==='ياردة')?'ياردة':'متر';}
+function rsMaxLenM(){return (+($('rs-maxlen')&&$('rs-maxlen').value)||0)/rsUF();}
+function rsUpdateUnitLabels(){const u=rsUL();document.querySelectorAll('.rsu-h').forEach(e=>{e.textContent=e.getAttribute('data-b')+' ('+u+')';});}
+function rsUnitChanged(){const to=($('rs-unit')&&$('rs-unit').value)||'متر';const uf=x=>x==='ياردة'?1.0936133:1;
+  const el=$('rs-maxlen');if(el&&el.value)el.value=Math.round(+el.value*(uf(to)/uf(RS_PREV_UNIT))*100)/100;
+  RS_PREV_UNIT=to;rsUpdateUnitLabels();rsCalc();rsSaveDraft();}
 // أول تحميل في الجلسة: استعد المسودة المحفوظة، وإلا املأ مقاسات المنتج
 function rsInit(){if(RS_LOADED||!$('rs-qty-rows'))return;if(!prodNames().length)return;
   if(RS_DRAFT&&((RS_DRAFT.qty&&RS_DRAFT.qty.length)||(RS_DRAFT.markers&&RS_DRAFT.markers.length)))rsApplyDraft(RS_DRAFT);
   else if(rsSizeSrc().length){$('rs-qty-rows').innerHTML='';rsFillProduct();}
   else{if(!$('rs-qty-rows').children.length)rsAddQtyRow();rsCalc();}
-  RS_LOADED=true;}
+  rsUpdateUnitLabels();RS_LOADED=true;}
 function rsApplyDraft(d){
   if($('rs-title'))$('rs-title').value=d.title||'';
   if(d.product&&prodNames().includes(d.product))$('rs-product').value=d.product;
+  if($('rs-unit')){$('rs-unit').value=d.unit||'متر';RS_PREV_UNIT=$('rs-unit').value;}
   if(d.maxlen!=null)$('rs-maxlen').value=d.maxlen;
   if(d.maxsizes!=null)$('rs-maxsizes').value=d.maxsizes;
   if(d.maxpcs!=null)$('rs-maxpcs').value=d.maxpcs;
@@ -1792,6 +1803,7 @@ function rsProductChanged(){RS_LOADED=true;$('rs-qty-rows').innerHTML='';if($('r
 function rsSaveDraft(){if(!RS_LOADED||!MEMBER||!$('rs-qty-rows'))return;
   clearTimeout(RS_SAVE_T);RS_SAVE_T=setTimeout(()=>{
     const draft={title:($('rs-title')?$('rs-title').value.trim():''),product:($('rs-product')?$('rs-product').value:''),
+      unit:($('rs-unit')?$('rs-unit').value:'متر'),
       maxlen:+$('rs-maxlen').value||0,maxsizes:+$('rs-maxsizes').value||6,maxpcs:+$('rs-maxpcs').value||5,
       qty:[...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0})).filter(x=>x.size),
       markers:rsReadMarkers().filter(m=>m.pairs.length||m.plies).map(m=>({pairs:m.pairs,plies:+m.plies||0}))};
@@ -1835,17 +1847,17 @@ function rsReadQty(){return [...document.querySelectorAll('.rsq-row')].map(tr=>(
   size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0,
   cons:+tr.querySelector('.rsq-cons').value||0,
   ratio:+tr.querySelector('.rsq-ratio').value||0})).filter(x=>x.size&&x.qty>0&&x.cons>0);}
-function rsCalc(){if(!$('rs-qty-rows'))return;
+function rsCalc(){if(!$('rs-qty-rows'))return;const uf=rsUF();
   let q=0,rsum=0,csum=0;
   document.querySelectorAll('.rsq-row').forEach(tr=>{
     const qty=+tr.querySelector('.rsq-qty').value||0;
     const cons=+tr.querySelector('.rsq-cons').value||0;
     const ratio=+tr.querySelector('.rsq-ratio').value||0;
-    tr.querySelector('.rsq-tot').textContent=(qty>0&&cons>0)?Math.round(qty*cons*100)/100:'\u2014';
+    tr.querySelector('.rsq-tot').textContent=(qty>0&&cons>0)?Math.round(qty*cons*uf*100)/100:'\u2014';
     q+=qty;rsum+=ratio;csum+=qty*cons;});
   $('rs-qt-q').textContent=q||'\u2014';
   $('rs-qt-r').textContent=rsum?Math.round(rsum*100)/100:'\u2014';
-  $('rs-qt-c').textContent=csum?Math.round(csum*100)/100:'\u2014';
+  $('rs-qt-c').textContent=csum?Math.round(csum*uf*100)/100:'\u2014';
   rsMkCalc();rsSaveDraft();}
 /* ---- \u062c\u062f\u0648\u0644 \u0627\u0644\u0645\u0627\u0631\u0643\u0631\u0627\u062a ---- */
 const RS_COLORS=['#d9e8f7','#d9f0d5','#f7d9ec','#f9e0cb','#d5eef4','#eaf4cf','#e6e0f7','#f7f3cf'];
@@ -1896,7 +1908,7 @@ function rsAddFit(vp,cons,len,pcs,maxlen,maxpcs,maxsizes,rem){
   let pick;
   if(need.length)pick=need.sort((a,b)=>(rem[b]-rem[a])||(cons[b]-cons[a]))[0]; // الأكثر احتياجاً
   else pick=cands.sort((a,b)=>cons[b]-cons[a])[0]; // الأكفأ لملء المساحة
-  return tf('rsAddFit',{s:pick,r:Math.round((room-cons[pick])*100)/100});}
+  return tf('rsAddFit',{s:pick,r:Math.round((room-cons[pick])*rsUF()*100)/100+' '+rsUL()});}
 // كل توليفات المقاسات ضمن الحدود (عدد قياسات ≤ maxsizes، مجموع قطع ≤ maxpcs)
 function rsCombos(sizes,maxsizes,maxpcs){const out=[];
   const rec=(start,cur,pcs)=>{if(cur.length)out.push(cur.slice());if(cur.length>=maxsizes)return;
@@ -1928,7 +1940,7 @@ function rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,rawPairs){
   return true;}
 function rsAutoPlan(){if(!$('rs-markers'))return;
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
-  const maxlen=+$('rs-maxlen').value||0,maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
   const reqMap={};[...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();if(s)reqMap[s]=+tr.querySelector('.rsq-qty').value||0;});
   if(!Object.keys(reqMap).length)return toast(t('mkNeed'));
   const produced={};rsReadMarkers().forEach(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
@@ -1944,14 +1956,14 @@ let RS_SUGS=[],RS_SUG_REM0={},RS_SUG_BT=null;
 function rsScheduleSugs(){clearTimeout(RS_SUG_BT);RS_SUG_BT=setTimeout(rsBuildSugs,250);}
 function rsBuildSugs(){if(!$('rs-sug-rows'))return;
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
-  const maxlen=+$('rs-maxlen').value||0,maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
   const reqMap={};[...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();if(s)reqMap[s]=+tr.querySelector('.rsq-qty').value||0;});
   const produced={};rsReadMarkers().forEach(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
     if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs))vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);});
   RS_SUG_REM0={};Object.keys(reqMap).forEach(s=>RS_SUG_REM0[s]=reqMap[s]-(produced[s]||0));
   RS_SUGS=rsSolve(RS_SUG_REM0,cons,maxlen,maxsizes,maxpcs).map(s=>({combo:s.combo,sug:s.plies,plies:s.plies,len:s.len}));
   rsRenderSugs();}
-function rsRenderSugs(){const tb=$('rs-sug-rows');if(!tb)return;
+function rsRenderSugs(){const tb=$('rs-sug-rows');if(!tb)return;const uf=rsUF();
   if(!RS_SUGS.length){tb.innerHTML=`<tr><td colspan="15" style="padding:10px;color:#667">${t('rsSugEmpty')}</td></tr>`;return;}
   const rem={...RS_SUG_REM0};let html='';
   RS_SUGS.forEach((s,i)=>{const pcs=s.combo.reduce((a,p)=>a+p.cnt,0);const plies=+s.plies||0;const run=plies*pcs;const fab=s.len*plies;
@@ -1967,8 +1979,8 @@ function rsRenderSugs(){const tb=$('rs-sug-rows');if(!tb)return;
       <td rowspan="2" style="background:${bg};font-weight:800">${s.sug}</td>
       <td rowspan="2" style="background:#fffbe8"><input type="number" min="1" value="${plies}" onchange="rsSugPlies(${i},this.value)" style="width:58px;padding:4px;text-align:center;font-weight:800;border:1px solid #d8c27a;border-radius:6px;background:#fffbe8"></td>
       <td rowspan="2" style="background:${bg};font-weight:800;font-size:15px">${run}</td>
-      <td rowspan="2" class="red" style="background:${bg}">${Math.round(s.len*100)/100}</td>
-      <td rowspan="2" class="red" style="background:${bg}">${Math.round(fab*100)/100}</td>
+      <td rowspan="2" class="red" style="background:${bg}">${Math.round(s.len*uf*100)/100}</td>
+      <td rowspan="2" class="red" style="background:${bg}">${Math.round(fab*uf*100)/100}</td>
       <td rowspan="2" style="background:${bg};font-weight:800;color:${over?'#c00000':left===0?'#1e7e40':'#1c1c1c'}">${left}${over?' ⚠':''}</td></tr>
      <tr><td style="background:${bg};font-weight:700">${t('rsQtyRow')}</td>${ct}</tr>`;});
   tb.innerHTML=html;}
@@ -1981,9 +1993,9 @@ function rsReadMarkers(){return [...document.querySelectorAll('.rs-mrow1')].map(
   const cs=tr2?[...tr2.querySelectorAll('.rsp-cnt')].map(e=>+e.value||0):[];
   const pairs=ss.map((s,i)=>({size:s,cnt:cs[i]||0})).filter(p=>p.size||p.cnt);
   return {pairs,plies:tr1.querySelector('.rsm-plies').value};});}
-function rsMkCalc(){if(!$('rs-markers'))return;
+function rsMkCalc(){if(!$('rs-markers'))return;const uf=rsUF();
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
-  const maxlen=+$('rs-maxlen').value||0,maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
   const raw=rsReadMarkers();let tRun=0,tFab=0,tPlies=0,tPcs=0;RS_VALIDN=0;
   const reqMap={};[...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();if(s)reqMap[s]=+tr.querySelector('.rsq-qty').value||0;});
   const produced={};const MR=[];
@@ -2008,8 +2020,8 @@ function rsMkCalc(){if(!$('rs-markers'))return;
     tr1.querySelector('.rsm-code').textContent='M'+String(i+1).padStart(2,'0');
     tr1.querySelector('.rsm-pcs').textContent=pcs;
     tr1.querySelector('.rsm-run').textContent=run;
-    tr1.querySelector('.rsm-len').textContent=Math.round(len*100)/100;
-    tr1.querySelector('.rsm-fab').textContent=Math.round(fab*100)/100;
+    tr1.querySelector('.rsm-len').textContent=Math.round(len*uf*100)/100;
+    tr1.querySelector('.rsm-fab').textContent=Math.round(fab*uf*100)/100;
     const stc=tr1.querySelector('.rsm-st');
     const tip=(st==='st_len')?rsLenFix(vp,cons,len,maxlen):'';
     stc.innerHTML=esc(t(st))+(tip?`<div class="rsm-tip" style="font-weight:700;font-size:11.5px;margin-top:3px;color:#8a4b00">\ud83d\udca1 ${esc(tip)}</div>`:'');
@@ -2022,20 +2034,20 @@ function rsMkCalc(){if(!$('rs-markers'))return;
   // \u062c\u062f\u0648\u0644 \u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0646\u0627\u062a\u062c \u062d\u0633\u0628 \u0627\u0644\u0645\u0642\u0627\u0633
   if($('rs-review')){const srows=[...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),c:+tr.querySelector('.rsq-cons').value||0})).filter(x=>x.size);
     let tReq=0,tProd=0,tRem=0,tCons=0;
-    $('rs-review').innerHTML=srows.map(x=>{const req=reqMap[x.size]||0,prod=produced[x.size]||0,r=req-prod,oc=Math.round(req*x.c*100)/100;
+    $('rs-review').innerHTML=srows.map(x=>{const req=reqMap[x.size]||0,prod=produced[x.size]||0,r=req-prod,oc=Math.round(req*x.c*uf*100)/100;
       tReq+=req;tProd+=prod;tRem+=r;tCons+=req*x.c;
       const stW=r===0?t('rsRvMatch'):r>0?t('rsRvShort'):t('rsRvSurplus');
       return `<tr><td style="font-weight:800">${esc(x.size)}</td><td style="font-weight:800;font-size:15px">${req}</td><td style="font-weight:800;font-size:15px">${prod}</td><td style="font-weight:800">${r}</td>
         <td style="font-weight:800;color:${r===0?'#1e7e40':'#c00000'};background:${r===0?'#e2f2e2':'#fbe3e3'}">${stW}</td>
         <td class="red">${x.c}</td><td class="red">${oc}</td></tr>`;}).join('');
     $('rs-rv-req').textContent=tReq||'\u2014';$('rs-rv-prod').textContent=tProd||'\u2014';$('rs-rv-rem').textContent=srows.length?tRem:'\u2014';
-    $('rs-rv-cons').textContent=tCons?Math.round(tCons*100)/100:'\u2014';
+    $('rs-rv-cons').textContent=tCons?Math.round(tCons*uf*100)/100:'\u2014';
     $('rs-rv-st').textContent=!srows.length?'\u2014':tRem>0?t('rsRvShort'):tRem<0?t('rsRvSurplus'):t('rsRvMatch');}
   rsScheduleSugs();
   if($('rs-mt-pcs')){$('rs-mt-pcs').textContent=tPcs||'\u2014';$('rs-mt-plies').textContent=tPlies||'\u2014';
     $('rs-mt-run').textContent=tRun||'\u2014';$('rs-mt-fab').textContent=tFab?Math.round(tFab*100)/100:'\u2014';}
   const totalReq=[...document.querySelectorAll('.rsq-row')].reduce((s,tr)=>s+(+tr.querySelector('.rsq-qty').value||0),0);
-  rsRenderSummary({totalReq,prod:tRun,rem:totalReq-tRun,valid:RS_VALIDN,fab:Math.round(tFab*100)/100,maxlen,ready:totalReq>0&&tRun===totalReq});
+  rsRenderSummary({totalReq,prod:tRun,rem:totalReq-tRun,valid:RS_VALIDN,fab:Math.round(tFab*uf*100)/100,ready:totalReq>0&&tRun===totalReq});
   rsSaveDraft();}
 function rsRenderSummary(d){const el=$('rs-summary');if(!el)return;
   const c=(l,v,col)=>`<div style="flex:1 1 150px;display:flex;border:1px solid #d8c27a;border-radius:8px;overflow:hidden;min-width:140px">
@@ -2045,11 +2057,11 @@ function rsRenderSummary(d){const el=$('rs-summary');if(!el)return;
     +c(t('rsSumProd'),d.prod||'\u2014')
     +c(t('rsSumRem'),d.rem,d.rem===0?'#1e7e40':'#c00000')
     +c(t('rsSumValid'),d.valid||'\u2014')
-    +c(t('rsSumFabT'),(d.fab||0)+' \u0645')
+    +c(t('rsSumFabT'),(d.fab||0)+' '+rsUL())
     +c(t('rsPlanState'),d.ready?t('rsReady'):t('rsReview'),d.ready?'#1e7e40':'#c00000');}
 /* ---- \u062d\u0641\u0638 / \u0637\u0628\u0627\u0639\u0629 / \u0641\u062a\u062d \u062e\u0637\u0629 \u0627\u0644\u0631\u064a\u0634\u0648 ---- */
 function rsResult(){const qty=rsReadQty();if(!qty.length)return null;
-  const maxlen=+$('rs-maxlen').value||0,maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const markers=[];let tRun=0,tFab=0;
   rsReadMarkers().forEach((m,i)=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);if(!vp.length&&!m.plies)return;
@@ -2066,7 +2078,8 @@ function rsResult(){const qty=rsReadQty();if(!qty.length)return null;
   const cover=qty.map(x=>{const made=markers.filter(m=>m.ok).reduce((s,m)=>s+m.pairs.filter(p=>p.size===x.size).reduce((a,p)=>a+p.cnt,0)*m.plies,0);
     return {size:x.size,req:x.qty,made,rem:x.qty-made};});
   const ready=totalReq>0&&cover.every(c=>c.rem===0);
-  return {product:($('rs-product')&&$('rs-product').value)||'',maxlen,maxsizes,maxpcs,
+  return {product:($('rs-product')&&$('rs-product').value)||'',maxlen,maxlenDisp:+($('rs-maxlen')&&$('rs-maxlen').value)||0,maxsizes,maxpcs,
+    unit:rsUL(),uf:rsUF(),
     qty,markers,cover,totalReq,totalMade:tRun,totRem:totalReq-tRun,totFab:Math.round(tFab*100)/100,
     valid:markers.filter(m=>m.ok).length,decision:ready?'PASS':'FAIL'};}
 function saveRsPlan(){const result=rsResult();if(!result)return toast(t('mkNeed'));
@@ -2077,19 +2090,20 @@ function rsOpenInCalc(id){const c=TOOLCHK.find(x=>x.id===id);if(!c||c.type!=='rs
   go('marker',navBtn('marker'));goMarker('rs',document.querySelectorAll('#marker-subnav button')[1]);
   if($('rs-title'))$('rs-title').value=c.title||'';
   if(r.product&&prodNames().includes(r.product))$('rs-product').value=r.product;
-  $('rs-maxlen').value=r.maxlen||'';$('rs-maxsizes').value=r.maxsizes||6;$('rs-maxpcs').value=r.maxpcs||5;
+  if($('rs-unit')){$('rs-unit').value=r.unit||'متر';RS_PREV_UNIT=$('rs-unit').value;}
+  $('rs-maxlen').value=(r.maxlenDisp!=null?r.maxlenDisp:r.maxlen)||'';$('rs-maxsizes').value=r.maxsizes||6;$('rs-maxpcs').value=r.maxpcs||5;
   $('rs-qty-rows').innerHTML='';(r.qty||[]).forEach(x=>rsAddQtyRow(x));
   $('rs-markers').innerHTML='';(r.markers||[]).forEach(m=>rsAddMarker({pairs:m.pairs,plies:m.plies}));
-  rsCalc();toast(t('restored'));}
-function rsPlanTablesHtml(r){
+  rsUpdateUnitLabels();rsCalc();toast(t('restored'));}
+function rsPlanTablesHtml(r){const uf=r.uf||1,u=r.unit||'\u0645\u062a\u0631';const R=v=>Math.round(v*uf*100)/100;
   const qt=`<table style="width:100%;border-collapse:collapse;margin-top:8px;font-size:13px" border="1" cellpadding="6">
-    <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('sizeName')}</td><td>${t('mkQtyOrder')}</td><td>${t('rsRatio')}</td><td>${t('rsPieceConsM')}</td><td>${t('rsQtyConsM')}</td></tr>
-    ${(r.qty||[]).map(x=>`<tr><td>${esc(x.size)}</td><td>${x.qty}</td><td>${x.ratio||'\u2014'}</td><td>${x.cons}</td><td>${Math.round(x.qty*x.cons*100)/100}</td></tr>`).join('')}
-    <tr style="font-weight:800;background:#f4f8f8"><td>${t('total')}</td><td>${r.totalReq}</td><td>${(r.qty||[]).reduce((s,x)=>s+(x.ratio||0),0)||'\u2014'}</td><td>\u2014</td><td>${Math.round((r.qty||[]).reduce((s,x)=>s+x.qty*x.cons,0)*100)/100}</td></tr></table>`;
+    <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('sizeName')}</td><td>${t('mkQtyOrder')}</td><td>${t('rsRatio')}</td><td>${t('rsPieceConsM')}</td><td>${t('rsQtyConsM').replace('\u0645\u062a\u0631',u).replace('(m)','('+u+')')}</td></tr>
+    ${(r.qty||[]).map(x=>`<tr><td>${esc(x.size)}</td><td>${x.qty}</td><td>${x.ratio||'\u2014'}</td><td>${x.cons}</td><td>${R(x.qty*x.cons)}</td></tr>`).join('')}
+    <tr style="font-weight:800;background:#f4f8f8"><td>${t('total')}</td><td>${r.totalReq}</td><td>${(r.qty||[]).reduce((s,x)=>s+(x.ratio||0),0)||'\u2014'}</td><td>\u2014</td><td>${R((r.qty||[]).reduce((s,x)=>s+x.qty*x.cons,0))}</td></tr></table>`;
   const mk=`<table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:13px" border="1" cellpadding="6">
-    <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('rsCode')}</td><td>${t('rsMkTbl')}</td><td>${t('rsPcsLbl')}</td><td>${t('rsPlies')}</td><td>${t('rsPcsRun')}</td><td>${t('rsMkStatus')}</td><td>${t('rsMkPerPly')}</td><td>${t('rsSumFab')}</td></tr>
-    ${(r.markers||[]).map(m=>`<tr><td style="font-weight:700">${esc(m.code)}</td><td>${m.pairs.map(p=>esc(p.size)+'\u00d7'+p.cnt).join(' \u00b7 ')||'\u2014'}</td><td>${m.pcs}</td><td>${m.plies}</td><td>${m.run}</td><td style="color:${m.ok?'#1e7e40':'#c00000'};font-weight:700">${esc(m.status)}</td><td>${m.len}</td><td>${m.fab}</td></tr>`).join('')}
-    <tr style="font-weight:800;background:#f4f8f8"><td colspan="4">${t('total')}</td><td>${r.totalMade}</td><td></td><td></td><td>${r.totFab}</td></tr></table>`;
+    <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('rsCode')}</td><td>${t('rsMkTbl')}</td><td>${t('rsPcsLbl')}</td><td>${t('rsPlies')}</td><td>${t('rsPcsRun')}</td><td>${t('rsMkStatus')}</td><td>${t('rsMkPerPly').replace('\u0645\u062a\u0631',u).replace('(m)','('+u+')')}</td><td>${t('rsSumFab').replace('\u0645\u062a\u0631',u).replace('(m)','('+u+')')}</td></tr>
+    ${(r.markers||[]).map(m=>`<tr><td style="font-weight:700">${esc(m.code)}</td><td>${m.pairs.map(p=>esc(p.size)+'\u00d7'+p.cnt).join(' \u00b7 ')||'\u2014'}</td><td>${m.pcs}</td><td>${m.plies}</td><td>${m.run}</td><td style="color:${m.ok?'#1e7e40':'#c00000'};font-weight:700">${esc(m.status)}</td><td>${R(m.len)}</td><td>${R(m.fab)}</td></tr>`).join('')}
+    <tr style="font-weight:800;background:#f4f8f8"><td colspan="4">${t('total')}</td><td>${r.totalMade}</td><td></td><td></td><td>${R(r.totFab)}</td></tr></table>`;
   const cv=`<table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:13px" border="1" cellpadding="6">
     <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('sizeName')}</td><td>${t('mkQtyOrder')}</td><td>${t('rsPcsRun')}</td><td>${t('rsRemaining')}</td></tr>
     ${(r.cover||[]).map(c=>`<tr><td>${esc(c.size)}</td><td>${c.req}</td><td>${c.made}</td><td style="color:${c.rem===0?'#1e7e40':'#c00000'};font-weight:700">${c.rem}</td></tr>`).join('')}
