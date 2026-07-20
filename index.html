@@ -125,6 +125,9 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
 .xtbl th,.xtbl td{border:1px solid #9db8b8;padding:6px;text-align:center;vertical-align:middle}
 .xtbl th{background:#ffc000;color:#1c1c1c;font-weight:800;white-space:normal;line-height:1.35;overflow-wrap:break-word;max-width:104px}
 .xtbl th.ttl,.xtbl th.wide{max-width:none;white-space:normal}
+.xtbl.fit{width:auto;min-width:0}
+.xtbl .szc{width:52px;max-width:52px}
+.xtbl .szc select,.xtbl .szc input{min-width:0!important;width:100%}
 .xtbl th.or{background:#f0a13c}
 .xtbl tr.tot td{background:#17696b;color:#fff;font-weight:800}
 .xtbl .red{color:#c00000;font-weight:800}
@@ -306,7 +309,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
       </div>
       <div id="tool-rs" class="card hide">
         <label class="inl" data-i18n="mkReportName">اسم التقرير (اختياري)</label>
-        <input id="rs-title" data-i18n-ph="mkReportNamePh" placeholder="مثال: أوردر رمضان — العميل أحمد">
+        <input id="rs-title" data-i18n-ph="mkReportNamePh" placeholder="مثال: أوردر رمضان — العميل أحمد" oninput="rsSaveDraft()">
         <div class="grid2" style="margin-top:8px"><div><label class="inl" data-i18n="productLbl">المنتج</label><select id="rs-product" onchange="rsProductChanged()"></select></div>
           <div style="display:flex;align-items:flex-end"><button type="button" class="mini g" onclick="modelsManager()" data-i18n="rsEditList">⚙️ إضافة / تعديل قائمة المقاسات</button></div></div>
         <div id="rs-nosizes" class="hide" style="margin:8px 0;padding:10px;border:1px dashed #d8a03c;background:#fff8e6;border-radius:10px">
@@ -322,10 +325,10 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <div><label class="inl" data-i18n="rsMaxLen">حد طول الماركر (متر)</label><input id="rs-maxlen" type="number" step="0.01" value="17" oninput="rsMkCalc()"></div>
           <div><label class="inl" data-i18n="rsMaxSizes">أقصى عدد قياسات في الماركر</label><input id="rs-maxsizes" type="number" value="6" oninput="rsMkCalc()"></div>
           <div><label class="inl" data-i18n="rsMaxPcs">أقصى عدد قطع في الماركر</label><input id="rs-maxpcs" type="number" value="5" oninput="rsMkCalc()"></div></div>
-        <div style="overflow-x:auto;margin-top:10px"><table class="xtbl" style="min-width:940px">
+        <div style="overflow-x:auto;margin-top:10px"><table class="xtbl fit" style="min-width:760px">
           <tr><th colspan="15" class="ttl" data-i18n="rsMkTbl">القياسات والكميات داخل الماركر</th></tr>
           <tr><th data-i18n="rsCode">الكود</th><th data-i18n="rsDesc">البيان</th>
-            <th>مقاس١</th><th>مقاس٢</th><th>مقاس٣</th><th>مقاس٤</th><th>مقاس٥</th><th>مقاس٦</th>
+            <th class="szc">مقاس١</th><th class="szc">مقاس٢</th><th class="szc">مقاس٣</th><th class="szc">مقاس٤</th><th class="szc">مقاس٥</th><th class="szc">مقاس٦</th>
             <th class="or" data-i18n="rsPcsLbl">إجمالي القطع في الماركر</th><th data-i18n="rsPlies">عدد الطبقات</th>
             <th class="or" data-i18n="rsPcsRun">إجمالي القطع في التشغيل</th><th data-i18n="rsMkStatus">حالة الماركر وسبب عدم الصلاحية</th>
             <th data-i18n="rsMkPerPly">استهلاك الماركر/طبقة (متر)</th><th class="or" data-i18n="rsSumFab">إجمالي استهلاك التشغيل (متر)</th><th></th></tr>
@@ -727,8 +730,8 @@ function show(s){['auth','onboard','app'].forEach(x=>$('s-'+x).classList.toggle(
 function updateWsLabel(){if($('ws-label'))$('ws-label').textContent=(MEMBER.wsName||'')+' · '+roleTxt();}
 
 /* ============ Listeners ============ */
-function listen(){unsub.forEach(u=>u&&u());unsub=[];const ws=MEMBER.wsId;
-  unsub.push(db.collection('qc_workspaces').doc(ws).onSnapshot(d=>{if(d.exists){ITEMS=d.data().items||[];SIZELS=d.data().sizeLists||((d.data().sizeList&&d.data().sizeList.length)?[{name:'ثوب سعودي',sizes:d.data().sizeList}]:[]);WSCODE=d.data().code||'—';WSAQL=d.data().aqlTab||null;WSCRIT=d.data().critMax||0;if($('items-list'))renderItemsManager();if($('ws-code'))$('ws-code').textContent=WSCODE;if($('sizes-list'))renderSizesManager();if($('mk-product'))renderMkProducts();if($('rs-product'))renderRsProducts();}},console.error));
+function listen(){unsub.forEach(u=>u&&u());unsub=[];const ws=MEMBER.wsId;RS_LOADED=false;RS_DRAFT=null;
+  unsub.push(db.collection('qc_workspaces').doc(ws).onSnapshot(d=>{if(d.exists){ITEMS=d.data().items||[];SIZELS=d.data().sizeLists||((d.data().sizeList&&d.data().sizeList.length)?[{name:'ثوب سعودي',sizes:d.data().sizeList}]:[]);WSCODE=d.data().code||'—';WSAQL=d.data().aqlTab||null;WSCRIT=d.data().critMax||0;if(!RS_LOADED)RS_DRAFT=d.data().rishoDraft||null;if($('items-list'))renderItemsManager();if($('ws-code'))$('ws-code').textContent=WSCODE;if($('sizes-list'))renderSizesManager();if($('mk-product'))renderMkProducts();if($('rs-product'))renderRsProducts();}},console.error));
   unsub.push(db.collection('qc_factories').where('wsId','==',ws).onSnapshot(s=>{FACT=s.docs.map(d=>({id:d.id,...d.data()}));renderFact();if(TAB==='dash')renderDash();if(TAB==='tools')renderToolFactSelects();},console.error));
   unsub.push(db.collection('qc_orders').where('wsId','==',ws).onSnapshot(s=>{ORDERS=s.docs.map(d=>({id:d.id,...d.data()}));renderOrders();if(TAB==='dash')renderDash();},console.error));
   unsub.push(db.collection('qc_inspections').where('wsId','==',ws).onSnapshot(s=>{INSP=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));renderInsp();renderDash();},console.error));
@@ -1277,7 +1280,7 @@ function goTool(id,btn){const all=id==='all';
   document.querySelectorAll('#tools-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');}
 function goMarker(id,btn){document.querySelectorAll('#marker-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');
   ['mk','rs'].forEach(x=>{const el=$('tool-'+x);if(el)el.classList.toggle('hide',x!==id);});
-  if(id==='rs'){renderRsProducts();if(!$('rs-qty-rows').children.length){if(rsSizeSrc().length)rsFillProduct();else rsAddQtyRow();}rsCalc();}}
+  if(id==='rs'){renderRsProducts();rsInit();}}
 const TOOL_TITLES={fp:'fpTitle',sh:'shTitle',aq:'aqlTitle',mk:'mkTitle',rs:'rsTitle',all:'allTitle'};
 function toolInfo(id,e){e.preventDefault();modal(`<h3>${esc(t(TOOL_TITLES[id]))}</h3>
   <p style="line-height:1.7;color:var(--mut)">${esc(t('toolDesc'+id))}</p>
@@ -1700,19 +1703,42 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
       <div>${t('repInspector')}: ______________</div><div>QC: ______________</div></div></div>`;
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 /* ============ الريشو ============ */
+let RS_DRAFT=null,RS_LOADED=false,RS_SAVE_T=null;
 function renderRsProducts(){const el=$('rs-product');if(!el)return;const cur=el.value;const ns=prodNames();
   el.innerHTML=ns.length?ns.map(n=>`<option ${n===cur?'selected':''}>${esc(n)}</option>`).join(''):`<option value="">\u2014</option>`;
   if(cur&&ns.includes(cur))el.value=cur;
   if($('rs-nosizes'))$('rs-nosizes').classList.toggle('hide',rsSizeSrc().length>0);
-  rsMaybeRefill();}
+  rsInit();}
 function rsSizeSrc(){return sizeList($('rs-product')?$('rs-product').value:'');}
-function rsProductChanged(){$('rs-qty-rows').innerHTML='';
+// أول تحميل في الجلسة: استعد المسودة المحفوظة، وإلا املأ مقاسات المنتج
+function rsInit(){if(RS_LOADED||!$('rs-qty-rows'))return;if(!prodNames().length)return;
+  if(RS_DRAFT&&((RS_DRAFT.qty&&RS_DRAFT.qty.length)||(RS_DRAFT.markers&&RS_DRAFT.markers.length)))rsApplyDraft(RS_DRAFT);
+  else if(rsSizeSrc().length){$('rs-qty-rows').innerHTML='';rsFillProduct();}
+  else{if(!$('rs-qty-rows').children.length)rsAddQtyRow();rsCalc();}
+  RS_LOADED=true;}
+function rsApplyDraft(d){
+  if($('rs-title'))$('rs-title').value=d.title||'';
+  if(d.product&&prodNames().includes(d.product))$('rs-product').value=d.product;
+  if(d.maxlen!=null)$('rs-maxlen').value=d.maxlen;
+  if(d.maxsizes!=null)$('rs-maxsizes').value=d.maxsizes;
+  if(d.maxpcs!=null)$('rs-maxpcs').value=d.maxpcs;
+  const src=rsSizeSrc(),cm={},rm={};src.forEach(s=>{cm[s.size]=s.cons;rm[s.size]=s.ratio;});
+  $('rs-qty-rows').innerHTML='';
+  const q=(d.qty&&d.qty.length)?d.qty:src.map(s=>({size:s.size}));
+  q.forEach(x=>rsAddQtyRow({size:x.size,qty:x.qty,cons:cm[x.size]!=null?cm[x.size]:x.cons,ratio:rm[x.size]!=null?rm[x.size]:x.ratio}));
+  if($('rs-markers'))$('rs-markers').innerHTML='';(d.markers||[]).forEach(m=>rsAddMarker({pairs:m.pairs,plies:m.plies}));
+  rsCalc();}
+function rsProductChanged(){RS_LOADED=true;$('rs-qty-rows').innerHTML='';if($('rs-markers'))$('rs-markers').innerHTML='';
   if(rsSizeSrc().length)rsFillProduct();else{rsAddQtyRow();rsCalc();}}
-// وصلت بيانات المقاسات بعد فتح الصفحة؟ أعد تعبئة الجدول إن كان فارغاً بلا قوائم
-function rsMaybeRefill(){const rows=[...document.querySelectorAll('.rsq-row')];if(!rows.length)return;
-  const allEmpty=rows.every(tr=>!tr.querySelector('.rsq-size').value.trim()&&!(+tr.querySelector('.rsq-qty').value||0));
-  const hasSelect=!!rows[0].querySelector('select.rsq-size');
-  if(allEmpty&&!hasSelect&&rsSizeSrc().length)rsProductChanged();}
+// حفظ تلقائي دائم (مسودة العمل) داخل مساحة العمل — تبقى بعد التحديث وإعادة الدخول
+function rsSaveDraft(){if(!RS_LOADED||!MEMBER||!$('rs-qty-rows'))return;
+  clearTimeout(RS_SAVE_T);RS_SAVE_T=setTimeout(()=>{
+    const draft={title:($('rs-title')?$('rs-title').value.trim():''),product:($('rs-product')?$('rs-product').value:''),
+      maxlen:+$('rs-maxlen').value||0,maxsizes:+$('rs-maxsizes').value||6,maxpcs:+$('rs-maxpcs').value||5,
+      qty:[...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0})).filter(x=>x.size),
+      markers:rsReadMarkers().filter(m=>m.pairs.length||m.plies).map(m=>({pairs:m.pairs,plies:+m.plies||0}))};
+    db.collection('qc_workspaces').doc(MEMBER.wsId).update({rishoDraft:draft}).catch(()=>{});
+  },700);}
 function rsAddQtyRow(r){r=r||{};const src=rsSizeSrc();const locked=src.length>0;
   const cell=locked
     ?`<select class="rsq-size" onchange="rsPickSize(this)" style="min-width:90px;padding:6px;font-weight:800"><option value="">\u2014</option>${sizeOptionsHtml(src,r.size,r.cons)}</select>`
@@ -1762,16 +1788,18 @@ function rsCalc(){if(!$('rs-qty-rows'))return;
   $('rs-qt-q').textContent=q||'\u2014';
   $('rs-qt-r').textContent=rsum?Math.round(rsum*100)/100:'\u2014';
   $('rs-qt-c').textContent=csum?Math.round(csum*100)/100:'\u2014';
-  rsMkCalc();}
+  rsMkCalc();rsSaveDraft();}
 /* ---- \u062c\u062f\u0648\u0644 \u0627\u0644\u0645\u0627\u0631\u0643\u0631\u0627\u062a ---- */
 const RS_COLORS=['#d9e8f7','#d9f0d5','#f7d9ec','#f9e0cb','#d5eef4','#eaf4cf','#e6e0f7','#f7f3cf'];
 let RS_MSEQ=0;
+// \u0643\u0644 \u0645\u0642\u0627\u0633\u0627\u062a \u062c\u062f\u0648\u0644 \u0627\u0644\u0643\u0645\u064a\u0627\u062a (\u0628\u0635\u0631\u0641 \u0627\u0644\u0646\u0638\u0631 \u0639\u0646 \u0627\u0644\u0643\u0645\u064a\u0629) \u2014 \u0644\u0642\u0627\u0626\u0645\u0629 \u0627\u062e\u062a\u064a\u0627\u0631 \u0627\u0644\u0645\u0642\u0627\u0633 \u062f\u0627\u062e\u0644 \u0627\u0644\u0645\u0627\u0631\u0643\u0631
+function rsAllSizes(){return [...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),cons:+tr.querySelector('.rsq-cons').value||0})).filter(x=>x.size);}
 function rsAddMarker(m){m=m||{};if(!$('rs-markers'))return;RS_MSEQ++;const id='rsm'+RS_MSEQ;
-  const pairs=m.pairs||[];const sizes=rsReadQty().map(x=>x.size);
-  const selCell=p=>`<td>${sizes.length
-    ?`<select class="rsp-size" onchange="rsMkCalc()" style="width:100%;min-width:62px;padding:4px;border:none;background:transparent;text-align:center;font-weight:700"><option value=""></option>${sizes.map(s=>`<option ${p&&p.size===s?'selected':''}>${esc(s)}</option>`).join('')}${(p&&p.size&&!sizes.includes(p.size))?`<option selected>${esc(p.size)}</option>`:''}</select>`
-    :`<input class="rsp-size" value="${esc((p&&p.size)||'')}" style="width:100%;min-width:56px;border:none;background:transparent;text-align:center;font-weight:700" oninput="rsMkCalc()">`}</td>`;
-  const cntCell=p=>`<td><input class="rsp-cnt" type="number" min="1" value="${p&&p.cnt!=null?p.cnt:''}" style="width:100%;min-width:48px;border:none;background:transparent;text-align:center;font-weight:700" oninput="rsMkCalc()"></td>`;
+  const pairs=m.pairs||[];const sizes=rsAllSizes().map(x=>x.size);
+  const selCell=p=>`<td class="szc">${sizes.length
+    ?`<select class="rsp-size" onchange="rsMkCalc()" style="width:100%;padding:4px 2px;border:none;background:transparent;text-align:center;font-weight:700"><option value=""></option>${sizes.map(s=>`<option ${p&&p.size===s?'selected':''}>${esc(s)}</option>`).join('')}${(p&&p.size&&!sizes.includes(p.size))?`<option selected>${esc(p.size)}</option>`:''}</select>`
+    :`<input class="rsp-size" value="${esc((p&&p.size)||'')}" style="width:100%;border:none;background:transparent;text-align:center;font-weight:700" oninput="rsMkCalc()">`}</td>`;
+  const cntCell=p=>`<td class="szc"><input class="rsp-cnt" type="number" min="1" value="${p&&p.cnt!=null?p.cnt:''}" style="width:100%;border:none;background:transparent;text-align:center;font-weight:700" oninput="rsMkCalc()"></td>`;
   $('rs-markers').insertAdjacentHTML('beforeend',
    `<tr class="rs-mrow1" data-mid="${id}">
      <td rowspan="2" class="rsm-code" style="font-weight:800">\u2014</td>
@@ -1793,7 +1821,7 @@ function rsReadMarkers(){return [...document.querySelectorAll('.rs-mrow1')].map(
   const pairs=ss.map((s,i)=>({size:s,cnt:cs[i]||0})).filter(p=>p.size||p.cnt);
   return {pairs,plies:tr1.querySelector('.rsm-plies').value};});}
 function rsMkCalc(){if(!$('rs-markers'))return;
-  const qty=rsReadQty();const cons={};qty.forEach(x=>cons[x.size]=x.cons);
+  const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const maxlen=+$('rs-maxlen').value||0,maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
   const raw=rsReadMarkers();let tRun=0,tFab=0,tPlies=0,tPcs=0;
   [...document.querySelectorAll('.rs-mrow1')].forEach((tr1,i)=>{const m=raw[i];const tr2=tr1.nextElementSibling;
@@ -1821,11 +1849,12 @@ function rsMkCalc(){if(!$('rs-markers'))return;
     const stc=tr1.querySelector('.rsm-st');stc.textContent=t(st);
     stc.style.cssText='max-width:170px;font-weight:800;background:'+(ok?'#e2f2e2':(st==='st_empty'?bg:'#fbe3e3'))+';color:'+(ok?'#1e7e40':(st==='st_empty'?'#667':'#c00000'));});
   if($('rs-mt-pcs')){$('rs-mt-pcs').textContent=tPcs||'\u2014';$('rs-mt-plies').textContent=tPlies||'\u2014';
-    $('rs-mt-run').textContent=tRun||'\u2014';$('rs-mt-fab').textContent=tFab?Math.round(tFab*100)/100:'\u2014';}}
+    $('rs-mt-run').textContent=tRun||'\u2014';$('rs-mt-fab').textContent=tFab?Math.round(tFab*100)/100:'\u2014';}
+  rsSaveDraft();}
 /* ---- \u062d\u0641\u0638 / \u0637\u0628\u0627\u0639\u0629 / \u0641\u062a\u062d \u062e\u0637\u0629 \u0627\u0644\u0631\u064a\u0634\u0648 ---- */
 function rsResult(){const qty=rsReadQty();if(!qty.length)return null;
   const maxlen=+$('rs-maxlen').value||0,maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
-  const cons={};qty.forEach(x=>cons[x.size]=x.cons);
+  const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const markers=[];let tRun=0,tFab=0;
   rsReadMarkers().forEach((m,i)=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);if(!vp.length&&!m.plies)return;
     const plies=+m.plies||0,pcs=vp.reduce((s,p)=>s+p.cnt,0),len=vp.reduce((s,p)=>s+p.cnt*(cons[p.size]||0),0);
