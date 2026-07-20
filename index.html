@@ -321,7 +321,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <div><label class="inl" data-i18n="rsMaxSizes">أقصى عدد قياسات في الماركر</label><input id="rs-maxsizes" type="number" value="6" oninput="rsMkCalc()"></div>
           <div><label class="inl" data-i18n="rsMaxPcs">أقصى عدد قطع في الماركر</label><input id="rs-maxpcs" type="number" value="5" oninput="rsMkCalc()"></div></div>
         <div style="margin-top:10px"><label class="inl" data-i18n="rsObjective">هدف تحسين الاقتراح التلقائي</label>
-          <select id="rs-objective" onchange="rsMkCalc();rsSaveDraft()" style="padding:7px;font-weight:700;min-width:260px;max-width:100%">
+          <select id="rs-objective" onchange="rsObjectiveChanged()" style="padding:7px;font-weight:700;min-width:260px;max-width:100%">
             <option value="plies" data-i18n="rsObjPlies">⬇️ أقل عدد طبقات (ماركرات أقرب للطول)</option>
             <option value="markers" data-i18n="rsObjMarkers">⬇️ أقل عدد ماركرات</option></select></div>
         <div style="overflow-x:auto;margin-top:10px"><table class="xtbl" style="min-width:760px">
@@ -467,6 +467,7 @@ rsPcsLbl:'إجمالي القطع في الماركر',rsPlies:'عدد الطب�
 rsMkPerPly:'استهلاك الماركر/طبقة (متر)',rsSumFab:'إجمالي استهلاك التشغيل (متر)',rsAddMarker:'إضافة ماركر',
 rsMaxLen:'حد طول الماركر (متر)',rsMaxSizes:'أقصى عدد قياسات في الماركر',rsMaxPcs:'أقصى عدد قطع في الماركر',
 rsObjective:'هدف تحسين الاقتراح التلقائي',rsObjPlies:'⬇️ أقل عدد طبقات (ماركرات أقرب للطول)',rsObjMarkers:'⬇️ أقل عدد ماركرات',
+rsRebuildQ:'تغيير الهدف يؤثّر على التوليد التلقائي. هل أعيد بناء كل الماركرات الآن بالهدف الجديد؟ (سيُستبدل الترتيب الحالي بخطة جديدة بلا زيادة إنتاج)',
 rsPrint:'🖨 طباعة الخطة',rsPlanState:'حالة الخطة',rsReady:'مطابقة وجاهزة',rsReview:'تحتاج مراجعة',rsRemaining:'المتبقي',rsTotalProd:'إجمالي المنتَج',
 rsSumReq:'إجمالي كمية الطلب',rsSumProd:'إجمالي إنتاج الخطة',rsSumRem:'إجمالي المتبقي',rsSumSurplus:'زيادة الإنتاج',rsSumValid:'عدد الماركرات الصالحة',rsSumFabT:'إجمالي استهلاك التشغيل',rsDispUnit:'وحدة العرض',
 rsOverProd:'زيادة إنتاج: {n} قطعة فوق المطلوب — قلّل الطبقات أو احذف قياساً من الماركرات ذات «زيادة» في جدول المراجعة',rsUnderProd:'نقص إنتاج: {n} قطعة أقل من المطلوب — أكمل الخطة تلقائياً أو أضف ماركرات',
@@ -613,6 +614,7 @@ rsPcsLbl:'Total pieces per marker',rsPlies:'Plies',rsPcsRun:'Total run pieces',r
 rsMkPerPly:'Marker cons/ply (m)',rsSumFab:'Total run consumption (m)',rsAddMarker:'Add marker',
 rsMaxLen:'Marker length limit (m)',rsMaxSizes:'Max sizes per marker',rsMaxPcs:'Max pieces per marker',
 rsObjective:'Auto-suggest optimization goal',rsObjPlies:'⬇️ Fewest plies (fuller markers)',rsObjMarkers:'⬇️ Fewest markers',
+rsRebuildQ:'Changing the goal affects auto-generation. Rebuild all markers now with the new goal? (replaces the current layout with a fresh plan, no overproduction)',
 rsPrint:'🖨 Print plan',rsPlanState:'Plan status',rsReady:'Matched & ready',rsReview:'Needs review',rsRemaining:'Remaining',rsTotalProd:'Total produced',
 rsSumReq:'Total order qty',rsSumProd:'Plan production',rsSumRem:'Total remaining',rsSumSurplus:'Overproduction',rsSumValid:'Valid markers',rsSumFabT:'Total run consumption',rsDispUnit:'Display unit',
 rsOverProd:'Overproduction: {n} pcs above required — reduce plies or remove a size from the markers marked “surplus” in the review table',rsUnderProd:'Underproduction: {n} pcs below required — auto-complete the plan or add markers',
@@ -1904,6 +1906,11 @@ function rsClearMarkers(){if(!$('rs-markers'))return;
   if(![...document.querySelectorAll('.rs-mrow1')].length)return;
   if(!confirm(t('rsClearMkQ')))return;
   $('rs-markers').innerHTML='';rsMkCalc();rsSaveDraft();}
+// تغيير هدف التحسين: يؤثّر على التوليد التلقائي فقط، لذا نعرض إعادة بناء الخطة بالكامل بالهدف الجديد
+function rsObjectiveChanged(){rsSaveDraft();
+  if([...document.querySelectorAll('.rs-mrow1')].length&&$('rs-qty-rows')&&[...document.querySelectorAll('.rsq-row')].some(tr=>+tr.querySelector('.rsq-qty').value>0)){
+    if(confirm(t('rsRebuildQ'))){$('rs-markers').innerHTML='';rsAutoPlan();return;}}
+  rsMkCalc();}
 function rsReadMarkers(){return [...document.querySelectorAll('.rs-mrow1')].map(tr1=>{
   const tr2=tr1.nextElementSibling;
   const ss=[...tr1.querySelectorAll('.rsp-size')].map(e=>e.value.trim());
