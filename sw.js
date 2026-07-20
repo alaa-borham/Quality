@@ -1,5 +1,5 @@
 // Service worker — network-first for app HTML so updates always appear
-const CACHE = 'qc-root-v3';
+const CACHE = 'qc-root-v4';
 const SHELL = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

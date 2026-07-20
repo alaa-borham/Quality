@@ -1904,11 +1904,22 @@ function rsClearMarkers(){if(!$('rs-markers'))return;
   if(![...document.querySelectorAll('.rs-mrow1')].length)return;
   if(!confirm(t('rsClearMkQ')))return;
   $('rs-markers').innerHTML='';rsMkCalc();rsSaveDraft();}
-// تغيير هدف التحسين: يؤثّر على التوليد التلقائي فقط، لذا نعرض إعادة بناء الخطة بالكامل بالهدف الجديد
+// تغيير هدف التحسين: يعيد بناء كل الماركرات فوراً بالهدف الجديد.
+// الطلب يُؤخذ من جدول الكميات إن كانت مُدخَلة، وإلا يُشتقّ من إنتاج الماركرات الحالية (خطة يدوية بلا كميات).
 function rsObjectiveChanged(){rsSaveDraft();
-  if([...document.querySelectorAll('.rs-mrow1')].length&&$('rs-qty-rows')&&[...document.querySelectorAll('.rsq-row')].some(tr=>+tr.querySelector('.rsq-qty').value>0)){
-    $('rs-markers').innerHTML='';rsAutoPlan();return;}
-  rsMkCalc();}
+  const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const reqMap={};
+  [...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();const q=+tr.querySelector('.rsq-qty').value||0;if(s&&q>0)reqMap[s]=q;});
+  if(!Object.keys(reqMap).length){ // لا كميات مُدخَلة: اشتقّ الطلب من إنتاج الماركرات الصالحة الحالية
+    rsReadMarkers().forEach(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
+      if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs))vp.forEach(p=>reqMap[p.size]=(reqMap[p.size]||0)+p.cnt*plies);});}
+  if(!Object.keys(reqMap).length){rsMkCalc();return;} // لا شيء لإعادة بنائه
+  const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]);
+  const added=rsSolve(rem,cons,maxlen,maxsizes,maxpcs);
+  if(!added.length){rsMkCalc();return;}
+  $('rs-markers').innerHTML='';added.forEach(a=>rsAddMarker({pairs:a.combo,plies:a.plies}));
+  rsMkCalc();rsSaveDraft();}
 function rsReadMarkers(){return [...document.querySelectorAll('.rs-mrow1')].map(tr1=>{
   const tr2=tr1.nextElementSibling;
   const ss=[...tr1.querySelectorAll('.rsp-size')].map(e=>e.value.trim());
