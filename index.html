@@ -304,7 +304,9 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div class="res-box" id="mk-res"></div>
       </div>
       <div id="tool-rs" class="card hide">
-        <div class="grid2"><div><label class="inl" data-i18n="productLbl">المنتج</label><select id="rs-product" onchange="rsProductChanged()"></select></div>
+        <label class="inl" data-i18n="mkReportName">اسم التقرير (اختياري)</label>
+        <input id="rs-title" data-i18n-ph="mkReportNamePh" placeholder="مثال: أوردر رمضان — العميل أحمد">
+        <div class="grid2" style="margin-top:8px"><div><label class="inl" data-i18n="productLbl">المنتج</label><select id="rs-product" onchange="rsProductChanged()"></select></div>
           <div style="display:flex;align-items:flex-end"><button type="button" class="mini g" onclick="modelsManager()" data-i18n="rsEditList">⚙️ إضافة / تعديل قائمة المقاسات</button></div></div>
         <div id="rs-nosizes" class="hide" style="margin:8px 0;padding:10px;border:1px dashed #d8a03c;background:#fff8e6;border-radius:10px">
           <span data-i18n="rsNoSizes">المنتج المختار بلا مقاسات محفوظة — افتح إدارة الموديلات والمقاسات وأضف المقاسات مع الاستهلاك والنسبة</span>
@@ -329,6 +331,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <tbody id="rs-markers"></tbody>
           <tr class="tot"><td colspan="8" data-i18n="total">الإجمالي</td><td id="rs-mt-pcs">—</td><td id="rs-mt-plies">—</td><td id="rs-mt-run">—</td><td></td><td>—</td><td id="rs-mt-fab">—</td><td></td></tr></table></div>
         <button type="button" class="mini" style="margin-top:6px" onclick="rsAddMarker()">➕ <span data-i18n="rsAddMarker">إضافة ماركر</span></button>
+        <div class="row-btns" style="margin-top:14px"><button class="btn sec" onclick="saveRsPlan()" data-i18n="saveCheck">💾 حفظ</button>
+        <button class="btn sec" onclick="printRsPlan()" data-i18n="rsPrint">🖨 طباعة الخطة</button></div>
       </div>
     </div>
     <div id="p-ref" class="hide">
@@ -441,6 +445,7 @@ rsMkTbl:'القياسات والكميات داخل الماركر',rsCode:'ال
 rsPcsLbl:'إجمالي القطع في الماركر',rsPlies:'عدد الطبقات',rsPcsRun:'إجمالي القطع في التشغيل',rsMkStatus:'حالة الماركر وسبب عدم الصلاحية',
 rsMkPerPly:'استهلاك الماركر/طبقة (متر)',rsSumFab:'إجمالي استهلاك التشغيل (متر)',rsAddMarker:'إضافة ماركر',
 rsMaxLen:'حد طول الماركر (متر)',rsMaxSizes:'أقصى عدد قياسات في الماركر',rsMaxPcs:'أقصى عدد قطع في الماركر',
+rsPrint:'🖨 طباعة الخطة',rsPlanState:'حالة الخطة',rsReady:'مطابقة وجاهزة',rsReview:'تحتاج مراجعة',rsRemaining:'المتبقي',rsTotalProd:'إجمالي المنتَج',
 st_ok:'صالح',st_empty:'فارغ',st_dup:'غير صالح: مقاس مكرر',st_badqty:'غير صالح: كمية غير صحيحة',st_maxpcs:'غير صالح: تجاوز أقصى قطع',st_maxsizes:'غير صالح: تجاوز عدد القياسات',st_len:'غير صالح: تجاوز حد الطول',st_plies:'غير صالح: عدد الطبقات غير صحيح',st_nosize:'غير صالح: كمية بلا مقاس',
 rsNoSizes:'المنتج المختار بلا مقاسات محفوظة — افتح إدارة الموديلات والمقاسات وأضف المقاسات مع الاستهلاك والنسبة',
 mkMkLen:'طول الماركر',mkTotalPlies:'إجمالي الطبقات',mkSpreadsShort:'فرشة',
@@ -574,6 +579,7 @@ rsMkTbl:'Sizes & quantities per marker',rsCode:'Code',rsDesc:'Item',rsSizesRow:'
 rsPcsLbl:'Total pieces per marker',rsPlies:'Plies',rsPcsRun:'Total run pieces',rsMkStatus:'Marker status & invalid reason',
 rsMkPerPly:'Marker cons/ply (m)',rsSumFab:'Total run consumption (m)',rsAddMarker:'Add marker',
 rsMaxLen:'Marker length limit (m)',rsMaxSizes:'Max sizes per marker',rsMaxPcs:'Max pieces per marker',
+rsPrint:'🖨 Print plan',rsPlanState:'Plan status',rsReady:'Matched & ready',rsReview:'Needs review',rsRemaining:'Remaining',rsTotalProd:'Total produced',
 st_ok:'valid',st_empty:'empty',st_dup:'invalid: duplicate size',st_badqty:'invalid: bad quantity',st_maxpcs:'invalid: exceeds max pieces',st_maxsizes:'invalid: exceeds max sizes',st_len:'invalid: exceeds length limit',st_plies:'invalid: bad ply count',st_nosize:'invalid: quantity without size',
 rsNoSizes:'The selected product has no saved sizes — open the models & sizes manager and add sizes with consumption and ratio',
 mkMkLen:'Marker length',mkTotalPlies:'Total plies',mkSpreadsShort:'spreads',
@@ -1271,7 +1277,7 @@ function goTool(id,btn){const all=id==='all';
 function goMarker(id,btn){document.querySelectorAll('#marker-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');
   ['mk','rs'].forEach(x=>{const el=$('tool-'+x);if(el)el.classList.toggle('hide',x!==id);});
   if(id==='rs'){renderRsProducts();if(!$('rs-qty-rows').children.length){if(rsSizeSrc().length)rsFillProduct();else rsAddQtyRow();}rsCalc();}}
-const TOOL_TITLES={fp:'fpTitle',sh:'shTitle',aq:'aqlTitle',mk:'mkTitle',all:'allTitle'};
+const TOOL_TITLES={fp:'fpTitle',sh:'shTitle',aq:'aqlTitle',mk:'mkTitle',rs:'rsTitle',all:'allTitle'};
 function toolInfo(id,e){e.preventDefault();modal(`<h3>${esc(t(TOOL_TITLES[id]))}</h3>
   <p style="line-height:1.7;color:var(--mut)">${esc(t('toolDesc'+id))}</p>
   <div class="row-btns"><button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);return false;}
@@ -1597,6 +1603,7 @@ function toolResultSummary(c){const r=c.result;const mk=d=>d.decision==='PASS'?'
   if(c.type==='sh')return `${t('shrLen')} ${r.shrLen}% · ${t('shrWid')} ${r.shrWid}% (${t('limit')} ${r.lim}%)`;
   if(c.type==='aq')return `${t('aqlSample')}: ${r.sample} · ${t('majorLbl')} ${r.maj}/${r.re25} · ${t('minorLbl')} ${r.min}/${r.re40}`;
   if(c.type==='mk')return `${r.product?esc(r.product)+' · ':''}${r.model?esc(r.model)+' · ':''}${t('totalPieces')} ${r.pieces} · ${t('mkTotalFabric')} ${r.totalFabric} ${r.unit||''}`;
+  if(c.type==='rs')return `${r.product?esc(r.product)+' · ':''}${t('rsPlanState')}: ${r.decision==='PASS'?t('rsReady'):t('rsReview')} · ${t('rsTotalProd')} ${r.totalMade}/${r.totalReq} · ${t('mkTotalFabric')} ${r.totFab} م`;
   return `${t('fpShort')} ${mk(r.fp)} · ${t('shShort')} ${mk(r.sh)} · AQL ${mk(r.aq)}`;}
 function renderToolChk(){const el=$('toolchk-list');if(!el)return;if(!TOOLCHK.length){el.innerHTML=empty(t('noToolChk'));return;}
   const bar=`<div style="display:flex;gap:8px;margin-bottom:10px"><button class="mini g" onclick="exportToolChk()">${t('exportCsv')}</button></div>`;
@@ -1606,6 +1613,7 @@ function renderToolChk(){const el=$('toolchk-list');if(!el)return;if(!TOOLCHK.le
     <span class="badge ${b}">${c.result.decision==='PASS'?t('pass'):t('fail')}</span></div>
     <div class="row-btns"><button class="mini" onclick="printToolChk('${c.id}')">${t('reportBtn')}</button>
     ${c.type==='mk'?`<button class="mini g" onclick="openMkInCalc('${c.id}')">${t('openInCalc')}</button>`:''}
+    ${c.type==='rs'?`<button class="mini g" onclick="rsOpenInCalc('${c.id}')">${t('openInCalc')}</button>`:''}
     ${can('del')?`<button class="mini r" onclick="delToolChk('${c.id}')">${t('del')}</button>`:''}</div></div>`;}).join('')+'</div>';}
 function delToolChk(id){if(!confirm(t('delInspQ')))return;db.collection('qc_toolchecks').doc(id).delete().catch(e=>toast(rulesHint(e)));}
 function navBtn(tb){return [...document.querySelectorAll('.nav button')].find(b=>(b.getAttribute('onclick')||'').includes("'"+tb+"'"));}
@@ -1674,6 +1682,8 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
       <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('colorLbl')}</td><td>${t('mkColorPieces2')}</td><td>${t('mkColorFabric')} (${u})</td>${sp?`<td>${t('mkPlies')}</td>`:''}${anyAv?`<td>${t('mkAvailCol')}</td><td>${t('mkStateCol')}</td>`:''}</tr>
       ${r.colors.map(x=>`<tr><td>${esc(x.color||'—')}</td><td>${x.pcs}</td><td>${x.fabric}</td>${sp?`<td>${x.plies}${x.over>0?' (+'+x.over+')':''}</td>`:''}${anyAv?`<td>${x.avail!=null?x.avail:'—'}</td><td>${x.avail!=null?(x.diff>=0?'✔':'✘ '+Math.round(-x.diff*100)/100):'—'}</td>`:''}</tr>`).join('')}
       <tr style="font-weight:800"><td>${t('total')}</td><td>${r.pieces}</td><td>${r.totalFabric}</td>${sp?`<td>${r.totalPlies}</td>`:''}${anyAv?'<td></td><td></td>':''}</tr></table></td></tr>`;}}
+  else if(c.type==='rs'){rows=row(t('productLbl'),r.product||'—')+row(t('rsPlanState'),r.decision==='PASS'?t('rsReady'):t('rsReview'))
+    +`<tr><td colspan="2" style="padding:0">${rsPlanTablesHtml(r)}</td></tr>`;}
   else rows=sec(t('fpTitle'),r.fp.decision)+fpRows(r.fp)+sec(t('shTitle'),r.sh.decision)+shRows(r.sh)+sec(t('aqlTitle'),r.aq.decision)+aqRows(r.aq);
   $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:720px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
@@ -1811,6 +1821,67 @@ function rsMkCalc(){if(!$('rs-markers'))return;
     stc.style.cssText='max-width:170px;font-weight:800;background:'+(ok?'#e2f2e2':(st==='st_empty'?bg:'#fbe3e3'))+';color:'+(ok?'#1e7e40':(st==='st_empty'?'#667':'#c00000'));});
   if($('rs-mt-pcs')){$('rs-mt-pcs').textContent=tPcs||'\u2014';$('rs-mt-plies').textContent=tPlies||'\u2014';
     $('rs-mt-run').textContent=tRun||'\u2014';$('rs-mt-fab').textContent=tFab?Math.round(tFab*100)/100:'\u2014';}}
+/* ---- \u062d\u0641\u0638 / \u0637\u0628\u0627\u0639\u0629 / \u0641\u062a\u062d \u062e\u0637\u0629 \u0627\u0644\u0631\u064a\u0634\u0648 ---- */
+function rsResult(){const qty=rsReadQty();if(!qty.length)return null;
+  const maxlen=+$('rs-maxlen').value||0,maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const cons={};qty.forEach(x=>cons[x.size]=x.cons);
+  const markers=[];let tRun=0,tFab=0;
+  rsReadMarkers().forEach((m,i)=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);if(!vp.length&&!m.plies)return;
+    const plies=+m.plies||0,pcs=vp.reduce((s,p)=>s+p.cnt,0),len=vp.reduce((s,p)=>s+p.cnt*(cons[p.size]||0),0);
+    let st='st_ok';
+    if(m.pairs.some(p=>!p.size&&p.cnt>0))st='st_nosize';
+    else if(m.pairs.some(p=>p.size&&(!(p.cnt>0)||p.cnt%1!==0)))st='st_badqty';
+    else if(new Set(vp.map(p=>p.size)).size<vp.length)st='st_dup';
+    else if(vp.length>maxsizes)st='st_maxsizes';else if(pcs>maxpcs)st='st_maxpcs';
+    else if(!(plies>0)||plies%1!==0)st='st_plies';else if(maxlen>0&&len>maxlen+1e-9)st='st_len';
+    const ok=st==='st_ok',run=ok?pcs*plies:0,fab=ok?len*plies:0;if(ok){tRun+=run;tFab+=fab;}
+    markers.push({code:'M'+String(i+1).padStart(2,'0'),pairs:vp,plies,pcs,len:Math.round(len*100)/100,status:t(st),ok,run,fab:Math.round(fab*100)/100});});
+  const totalReq=qty.reduce((s,x)=>s+x.qty,0);
+  const cover=qty.map(x=>{const made=markers.filter(m=>m.ok).reduce((s,m)=>s+m.pairs.filter(p=>p.size===x.size).reduce((a,p)=>a+p.cnt,0)*m.plies,0);
+    return {size:x.size,req:x.qty,made,rem:x.qty-made};});
+  const ready=totalReq>0&&cover.every(c=>c.rem===0);
+  return {product:($('rs-product')&&$('rs-product').value)||'',maxlen,maxsizes,maxpcs,
+    qty,markers,cover,totalReq,totalMade:tRun,totRem:totalReq-tRun,totFab:Math.round(tFab*100)/100,
+    valid:markers.filter(m=>m.ok).length,decision:ready?'PASS':'FAIL'};}
+function saveRsPlan(){const result=rsResult();if(!result)return toast(t('mkNeed'));
+  const title=$('rs-title')?$('rs-title').value.trim():'';
+  const data={wsId:MEMBER.wsId,type:'rs',title,factoryId:'',factoryName:'',date:today(),inspector:MEMBER.name||ME.email,result};
+  db.collection('qc_toolchecks').add({...data,createdAt:FV.serverTimestamp()}).then(()=>toast(t('saved'))).catch(e=>toast(rulesHint(e)));}
+function rsOpenInCalc(id){const c=TOOLCHK.find(x=>x.id===id);if(!c||c.type!=='rs')return;const r=c.result;
+  go('marker',navBtn('marker'));goMarker('rs',document.querySelectorAll('#marker-subnav button')[1]);
+  if($('rs-title'))$('rs-title').value=c.title||'';
+  if(r.product&&prodNames().includes(r.product))$('rs-product').value=r.product;
+  $('rs-maxlen').value=r.maxlen||'';$('rs-maxsizes').value=r.maxsizes||6;$('rs-maxpcs').value=r.maxpcs||5;
+  $('rs-qty-rows').innerHTML='';(r.qty||[]).forEach(x=>rsAddQtyRow(x));
+  $('rs-markers').innerHTML='';(r.markers||[]).forEach(m=>rsAddMarker({pairs:m.pairs,plies:m.plies}));
+  rsCalc();toast(t('restored'));}
+function rsPlanTablesHtml(r){
+  const qt=`<table style="width:100%;border-collapse:collapse;margin-top:8px;font-size:13px" border="1" cellpadding="6">
+    <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('sizeName')}</td><td>${t('mkQtyOrder')}</td><td>${t('rsRatio')}</td><td>${t('rsPieceConsM')}</td><td>${t('rsQtyConsM')}</td></tr>
+    ${(r.qty||[]).map(x=>`<tr><td>${esc(x.size)}</td><td>${x.qty}</td><td>${x.ratio||'\u2014'}</td><td>${x.cons}</td><td>${Math.round(x.qty*x.cons*100)/100}</td></tr>`).join('')}
+    <tr style="font-weight:800;background:#f4f8f8"><td>${t('total')}</td><td>${r.totalReq}</td><td>${(r.qty||[]).reduce((s,x)=>s+(x.ratio||0),0)||'\u2014'}</td><td>\u2014</td><td>${Math.round((r.qty||[]).reduce((s,x)=>s+x.qty*x.cons,0)*100)/100}</td></tr></table>`;
+  const mk=`<table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:13px" border="1" cellpadding="6">
+    <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('rsCode')}</td><td>${t('rsMkTbl')}</td><td>${t('rsPcsLbl')}</td><td>${t('rsPlies')}</td><td>${t('rsPcsRun')}</td><td>${t('rsMkStatus')}</td><td>${t('rsMkPerPly')}</td><td>${t('rsSumFab')}</td></tr>
+    ${(r.markers||[]).map(m=>`<tr><td style="font-weight:700">${esc(m.code)}</td><td>${m.pairs.map(p=>esc(p.size)+'\u00d7'+p.cnt).join(' \u00b7 ')||'\u2014'}</td><td>${m.pcs}</td><td>${m.plies}</td><td>${m.run}</td><td style="color:${m.ok?'#1e7e40':'#c00000'};font-weight:700">${esc(m.status)}</td><td>${m.len}</td><td>${m.fab}</td></tr>`).join('')}
+    <tr style="font-weight:800;background:#f4f8f8"><td colspan="4">${t('total')}</td><td>${r.totalMade}</td><td></td><td></td><td>${r.totFab}</td></tr></table>`;
+  const cv=`<table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:13px" border="1" cellpadding="6">
+    <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>${t('sizeName')}</td><td>${t('mkQtyOrder')}</td><td>${t('rsPcsRun')}</td><td>${t('rsRemaining')}</td></tr>
+    ${(r.cover||[]).map(c=>`<tr><td>${esc(c.size)}</td><td>${c.req}</td><td>${c.made}</td><td style="color:${c.rem===0?'#1e7e40':'#c00000'};font-weight:700">${c.rem}</td></tr>`).join('')}
+    <tr style="font-weight:800;background:#f4f8f8"><td>${t('total')}</td><td>${r.totalReq}</td><td>${r.totalMade}</td><td>${r.totRem}</td></tr></table>`;
+  return qt+mk+cv;}
+function printRsPlan(){const r=rsResult();if(!r)return toast(t('mkNeed'));
+  const title=$('rs-title')?$('rs-title').value.trim():'';const dcol=r.decision==='PASS'?'#1e7e40':'#b02a26';
+  $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:780px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
+      <div><div style="font-size:22px;font-weight:800;color:#14504f">\ud83e\uddf5 ${esc(MEMBER.wsName||'')}</div>
+      <div style="font-size:15px;color:#555">${t('rsTitle')}${title?' \u2014 <b>'+esc(title)+'</b>':''}${r.product?' \u00b7 \ud83d\udce6 '+esc(r.product):''}</div></div>
+      <div style="text-align:${LANG==='ar'?'left':'right'};font-size:12px;color:#666">${fmtDate(today())}</div></div>
+    ${rsPlanTablesHtml(r)}
+    <div style="margin-top:14px;padding:12px;border:2px solid ${dcol};border-radius:10px;text-align:center">
+      <span style="font-size:20px;font-weight:800;color:${dcol}">${r.decision==='PASS'?t('rsReady'):t('rsReview')}</span></div>
+    <div style="margin-top:26px;display:flex;justify-content:space-between;font-size:13px;color:#444">
+      <div>${t('repInspector')}: ${esc(MEMBER.name||'')} ______________</div><div>QC: ______________</div></div></div>`;
+  window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 function calcFP(){const Ln=+$('fp-len').value,W=+$('fp-wid').value,lim=+$('fp-lim').value||40;
   const pts=(+$('fp-1').value||0)*1+(+$('fp-2').value||0)*2+(+$('fp-3').value||0)*3+(+$('fp-4').value||0)*4;
   if(!Ln||!W){$('fp-res').innerHTML=`<span class="note">${t('enterLW')}</span>`;return;}
