@@ -1879,6 +1879,22 @@ function rsCombos(sizes,maxsizes,maxpcs){const out=[];
   const rec=(start,cur,pcs)=>{if(cur.length)out.push(cur.slice());if(cur.length>=maxsizes)return;
     for(let i=start;i<sizes.length;i++)for(let c=1;pcs+c<=maxpcs;c++){cur.push({size:sizes[i],cnt:c});rec(i+1,cur,pcs+c);cur.pop();}};
   rec(0,[],0);return out;}
+// المحرك الموحّد: تغطية جشعة بأقل استهلاك، مع تفضيل حشو أكثر قطع/مقاسات في الماركر الواحد لتقليل عددها
+function rsSolve(rem0,cons,maxlen,maxsizes,maxpcs){
+  const work={};Object.keys(rem0).forEach(s=>work[s]=rem0[s]);
+  const out=[];let guard=0;const t0=Date.now();
+  while(guard++<500&&Date.now()-t0<3500){
+    const active=Object.keys(work).filter(s=>work[s]>0&&cons[s]>0);if(!active.length)break;
+    let best=null;
+    for(const combo of rsCombos(active,maxsizes,maxpcs)){
+      const len=combo.reduce((a,p)=>a+p.cnt*cons[p.size],0);if(maxlen>0&&len>maxlen+1e-9)continue;
+      const plies=Math.min(...combo.map(p=>Math.floor(work[p.size]/p.cnt)));if(plies<1)continue;
+      const pcs=combo.reduce((a,p)=>a+p.cnt,0);const covered=plies*pcs;
+      // أولاً أكبر تغطية؛ ثم أكثر قطع في الماركر (دمج أكثر)؛ ثم أقل طول
+      if(!best||covered>best.covered||(covered===best.covered&&(pcs>best.pcs||(pcs===best.pcs&&len<best.len))))
+        best={combo:combo.map(p=>({size:p.size,cnt:p.cnt})),plies,covered,len,pcs};}
+    if(!best)break;out.push({combo:best.combo,plies:best.plies,len:best.len});best.combo.forEach(p=>work[p.size]-=p.cnt*best.plies);}
+  return out;}
 // أفضل خطة تلقائياً للكميات المتبقية بأقل استهلاك (تغطية تامة بلا زيادة)
 function rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,rawPairs){
   if(!vp.length)return false;const pcs=vp.reduce((a,p)=>a+p.cnt,0);const len=vp.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);
@@ -1896,16 +1912,7 @@ function rsAutoPlan(){if(!$('rs-markers'))return;
     if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs))vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);});
   const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]-(produced[s]||0));
   if(!Object.values(rem).some(v=>v>0))return toast(t('rsAutoDone'));
-  const added=[];let guard=0;const t0=Date.now();
-  while(guard++<400&&Date.now()-t0<4000){
-    const active=Object.keys(rem).filter(s=>rem[s]>0&&cons[s]>0);if(!active.length)break;
-    let best=null;
-    for(const combo of rsCombos(active,maxsizes,maxpcs)){
-      const len=combo.reduce((a,p)=>a+p.cnt*cons[p.size],0);if(maxlen>0&&len>maxlen+1e-9)continue;
-      const plies=Math.min(...combo.map(p=>Math.floor(rem[p.size]/p.cnt)));if(plies<1)continue;
-      const covered=plies*combo.reduce((a,p)=>a+p.cnt,0);
-      if(!best||covered>best.covered||(covered===best.covered&&len<best.len))best={combo:combo.map(p=>({size:p.size,cnt:p.cnt})),plies,covered,len};}
-    if(!best)break;added.push(best);best.combo.forEach(p=>rem[p.size]-=p.cnt*best.plies);}
+  const added=rsSolve(rem,cons,maxlen,maxsizes,maxpcs);
   if(!added.length)return toast(t('rsNoSug'));
   added.forEach(a=>rsAddMarker({pairs:a.combo,plies:a.plies}));rsMkCalc();
   toast(tf('rsAutoAdded',{n:added.length}));}
@@ -1919,18 +1926,8 @@ function rsBuildSugs(){if(!$('rs-sug-rows'))return;
   const produced={};rsReadMarkers().forEach(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
     if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs))vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);});
   RS_SUG_REM0={};Object.keys(reqMap).forEach(s=>RS_SUG_REM0[s]=reqMap[s]-(produced[s]||0));
-  const work={};Object.keys(RS_SUG_REM0).forEach(s=>work[s]=RS_SUG_REM0[s]);
-  const sugs=[];let guard=0;const t0=Date.now();
-  while(guard++<400&&Date.now()-t0<3000){
-    const active=Object.keys(work).filter(s=>work[s]>0&&cons[s]>0);if(!active.length)break;
-    let best=null;
-    for(const combo of rsCombos(active,maxsizes,maxpcs)){
-      const len=combo.reduce((a,p)=>a+p.cnt*cons[p.size],0);if(maxlen>0&&len>maxlen+1e-9)continue;
-      const plies=Math.min(...combo.map(p=>Math.floor(work[p.size]/p.cnt)));if(plies<1)continue;
-      const covered=plies*combo.reduce((a,p)=>a+p.cnt,0);
-      if(!best||covered>best.covered||(covered===best.covered&&len<best.len))best={combo:combo.map(p=>({size:p.size,cnt:p.cnt})),plies,covered,len};}
-    if(!best)break;sugs.push({combo:best.combo,sug:best.plies,plies:best.plies,len:best.len});best.combo.forEach(p=>work[p.size]-=p.cnt*best.plies);}
-  RS_SUGS=sugs;rsRenderSugs();}
+  RS_SUGS=rsSolve(RS_SUG_REM0,cons,maxlen,maxsizes,maxpcs).map(s=>({combo:s.combo,sug:s.plies,plies:s.plies,len:s.len}));
+  rsRenderSugs();}
 function rsRenderSugs(){const tb=$('rs-sug-rows');if(!tb)return;
   if(!RS_SUGS.length){tb.innerHTML=`<tr><td colspan="15" style="padding:10px;color:#667">${t('rsSugEmpty')}</td></tr>`;return;}
   const rem={...RS_SUG_REM0};let html='';
