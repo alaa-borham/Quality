@@ -371,7 +371,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <tbody id="rs-sug-rows" class="rss-hide"></tbody></table></div>
         <button type="button" class="btn g rss-hide" style="margin-top:6px" onclick="rsApplySugs()" data-i18n="rsApplyAll">✔ اعتماد كل الاقتراحات كماركرات</button>
         <div class="row-btns" style="margin-top:14px"><button class="btn sec" onclick="saveRsPlan()" data-i18n="saveCheck">💾 حفظ</button>
-        <button class="btn sec" onclick="printRsPlan()" data-i18n="rsPrint">🖨 طباعة الخطة</button></div>
+        <button class="btn sec" onclick="printRsPlan()" data-i18n="rsPrint">🖨 طباعة الخطة</button>
+        <button class="btn sec" onclick="printRsSpread()" data-i18n="rsSpreadBtn">🧵 أمر الفرد</button></div>
       </div>
     </div>
     <div id="p-ref" class="hide">
@@ -489,6 +490,7 @@ rsSumReq:'إجمالي كمية الطلب',rsSumProd:'إجمالي إنتاج �
 rsReviewTbl:'مراجعة الناتج حسب المقاس',rsProdFromMk:'إجمالي القطع من الماركر',rsRemFromOrder:'المتبقي من الأوردر',rsOrderConsM:'إجمالي استهلاك الأوردر (متر)',rsRvShort:'نقص',rsRvMatch:'مطابق',rsRvSurplus:'زيادة',
 rsAutoBtn:'أكمل الخطة تلقائياً (أقل استهلاك)',rsAutoDone:'الخطة مكتملة — لا كميات متبقية',rsAutoAdded:'أُضيف {n} ماركر تلقائياً',
 rsSugTbl:'اقتراحات تغطية باقي كمية الأوردر (أقل استهلاك)',rsSugPliesC:'الطبقات المقترحة',rsEditPliesC:'تعديل الطبقات يدويًا (اختياري)',rsRemWithRun:'إجمالي المتبقي مع التشغيل',rsApplyAll:'✔ اعتماد كل الاقتراحات كماركرات',rsSugEmpty:'لا كميات متبقية — الاقتراحات فارغة',
+rsSpreadBtn:'🧵 أمر الفرد',rsSpreadTitle:'أمر الفرد (تشغيل الفرشات)',rsMkLenH:'طول الماركر',rsNoValidMk:'لا ماركرات صالحة للفرد',
 rsLenTip:'لتلائم الطول: ',rsLenReduce:'قلّل {s} بمقدار {n} قطعة',rsLenRemove:'احذف {s}',rsAddFit:'يمكن إضافة {s} (يتبقّى {r})',
 st_ok:'صالح',st_empty:'فارغ',st_dup:'غير صالح: مقاس مكرر',st_badqty:'غير صالح: كمية غير صحيحة',st_maxpcs:'غير صالح: تجاوز أقصى قطع',st_maxsizes:'غير صالح: تجاوز عدد القياسات',st_len:'غير صالح: تجاوز حد الطول',st_plies:'غير صالح: عدد الطبقات غير صحيح',st_nosize:'غير صالح: كمية بلا مقاس',
 rsNoSizes:'المنتج المختار بلا مقاسات محفوظة — افتح إدارة الموديلات والمقاسات وأضف المقاسات مع الاستهلاك والنسبة',
@@ -628,6 +630,7 @@ rsSumReq:'Total order qty',rsSumProd:'Plan production',rsSumRem:'Total remaining
 rsReviewTbl:'Output review by size',rsProdFromMk:'Pieces from markers',rsRemFromOrder:'Remaining of order',rsOrderConsM:'Total order consumption (m)',rsRvShort:'short',rsRvMatch:'matched',rsRvSurplus:'surplus',
 rsAutoBtn:'Auto-complete plan (least consumption)',rsAutoDone:'Plan complete — nothing remaining',rsAutoAdded:'{n} markers added automatically',
 rsSugTbl:'Suggestions to cover the remaining order (least consumption)',rsSugPliesC:'Suggested plies',rsEditPliesC:'Adjust plies (optional)',rsRemWithRun:'Remaining after run',rsApplyAll:'✔ Apply all suggestions as markers',rsSugEmpty:'Nothing remaining — no suggestions',
+rsSpreadBtn:'🧵 Spreading order',rsSpreadTitle:'Spreading order',rsMkLenH:'Marker length',rsNoValidMk:'No valid markers to spread',
 rsLenTip:'To fit length: ',rsLenReduce:'Reduce {s} by {n} pcs',rsLenRemove:'Remove {s}',rsAddFit:'Can add {s} ({r} left)',
 st_ok:'valid',st_empty:'empty',st_dup:'invalid: duplicate size',st_badqty:'invalid: bad quantity',st_maxpcs:'invalid: exceeds max pieces',st_maxsizes:'invalid: exceeds max sizes',st_len:'invalid: exceeds length limit',st_plies:'invalid: bad ply count',st_nosize:'invalid: quantity without size',
 rsNoSizes:'The selected product has no saved sizes — open the models & sizes manager and add sizes with consumption and ratio',
@@ -2121,6 +2124,31 @@ function printRsPlan(){const r=rsResult();if(!r)return toast(t('mkNeed'));
       <span style="font-size:20px;font-weight:800;color:${dcol}">${r.decision==='PASS'?t('rsReady'):t('rsReview')}</span></div>
     <div style="margin-top:26px;display:flex;justify-content:space-between;font-size:13px;color:#444">
       <div>${t('repInspector')}: ${esc(MEMBER.name||'')} ______________</div><div>QC: ______________</div></div></div>`;
+  window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
+// أمر الفرد: ورقة تشغيل لعامل الفرشة — ماركر لكل صف مع الطبقات وطول الماركر وخانة توقيع
+function printRsSpread(){const r=rsResult();if(!r)return toast(t('mkNeed'));
+  const mk=(r.markers||[]).filter(m=>m.ok);if(!mk.length)return toast(t('rsNoValidMk'));
+  const uf=r.uf||1,u=r.unit||'متر';const R=v=>Math.round(v*uf*100)/100;
+  const title=$('rs-title')?$('rs-title').value.trim():'';
+  const rows=mk.map((m,i)=>`<tr>
+    <td style="font-weight:800;font-size:16px;text-align:center">${esc(m.code)}</td>
+    <td>${m.pairs.map(p=>`<span style="display:inline-block;border:1px solid #bbb;border-radius:6px;padding:2px 8px;margin:2px;font-weight:700">${esc(p.size)} <b style="color:#14504f">×${p.cnt}</b></span>`).join('')}</td>
+    <td style="text-align:center;font-weight:800;font-size:18px">${m.plies}</td>
+    <td style="text-align:center">${R(m.len)} ${u}</td>
+    <td style="text-align:center;font-weight:700">${m.run}</td>
+    <td style="min-width:120px"></td></tr>`).join('');
+  const totPlies=mk.reduce((s,m)=>s+m.plies,0),totRun=mk.reduce((s,m)=>s+m.run,0),totFab=mk.reduce((s,m)=>s+m.fab,0);
+  $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:820px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
+      <div><div style="font-size:22px;font-weight:800;color:#14504f">🧵 ${esc(MEMBER.wsName||'')}</div>
+      <div style="font-size:15px;color:#555">${t('rsSpreadTitle')}${title?' — <b>'+esc(title)+'</b>':''}${r.product?' · 📦 '+esc(r.product):''}</div></div>
+      <div style="text-align:${LANG==='ar'?'left':'right'};font-size:12px;color:#666">${fmtDate(today())}</div></div>
+    <table style="width:100%;border-collapse:collapse;margin-top:12px;font-size:14px" border="1" cellpadding="8">
+      <tr style="background:#e6efee;font-weight:800;color:#14504f"><td style="text-align:center">${t('rsCode')}</td><td>${t('rsMkTbl')}</td><td style="text-align:center">${t('rsPlies')}</td><td style="text-align:center">${t('rsMkLenH')} (${u})</td><td style="text-align:center">${t('rsPcsRun')}</td><td style="text-align:center">${t('signature')}</td></tr>
+      ${rows}
+      <tr style="font-weight:800;background:#f4f8f8"><td colspan="2">${t('total')}</td><td style="text-align:center">${totPlies}</td><td></td><td style="text-align:center">${totRun}</td><td style="text-align:center">${R(totFab)} ${u}</td></tr></table>
+    <div style="margin-top:26px;display:flex;justify-content:space-between;font-size:13px;color:#444">
+      <div>${t('repInspector')}: ${esc(MEMBER.name||'')} ______________</div><div>${t('signature')}: ______________</div></div></div>`;
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 function calcFP(){const Ln=+$('fp-len').value,W=+$('fp-wid').value,lim=+$('fp-lim').value||40;
   const pts=(+$('fp-1').value||0)*1+(+$('fp-2').value||0)*2+(+$('fp-3').value||0)*3+(+$('fp-4').value||0)*4;
