@@ -128,6 +128,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
 .mini-toggle{background:#fff;border:1px solid #b98;border-radius:7px;padding:2px 12px;cursor:pointer;font-weight:900;font-size:15px;color:#14504f;line-height:1.2}
 .mini-toggle:hover{background:#f4f4f4}
 .xtbl.fit{width:auto;min-width:0}
+.xtbl.collapsed{width:auto;min-width:0}
 .xtbl .szc{width:52px;max-width:52px}
 .xtbl .szc select,.xtbl .szc input{min-width:0!important;width:100%}
 .xtbl th.or{background:#f0a13c}
@@ -317,17 +318,13 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div id="rs-nosizes" class="hide" style="margin:8px 0;padding:10px;border:1px dashed #d8a03c;background:#fff8e6;border-radius:10px">
           <span data-i18n="rsNoSizes">المنتج المختار بلا مقاسات محفوظة — افتح إدارة الموديلات والمقاسات وأضف المقاسات مع الاستهلاك والنسبة</span>
           <button type="button" class="mini g" style="margin-inline-start:8px" onclick="modelsManager()" data-i18n="mkManage">⚙️ إدارة الموديلات والمقاسات</button></div>
-        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;margin-top:10px">
-        <div style="flex:1 1 520px;min-width:0">
-        <div style="overflow-x:auto"><table class="xtbl" style="min-width:520px">
+        <div id="rs-summary" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"></div>
+        <div style="overflow-x:auto;margin-top:10px"><table id="rs-qty-tbl" class="xtbl" style="min-width:520px">
           <tr><th colspan="6" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsq-cv" onclick="rsCollapse('rsq')" title="تصغير/تكبير">–</button><span data-i18n="rsQtyTbl2">الكميات المطلوبة والاستهلاك حسب المقاس</span></span></th></tr>
           <tr class="rsq-hide"><th data-i18n="sizeName">المقاس</th><th class="or" data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="rsRatio">نسبة بحسب الموديل</th><th class="or" data-i18n="rsQtyConsM">استهلاك الكمية (متر)</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th></th></tr>
           <tbody id="rs-qty-rows" class="rsq-hide"></tbody>
           <tr class="tot rsq-hide"><td data-i18n="total">الإجمالي</td><td id="rs-qt-q">—</td><td id="rs-qt-r">—</td><td id="rs-qt-c">—</td><td>—</td><td></td></tr></table></div>
         <button type="button" class="mini rsq-hide" style="margin-top:6px" onclick="rsAddQtyRow()">➕ <span data-i18n="mkAddRow">إضافة مقاس</span></button>
-        </div>
-        <div id="rs-summary" style="flex:0 1 240px;display:flex;flex-direction:column;gap:6px;min-width:200px"></div>
-        </div>
         <div class="grid3" style="margin-top:14px">
           <div><label class="inl" data-i18n="rsMaxLen">حد طول الماركر (متر)</label><input id="rs-maxlen" type="number" step="0.01" value="17" oninput="rsMkCalc()"></div>
           <div><label class="inl" data-i18n="rsMaxSizes">أقصى عدد قياسات في الماركر</label><input id="rs-maxsizes" type="number" value="6" oninput="rsMkCalc()"></div>
@@ -1718,7 +1715,8 @@ let RS_DRAFT=null,RS_LOADED=false,RS_SAVE_T=null,RS_COL={};
 // طيّ/فتح جدول
 function rsCollapse(key){const on=RS_COL[key]=!RS_COL[key];
   document.querySelectorAll('.'+key+'-hide').forEach(e=>e.style.display=on?'none':'');
-  document.querySelectorAll('.'+key+'-cv').forEach(e=>e.textContent=on?'+':'–');}
+  document.querySelectorAll('.'+key+'-cv').forEach(e=>e.textContent=on?'+':'–');
+  if(key==='rsq'){const tbl=$('rs-qty-tbl');if(tbl)tbl.classList.toggle('collapsed',on);}}
 function renderRsProducts(){const el=$('rs-product');if(!el)return;const cur=el.value;const ns=prodNames();
   el.innerHTML=ns.length?ns.map(n=>`<option ${n===cur?'selected':''}>${esc(n)}</option>`).join(''):`<option value="">\u2014</option>`;
   if(cur&&ns.includes(cur))el.value=cur;
@@ -1903,9 +1901,9 @@ function rsMkCalc(){if(!$('rs-markers'))return;
   rsRenderSummary({totalReq,prod:tRun,rem:totalReq-tRun,valid:RS_VALIDN,fab:Math.round(tFab*100)/100,maxlen,ready:totalReq>0&&tRun===totalReq});
   rsSaveDraft();}
 function rsRenderSummary(d){const el=$('rs-summary');if(!el)return;
-  const c=(l,v,col)=>`<div style="display:flex;border:1px solid #d8c27a;border-radius:8px;overflow:hidden">
+  const c=(l,v,col)=>`<div style="flex:1 1 150px;display:flex;border:1px solid #d8c27a;border-radius:8px;overflow:hidden;min-width:140px">
     <div style="background:#ffc000;padding:8px 10px;font-weight:800;flex:1;font-size:12.5px">${l}</div>
-    <div style="background:#fdf6e3;padding:8px 10px;font-weight:800;min-width:64px;text-align:center;color:${col||'#1c1c1c'}">${v}</div></div>`;
+    <div style="background:#fdf6e3;padding:8px 10px;font-weight:800;min-width:56px;text-align:center;color:${col||'#1c1c1c'}">${v}</div></div>`;
   el.innerHTML=c(t('rsSumReq'),d.totalReq||'\u2014')
     +c(t('rsSumProd'),d.prod||'\u2014')
     +c(t('rsSumRem'),d.rem,d.rem===0?'#1e7e40':'#c00000')
