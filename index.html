@@ -304,7 +304,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div class="res-box" id="mk-res"></div>
       </div>
       <div id="tool-rs" class="card hide">
-        <div class="grid2"><div><label class="inl" data-i18n="productLbl">المنتج</label><select id="rs-product" onchange="rsProductChanged()"></select></div></div>
+        <div class="grid2"><div><label class="inl" data-i18n="productLbl">المنتج</label><select id="rs-product" onchange="rsProductChanged()"></select></div>
+          <div style="display:flex;align-items:flex-end"><button type="button" class="mini g" onclick="modelsManager()" data-i18n="rsEditList">⚙️ إضافة / تعديل قائمة المقاسات</button></div></div>
         <div id="rs-nosizes" class="hide" style="margin:8px 0;padding:10px;border:1px dashed #d8a03c;background:#fff8e6;border-radius:10px">
           <span data-i18n="rsNoSizes">المنتج المختار بلا مقاسات محفوظة — افتح إدارة الموديلات والمقاسات وأضف المقاسات مع الاستهلاك والنسبة</span>
           <button type="button" class="mini g" style="margin-inline-start:8px" onclick="modelsManager()" data-i18n="mkManage">⚙️ إدارة الموديلات والمقاسات</button></div>
@@ -415,7 +416,8 @@ mkFabric:'القماش المطلوب للفرش',mkExtra:'قطع زائدة',mk
 mkColorsLbl:'توزيعة الأوردر بالألوان (اختياري)',mkColorAdd:'إضافة لون',total:'الإجمالي',mkColorFabric:'استهلاك قماش اللون',
 mkTableLbl:'بيانات الأوردر',mkQtyOrder:'الكمية المطلوبة',mkAddRow:'إضافة مقاس',mkColorPieces2:'إجمالي القطع',mkTotalFabric:'إجمالي القماش',
 mkReportName:'اسم التقرير (اختياري)',mkReportNamePh:'مثال: أوردر رمضان — العميل أحمد',reportNameLbl:'اسم التقرير',
-ratioPh:'النسبة (ريشو الموديل)',ratioShort:'نسبة',
+ratioPh:'النسبة (ريشو الموديل)',ratioShort:'نسبة',rsEditList:'⚙️ إضافة / تعديل قائمة المقاسات',
+clearSizesBtn:'🗑 مسح كل مقاسات هذا المنتج',clearSizesQ:'حذف كل مقاسات هذا المنتج؟ (الموديلات والتقارير المحفوظة لا تتأثر)',
 mkAvail:'القماش المتاح (اختياري)',mkEnough:'القماش المتاح يكفي',mkShort:'ينقص',
 fillModelBtn:'تعبئة مقاسات الموديل',selectModelFirst:'اختر الموديل أولاً',openInCalc:'📂 فتح في الحاسبة',restored:'تم التحميل في الحاسبة — عدّل واحسب من جديد',
 mkAvailCol:'المتاح',mkStateCol:'الحالة',mkOver:'فائض تقريب الطبقات',mkActual:'القماش الفعلي بعد القص (اختياري)',mkDev:'الانحراف عن المحسوب',
@@ -542,7 +544,8 @@ mkFabric:'Fabric needed for spreading',mkExtra:'extra pieces',mkSpreads:'Number 
 mkColorsLbl:'Order breakdown by color (optional)',mkColorAdd:'Add color',total:'Total',mkColorFabric:'Color fabric consumption',
 mkTableLbl:'Order data',mkQtyOrder:'Quantity',mkAddRow:'Add size',mkColorPieces2:'Total pieces',mkTotalFabric:'Total fabric',
 mkReportName:'Report name (optional)',mkReportNamePh:'e.g. Ramadan order — client Ahmed',reportNameLbl:'Report name',
-ratioPh:'Ratio (model ratio)',ratioShort:'ratio',
+ratioPh:'Ratio (model ratio)',ratioShort:'ratio',rsEditList:'⚙️ Add / edit sizes list',
+clearSizesBtn:'🗑 Clear all sizes of this product',clearSizesQ:'Delete all sizes of this product? (models and saved reports are unaffected)',
 mkAvail:'Available fabric (optional)',mkEnough:'Available fabric is enough',mkShort:'short by',
 fillModelBtn:'Fill model sizes',selectModelFirst:'Select a model first',openInCalc:'📂 Open in calculator',restored:'Loaded into the calculator — edit and recalculate',
 mkAvailCol:'Available',mkStateCol:'Status',mkOver:'Ply rounding surplus',mkActual:'Actual fabric after cutting (optional)',mkDev:'Deviation from computed',
@@ -1365,6 +1368,7 @@ function modelsManager(){modal(`<h3>${t('mkManage')}</h3>
       <button type="button" class="mini" onclick="$('sizes-file').click()">${t('importFileBtn')}</button>
       <input id="sizes-file" type="file" accept=".csv,.txt,.tsv" class="hide" onchange="importSizesFile(this)"></div>
   </div>
+  <button type="button" class="mini r" style="margin-top:6px" onclick="clearSizes()">${t('clearSizesBtn')}</button>
   <div id="sizes-list" style="margin-top:8px"></div>
   <label class="inl" style="margin-top:12px">${t('modelsListLbl')}</label>
   <div id="models-list"></div>
@@ -1446,6 +1450,9 @@ function addSize(){const name=$('new-size').value.trim();if(!name)return;
   setProdSizes(SM_PROD,nl).then(()=>{$('new-size').value='';$('new-size-cons').value='';if($('new-size-ratio'))$('new-size-ratio').value='';}).catch(e=>toast(rulesHint(e)));}
 function delSize(name){if(!SM_PROD)return;
   setProdSizes(SM_PROD,sizeList(SM_PROD).filter(s=>s.size!==name)).catch(e=>toast(rulesHint(e)));}
+function clearSizes(){if(!SM_PROD)return toast(t('noProducts'));
+  if(!confirm(t('clearSizesQ')))return;
+  setProdSizes(SM_PROD,[]).then(()=>toast(t('deleted'))).catch(e=>toast(rulesHint(e)));}
 function editSizeCons(name,val){const cons=+normNum(val);
   if(!(cons>0)){renderSizesManager();return toast(t('badSizeRow'));}
   const nl=sizeList(SM_PROD).map(s=>s.size===name?{...s,cons:Math.round(cons*10000)/10000}:s);
@@ -1457,15 +1464,21 @@ function editSizeRatio(name,val){const ratio=+normNum(val)||0;
 function normNum(s){return String(s).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace('٫','.');}
 function parseSizeLines(text){const ok=[];let skipped=0;
   String(text||'').split(/\r?\n/).forEach(line=>{if(!line.trim())return;
+    if(/إجمالي|Total|total/.test(line)){skipped++;return;}
     const toks=line.split(/[\t;,]+|\s+/).map(x=>x.trim()).filter(Boolean);
-    let ci=-1;for(let i=toks.length-1;i>=0;i--){if(+normNum(toks[i])>0){ci=i;break;}}
-    if(ci<1){skipped++;return;}
-    // عمودان رقميان في آخر السطر = استهلاك ثم نسبة؛ رقم واحد = استهلاك فقط
-    let cons,ratio=0,si=ci;
-    if(ci>1&&+normNum(toks[ci-1])>0){cons=+normNum(toks[ci-1]);ratio=+normNum(toks[ci]);si=ci-1;}
-    else cons=+normNum(toks[ci]);
+    // السلسلة الرقمية في نهاية السطر — ما قبلها هو اسم المقاس
+    let si=toks.length;
+    while(si>1&&+normNum(toks[si-1])>0)si--;
+    const nums=toks.slice(si).map(x=>+normNum(x));
     const size=toks.slice(0,si).join(' ');
-    if(!size){skipped++;return;}
+    if(!size||!nums.length){skipped++;return;}
+    // رقم واحد: استهلاك · رقمان: استهلاك ثم نسبة
+    // ٣ أرقام أو أكثر (لصق صف كامل من الجدول): الكمية، النسبة، [استهلاك الكمية]، استهلاك القطعة
+    let cons=0,ratio=0;
+    if(nums.length===1)cons=nums[0];
+    else if(nums.length===2){cons=nums[0];ratio=nums[1];}
+    else{ratio=nums[1];cons=nums[nums.length-1];}
+    if(!(cons>0)){skipped++;return;}
     ok.push({size,cons:Math.round(cons*10000)/10000,ratio:Math.round(ratio*100)/100});});
   return {ok,skipped};}
 function importSizes(text){if(!SM_PROD)return toast(t('noProducts'));
