@@ -1693,7 +1693,7 @@ function rsApplyDraft(d){
   const q=(d.qty&&d.qty.length)?d.qty:src.map(s=>({size:s.size}));
   q.forEach(x=>rsAddQtyRow({size:x.size,qty:x.qty,cons:cm[x.size]!=null?cm[x.size]:x.cons,ratio:rm[x.size]!=null?rm[x.size]:x.ratio}));
   if($('rs-markers'))$('rs-markers').innerHTML='';(d.markers||[]).forEach(m=>rsAddMarker({pairs:m.pairs,plies:m.plies}));
-  rsCalc();}
+  rsUpdateUnitLabels();rsCalc();}
 function rsProductChanged(){RS_LOADED=true;$('rs-qty-rows').innerHTML='';if($('rs-markers'))$('rs-markers').innerHTML='';
   if(rsSizeSrc().length)rsFillProduct();else{rsAddQtyRow();rsCalc();}}
 // حفظ تلقائي دائم (مسودة العمل) داخل مساحة العمل — تبقى بعد التحديث وإعادة الدخول
