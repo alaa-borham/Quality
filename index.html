@@ -135,7 +135,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
 .mini-toggle{background:#fff;border:1px solid #b98;border-radius:7px;padding:2px 12px;cursor:pointer;font-weight:900;font-size:15px;color:#14504f;line-height:1.2}
 .mini-toggle:hover{background:#f4f4f4}
 .xtbl.fit{width:auto;min-width:0}
-.xtbl .szc{width:52px;max-width:52px}
+.xtbl .szc{width:82px;max-width:82px}
+.xtbl .szc select,.xtbl .szc input{font-size:12px}
 .xtbl .szc select,.xtbl .szc input{min-width:0!important;width:100%}
 .xtbl th.or{background:#f0a13c}
 .xtbl tr.tot td{background:#17696b;color:#fff;font-weight:800}
@@ -335,7 +336,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
             <option value="markers" data-i18n="rsObjMarkers">⬇️ أقل عدد ماركرات</option></select></div>
           <div><label class="inl rsu-price" data-b="سعر متر القماش (اختياري)">سعر متر القماش (اختياري)</label>
           <input id="rs-price" type="number" step="0.01" min="0" placeholder="—" oninput="rsMkCalc();rsSaveDraft()" style="max-width:150px;padding:6px;background:var(--inp)"></div></div>
-        <div style="overflow-x:auto;margin-top:10px"><table class="xtbl" style="min-width:760px">
+        <div style="overflow-x:auto;margin-top:10px"><table class="xtbl" style="min-width:1500px">
           <tr><th colspan="16" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsm-cv" onclick="rsCollapse('rsm')" title="تصغير/تكبير">–</button><span data-i18n="rsMkTbl">القياسات والكميات داخل الماركر</span></span></th></tr>
           <tr class="rsm-hide"><th data-i18n="rsCode">الكود</th><th data-i18n="rsDesc">البيان</th>
             <th class="szc">مقاس١</th><th class="szc">مقاس٢</th><th class="szc">مقاس٣</th><th class="szc">مقاس٤</th><th class="szc">مقاس٥</th><th class="szc">مقاس٦</th>
@@ -358,7 +359,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <tr class="rsr-hide"><th data-i18n="sizeName">القياس</th><th class="or" data-i18n="mkQtyOrder">المطلوب</th><th data-i18n="rsProdFromMk">إجمالي القطع من الماركر</th><th class="or" data-i18n="rsRemFromOrder">المتبقي من الأوردر</th><th data-i18n="mkStateCol">الحالة</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th class="or rsu-h" data-b="إجمالي استهلاك الأوردر">إجمالي استهلاك الأوردر (متر)</th></tr>
           <tbody id="rs-review" class="rsr-hide"></tbody>
           <tr class="tot rsr-hide"><td data-i18n="total">الإجمالي</td><td id="rs-rv-req" style="font-size:15px">—</td><td id="rs-rv-prod" style="font-size:15px">—</td><td id="rs-rv-rem">—</td><td id="rs-rv-st">—</td><td>—</td><td id="rs-rv-cons">—</td></tr></table></div>
-        <div style="overflow-x:auto;margin-top:12px"><table class="xtbl" style="min-width:820px">
+        <div style="overflow-x:auto;margin-top:12px"><table class="xtbl" style="min-width:1500px">
           <tr><th colspan="15" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rss-cv" onclick="rsCollapse('rss')" title="تصغير/تكبير">–</button><span data-i18n="rsSugTbl">اقتراحات تغطية باقي كمية الأوردر (أقل استهلاك)</span></span></th></tr>
           <tr class="rss-hide"><th data-i18n="rsCode">الكود</th><th data-i18n="rsDesc">البيان</th>
             <th class="szc">مقاس١</th><th class="szc">مقاس٢</th><th class="szc">مقاس٣</th><th class="szc">مقاس٤</th><th class="szc">مقاس٥</th><th class="szc">مقاس٦</th>
