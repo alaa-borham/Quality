@@ -310,6 +310,14 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <span data-i18n="rsNoSizes">المنتج المختار بلا مقاسات محفوظة — افتح إدارة الموديلات والمقاسات وأضف المقاسات مع الاستهلاك والنسبة</span>
           <button type="button" class="mini g" style="margin-inline-start:8px" onclick="modelsManager()" data-i18n="mkManage">⚙️ إدارة الموديلات والمقاسات</button></div>
         <div id="rs-summary" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"></div>
+        <div style="margin-top:12px">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <button type="button" class="mini-toggle rsc-cv" onclick="rsCollapse('rsc')" title="تصغير/تكبير">–</button>
+            <span style="font-weight:800" data-i18n="rsColTitle">🎨 توزيع الألوان (اختياري)</span>
+            <button type="button" class="mini" onclick="rsAddColorRow()">➕ <span data-i18n="rsColAdd">إضافة لون</span></button></div>
+          <div class="rsc-hide" style="margin-top:8px">
+            <div id="rs-colors" style="display:flex;flex-direction:column;gap:6px;max-width:520px"></div>
+            <div id="rs-colors-sum" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div></div></div>
         <div style="overflow-x:auto;margin-top:10px"><table id="rs-qty-tbl" class="xtbl" style="min-width:520px">
           <tr><th colspan="6" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsq-cv" onclick="rsCollapse('rsq')" title="تصغير/تكبير">–</button><span data-i18n="rsQtyTbl2">الكميات المطلوبة والاستهلاك حسب المقاس</span></span></th></tr>
           <tr class="rsq-hide"><th data-i18n="sizeName">المقاس</th><th class="or" data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="rsRatio">نسبة بحسب الموديل</th><th class="or rsu-h" data-b="استهلاك الكمية">استهلاك الكمية (متر)</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th></th></tr>
@@ -494,6 +502,7 @@ rsReviewTbl:'مراجعة الناتج حسب المقاس',rsProdFromMk:'إجم
 rsAutoBtn:'أكمل الخطة تلقائياً (أقل استهلاك)',rsAutoDone:'الخطة مكتملة — لا كميات متبقية',rsAutoAdded:'أُضيف {n} ماركر تلقائياً',
 rsReducePliesBtn:'قلّل الطبقات',rsReduceDone:'قُلّلت الطبقات في {n} ماركر: {a} ← {b} طبقة (القماش والكمية دون تغيير)',rsReduceNone:'لا يمكن تقليل الطبقات أكثر — الماركرات مضبوطة على حدّ الطول أو أقصى قطع',
 rsClearMkBtn:'امسح الماركرات',rsClearMkQ:'حذف كل الماركرات؟ يمكنك بعدها الضغط على «أكمل الخطة تلقائياً» لبناء خطة بلا زيادة إنتاج.',rsSortBtn:'ترتيب حسب الطول',
+rsColTitle:'🎨 توزيع الألوان (اختياري)',rsColAdd:'إضافة لون',rsColName:'اسم اللون',rsColQty:'الكمية',rsColUnnamed:'لون',rsColPcs:'القطع',rsColMismatch:'مجموع كميات الألوان ({c}) لا يساوي كمية الطلب ({o})',
 rsSugTbl:'اقتراحات تغطية باقي كمية الأوردر (أقل استهلاك)',rsSugPliesC:'الطبقات المقترحة',rsEditPliesC:'تعديل الطبقات يدويًا (اختياري)',rsRemWithRun:'إجمالي المتبقي مع التشغيل',rsApplyAll:'✔ اعتماد كل الاقتراحات كماركر',rsSugEmpty:'لا كميات متبقية — الاقتراحات فارغة',
 rsSpreadBtn:'🧵 أمر الفرد',rsSpreadTitle:'أمر الفرد (تشغيل الفرشات)',rsMkLenH:'طول الماركر',rsNoValidMk:'لا ماركرات صالحة للفرد',
 rsSpreadJobs:'عدد الماركرات',rsSpreadDone:'تم الفرد',rsFarradSig:'توقيع الفرّاد',rsCutSupSig:'مشرف القص',rsSpreadHint:'ملاحظة: افرد كل ماركر بعدد الطبقات المذكور — راجع طول الماركر قبل القص',
@@ -644,6 +653,7 @@ rsReviewTbl:'Output review by size',rsProdFromMk:'Pieces from markers',rsRemFrom
 rsAutoBtn:'Auto-complete plan (least consumption)',rsAutoDone:'Plan complete — nothing remaining',rsAutoAdded:'{n} markers added automatically',
 rsReducePliesBtn:'Reduce plies',rsReduceDone:'Plies reduced in {n} marker(s): {a} → {b} plies (fabric & quantity unchanged)',rsReduceNone:'Cannot reduce plies further — markers are capped by length limit or max pieces',
 rsClearMkBtn:'Clear markers',rsClearMkQ:'Delete all markers? You can then press “Auto-complete plan” to build a plan with no overproduction.',rsSortBtn:'Sort by length',
+rsColTitle:'🎨 Color split (optional)',rsColAdd:'Add color',rsColName:'Color name',rsColQty:'Quantity',rsColUnnamed:'Color',rsColPcs:'Pieces',rsColMismatch:'Colors total ({c}) ≠ order quantity ({o})',
 rsSugTbl:'Suggestions to cover the remaining order (least consumption)',rsSugPliesC:'Suggested plies',rsEditPliesC:'Adjust plies (optional)',rsRemWithRun:'Remaining after run',rsApplyAll:'✔ Apply all suggestions as markers',rsSugEmpty:'Nothing remaining — no suggestions',
 rsSpreadBtn:'🧵 Spreading order',rsSpreadTitle:'Spreading order',rsMkLenH:'Marker length',rsNoValidMk:'No valid markers to spread',
 rsSpreadJobs:'Markers',rsSpreadDone:'Spread done',rsFarradSig:'Spreader signature',rsCutSupSig:'Cutting supervisor',rsSpreadHint:'Note: spread each marker for the stated ply count — verify marker length before cutting',
@@ -1685,6 +1695,7 @@ function rsApplyDraft(d){
   if(d.rolllen&&$('rs-rolllen'))$('rs-rolllen').value=d.rolllen;
   if(d.rollmode&&$('rs-rollmode'))$('rs-rollmode').value=d.rollmode;
   if(d.price&&$('rs-price'))$('rs-price').value=d.price;
+  if($('rs-colors')){$('rs-colors').innerHTML='';(d.colors||[]).forEach(c=>rsAddColorRow(c));}
   if(d.maxsizes!=null)$('rs-maxsizes').value=d.maxsizes;
   if(d.maxpcs!=null)$('rs-maxpcs').value=d.maxpcs;
   if(d.objective&&$('rs-objective'))$('rs-objective').value=d.objective;
@@ -1702,7 +1713,7 @@ function rsSaveDraft(){if(!RS_LOADED||!MEMBER||!$('rs-qty-rows'))return;
     const draft={title:($('rs-title')?$('rs-title').value.trim():''),product:($('rs-product')?$('rs-product').value:''),
       unit:($('rs-unit')?$('rs-unit').value:'متر'),
       maxlen:+$('rs-maxlen').value||0,maxsizes:+$('rs-maxsizes').value||6,maxpcs:+$('rs-maxpcs').value||5,
-      objective:($('rs-objective')?$('rs-objective').value:'plies'),rolllen:+($('rs-rolllen')&&$('rs-rolllen').value)||0,rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,
+      objective:($('rs-objective')?$('rs-objective').value:'plies'),rolllen:+($('rs-rolllen')&&$('rs-rolllen').value)||0,rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,colors:rsColors(),
       qty:[...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0})).filter(x=>x.size),
       markers:rsReadMarkers().filter(m=>m.pairs.length||m.plies).map(m=>({pairs:m.pairs,plies:+m.plies||0}))};
     db.collection('qc_workspaces').doc(MEMBER.wsId).update({rishoDraft:draft}).catch(()=>{});
@@ -1821,10 +1832,21 @@ function rsApplyAdd(i,size){const tr1=[...document.querySelectorAll('.rs-mrow1')
   if(cntEls[slot])cntEls[slot].value=(+cntEls[slot].value||0)+1;
   rsMkCalc();rsSaveDraft();}
 // كل توليفات المقاسات ضمن الحدود (عدد قياسات ≤ maxsizes، مجموع قطع ≤ maxpcs)
-function rsCombos(sizes,maxsizes,maxpcs){const out=[];
-  const rec=(start,cur,pcs)=>{if(cur.length)out.push(cur.slice());if(cur.length>=maxsizes)return;
-    for(let i=start;i<sizes.length;i++)for(let c=1;pcs+c<=maxpcs;c++){cur.push({size:sizes[i],cnt:c});rec(i+1,cur,pcs+c);cur.pop();}};
-  rec(0,[],0);return out;}
+// يُقلَّم أثناء التوليد بحدّ الطول (لا بعده) وبحدّ أقصى لعدد التوليفات — لمنع الانفجار التوافقي
+// مع كثرة القياسات (كان يُنتج ملايين التوليفات ويُهدر الذاكرة قبل هذا التقليم)
+function rsCombos(sizes,maxsizes,maxpcs,cons,maxlen){const out=[];const CAP=150000;let full=false;
+  const rec=(start,cur,pcs,len)=>{
+    if(cur.length)out.push(cur.slice());
+    if(out.length>=CAP){full=true;return;}
+    if(cur.length>=maxsizes)return;
+    for(let i=start;i<sizes.length&&!full;i++){
+      const c0=cons?(cons[sizes[i]]||0):0;
+      for(let c=1;pcs+c<=maxpcs;c++){
+        const nlen=len+c*c0;
+        if(maxlen>0&&c0>0&&nlen>maxlen+1e-9)break; // كل c أكبر يزيد الطول أكثر، فلا فائدة من الاستمرار
+        cur.push({size:sizes[i],cnt:c});rec(i+1,cur,pcs+c,nlen);cur.pop();
+        if(full)break;}}};
+  rec(0,[],0,0);return out;}
 // المحرك الموحّد: تغطية جشعة تامة بلا زيادة. الاستهلاك ثابت (مجموع قطع×استهلاك) في كل الأهداف؛
 // «أقل طبقات» يملأ كل ماركر لأقرب ما يمكن من حدّ الطول (أكثر قطع/طبقة) فتقلّ الطبقات؛
 // «أقل ماركرات» يفضّل أكبر تغطية في الماركر الواحد فيقلّ عددها (طبقات أكثر).
@@ -1838,7 +1860,7 @@ function rsSolve(rem0,cons,maxlen,maxsizes,maxpcs){
   while(guard++<2000&&Date.now()-t0<3500){
     const active=Object.keys(work).filter(s=>work[s]>0&&cons[s]>0);if(!active.length)break;
     let best=null;
-    for(const combo of rsCombos(active,maxsizes,maxpcs)){
+    for(const combo of rsCombos(active,maxsizes,maxpcs,cons,maxlen)){
       const len=combo.reduce((a,p)=>a+p.cnt*cons[p.size],0);if(maxlen>0&&len>maxlen+1e-9)continue;
       const plies=Math.min(...combo.map(p=>Math.floor(work[p.size]/p.cnt)));if(plies<1)continue;
       const pcs=combo.reduce((a,p)=>a+p.cnt,0);const covered=plies*pcs;
@@ -1964,6 +1986,43 @@ function rsObjectiveChanged(){rsSaveDraft();
   added.sort((a,b)=>b.len-a.len);// ترتيب تنازلي حسب طول الماركر
   $('rs-markers').innerHTML='';added.forEach(a=>rsAddMarker({pairs:a.combo,plies:a.plies}));
   rsMkCalc();rsSaveDraft();}
+/* ---- توزيع الألوان (اختياري): يوزّع طبقات كل ماركر على الألوان حسب حصصها ---- */
+function rsAddColorRow(c){c=c||{};if(!$('rs-colors'))return;
+  const row=document.createElement('div');row.className='rs-color-row';row.style.cssText='display:flex;gap:6px;align-items:center';
+  row.innerHTML=`<input class="rsc-name" value="${esc(c.name||'')}" placeholder="${esc(t('rsColName'))}" style="flex:2;padding:6px;background:var(--inp)" oninput="rsMkCalc();rsSaveDraft()">
+    <input class="rsc-qty" type="number" min="0" value="${c.qty!=null?c.qty:''}" placeholder="${esc(t('rsColQty'))}" style="flex:1;max-width:120px;padding:6px;text-align:center;font-weight:700;background:var(--inp)" oninput="rsMkCalc();rsSaveDraft()">
+    <button type="button" class="mini r" onclick="this.closest('.rs-color-row').remove();rsMkCalc();rsSaveDraft()">✕</button>`;
+  $('rs-colors').appendChild(row);}
+function rsColors(){return [...document.querySelectorAll('.rs-color-row')].map(r=>({name:r.querySelector('.rsc-name').value.trim()||t('rsColUnnamed'),qty:+r.querySelector('.rsc-qty').value||0})).filter(c=>c.qty>0);}
+// توزيع P طبقة على الألوان حسب حصصها (أعداد صحيحة، مجموعها P — طريقة أكبر باقٍ)
+function rsDistribute(P,colors){const sum=colors.reduce((s,c)=>s+c.qty,0);if(sum<=0||P<=0)return colors.map(c=>({name:c.name,plies:0}));
+  const b=colors.map(c=>{const ex=P*c.qty/sum;return {name:c.name,plies:Math.floor(ex),rem:ex-Math.floor(ex)};});
+  let left=P-b.reduce((s,x)=>s+x.plies,0);const ord=[...b].sort((a,b2)=>b2.rem-a.rem);
+  for(let i=0;i<left;i++)ord[i%ord.length].plies++;
+  return b.map(x=>({name:x.name,plies:x.plies}));}
+// إجمالي لكل لون (طبقات/قطع/قماش) عبر كل الماركرات الصالحة
+function rsColorTotals(){const colors=rsColors();if(!colors.length)return null;
+  const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const per={};colors.forEach(c=>per[c.name]={plies:0,fab:0,pcs:0});
+  rsReadMarkers().forEach(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
+    if(!rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs))return;
+    const len=vp.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0),pcs=vp.reduce((a,p)=>a+p.cnt,0);
+    rsDistribute(plies,colors).forEach(d=>{if(per[d.name]){per[d.name].plies+=d.plies;per[d.name].fab+=d.plies*len;per[d.name].pcs+=d.plies*pcs;}});});
+  const totalQty=colors.reduce((s,c)=>s+c.qty,0);
+  return {colors,per,totalQty};}
+function rsColorsCalc(){const el=$('rs-colors-sum');if(!el)return;
+  const ct=rsColorTotals();if(!ct){el.innerHTML='';return;}
+  const uf=rsUF(),u=rsUL();const R=v=>Math.round(v*uf*100)/100;const roll=(+($('rs-rolllen')&&$('rs-rolllen').value)||0)/uf;
+  const totalReq=[...document.querySelectorAll('.rsq-row')].reduce((s,tr)=>s+(+tr.querySelector('.rsq-qty').value||0),0);
+  const warn=(totalReq>0&&ct.totalQty!==totalReq)?`<div style="flex:1 1 100%;font-size:12px;color:#8a6d00;background:#fff8e6;border:1px solid #f0dca0;border-radius:8px;padding:6px 10px">🟡 ${tf('rsColMismatch',{c:ct.totalQty,o:totalReq})}</div>`:'';
+  el.innerHTML=warn+ct.colors.map((c,i)=>{const p=ct.per[c.name];const rolls=roll>0?Math.ceil(Math.round(p.fab*100)/100/roll):0;
+    const bg=RS_COLORS[i%RS_COLORS.length];
+    return `<div style="flex:1 1 150px;min-width:150px;border:1px solid var(--line);border-radius:10px;overflow:hidden">
+      <div style="background:${bg};padding:6px 10px;font-weight:800;color:#1c2530">🎨 ${esc(c.name)}</div>
+      <div style="padding:8px 10px;font-size:12.5px;line-height:1.9;background:var(--card)">
+        <div>${t('rsColPcs')}: <b>${p.pcs}</b> · ${t('rsPlies')}: <b>${p.plies}</b></div>
+        <div>${t('mkTotalFabric')}: <b>${R(p.fab)} ${u}</b>${rolls?` · ${t('rsRollCount')}: <b>${rolls}</b>`:''}</div></div></div>`;}).join('');}
 function rsReadMarkers(){return [...document.querySelectorAll('.rs-mrow1')].map(tr1=>{
   const tr2=tr1.nextElementSibling;
   const ss=[...tr1.querySelectorAll('.rsp-size')].map(e=>e.value.trim());
@@ -2033,7 +2092,7 @@ function rsMkCalc(){if(!$('rs-markers'))return;const uf=rsUF();
   const price=+($('rs-price')&&$('rs-price').value)||0;const fabDisp=Math.round(tFab*uf*100)/100;
   const cost=price>0?Math.round(fabDisp*price*100)/100:0,pieceCost=(price>0&&prodAll>0)?Math.round(cost/prodAll*100)/100:0;
   rsRenderSummary({totalReq,prod:prodAll,rem:totalReq-prodAll,valid:RS_VALIDN,fab:fabDisp,ready:totalReq>0&&prodAll===totalReq,price,cost,pieceCost});
-  rsRollPlan();
+  rsRollPlan();rsColorsCalc();
   rsSaveDraft();}
 function rsRenderSummary(d){const el=$('rs-summary');if(!el)return;
   const c=(l,v,col)=>`<div style="flex:1 1 150px;display:flex;border:1px solid #d8c27a;border-radius:8px;overflow:hidden;min-width:140px">
@@ -2136,13 +2195,15 @@ function printRsSpread(){const r=rsResult();if(!r)return toast(t('mkNeed'));
   const mk=(r.markers||[]).filter(m=>m.ok);if(!mk.length)return toast(t('rsNoValidMk'));
   const uf=r.uf||1,u=r.unit||'متر';const R=v=>Math.round(v*uf*100)/100;
   const title=$('rs-title')?$('rs-title').value.trim():'';
+  const colors=rsColors();
+  const clrBreak=m=>colors.length?`<div style="margin-top:4px;font-size:10.5px;color:#44515e;line-height:1.6">${rsDistribute(m.plies,colors).map(d=>`${esc(d.name)} <b>${d.plies}</b>`).join(' · ')}</div>`:'';
   const totPlies=mk.reduce((s,m)=>s+m.plies,0),totRun=mk.reduce((s,m)=>s+m.run,0),totFab=mk.reduce((s,m)=>s+m.fab,0);
   const th=(txt,al)=>`<th style="padding:9px 8px;text-align:${al||'center'};font-weight:800;font-size:12.5px;color:#0e3f3e;border-bottom:2px solid #14504f;white-space:nowrap">${txt}</th>`;
   const rows=mk.map((m,i)=>`<tr style="background:${i%2?'#f6faf9':'#fff'}">
     <td style="text-align:center;color:#9aa7b4;font-weight:800;font-size:12px;padding:9px 6px">${i+1}</td>
     <td style="text-align:center;padding:9px 6px"><span style="display:inline-block;background:#14504f;color:#fff;font-weight:800;font-size:14px;padding:4px 11px;border-radius:8px;letter-spacing:.5px">${esc(m.code)}</span></td>
     <td style="padding:9px 8px;line-height:2">${m.pairs.map(p=>`<span style="display:inline-block;background:#fff;border:1.5px solid #cfe0df;border-radius:999px;padding:3px 11px;margin:2px 3px;font-weight:800;font-size:13px;white-space:nowrap">${esc(p.size)} <span style="color:#1f6e6e">×${p.cnt}</span></span>`).join('')}</td>
-    <td style="text-align:center;padding:9px 6px"><span style="display:inline-block;min-width:32px;background:#eef5f4;border:1px solid #bcd4d2;border-radius:8px;padding:4px 9px;font-weight:800;font-size:17px;color:#14504f">${m.plies}</span></td>
+    <td style="text-align:center;padding:9px 6px"><span style="display:inline-block;min-width:32px;background:#eef5f4;border:1px solid #bcd4d2;border-radius:8px;padding:4px 9px;font-weight:800;font-size:17px;color:#14504f">${m.plies}</span>${clrBreak(m)}</td>
     <td style="text-align:center;padding:9px 6px;font-weight:700;font-size:13px;white-space:nowrap">${R(m.len)} <span style="color:#93a0ab;font-size:11px">${u}</span></td>
     <td style="text-align:center;padding:9px 6px;font-weight:800;font-size:15px">${m.run}</td>
     <td style="text-align:center;padding:9px 6px;color:#c3ccd4;font-size:19px">☐</td>
