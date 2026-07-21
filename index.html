@@ -355,20 +355,20 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div style="overflow-x:auto;margin-top:16px">
           <div style="background:#f0a13c;color:#1c1c1c;font-weight:800;font-size:14px;padding:8px;border-radius:8px 8px 0 0;display:flex;align-items:center;gap:10px">
             <button type="button" class="mini-toggle rso-cv" onclick="rsCollapse('rso')" title="تصغير/تكبير">–</button>
-            <span data-i18n="rsRollTbl">📦 خطة الأثواب (توزيع الرولات)</span></div>
+            <span data-i18n="rsRollTbl">📦 خطة الرولات</span></div>
           <div class="rso-hide" style="border:1px solid var(--line);border-top:none;padding:12px;border-radius:0 0 8px 8px;background:var(--card)">
-            <label class="inl rsu-h" data-b="طول الثوب" style="display:inline;font-size:13px">طول الثوب (متر)</label>
+            <label class="inl rsu-h" data-b="طول الرول" style="display:inline;font-size:13px">طول الرول (متر)</label>
             <input id="rs-rolllen" type="number" step="0.01" min="0" value="100" oninput="rsRollPlan();rsSaveDraft()" style="max-width:130px;padding:6px;margin-inline-start:8px;background:var(--inp)">
             <label class="inl" data-i18n="rsRollMode" style="display:inline;font-size:13px;margin-inline-start:14px">طريقة الفرد</label>
             <select id="rs-rollmode" onchange="rsRollPlan();rsSaveDraft()" style="padding:6px;font-weight:700;margin-inline-start:8px;background:var(--inp)">
-              <option value="nosplice" data-i18n="rsRollNoSplice">بلا وصل — كل طبقة من ثوب واحد</option>
+              <option value="nosplice" data-i18n="rsRollNoSplice">بلا وصل — كل طبقة من رول واحد</option>
               <option value="salvage" data-i18n="rsRollSalvage">بلا وصل + استغلال البواقي بقياسات صغيرة</option>
-              <option value="continuous" data-i18n="rsRollCont">متصل بوصل الأثواب — أقل هدر</option></select>
+              <option value="continuous" data-i18n="rsRollCont">متصل بوصل الرولات — أقل هدر</option></select>
             <div id="rs-rolls" style="margin-top:12px"></div></div></div>
         <div class="row-btns" style="margin-top:14px"><button class="btn sec" onclick="saveRsPlan()" data-i18n="saveCheck">💾 حفظ</button>
         <button class="btn sec" onclick="printRsPlan()" data-i18n="rsPrint">🖨 طباعة الخطة</button>
         <button class="btn sec" onclick="printRsSpread()" data-i18n="rsSpreadBtn">🧵 أمر الفرد</button>
-        <button class="btn sec" onclick="printRsRolls()" data-i18n="rsRollBtn">📦 أمر الأثواب</button>
+        <button class="btn sec" onclick="printRsRolls()" data-i18n="rsRollBtn">📦 أمر الرولات</button>
         <button class="btn sec" onclick="exportRsExcel()" data-i18n="rsExcelBtn">📊 تصدير Excel</button></div>
       </div>
     </div>
@@ -493,8 +493,8 @@ rsClearMkBtn:'امسح الماركرات',rsClearMkQ:'حذف كل المارك�
 rsSugTbl:'اقتراحات تغطية باقي كمية الأوردر (أقل استهلاك)',rsSugPliesC:'الطبقات المقترحة',rsEditPliesC:'تعديل الطبقات يدويًا (اختياري)',rsRemWithRun:'إجمالي المتبقي مع التشغيل',rsApplyAll:'✔ اعتماد كل الاقتراحات كماركر',rsSugEmpty:'لا كميات متبقية — الاقتراحات فارغة',
 rsSpreadBtn:'🧵 أمر الفرد',rsSpreadTitle:'أمر الفرد (تشغيل الفرشات)',rsMkLenH:'طول الماركر',rsNoValidMk:'لا ماركرات صالحة للفرد',
 rsSpreadJobs:'عدد الماركرات',rsSpreadDone:'تم الفرد',rsFarradSig:'توقيع الفرّاد',rsCutSupSig:'مشرف القص',rsSpreadHint:'ملاحظة: افرد كل ماركر بعدد الطبقات المذكور — راجع طول الماركر قبل القص',
-rsRollTbl:'📦 خطة الأثواب (توزيع الرولات)',rsRollTitle:'أمر الأثواب (توزيع الرولات)',rsRollBtn:'📦 أمر الأثواب',rsRollNo:'ثوب',rsRollNo2:'رقم الثوب',rsRollLenLbl:'طول الثوب',rsStoreKeeper:'أمين المخزن',rsRollNeedLen:'أدخل طول الثوب لحساب توزيع الأثواب',rsRollNoMk:'لا ماركرات صالحة بعد — أكمل الخطة أولاً',rsRollTooShort:'طول الثوب أقصر من أطول ماركر ({n}) — زِد طول الثوب',rsRollCount:'عدد الأثواب المطلوبة',rsRollTotalLen:'إجمالي طول الأثواب',rsRollWaste:'الهدر (بواقي الأثواب)',rsRollEff:'كفاءة الاستخدام',rsRollPlies:'الطبقات المفرودة (ماركر×عدد)',rsRollUsed:'الطول المستخدم',rsRollRem:'الباقي',rsExcelBtn:'📊 تصدير Excel',
-rsRollMode:'طريقة الفرد',rsRollNoSplice:'بلا وصل — كل طبقة من ثوب واحد',rsRollCont:'متصل بوصل الأثواب — أقل هدر',rsRollSalvage:'بلا وصل + استغلال البواقي بقياسات صغيرة',rsRollSplices:'عدد الوصلات',rsRollTip:'الفرد المتصل يوفّر: {n} ثوب فقط · هدر {l} · كفاءة {e}% (تحدث وصلة عند نهاية الثوب)',rsRollExtra:'قطع من البواقي تُغطّي الأوردر: {n} قطعة ({l} مستغَلة من الهدر)',
+rsRollTbl:'📦 خطة الرولات',rsRollTitle:'أمر الرولات',rsRollBtn:'📦 أمر الرولات',rsRollNo:'رول',rsRollNo2:'رقم الرول',rsRollLenLbl:'طول الرول',rsStoreKeeper:'أمين المخزن',rsRollNeedLen:'أدخل طول الرول لحساب التوزيع',rsRollNoMk:'لا ماركرات صالحة بعد — أكمل الخطة أولاً',rsRollTooShort:'طول الرول أقصر من أطول ماركر ({n}) — زِد طول الرول',rsRollCount:'عدد الرولات المطلوبة',rsRollTotalLen:'إجمالي طول الرولات',rsRollWaste:'الهدر (بواقي الرولات)',rsRollEff:'كفاءة الاستخدام',rsRollPlies:'الطبقات المفرودة (ماركر×عدد)',rsRollUsed:'الطول المستخدم',rsRollRem:'الباقي',rsExcelBtn:'📊 تصدير Excel',
+rsRollMode:'طريقة الفرد',rsRollNoSplice:'بلا وصل — كل طبقة من رول واحد',rsRollCont:'متصل بوصل الرولات — أقل هدر',rsRollSalvage:'بلا وصل + استغلال البواقي بقياسات صغيرة',rsRollSplices:'عدد الوصلات',rsRollTip:'الفرد المتصل يوفّر: {n} رول فقط · هدر {l} · كفاءة {e}% (تحدث وصلة عند نهاية الرول)',rsRollExtra:'قطع من البواقي تُغطّي الأوردر: {n} قطعة ({l} مستغَلة من الهدر)',
 rsCompareBtn:'⚖️ مقارنة السيناريوهات',rsCompareTitle:'مقارنة سيناريوهات الريشو',rsCmpPick:'اختر خطتين أو أكثر للمقارنة',rsCmpNeed2:'اختر خطتين على الأقل للمقارنة',rsCmpNone:'لا خطط ريشو محفوظة للمقارنة',rsCmpMetric:'المؤشر',rsCmpMarkers:'عدد الماركرات الصالحة',rsCmpBest:'الأفضل',rsCmpWaste:'الهدر مقابل الأقل',rsCmpDate:'التاريخ',rsCmpDo:'قارن',rsCmpPrint:'🖨 طباعة المقارنة',
 rsLenTip:'لتلائم الطول: ',rsLenReduce:'قلّل {s} بمقدار {n} قطعة',rsLenRemove:'احذف {s}',rsAddFit:'يمكن إضافة {s} (يتبقّى {r})',rsAddApply:'اضغط لإضافة هذا القياس إلى الماركر',
 st_ok:'صالح',st_empty:'فارغ',st_dup:'غير صالح: مقاس مكرر',st_badqty:'غير صالح: كمية غير صحيحة',st_maxpcs:'غير صالح: تجاوز أقصى قطع',st_maxsizes:'غير صالح: تجاوز عدد القياسات',st_len:'غير صالح: تجاوز حد الطول',st_plies:'غير صالح: عدد الطبقات غير صحيح',st_nosize:'غير صالح: كمية بلا مقاس',
