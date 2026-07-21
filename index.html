@@ -351,7 +351,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <button type="button" class="btn g" style="padding:6px 14px" onclick="rsAutoPlan()">⚡ <span data-i18n="rsAutoBtn">أكمل الخطة تلقائياً (أقل استهلاك)</span></button>
           <button type="button" class="mini g" onclick="rsReducePlies()" title="تكرار القياسات لتقليل الطبقات دون تغيير القماش أو الكمية">🔽 <span data-i18n="rsReducePliesBtn">قلّل الطبقات</span></button>
           <button type="button" class="mini g" onclick="rsSortMarkers()" title="ترتيب الماركرات من الأكبر إلى الأصغر حسب طول الماركر (استهلاك الماركر/طبقة)">↓ <span data-i18n="rsSortBtn">ترتيب حسب الطول</span></button>
-          <button type="button" class="mini r" onclick="rsClearMarkers()" title="حذف كل الماركرات للبدء من جديد (استخدم بعدها: أكمل الخطة تلقائياً)">🧹 <span data-i18n="rsClearMkBtn">امسح الماركرات</span></button></div>
+          <button type="button" class="mini r" onclick="rsClearMarkers()" title="حذف كل الماركرات للبدء من جديد (استخدم بعدها: أكمل الخطة تلقائياً)">🧹 <span data-i18n="rsClearMkBtn">امسح الماركرات</span></button>
+          <button type="button" class="btn sec" style="padding:6px 14px" onclick="rsCalibrateOpen()" title="يحسب القيمة الصحيحة لاستهلاك كل مقاس من الأطوال الفعلية المُدخَلة على عدة ماركرات — يحدّد المقاسات ذات القيمة الخاطئة بدقة">🧮 <span data-i18n="rsCalibBtn">معايرة استهلاك القياسات</span></button></div>
         <div style="overflow-x:auto;margin-top:12px"><table class="xtbl" style="min-width:560px">
           <tr><th colspan="7" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsr-cv" onclick="rsCollapse('rsr')" title="تصغير/تكبير">–</button><span data-i18n="rsReviewTbl">مراجعة الناتج حسب المقاس</span></span></th></tr>
           <tr class="rsr-hide"><th data-i18n="sizeName">القياس</th><th class="or" data-i18n="mkQtyOrder">المطلوب</th><th data-i18n="rsProdFromMk">إجمالي القطع من الماركر</th><th class="or" data-i18n="rsRemFromOrder">المتبقي من الأوردر</th><th data-i18n="mkStateCol">الحالة</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th class="or rsu-h" data-b="إجمالي استهلاك الأوردر">إجمالي استهلاك الأوردر (متر)</th></tr>
@@ -494,6 +495,7 @@ rsTitle:'الريشو',rsQtyTbl2:'الكميات المطلوبة والاسته
 rsMkTbl:'القياسات والكميات داخل الماركر',rsCode:'الكود',rsDesc:'البيان',rsSizesRow:'المقاسات',rsQtyRow:'الكميات',
 rsPcsLbl:'إجمالي القطع في الماركر',rsPlies:'عدد الطبقات',rsPcsRun:'إجمالي القطع في التشغيل',rsMkStatus:'حالة الماركر وسبب عدم الصلاحية',
 rsMkPerPly:'استهلاك الماركر/طبقة (متر)',rsSumFab:'إجمالي استهلاك التشغيل (متر)',rsAddMarker:'إضافة ماركر',rsActLen:'الطول الفعلي (اختياري)',
+rsCalibBtn:'معايرة استهلاك القياسات',rsCalibTitle:'معايرة استهلاك القياسات',rsCalibNeed2:'أدخل الطول الفعلي لماركرين على الأقل (بمقاسات متنوعة) لحساب المعايرة',rsCalibNoSizes:'لا مقاسات مشتركة كافية بين الماركرات المُدخَل لها طول فعلي',rsCalibInfo:'محسوبة من {n} ماركر (بطول فعلي مُدخَل) تغطّي {s} مقاساً',rsCalibRmseBefore:'خطأ التقدير الحالي',rsCalibRmseAfter:'خطأ التقدير بعد المعايرة',rsCalibImprove:'نسبة التحسّن',rsCalibCurrent:'القيمة الحالية',rsCalibSuggested:'القيمة المصحَّحة',rsCalibDelta:'الفرق',rsCalibCoverage:'عدد الماركرات',rsCalibCovTip:'عدد الماركرات (بطول فعلي مُدخَل) التي استُخدمت لحساب قيمة هذا المقاس — كلما زاد ازدادت الثقة بالتصحيح',rsCalibNote:'💡 المقاسات ذات التغطية المنخفضة (ماركر واحد) قد تحتاج مزيداً من الأطوال الفعلية لتأكيد التصحيح. المقاسات غير الظاهرة هنا لم تُصحَّح (لا بيانات كافية عنها).',rsCalibApply:'تطبيق القيم المصحَّحة',
 rsMaxLen:'حد طول الماركر (متر)',rsMaxSizes:'أقصى عدد قياسات في الماركر',rsMaxPcs:'أقصى عدد قطع في الماركر',
 rsObjective:'هدف تحسين الاقتراح التلقائي',rsObjPlies:'⬇️ أقل عدد طبقات (ماركرات أقرب للطول)',rsObjMarkers:'⬇️ أقل عدد ماركرات',
 rsPrint:'🖨 طباعة الخطة',rsPlanState:'حالة الخطة',rsReady:'مطابقة وجاهزة',rsReview:'تحتاج مراجعة',rsRemaining:'المتبقي',rsTotalProd:'إجمالي المنتَج',
@@ -645,6 +647,7 @@ rsTitle:'Ratio',rsQtyTbl2:'Required quantities & consumption by size',rsRatio:'R
 rsMkTbl:'Sizes & quantities per marker',rsCode:'Code',rsDesc:'Item',rsSizesRow:'Sizes',rsQtyRow:'Quantities',
 rsPcsLbl:'Total pieces per marker',rsPlies:'Plies',rsPcsRun:'Total run pieces',rsMkStatus:'Marker status & invalid reason',
 rsMkPerPly:'Marker cons/ply (m)',rsSumFab:'Total run consumption (m)',rsAddMarker:'Add marker',rsActLen:'Actual measured length (optional)',
+rsCalibBtn:'Calibrate size consumption',rsCalibTitle:'Size consumption calibration',rsCalibNeed2:'Enter the actual length for at least 2 markers (with varied sizes) to calibrate',rsCalibNoSizes:'Not enough shared sizes between the markers with an actual length entered',rsCalibInfo:'Computed from {n} markers (with actual length entered) covering {s} sizes',rsCalibRmseBefore:'Current estimate error',rsCalibRmseAfter:'Error after calibration',rsCalibImprove:'Improvement',rsCalibCurrent:'Current value',rsCalibSuggested:'Corrected value',rsCalibDelta:'Delta',rsCalibCoverage:'Markers used',rsCalibCovTip:'How many actual-length markers were used to compute this size — more means higher confidence in the correction',rsCalibNote:'💡 Low-coverage sizes (one marker) may need more actual-length entries to confirm the correction. Sizes not listed here were not adjusted (insufficient data).',rsCalibApply:'Apply corrected values',
 rsMaxLen:'Marker length limit (m)',rsMaxSizes:'Max sizes per marker',rsMaxPcs:'Max pieces per marker',
 rsObjective:'Auto-suggest optimization goal',rsObjPlies:'⬇️ Fewest plies (fuller markers)',rsObjMarkers:'⬇️ Fewest markers',
 rsPrint:'🖨 Print plan',rsPlanState:'Plan status',rsReady:'Matched & ready',rsReview:'Needs review',rsRemaining:'Remaining',rsTotalProd:'Total produced',
@@ -2058,6 +2061,78 @@ function rsReadMarkers(){return [...document.querySelectorAll('.rs-mrow1')].map(
   return {pairs,plies:tr1.querySelector('.rsm-plies').value,actlen:al?(+al.value||0):0};});}
 // الطول الفعّال للماركر: الطول الفعلي المُدخَل (مقاس على الطاولة) إن وُجد، وإلا الحساب النظري من استهلاك القياسات
 function rsEffLen(calcLen,actlen){return (actlen&&actlen>0)?actlen:calcLen;}
+/* ---- معايرة استهلاك القياسات: تحسب القيمة الصحيحة لكل مقاس من الأطوال الفعلية المُدخَلة على عدة ماركرات ----
+   المعادلة لكل ماركر: مجموع(عدد القطعة × استهلاكها) ≈ الطول الفعلي المقاس. بعدة ماركرات بمقاسات مختلطة
+   نحل نظام معادلات (مربعات صغرى + تنعيم Ridge نحو القيمة الحالية) فنستخرج القيمة الصحيحة لكل مقاس على حدة،
+   بدل التخمين — ونحدد أي مقاس بالضبط يحمل الخطأ وبأي مقدار. */
+function rsGaussSolve(Ain,bin){const n=bin.length;const A=Ain.map(r=>r.slice());const b=bin.slice();
+  for(let c=0;c<n;c++){let piv=c;for(let r=c+1;r<n;r++)if(Math.abs(A[r][c])>Math.abs(A[piv][c]))piv=r;
+    if(Math.abs(A[piv][c])<1e-12)continue;
+    if(piv!==c){[A[c],A[piv]]=[A[piv],A[c]];[b[c],b[piv]]=[b[piv],b[c]];}
+    for(let r=0;r<n;r++){if(r===c)continue;const f=A[r][c]/A[c][c];if(!f)continue;
+      for(let k=c;k<n;k++)A[r][k]-=f*A[c][k];b[r]-=f*b[c];}}
+  return A.map((row,i)=>Math.abs(row[i])>1e-9?b[i]/row[i]:0);}
+function rsCalibGather(){const uf=rsUF();
+  return rsReadMarkers().map(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);
+    if(!m.actlen||m.actlen<=0||!vp.length)return null;
+    if(vp.some(p=>!(p.cnt>0)||p.cnt%1!==0))return null;
+    if(new Set(vp.map(p=>p.size)).size<vp.length)return null;
+    return {counts:vp.reduce((o,p)=>(o[p.size]=p.cnt,o),{}),actLen:m.actlen/uf};}).filter(Boolean);}
+function rsCalibrate(){const rows=rsCalibGather();if(rows.length<2)return {err:'need2'};
+  const c0map={};rsAllSizes().forEach(x=>c0map[x.size]=x.cons);
+  const sizes=[...new Set(rows.flatMap(r=>Object.keys(r.counts)))].filter(s=>c0map[s]!=null);
+  if(!sizes.length)return {err:'nosizes'};
+  const S=sizes.length,M=rows.length;
+  const A=rows.map(r=>sizes.map(s=>r.counts[s]||0));
+  const b=rows.map(r=>r.actLen);
+  const c0=sizes.map(s=>c0map[s]||0);
+  // AᵀA + λI ، Aᵀb + λc0 — تنعيم Ridge يثبّت الحل عند نقص البيانات لمقاس معيّن (يبقيه قريباً من قيمته الحالية)
+  const AtA=Array.from({length:S},()=>Array(S).fill(0));const Atb=Array(S).fill(0);
+  for(let i=0;i<M;i++)for(let a=0;a<S;a++){Atb[a]+=A[i][a]*b[i];for(let c=0;c<S;c++)AtA[a][c]+=A[i][a]*A[i][c];}
+  let diagSum=0;for(let a=0;a<S;a++)diagSum+=AtA[a][a];const lambda=Math.max(0.01,0.01*(diagSum/S||1));
+  const M2=AtA.map((row,a)=>row.map((v,c)=>v+(a===c?lambda:0)));
+  const v2=Atb.map((v,a)=>v+lambda*c0[a]);
+  const c=rsGaussSolve(M2,v2);
+  const coverage=sizes.map(s=>rows.filter(r=>r.counts[s]).length);
+  const sqErr=(cv)=>rows.reduce((s,r)=>{const p=sizes.reduce((a,sz,i)=>a+(r.counts[sz]||0)*cv[i],0);return s+(p-r.actLen)**2;},0);
+  const before=Math.sqrt(sqErr(c0)/M),after=Math.sqrt(sqErr(c)/M);
+  const result=sizes.map((s,i)=>({size:s,current:c0[i],suggested:Math.max(0,Math.round(c[i]*10000)/10000),coverage:coverage[i]}))
+    .sort((a,b2)=>Math.abs(b2.suggested-b2.current)-Math.abs(a.suggested-a.current));
+  return {rows:M,sizes:S,result,rmseBefore:Math.round(before*1000)/1000,rmseAfter:Math.round(after*1000)/1000};}
+function rsCalibrateOpen(){const r=rsCalibrate();
+  if(r.err==='need2')return toast(t('rsCalibNeed2'));
+  if(r.err==='nosizes')return toast(t('rsCalibNoSizes'));
+  const u=rsUL();
+  const rows=r.result.map(x=>{const d=Math.round((x.suggested-x.current)*10000)/10000;const big=Math.abs(d)>0.05;
+    return `<tr><td style="font-weight:800">${esc(x.size)}</td><td>${x.current}</td>
+      <td style="font-weight:800;color:${big?'#c00000':'#1e7e40'}">${x.suggested}</td>
+      <td style="font-weight:700;color:${big?'#c00000':'#1e7e40'}">${d>=0?'+':''}${d}</td>
+      <td style="color:var(--mut)">${x.coverage}</td></tr>`;}).join('');
+  const improved=r.rmseBefore>0?Math.round((1-r.rmseAfter/r.rmseBefore)*100):0;
+  modal(`<h3>🧮 ${t('rsCalibTitle')}</h3>
+    <div class="note" style="margin-bottom:10px">${tf('rsCalibInfo',{n:r.rows,s:r.sizes})}</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+      <div style="flex:1;min-width:120px;border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center">
+        <div style="font-size:11px;color:var(--mut)">${t('rsCalibRmseBefore')}</div><div style="font-weight:800;color:#c00000">${r.rmseBefore} ${u}</div></div>
+      <div style="flex:1;min-width:120px;border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center">
+        <div style="font-size:11px;color:var(--mut)">${t('rsCalibRmseAfter')}</div><div style="font-weight:800;color:#1e7e40">${r.rmseAfter} ${u}</div></div>
+      <div style="flex:1;min-width:120px;border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center">
+        <div style="font-size:11px;color:var(--mut)">${t('rsCalibImprove')}</div><div style="font-weight:800;color:#1e7e40">${improved}%</div></div></div>
+    <div style="overflow-x:auto"><table class="xtbl" style="min-width:420px">
+      <tr><th data-i18n="sizeName">المقاس</th><th>${t('rsCalibCurrent')}</th><th>${t('rsCalibSuggested')}</th><th>${t('rsCalibDelta')}</th><th title="${esc(t('rsCalibCovTip'))}">${t('rsCalibCoverage')}</th></tr>
+      ${rows}</table></div>
+    <div class="note" style="margin-top:8px">${t('rsCalibNote')}</div>
+    <div class="row-btns" style="margin-top:12px"><button class="btn" onclick="rsCalibrateApply()">✔ ${t('rsCalibApply')}</button>
+    <button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);
+  window._rsCalib=r;}
+function rsCalibrateApply(){const r=window._rsCalib;if(!r)return;
+  const prod=$('rs-product')?$('rs-product').value:'';
+  document.querySelectorAll('.rsq-row').forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();
+    const hit=r.result.find(x=>x.size===s);if(hit)tr.querySelector('.rsq-cons').value=hit.suggested;});
+  if(prod&&sizeList(prod).length){
+    const nl=sizeList(prod).map(sz=>{const hit=r.result.find(x=>x.size===sz.size);return hit?{...sz,cons:hit.suggested}:sz;});
+    setProdSizes(prod,nl).catch(()=>{});}
+  rsCalc();closeModal();toast(t('saved'));}
 function rsMkCalc(){if(!$('rs-markers'))return;const uf=rsUF();
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
