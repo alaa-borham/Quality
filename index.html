@@ -362,6 +362,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
             <label class="inl" data-i18n="rsRollMode" style="display:inline;font-size:13px;margin-inline-start:14px">طريقة الفرد</label>
             <select id="rs-rollmode" onchange="rsRollPlan();rsSaveDraft()" style="padding:6px;font-weight:700;margin-inline-start:8px;background:var(--inp)">
               <option value="nosplice" data-i18n="rsRollNoSplice">بلا وصل — كل طبقة من ثوب واحد</option>
+              <option value="salvage" data-i18n="rsRollSalvage">بلا وصل + استغلال البواقي بقياسات صغيرة</option>
               <option value="continuous" data-i18n="rsRollCont">متصل بوصل الأثواب — أقل هدر</option></select>
             <div id="rs-rolls" style="margin-top:12px"></div></div></div>
         <div class="row-btns" style="margin-top:14px"><button class="btn sec" onclick="saveRsPlan()" data-i18n="saveCheck">💾 حفظ</button>
@@ -493,7 +494,7 @@ rsSugTbl:'اقتراحات تغطية باقي كمية الأوردر (أقل �
 rsSpreadBtn:'🧵 أمر الفرد',rsSpreadTitle:'أمر الفرد (تشغيل الفرشات)',rsMkLenH:'طول الماركر',rsNoValidMk:'لا ماركرات صالحة للفرد',
 rsSpreadJobs:'عدد الماركرات',rsSpreadDone:'تم الفرد',rsFarradSig:'توقيع الفرّاد',rsCutSupSig:'مشرف القص',rsSpreadHint:'ملاحظة: افرد كل ماركر بعدد الطبقات المذكور — راجع طول الماركر قبل القص',
 rsRollTbl:'📦 خطة الأثواب (توزيع الرولات)',rsRollTitle:'أمر الأثواب (توزيع الرولات)',rsRollBtn:'📦 أمر الأثواب',rsRollNo:'ثوب',rsRollNo2:'رقم الثوب',rsRollLenLbl:'طول الثوب',rsStoreKeeper:'أمين المخزن',rsRollNeedLen:'أدخل طول الثوب لحساب توزيع الأثواب',rsRollNoMk:'لا ماركرات صالحة بعد — أكمل الخطة أولاً',rsRollTooShort:'طول الثوب أقصر من أطول ماركر ({n}) — زِد طول الثوب',rsRollCount:'عدد الأثواب المطلوبة',rsRollTotalLen:'إجمالي طول الأثواب',rsRollWaste:'الهدر (بواقي الأثواب)',rsRollEff:'كفاءة الاستخدام',rsRollPlies:'الطبقات المفرودة (ماركر×عدد)',rsRollUsed:'الطول المستخدم',rsRollRem:'الباقي',rsExcelBtn:'📊 تصدير Excel',
-rsRollMode:'طريقة الفرد',rsRollNoSplice:'بلا وصل — كل طبقة من ثوب واحد',rsRollCont:'متصل بوصل الأثواب — أقل هدر',rsRollSplices:'عدد الوصلات',rsRollTip:'الفرد المتصل يوفّر: {n} ثوب فقط · هدر {l} · كفاءة {e}% (تحدث وصلة عند نهاية الثوب)',
+rsRollMode:'طريقة الفرد',rsRollNoSplice:'بلا وصل — كل طبقة من ثوب واحد',rsRollCont:'متصل بوصل الأثواب — أقل هدر',rsRollSalvage:'بلا وصل + استغلال البواقي بقياسات صغيرة',rsRollSplices:'عدد الوصلات',rsRollTip:'الفرد المتصل يوفّر: {n} ثوب فقط · هدر {l} · كفاءة {e}% (تحدث وصلة عند نهاية الثوب)',rsRollExtra:'قطع إضافية من البواقي: {n} قطعة ({l} مستغَلة من الهدر)',
 rsCompareBtn:'⚖️ مقارنة السيناريوهات',rsCompareTitle:'مقارنة سيناريوهات الريشو',rsCmpPick:'اختر خطتين أو أكثر للمقارنة',rsCmpNeed2:'اختر خطتين على الأقل للمقارنة',rsCmpNone:'لا خطط ريشو محفوظة للمقارنة',rsCmpMetric:'المؤشر',rsCmpMarkers:'عدد الماركرات الصالحة',rsCmpBest:'الأفضل',rsCmpWaste:'الهدر مقابل الأقل',rsCmpDate:'التاريخ',rsCmpDo:'قارن',rsCmpPrint:'🖨 طباعة المقارنة',
 rsLenTip:'لتلائم الطول: ',rsLenReduce:'قلّل {s} بمقدار {n} قطعة',rsLenRemove:'احذف {s}',rsAddFit:'يمكن إضافة {s} (يتبقّى {r})',rsAddApply:'اضغط لإضافة هذا القياس إلى الماركر',
 st_ok:'صالح',st_empty:'فارغ',st_dup:'غير صالح: مقاس مكرر',st_badqty:'غير صالح: كمية غير صحيحة',st_maxpcs:'غير صالح: تجاوز أقصى قطع',st_maxsizes:'غير صالح: تجاوز عدد القياسات',st_len:'غير صالح: تجاوز حد الطول',st_plies:'غير صالح: عدد الطبقات غير صحيح',st_nosize:'غير صالح: كمية بلا مقاس',
@@ -641,7 +642,7 @@ rsSugTbl:'Suggestions to cover the remaining order (least consumption)',rsSugPli
 rsSpreadBtn:'🧵 Spreading order',rsSpreadTitle:'Spreading order',rsMkLenH:'Marker length',rsNoValidMk:'No valid markers to spread',
 rsSpreadJobs:'Markers',rsSpreadDone:'Spread done',rsFarradSig:'Spreader signature',rsCutSupSig:'Cutting supervisor',rsSpreadHint:'Note: spread each marker for the stated ply count — verify marker length before cutting',
 rsRollTbl:'📦 Fabric roll plan',rsRollTitle:'Roll pull order',rsRollBtn:'📦 Roll order',rsRollNo:'Roll',rsRollNo2:'Roll #',rsRollLenLbl:'Roll length',rsStoreKeeper:'Store keeper',rsRollNeedLen:'Enter roll length to compute allocation',rsRollNoMk:'No valid markers yet — complete the plan first',rsRollTooShort:'Roll shorter than the longest marker ({n}) — increase roll length',rsRollCount:'Rolls needed',rsRollTotalLen:'Total roll length',rsRollWaste:'End-loss (remnants)',rsRollEff:'Utilization',rsRollPlies:'Plies laid (marker×count)',rsRollUsed:'Used length',rsRollRem:'Remnant',rsExcelBtn:'📊 Export Excel',
-rsRollMode:'Spreading method',rsRollNoSplice:'No splice — each ply from one roll',rsRollCont:'Continuous (spliced) — least waste',rsRollSplices:'Splices',rsRollTip:'Continuous spreading saves: only {n} rolls · {l} loss · {e}% utilization (a splice occurs at each roll end)',
+rsRollMode:'Spreading method',rsRollNoSplice:'No splice — each ply from one roll',rsRollCont:'Continuous (spliced) — least waste',rsRollSalvage:'No splice + salvage remnants with small sizes',rsRollSplices:'Splices',rsRollTip:'Continuous spreading saves: only {n} rolls · {l} loss · {e}% utilization (a splice occurs at each roll end)',rsRollExtra:'Extra pieces from remnants: {n} pcs ({l} salvaged from waste)',
 rsCompareBtn:'⚖️ Compare scenarios',rsCompareTitle:'Compare ratio scenarios',rsCmpPick:'Pick two or more plans to compare',rsCmpNeed2:'Select at least two plans to compare',rsCmpNone:'No saved ratio plans to compare',rsCmpMetric:'Metric',rsCmpMarkers:'Valid markers',rsCmpBest:'Best',rsCmpWaste:'Waste vs best',rsCmpDate:'Date',rsCmpDo:'Compare',rsCmpPrint:'🖨 Print comparison',
 rsLenTip:'To fit length: ',rsLenReduce:'Reduce {s} by {n} pcs',rsLenRemove:'Remove {s}',rsAddFit:'Can add {s} ({r} left)',rsAddApply:'Click to add this size to the marker',
 st_ok:'valid',st_empty:'empty',st_dup:'invalid: duplicate size',st_badqty:'invalid: bad quantity',st_maxpcs:'invalid: exceeds max pieces',st_maxsizes:'invalid: exceeds max sizes',st_len:'invalid: exceeds length limit',st_plies:'invalid: bad ply count',st_nosize:'invalid: quantity without size',
@@ -2188,9 +2189,23 @@ function rsRollCompute(){
       if(!r){r={rem:roll,used:0,plies:0,by:{},spl:0};rolls.push(r);}
       r.rem=rnd(r.rem-d.len);r.used=rnd(r.used+d.len);r.plies++;r.by[d.code]=(r.by[d.code]||0)+1;});
   }
-  const nRolls=rolls.length,totRoll=rnd(nRolls*roll),loss=rnd(totRoll-totalFab);
-  const eff=totRoll>0?Math.round(totalFab/totRoll*10000)/100:0;
-  return {mk,roll,rolls,totalFab,nRolls,totRoll,loss,eff,mode,splices};}
+  // استغلال البواقي: ملء باقي كل ثوب بقياسات صغيرة (قطع إضافية) لتقليل الهدر
+  const extra={};let salvLen=0;
+  if(mode==='salvage'){
+    const sizes=rsAllSizes().filter(x=>x.cons>0).sort((a,b)=>a.cons-b.cons);
+    const minC=sizes.length?sizes[0].cons:Infinity;
+    rolls.forEach(r=>{r.salv={};let g=0;
+      while(r.rem>=minC-1e-9&&g++<300){
+        // القياس الأصغر الذي يتّسع له الباقي (يخدم طلب «القياسات الصغيرة» ويزيد عدد القطع)
+        const pick=sizes.find(x=>x.cons<=r.rem+1e-9);
+        if(!pick)break;
+        r.salv[pick.size]=(r.salv[pick.size]||0)+1;extra[pick.size]=(extra[pick.size]||0)+1;
+        r.rem=rnd(r.rem-pick.cons);r.used=rnd(r.used+pick.cons);salvLen=rnd(salvLen+pick.cons);}});
+  }
+  const nRolls=rolls.length,totRoll=rnd(nRolls*roll),usedFab=rnd(totalFab+salvLen),loss=rnd(totRoll-usedFab);
+  const eff=totRoll>0?Math.round(usedFab/totRoll*10000)/100:0;
+  const extraTotal=Object.values(extra).reduce((s,n)=>s+n,0);
+  return {mk,roll,rolls,totalFab,nRolls,totRoll,loss,eff,mode,splices,extra,extraTotal,salvLen:rnd(salvLen)};}
 function rsRollPlan(){const host=$('rs-rolls');if(!host)return;const uf=rsUF(),u=rsUL();const R=v=>Math.round(v*uf*100)/100;
   const d=rsRollCompute();
   if(d.err==='empty'){host.innerHTML=`<div class="note">${t('rsRollNoMk')}</div>`;return;}
@@ -2204,13 +2219,18 @@ function rsRollPlan(){const host=$('rs-rolls');if(!host)return;const uf=rsUF(),u
   let hint='';
   if(d.mode!=='continuous'&&d.eff<90){const alt=rsRollAlt('continuous');
     if(alt&&!alt.err&&alt.nRolls<d.nRolls)hint=`<div style="margin-bottom:10px;font-size:12px;color:#8a6d00;background:#fff8e6;border:1px solid #f0dca0;border-radius:8px;padding:8px 11px">💡 ${tf('rsRollTip',{n:alt.nRolls,l:R(alt.loss)+' '+u,e:alt.eff})}</div>`;}
+  // قطع إضافية مستخرَجة من بواقي الأثواب
+  let extraBox='';
+  if(d.mode==='salvage'&&d.extraTotal>0){extraBox=`<div style="margin-bottom:10px;background:#e7f6ec;border:1px solid #b7e0c4;border-radius:8px;padding:8px 11px">
+    <b style="color:#1e7e40">🎁 ${tf('rsRollExtra',{n:d.extraTotal,l:R(d.salvLen)+' '+u})}</b>
+    <div style="margin-top:4px">${Object.entries(d.extra).sort((a,b)=>b[1]-a[1]).map(([s,n])=>`<span class="chip" style="margin:2px;background:#d5efdd">${esc(s)} +${n}</span>`).join(' ')}</div></div>`;}
   const rows=d.rolls.map((r,i)=>`<tr>
     <td style="font-weight:800">${t('rsRollNo')} ${i+1}</td>
-    <td style="text-align:start">${Object.entries(r.by).map(([c,n])=>`<span class="chip" style="margin:2px">${esc(c)} ×${n}</span>`).join(' ')}${r.spl?` <span style="color:#b5580a;font-weight:700">✂${r.spl}</span>`:''}</td>
+    <td style="text-align:start">${Object.entries(r.by).map(([c,n])=>`<span class="chip" style="margin:2px">${esc(c)} ×${n}</span>`).join(' ')}${r.spl?` <span style="color:#b5580a;font-weight:700">✂${r.spl}</span>`:''}${r.salv&&Object.keys(r.salv).length?' '+Object.entries(r.salv).map(([s,n])=>`<span class="chip" style="margin:2px;background:#d5efdd;color:#1e7e40">🎁${esc(s)}×${n}</span>`).join(' '):''}</td>
     <td style="font-weight:700">${r.plies}</td>
     <td>${R(r.used)} ${u}</td>
     <td style="font-weight:800;color:${r.rem>0.5?'#c00000':'#1e7e40'}">${R(r.rem)} ${u}</td></tr>`).join('');
-  host.innerHTML=hint+cards+`<div style="overflow-x:auto"><table class="xtbl" style="min-width:560px">
+  host.innerHTML=hint+extraBox+cards+`<div style="overflow-x:auto"><table class="xtbl" style="min-width:560px">
     <tr><th data-i18n="rsRollNo2">${t('rsRollNo2')}</th><th>${t('rsRollPlies')}</th><th>${t('rsPlies')}</th><th>${t('rsRollUsed')} (${u})</th><th>${t('rsRollRem')} (${u})</th></tr>
     ${rows}</table></div>`;}
 // حساب بديل بوضع مختلف دون تغيير الاختيار الحالي (للتلميح المقارن)
@@ -2222,7 +2242,7 @@ function printRsRolls(){const d=rsRollCompute();
   const card=(l,v)=>`<div style="flex:1;min-width:96px;border:1px solid #dbe5e4;border-radius:11px;padding:9px 8px;text-align:center;background:#f7faf9"><div style="font-size:10.5px;color:#6b7683;font-weight:700">${l}</div><div style="font-size:19px;color:#14504f;font-weight:800;margin-top:2px">${v}</div></div>`;
   const rows=d.rolls.map((r,i)=>`<tr style="background:${i%2?'#f6faf9':'#fff'}">
     <td style="text-align:center;padding:8px"><span style="display:inline-block;background:#14504f;color:#fff;font-weight:800;padding:3px 10px;border-radius:7px">${t('rsRollNo')} ${i+1}</span></td>
-    <td style="padding:8px;text-align:${LANG==='ar'?'right':'left'}">${Object.entries(r.by).map(([c,n])=>`<span style="display:inline-block;background:#fff;border:1.5px solid #cfe0df;border-radius:999px;padding:2px 9px;margin:2px;font-weight:800">${esc(c)} <span style="color:#1f6e6e">×${n}</span></span>`).join('')}${r.spl?` <b style="color:#b5580a">✂${r.spl}</b>`:''}</td>
+    <td style="padding:8px;text-align:${LANG==='ar'?'right':'left'}">${Object.entries(r.by).map(([c,n])=>`<span style="display:inline-block;background:#fff;border:1.5px solid #cfe0df;border-radius:999px;padding:2px 9px;margin:2px;font-weight:800">${esc(c)} <span style="color:#1f6e6e">×${n}</span></span>`).join('')}${r.spl?` <b style="color:#b5580a">✂${r.spl}</b>`:''}${r.salv&&Object.keys(r.salv).length?' '+Object.entries(r.salv).map(([s,n])=>`<span style="display:inline-block;background:#e7f6ec;border:1.5px solid #b7e0c4;border-radius:999px;padding:2px 9px;margin:2px;font-weight:800;color:#1e7e40">🎁 ${esc(s)} ×${n}</span>`).join(''):''}</td>
     <td style="text-align:center;padding:8px;font-weight:800">${r.plies}</td>
     <td style="text-align:center;padding:8px">${R(r.used)} ${u}</td>
     <td style="text-align:center;padding:8px;font-weight:800;color:${r.rem>0.5?'#b02a26':'#1e7e40'}">${R(r.rem)} ${u}</td>
@@ -2233,6 +2253,7 @@ function printRsRolls(){const d=rsRollCompute();
       <div style="display:inline-block;margin-top:6px;background:#14504f;color:#fff;font-size:13px;font-weight:800;padding:3px 12px;border-radius:7px">${t('rsRollTitle')}</div></div>
       <div style="text-align:${LANG==='ar'?'left':'right'};font-size:12px;color:#6b7683;line-height:1.9"><div>📅 ${fmtDate(today())}</div>${title?`<div>📝 ${esc(title)}</div>`:''}<div>📏 ${t('rsRollLenLbl')}: ${R(d.roll)} ${u}</div></div></div>
     <div style="display:flex;gap:8px;margin-top:12px">${card(t('rsRollCount'),d.nRolls)}${card(t('rsRollTotalLen'),R(d.totRoll)+' '+u)}${card(t('rsRollWaste'),R(d.loss)+' '+u)}${card(t('rsRollEff'),d.eff+'%')}</div>
+    ${d.mode==='salvage'&&d.extraTotal>0?`<div style="margin-top:10px;background:#e7f6ec;border:1px solid #b7e0c4;border-radius:9px;padding:8px 12px;font-weight:800;color:#1e7e40">🎁 ${tf('rsRollExtra',{n:d.extraTotal,l:R(d.salvLen)+' '+u})} — ${Object.entries(d.extra).sort((a,b)=>b[1]-a[1]).map(([s,n])=>esc(s)+' +'+n).join(' · ')}</div>`:''}
     <table style="width:100%;border-collapse:collapse;margin-top:14px;border:1px solid #d5dee2;border-radius:10px;overflow:hidden;font-size:13px">
       <thead><tr style="background:#e6efee"><th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${t('rsRollNo2')}</th><th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${t('rsRollPlies')}</th><th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${t('rsPlies')}</th><th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${t('rsRollUsed')} (${u})</th><th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${t('rsRollRem')} (${u})</th><th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${t('signature')}</th></tr></thead>
       <tbody>${rows}</tbody></table>
@@ -2281,8 +2302,9 @@ function exportRsExcel(){
   const rp=rsRollCompute();
   if(!rp.err){rows.push([t('rsRollTbl').replace(/^📦\s*/,'')]);
     rows.push([t('rsRollLenLbl'),R(rp.roll),t('rsRollCount'),rp.nRolls,t('rsRollWaste'),R(rp.loss),t('rsRollEff'),rp.eff+'%']);
+    if(rp.mode==='salvage'&&rp.extraTotal>0)rows.push([t('rsRollExtra').replace('{n}',rp.extraTotal).replace('{l}',R(rp.salvLen)+' '+u),Object.entries(rp.extra).map(([s,n])=>s+' +'+n).join(' · ')]);
     rows.push([t('rsRollNo2'),t('rsRollPlies'),t('rsPlies'),t('rsRollUsed')+' ('+u+')',t('rsRollRem')+' ('+u+')']);
-    rp.rolls.forEach((r,i)=>rows.push([t('rsRollNo')+' '+(i+1),Object.entries(r.by).map(([c,n])=>c+' ×'+n).join(' · '),r.plies,R(r.used),R(r.rem)]));}
+    rp.rolls.forEach((r,i)=>rows.push([t('rsRollNo')+' '+(i+1),Object.entries(r.by).map(([c,n])=>c+' ×'+n).join(' · ')+(r.salv&&Object.keys(r.salv).length?' 🎁 '+Object.entries(r.salv).map(([s,n])=>s+' ×'+n).join(' · '):''),r.plies,R(r.used),R(r.rem)]));}
   const csv='﻿'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
   a.download='risho_'+(title?title.replace(/[^\w؀-ۿ]+/g,'_').slice(0,30)+'_':'')+today()+'.csv';
