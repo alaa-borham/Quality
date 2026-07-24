@@ -2162,6 +2162,9 @@ function rsCalibrateApply(){const r=window._rsCalib;if(!r)return;
   // نصحّح قيم الاستهلاك فقط ونُبقي ماركرات المستخدم كما هي. أي ماركر يتجاوز الطول بعد
   // التصحيح يُصلَح بالاستبدال التلقائي داخل rsMkCalc (لكل ماركر على حدة) — دون إعادة بناء
   // الخطة كلها (فذلك يستبدل كل الماركرات بأخرى مرصوصة على حدّ الطول ويهدم خطة المستخدم).
+  // بعد المعايرة يصبح الاستهلاك المصحّح هو المرجع، فنمسح الطول الفعلي اليدوي (أدّى غرضه في
+  // المعايرة) كي تتحدّث كل الماركرات باستهلاكها المصحّح بشكل موحّد بلا قيمة يدوية تُثبّت بعضها.
+  document.querySelectorAll('.rsm-actlen').forEach(el=>el.value='');
   closeModal();rsCalc();toast(t('saved'));}
 function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
