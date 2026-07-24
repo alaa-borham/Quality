@@ -1808,9 +1808,10 @@ function rsPickMkSize(sel){const tr1=sel.closest('tr');const i=[...tr1.querySele
   rsMkCalc();}
 function rsDelMarker(id){document.querySelectorAll('tr[data-mid="'+id+'"]').forEach(tr=>tr.remove());rsMkCalc();}
 // اقتراح المقاس الذي يُقلَّل/يُحذف كي لا يتجاوز طول الماركر
-function rsLenFix(vp,cons,len,maxlen){const excess=len-maxlen;
-  // الأفضل أولاً: استبدال قياس داخل الماركر بقياس آخر أقصر غير مستخدم — يحافظ على عدد القطع والنسبة
-  // (بدل حذف قياس فيقلّ العدد وتُكسَر النسبة). نختار الاستبدال الذي يُدخل الماركر ضمن الحدّ بأقل تغيير.
+// اختيار استبدال قياس داخل الماركر بقياس آخر أقصر غير مستخدم — يحافظ على عدد القطع والنسبة
+// (بدل حذف قياس فيقلّ العدد وتُكسَر النسبة). يُختار الاستبدال الذي يُدخل الماركر ضمن الحدّ بأقل فائض.
+// يُرجع {from,to,slack} أو null إن تعذّر.
+function rsLenSwapPick(vp,cons,len,maxlen){
   const used=new Set(vp.map(p=>p.size));
   let sub=null;
   vp.forEach(p=>{const cOld=cons[p.size]||0;if(!(cOld>0))return;
@@ -1818,6 +1819,9 @@ function rsLenFix(vp,cons,len,maxlen){const excess=len-maxlen;
       const drop=p.cnt*(cOld-cNew);// النقص في الطول عند الاستبدال
       if(len-drop<=maxlen+1e-9){const slack=maxlen-(len-drop);
         if(!sub||slack<sub.slack)sub={from:p.size,to:s,slack};}});});
+  return sub;}
+function rsLenFix(vp,cons,len,maxlen){const excess=len-maxlen;
+  const sub=rsLenSwapPick(vp,cons,len,maxlen);
   if(sub)return t('rsLenTip')+tf('rsLenSwap',{a:sub.from,b:sub.to});
   // وإلا: تقليل عدد قطع أحد القياسات (أو حذفه إن لزم) — السلوك السابق
   let best=null;
@@ -1851,6 +1855,13 @@ function rsApplyAdd(i,size){const tr1=[...document.querySelectorAll('.rs-mrow1')
   else sEl.value=size;
   if(cntEls[slot])cntEls[slot].value=(+cntEls[slot].value||0)+1;
   rsMkCalc();rsSaveDraft();}
+// تطبيق الاستبدال: يغيّر خانة القياس (from) داخل الماركر رقم i إلى (to) مع الحفاظ على عدد القطع.
+// لا يستدعي rsMkCalc (المستدعي يتكفّل بإعادة الحساب). يُرجع true إن تمّ التغيير.
+function rsApplySwap(i,from,to){const tr1=[...document.querySelectorAll('.rs-mrow1')][i];if(!tr1)return false;
+  const el=[...tr1.querySelectorAll('.rsp-size')].find(e=>e.value.trim()===from);if(!el)return false;
+  if(el.tagName==='SELECT'){if(![...el.options].some(o=>o.value===to||o.text===to))el.insertAdjacentHTML('beforeend','<option>'+esc(to)+'</option>');el.value=to;}
+  else el.value=to;
+  return true;}
 // كل توليفات المقاسات ضمن الحدود (عدد قياسات ≤ maxsizes، مجموع قطع ≤ maxpcs)
 // يُقلَّم أثناء التوليد بحدّ الطول (لا بعده) وبحدّ أقصى لعدد التوليفات — لمنع الانفجار التوافقي
 // مع كثرة القياسات (كان يُنتج ملايين التوليفات ويُهدر الذاكرة قبل هذا التقليم)
@@ -2153,12 +2164,12 @@ function rsCalibrateApply(){const r=window._rsCalib;if(!r)return;
   closeModal();rsCalc();
   const rebuilt=rsRebuildPlan();
   toast(rebuilt?t('rsCalibRebuilt'):t('saved'));}
-function rsMkCalc(){if(!$('rs-markers'))return;const uf=rsUF();
+function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
   const raw=rsReadMarkers();let tRun=0,tFab=0,tPlies=0,tPcs=0;RS_VALIDN=0;
   const reqMap={};[...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();if(s)reqMap[s]=+tr.querySelector('.rsq-qty').value||0;});
-  const produced={};const MR=[];
+  const produced={};const MR=[];const swaps=[];
   [...document.querySelectorAll('.rs-mrow1')].forEach((tr1,i)=>{const m=raw[i];const tr2=tr1.nextElementSibling;
     const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;let st='',pcs=0,len=0,run=0,fab=0;
     if(!m.pairs.length&&!m.plies)st='st_empty';
@@ -2171,7 +2182,9 @@ function rsMkCalc(){if(!$('rs-markers'))return;const uf=rsUF();
       else if(pcs>maxpcs)st='st_maxpcs';
       else if(!(plies>0)||plies%1!==0)st='st_plies';
       else{len=vp.reduce((s,p)=>s+p.cnt*(cons[p.size]||0),0);
-        if(maxlen>0&&len>maxlen+1e-9)st='st_len';else st='st_ok';}}
+        if(maxlen>0&&len>maxlen+1e-9){st='st_len';
+          const sw=rsLenSwapPick(vp,cons,len,maxlen);if(sw)swaps.push({idx:i,from:sw.from,to:sw.to});}
+        else st='st_ok';}}
     const effLen=rsEffLen(len,m.actlen?m.actlen/uf:0);// m.actlen بوحدة العرض الحالية — يُحوَّل لمتر قبل المقارنة/الجمع
     if(st==='st_ok'){run=pcs*plies;fab=effLen*plies;tRun+=run;tFab+=fab;tPlies+=plies;tPcs+=pcs;RS_VALIDN++;
       vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);}
@@ -2191,6 +2204,11 @@ function rsMkCalc(){if(!$('rs-markers'))return;const uf=rsUF();
     stc.innerHTML=esc(t(st))+(tip?`<div class="rsm-tip" style="font-weight:700;font-size:11.5px;margin-top:3px;color:#8a4b00">\ud83d\udca1 ${esc(tip)}</div>`:'');
     stc.style.cssText='max-width:180px;font-weight:800;background:'+(ok?'#e2f2e2':(st==='st_empty'?bg:'#fbe3e3'))+';color:'+(ok?'#1e7e40':(st==='st_empty'?'#667':'#c00000'));
     MR.push({stc,st,vp,len,pcs,plies,idx:i});});
+  // \u0627\u0633\u062a\u0628\u062f\u0627\u0644 \u062a\u0644\u0642\u0627\u0626\u064a: \u0623\u064a \u0645\u0627\u0631\u0643\u0631 \u062a\u062c\u0627\u0648\u0632 \u0627\u0644\u0637\u0648\u0644 \u0648\u0644\u0647 \u0628\u062f\u064a\u0644 \u0623\u0642\u0635\u0631 \u2014 \u064a\u064f\u0637\u0628\u064e\u0651\u0642 \u0627\u0644\u0627\u0633\u062a\u0628\u062f\u0627\u0644 \u062b\u0645 \u064a\u064f\u0639\u0627\u062f \u0627\u0644\u062d\u0633\u0627\u0628 \u0645\u0631\u0629 \u0648\u0627\u062d\u062f\u0629.
+  // \u0643\u0644 \u0627\u0633\u062a\u0628\u062f\u0627\u0644 \u064a\u064f\u0642\u0635\u0651\u0631 \u0627\u0644\u0645\u0627\u0631\u0643\u0631 (cNew<cOld) \u0641\u0644\u0627 \u064a\u062a\u0643\u0631\u0631 \u0628\u0644\u0627 \u0646\u0647\u0627\u064a\u0629\u061b \u0645\u0639 \u062d\u062f\u0651 \u062a\u0643\u0631\u0627\u0631 \u0627\u062d\u062a\u0631\u0627\u0632\u064a.
+  if(swaps.length&&(_depth||0)<12){
+    let changed=false;swaps.forEach(s=>{if(rsApplySwap(s.idx,s.from,s.to))changed=true;});
+    if(changed){rsSaveDraft();rsMkCalc((_depth||0)+1);return;}}
   // \u0627\u0633\u062a\u063a\u0644\u0627\u0644 \u0627\u0644\u0628\u0648\u0627\u0642\u064a \u0645\u062d\u0633\u0648\u0628 \u0645\u0646 \u0627\u0644\u0643\u0645\u064a\u0629: \u0642\u0637\u0639 \u0627\u0644\u0628\u0648\u0627\u0642\u064a \u062a\u064f\u0636\u0627\u0641 \u0625\u0644\u0649 \u0627\u0644\u0625\u0646\u062a\u0627\u062c (\u0628\u062d\u062f\u0651 \u0627\u0644\u0645\u062a\u0628\u0642\u0651\u064a) \u0641\u062a\u064f\u062d\u0633\u0628 \u0636\u0645\u0646 \u062a\u063a\u0637\u064a\u0629 \u0627\u0644\u0623\u0648\u0631\u062f\u0631
   let salvTot=0;
   if($('rs-rollmode')&&$('rs-rollmode').value==='salvage'){
