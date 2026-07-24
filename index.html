@@ -2159,11 +2159,10 @@ function rsCalibrateApply(){const r=window._rsCalib;if(!r)return;
   if(prod&&sizeList(prod).length){
     const nl=sizeList(prod).map(sz=>{const hit=r.result.find(x=>x.size===sz.size);return hit?{...sz,cons:hit.suggested}:sz;});
     setProdSizes(prod,nl).catch(()=>{});}
-  // بعد تصحيح قيم الاستهلاك قد تتجاوز الماركرات حدّ الطول؛ نعيد بناء الخطة بالقيم المصحّحة
-  // بدل ترك ماركرات غير صالحة تطلب حذف قياس (فيقلّ عدد القطع وتُكسَر النسبة)
-  closeModal();rsCalc();
-  const rebuilt=rsRebuildPlan();
-  toast(rebuilt?t('rsCalibRebuilt'):t('saved'));}
+  // نصحّح قيم الاستهلاك فقط ونُبقي ماركرات المستخدم كما هي. أي ماركر يتجاوز الطول بعد
+  // التصحيح يُصلَح بالاستبدال التلقائي داخل rsMkCalc (لكل ماركر على حدة) — دون إعادة بناء
+  // الخطة كلها (فذلك يستبدل كل الماركرات بأخرى مرصوصة على حدّ الطول ويهدم خطة المستخدم).
+  closeModal();rsCalc();toast(t('saved'));}
 function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
