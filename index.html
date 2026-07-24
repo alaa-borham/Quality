@@ -2105,6 +2105,13 @@ function rsCalibGather(){const uf=rsUF();
     if(vp.some(p=>!(p.cnt>0)||p.cnt%1!==0))return null;
     if(new Set(vp.map(p=>p.size)).size<vp.length)return null;
     return {counts:vp.reduce((o,p)=>(o[p.size]=p.cnt,o),{}),actLen:m.actlen/uf};}).filter(Boolean);}
+// حلّ Ridge (مربعات صغرى منتظمة نحو c0): (AᵀA+λI)c = Aᵀb+λc0 على الأعمدة الحرة فقط.
+function rsRidgeSolve(A,b,c0,lambda){const S=c0.length,M=A.length;
+  const AtA=Array.from({length:S},()=>Array(S).fill(0));const Atb=Array(S).fill(0);
+  for(let i=0;i<M;i++)for(let a=0;a<S;a++){Atb[a]+=A[i][a]*b[i];for(let cc=0;cc<S;cc++)AtA[a][cc]+=A[i][a]*A[i][cc];}
+  const M2=AtA.map((row,a)=>row.map((v,cc)=>v+(a===cc?lambda:0)));
+  const v2=Atb.map((v,a)=>v+lambda*c0[a]);
+  return rsGaussSolve(M2,v2);}
 function rsCalibrate(){const rows=rsCalibGather();if(rows.length<2)return {err:'need2'};
   const c0map={};rsAllSizes().forEach(x=>c0map[x.size]=x.cons);
   const sizes=[...new Set(rows.flatMap(r=>Object.keys(r.counts)))].filter(s=>c0map[s]!=null);
@@ -2113,17 +2120,27 @@ function rsCalibrate(){const rows=rsCalibGather();if(rows.length<2)return {err:'
   const A=rows.map(r=>sizes.map(s=>r.counts[s]||0));
   const b=rows.map(r=>r.actLen);
   const c0=sizes.map(s=>c0map[s]||0);
-  // AᵀA + λI ، Aᵀb + λc0 — تنعيم Ridge يثبّت الحل عند نقص البيانات لمقاس معيّن (يبقيه قريباً من قيمته الحالية)
-  const AtA=Array.from({length:S},()=>Array(S).fill(0));const Atb=Array(S).fill(0);
-  for(let i=0;i<M;i++)for(let a=0;a<S;a++){Atb[a]+=A[i][a]*b[i];for(let c=0;c<S;c++)AtA[a][c]+=A[i][a]*A[i][c];}
-  let diagSum=0;for(let a=0;a<S;a++)diagSum+=AtA[a][a];const lambda=Math.max(0.01,0.01*(diagSum/S||1));
-  const M2=AtA.map((row,a)=>row.map((v,c)=>v+(a===c?lambda:0)));
-  const v2=Atb.map((v,a)=>v+lambda*c0[a]);
-  const c=rsGaussSolve(M2,v2);
+  let diagSum=0;for(let i=0;i<M;i++)for(let a=0;a<S;a++)diagSum+=A[i][a]*A[i][a];
+  const lambda=Math.max(0.01,0.01*(diagSum/S||1));
+  // مجموعة نشطة: نحلّ، وأي قياس يخرج بقيمة غير منطقية (سالب/شبه صفر — أثر نقص البيانات والإفراط في المطابقة)
+  // نُثبّته على قيمته المُدخلة c0 ونُعيد الحلّ للباقي. هكذا نصحّح فقط القياسات الموثوقة ولا نكسر
+  // المعادلات بالقصّ لصفر عند التطبيق (كان الحلّ السالب يُقصّ فتظهر فجوة رغم تقرير مطابقة ممتازة).
+  const FLOOR=0.05;const c=c0.slice();let free=sizes.map((_,i)=>i);
+  for(let iter=0;iter<=S;iter++){
+    if(!free.length)break;
+    const Af=A.map(row=>free.map(i=>row[i]));
+    const bAdj=b.map((bv,r)=>{let sub=0;for(let i=0;i<S;i++)if(free.indexOf(i)<0)sub+=A[r][i]*c[i];return bv-sub;});
+    const cf=rsRidgeSolve(Af,bAdj,free.map(i=>c0[i]),lambda);
+    free.forEach((i,k)=>c[i]=cf[k]);
+    const bad=free.filter(i=>c[i]<FLOOR);
+    if(!bad.length)break;
+    bad.forEach(i=>c[i]=c0[i]);free=free.filter(i=>bad.indexOf(i)<0);}
   const coverage=sizes.map(s=>rows.filter(r=>r.counts[s]).length);
+  // نقرّب أولاً إلى القيم المطبَّقة فعلاً ثم نحسب RMSE عليها — كي يكون التقرير صادقاً لا يعِد بما لا يُطبَّق
+  const applied=c.map(v=>Math.max(0,Math.round(v*10000)/10000));
   const sqErr=(cv)=>rows.reduce((s,r)=>{const p=sizes.reduce((a,sz,i)=>a+(r.counts[sz]||0)*cv[i],0);return s+(p-r.actLen)**2;},0);
-  const before=Math.sqrt(sqErr(c0)/M),after=Math.sqrt(sqErr(c)/M);
-  const result=sizes.map((s,i)=>({size:s,current:c0[i],suggested:Math.max(0,Math.round(c[i]*10000)/10000),coverage:coverage[i]}))
+  const before=Math.sqrt(sqErr(c0)/M),after=Math.sqrt(sqErr(applied)/M);
+  const result=sizes.map((s,i)=>({size:s,current:c0[i],suggested:applied[i],coverage:coverage[i]}))
     .sort((a,b2)=>Math.abs(b2.suggested-b2.current)-Math.abs(a.suggested-a.current));
   return {rows:M,sizes:S,result,rmseBefore:Math.round(before*1000)/1000,rmseAfter:Math.round(after*1000)/1000};}
 function rsCalibrateOpen(){const r=rsCalibrate();
