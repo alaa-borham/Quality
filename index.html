@@ -2136,8 +2136,10 @@ function rsCalibrate(){const rows=rsCalibGather();if(rows.length<2)return {err:'
     if(!bad.length)break;
     bad.forEach(i=>c[i]=c0[i]);free=free.filter(i=>bad.indexOf(i)<0);}
   const coverage=sizes.map(s=>rows.filter(r=>r.counts[s]).length);
-  // نقرّب أولاً إلى القيم المطبَّقة فعلاً ثم نحسب RMSE عليها — كي يكون التقرير صادقاً لا يعِد بما لا يُطبَّق
-  const applied=c.map(v=>Math.max(0,Math.round(v*10000)/10000));
+  // نقرّب إلى القيم المطبَّقة فعلاً؛ وأي تصحيح أصغر من عتبة (أدقّ من القياس اليدوي) نُبقي القيمة
+  // المُدخلة كما هي بالضبط — كي تكون المعايرة مستقرة: إعادتها لا تُحرّك القياسات الصحيحة أصلاً.
+  const EPS=0.003;
+  const applied=c.map((v,i)=>{const r=Math.max(0,Math.round(v*10000)/10000);return Math.abs(r-c0[i])<EPS?c0[i]:r;});
   const sqErr=(cv)=>rows.reduce((s,r)=>{const p=sizes.reduce((a,sz,i)=>a+(r.counts[sz]||0)*cv[i],0);return s+(p-r.actLen)**2;},0);
   const before=Math.sqrt(sqErr(c0)/M),after=Math.sqrt(sqErr(applied)/M);
   const result=sizes.map((s,i)=>({size:s,current:c0[i],suggested:applied[i],coverage:coverage[i]}))
