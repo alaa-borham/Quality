@@ -515,7 +515,7 @@ rsRollTbl:'📦 خطة الرولات',rsRollTitle:'أمر الرولات',rsRol
 rsRollMode:'طريقة الفرد',rsRollNoSplice:'بلا وصل — كل طبقة من رول واحد',rsRollCont:'متصل بوصل الرولات — أقل هدر',rsRollSalvage:'بلا وصل + استغلال البواقي بقياسات صغيرة',rsRollSplices:'عدد الوصلات',rsRollTip:'الفرد المتصل يوفّر: {n} رول فقط · هدر {l} · كفاءة {e}% (تحدث وصلة عند نهاية الرول)',
 rsRollIdeal:'أساس الحساب طول الماركر ({L}). لأقل هدر: اطلب الرول بطول {y} = {k}× الماركر (يقسمه بلا باقٍ)',rsRollApplyIdeal:'طبّق الطول المثالي',rsRollExtra:'قطع من البواقي تُغطّي الأوردر: {n} قطعة ({l} مستغَلة من الهدر)',
 rsCompareBtn:'⚖️ مقارنة السيناريوهات',rsCompareTitle:'مقارنة سيناريوهات الريشو',rsCmpPick:'اختر خطتين أو أكثر للمقارنة',rsCmpNeed2:'اختر خطتين على الأقل للمقارنة',rsCmpNone:'لا خطط ريشو محفوظة للمقارنة',rsCmpMetric:'المؤشر',rsCmpMarkers:'عدد الماركرات الصالحة',rsCmpBest:'الأفضل',rsCmpWaste:'الهدر مقابل الأقل',rsCmpDate:'التاريخ',rsCmpDo:'قارن',rsCmpPrint:'🖨 طباعة المقارنة',
-rsLenTip:'لتلائم الطول: ',rsLenReduce:'قلّل {s} بمقدار {n} قطعة',rsLenRemove:'احذف {s}',rsAddFit:'يمكن إضافة {s} (يتبقّى {r})',rsAddApply:'اضغط لإضافة هذا القياس إلى الماركر',
+rsLenTip:'لتلائم الطول: ',rsLenReduce:'قلّل {s} بمقدار {n} قطعة',rsLenRemove:'احذف {s}',rsLenSwap:'استبدل {a} بـ {b} (أقصر، مع الحفاظ على عدد القطع)',rsCalibRebuilt:'تم تطبيق المعايرة وإعادة بناء الماركرات بالقيم المصحّحة',rsAddFit:'يمكن إضافة {s} (يتبقّى {r})',rsAddApply:'اضغط لإضافة هذا القياس إلى الماركر',
 st_ok:'صالح',st_empty:'فارغ',st_dup:'غير صالح: مقاس مكرر',st_badqty:'غير صالح: كمية غير صحيحة',st_maxpcs:'غير صالح: تجاوز أقصى قطع',st_maxsizes:'غير صالح: تجاوز عدد القياسات',st_len:'غير صالح: تجاوز حد الطول',st_plies:'غير صالح: عدد الطبقات غير صحيح',st_nosize:'غير صالح: كمية بلا مقاس',
 rsNoSizes:'المنتج المختار بلا مقاسات محفوظة — افتح إدارة الموديلات والمقاسات وأضف المقاسات مع الاستهلاك والنسبة',
 mkMkLen:'طول الماركر',mkTotalPlies:'إجمالي الطبقات',mkSpreadsShort:'فرشة',
@@ -667,7 +667,7 @@ rsRollTbl:'📦 Fabric roll plan',rsRollTitle:'Roll pull order',rsRollBtn:'📦 
 rsRollMode:'Spreading method',rsRollNoSplice:'No splice — each ply from one roll',rsRollCont:'Continuous (spliced) — least waste',rsRollSalvage:'No splice + salvage remnants with small sizes',rsRollSplices:'Splices',rsRollTip:'Continuous spreading saves: only {n} rolls · {l} loss · {e}% utilization (a splice occurs at each roll end)',
 rsRollIdeal:'Marker length is the basis ({L}). For least waste: order rolls of {y} = {k}× the marker (divides with no remnant)',rsRollApplyIdeal:'Apply ideal length',rsRollExtra:'Remnant pieces covering the order: {n} pcs ({l} salvaged from waste)',
 rsCompareBtn:'⚖️ Compare scenarios',rsCompareTitle:'Compare ratio scenarios',rsCmpPick:'Pick two or more plans to compare',rsCmpNeed2:'Select at least two plans to compare',rsCmpNone:'No saved ratio plans to compare',rsCmpMetric:'Metric',rsCmpMarkers:'Valid markers',rsCmpBest:'Best',rsCmpWaste:'Waste vs best',rsCmpDate:'Date',rsCmpDo:'Compare',rsCmpPrint:'🖨 Print comparison',
-rsLenTip:'To fit length: ',rsLenReduce:'Reduce {s} by {n} pcs',rsLenRemove:'Remove {s}',rsAddFit:'Can add {s} ({r} left)',rsAddApply:'Click to add this size to the marker',
+rsLenTip:'To fit length: ',rsLenReduce:'Reduce {s} by {n} pcs',rsLenRemove:'Remove {s}',rsLenSwap:'Swap {a} for {b} (shorter, keeps piece count)',rsCalibRebuilt:'Calibration applied and markers rebuilt with corrected values',rsAddFit:'Can add {s} ({r} left)',rsAddApply:'Click to add this size to the marker',
 st_ok:'valid',st_empty:'empty',st_dup:'invalid: duplicate size',st_badqty:'invalid: bad quantity',st_maxpcs:'invalid: exceeds max pieces',st_maxsizes:'invalid: exceeds max sizes',st_len:'invalid: exceeds length limit',st_plies:'invalid: bad ply count',st_nosize:'invalid: quantity without size',
 rsNoSizes:'The selected product has no saved sizes — open the models & sizes manager and add sizes with consumption and ratio',
 mkMkLen:'Marker length',mkTotalPlies:'Total plies',mkSpreadsShort:'spreads',
@@ -1808,7 +1808,19 @@ function rsPickMkSize(sel){const tr1=sel.closest('tr');const i=[...tr1.querySele
   rsMkCalc();}
 function rsDelMarker(id){document.querySelectorAll('tr[data-mid="'+id+'"]').forEach(tr=>tr.remove());rsMkCalc();}
 // اقتراح المقاس الذي يُقلَّل/يُحذف كي لا يتجاوز طول الماركر
-function rsLenFix(vp,cons,len,maxlen){const excess=len-maxlen;let best=null;
+function rsLenFix(vp,cons,len,maxlen){const excess=len-maxlen;
+  // الأفضل أولاً: استبدال قياس داخل الماركر بقياس آخر أقصر غير مستخدم — يحافظ على عدد القطع والنسبة
+  // (بدل حذف قياس فيقلّ العدد وتُكسَر النسبة). نختار الاستبدال الذي يُدخل الماركر ضمن الحدّ بأقل تغيير.
+  const used=new Set(vp.map(p=>p.size));
+  let sub=null;
+  vp.forEach(p=>{const cOld=cons[p.size]||0;if(!(cOld>0))return;
+    Object.keys(cons).forEach(s=>{if(used.has(s))return;const cNew=cons[s]||0;if(!(cNew>0)||cNew>=cOld)return;
+      const drop=p.cnt*(cOld-cNew);// النقص في الطول عند الاستبدال
+      if(len-drop<=maxlen+1e-9){const slack=maxlen-(len-drop);
+        if(!sub||slack<sub.slack)sub={from:p.size,to:s,slack};}});});
+  if(sub)return t('rsLenTip')+tf('rsLenSwap',{a:sub.from,b:sub.to});
+  // وإلا: تقليل عدد قطع أحد القياسات (أو حذفه إن لزم) — السلوك السابق
+  let best=null;
   vp.forEach(p=>{const c=cons[p.size]||0;if(c<=0)return;const n=Math.ceil((excess-1e-9)/c);
     if(n<=p.cnt&&(!best||n<best.n))best={size:p.size,n,all:n>=p.cnt};});
   if(!best){let mx=null;vp.forEach(p=>{const w=p.cnt*(cons[p.size]||0);if(!mx||w>mx.w)mx={size:p.size,w};});if(mx)best={size:mx.size,n:0,all:true};}
@@ -1997,8 +2009,10 @@ function rsObjectiveChanged(){rsSaveDraft();
 // تغيير حدّ طول الماركر: الماركرات القائمة قد تصبح غير صالحة (تجاوز الحد الجديد)، فنعيد بناء الخطة فوراً
 // بنفس الكميات المقصودة ضمن الحد الجديد. الكمية المقصودة تُشتقّ من جدول الكميات إن وُجد، وإلا من تركيبة
 // الماركرات الحالية (بصرف النظر عن صلاحيتها بحد الطول تحديداً — فهي أصبحت "غير صالحة" بسبب هذا الحد فقط).
-function rsMaxLenChanged(){rsSaveDraft();
-  if(![...document.querySelectorAll('.rs-mrow1')].length){rsMkCalc();return;}
+// إعادة بناء خطة الماركرات بالقيم الحالية (استهلاك/حدود) — يستنبط الكميات المطلوبة من جدول
+// الكميات إن وُجد، وإلا من تركيب الماركرات الحالية، ثم يعيد الحلّ. يُرجع true إن أعاد البناء فعلاً.
+function rsRebuildPlan(){
+  if(![...document.querySelectorAll('.rs-mrow1')].length){rsMkCalc();return false;}
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
   const reqMap={};
@@ -2009,13 +2023,14 @@ function rsMaxLenChanged(){rsSaveDraft();
       if(vp.some(p=>!(p.cnt>0)||p.cnt%1!==0))return;
       if(new Set(vp.map(p=>p.size)).size<vp.length)return;
       vp.forEach(p=>reqMap[p.size]=(reqMap[p.size]||0)+p.cnt*plies);});}
-  if(!Object.keys(reqMap).length){rsMkCalc();return;}
+  if(!Object.keys(reqMap).length){rsMkCalc();return false;}
   const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]);
   const added=rsSolve(rem,cons,maxlen,maxsizes,maxpcs);
-  if(!added.length){rsMkCalc();return;}
+  if(!added.length){rsMkCalc();return false;}
   added.sort((a,b)=>b.len-a.len);
   $('rs-markers').innerHTML='';added.forEach(a=>rsAddMarker({pairs:a.combo,plies:a.plies}));
-  rsMkCalc();rsSaveDraft();}
+  rsMkCalc();rsSaveDraft();return true;}
+function rsMaxLenChanged(){rsSaveDraft();rsRebuildPlan();}
 /* ---- توزيع الألوان (اختياري): يوزّع طبقات كل ماركر على الألوان حسب حصصها ---- */
 function rsAddColorRow(c){c=c||{};if(!$('rs-colors'))return;
   const row=document.createElement('div');row.className='rs-color-row';row.style.cssText='display:flex;gap:6px;align-items:center';
@@ -2133,7 +2148,11 @@ function rsCalibrateApply(){const r=window._rsCalib;if(!r)return;
   if(prod&&sizeList(prod).length){
     const nl=sizeList(prod).map(sz=>{const hit=r.result.find(x=>x.size===sz.size);return hit?{...sz,cons:hit.suggested}:sz;});
     setProdSizes(prod,nl).catch(()=>{});}
-  rsCalc();closeModal();toast(t('saved'));}
+  // بعد تصحيح قيم الاستهلاك قد تتجاوز الماركرات حدّ الطول؛ نعيد بناء الخطة بالقيم المصحّحة
+  // بدل ترك ماركرات غير صالحة تطلب حذف قياس (فيقلّ عدد القطع وتُكسَر النسبة)
+  closeModal();rsCalc();
+  const rebuilt=rsRebuildPlan();
+  toast(rebuilt?t('rsCalibRebuilt'):t('saved'));}
 function rsMkCalc(){if(!$('rs-markers'))return;const uf=rsUF();
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
