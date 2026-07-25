@@ -2125,10 +2125,12 @@ function rsCalibrate(){const rows=rsCalibGather();if(rows.length<2)return {err:'
   // تنعيم Ridge خفيف فقط لثبات عددي — صغير كي لا يحيد القياسات جيّدة التغطية عن قيمتها الحقيقية
   // لكل قطعة (كان التنعيم القوي يسحبها نحو المُدخَل الغلط، فيتضخّم الخطأ عند زيادة العدد داخل الماركر).
   const lambda=Math.max(2e-4,5e-4*(diagSum/S||1));
-  // مجموعة نشطة: القياس ذو التغطية <2 (شوهد في أقل من ماركرين) لا يمكن تقديره بثقة → يُثبَّت على قيمته
-  // المُدخلة. وكذلك أي قياس يخرج بقيمة غير منطقية (سالب/شبه صفر) يُثبَّت ويُعاد حلّ الباقي.
+  // ماركر القطعة الواحدة (قياس واحد فقط) يحدّد استهلاك قياسه مباشرة (الطول÷العدد) ولو ظهر مرة واحدة.
+  const solo=new Set();rows.forEach(r=>{const ks=Object.keys(r.counts);if(ks.length===1)solo.add(ks[0]);});
+  // مجموعة نشطة: القياس ذو التغطية <2 (شوهد في أقل من ماركرين مجمّعين) لا يمكن تقديره بثقة → يُثبَّت على
+  // قيمته المُدخلة — إلا إن كان له ماركر قطعة واحدة يحدّده مباشرة. وأي قياس يخرج بقيمة غير منطقية يُثبَّت.
   const FLOOR=0.05;const c=c0.slice();
-  let free=sizes.map((_,i)=>i).filter(i=>coverage[i]>=2);
+  let free=sizes.map((_,i)=>i).filter(i=>coverage[i]>=2||solo.has(sizes[i]));
   for(let iter=0;iter<=S;iter++){
     if(!free.length)break;
     const Af=A.map(row=>free.map(i=>row[i]));
