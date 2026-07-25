@@ -1890,9 +1890,11 @@ function rsCombos(sizes,maxsizes,maxpcs,cons,maxlen){const out=[];const CAP=1500
 // «أقل ماركرات» يفضّل أكبر تغطية في الماركر الواحد فيقلّ عددها (طبقات أكثر).
 function rsSolve(rem0,cons,maxlen,maxsizes,maxpcs){
   const mode=($('rs-objective')&&$('rs-objective').value)||'plies';
+  // ملاحظة: «أقل فائض» يأتي بعد التغطية مباشرةً — فالفائض لا يُطبَّق إلا حين يزيد التغطية فعلاً (يوفّر ماركر)،
+  // ولا يُطبَّق عبثاً لملء ماركر طويل بينما ماركر أقصر يغطّي بالضبط (كان يرفع الفائض بلا داعٍ مع الأطوال الكبيرة).
   const better=mode==='markers'
-    ? (a,b)=>(a.covered-b.covered)||(a.pcs-b.pcs)||(b.len-a.len)   // أقل ماركرات: أكبر تغطية ثم أكثر قطع ثم أقصر
-    : (a,b)=>(a.pcs-b.pcs)||(a.covered-b.covered)||(a.len-b.len);  // أقل طبقات: أكثر قطع/طبقة ثم أكبر تغطية ثم أقرب للطول
+    ? (a,b)=>(a.covered-b.covered)||(b.surplus-a.surplus)||(a.pcs-b.pcs)||(b.len-a.len)   // أقل ماركرات: أكبر تغطية ثم أقل فائض ثم أكثر قطع ثم أقصر
+    : (a,b)=>(a.pcs-b.pcs)||(a.covered-b.covered)||(b.surplus-a.surplus)||(a.len-b.len);  // أقل طبقات: أكثر قطع/طبقة ثم أكبر تغطية ثم أقل فائض ثم أقرب للطول
   const SUR=2; // فائض مسموح تلقائي: حتى قطعتين لكل قياس — يُنهي القياس في ماركره بدل ماركر ذيل صغير، فتقلّ الماركرات
   const work={};Object.keys(rem0).forEach(s=>work[s]=rem0[s]);
   const out=[];let guard=0;const t0=Date.now();
@@ -1907,10 +1909,11 @@ function rsSolve(rem0,cons,maxlen,maxsizes,maxpcs){
       const finOk=fin>=1&&combo.every(p=>fin*p.cnt-work[p.size]<=SUR);
       const plies=finOk?fin:flo;if(plies<1)continue;
       const pcs=combo.reduce((a,p)=>a+p.cnt,0);
-      // «covered» = تغطية الطلب الفعلي فقط (بلا احتساب الفائض) كي لا يفضّل الهدف الفائض لذاته
+      // «covered» = تغطية الطلب الفعلي فقط (بلا احتساب الفائض)؛ «surplus» = القطع الزائدة عن الطلب في هذا الماركر
       const covered=combo.reduce((a,p)=>a+Math.min(plies*p.cnt,work[p.size]),0);
-      const cand={plies,covered,len,pcs};
-      if(!best||better(cand,best)>0)best={combo:combo.map(p=>({size:p.size,cnt:p.cnt})),plies,covered,len,pcs};}
+      const surplus=combo.reduce((a,p)=>a+Math.max(0,plies*p.cnt-work[p.size]),0);
+      const cand={plies,covered,surplus,len,pcs};
+      if(!best||better(cand,best)>0)best={combo:combo.map(p=>({size:p.size,cnt:p.cnt})),plies,covered,surplus,len,pcs};}
     if(!best)break;out.push({combo:best.combo,plies:best.plies,len:best.len});
     best.combo.forEach(p=>work[p.size]-=p.cnt*best.plies);
     Object.keys(work).forEach(s=>{if(work[s]<0)work[s]=0;});} // تصفير الفائض كي لا يُحسب سالباً
