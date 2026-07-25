@@ -739,7 +739,10 @@ function applyTheme(th){if(!THEMES.includes(th))th='light';
   document.documentElement.setAttribute('data-theme',th);
   localStorage.setItem('qcTheme',th);
   const mc=document.querySelector('meta[name=theme-color]');if(mc)mc.setAttribute('content',th==='dark'?'#0f1720':th==='grey'?'#dfe3e8':'#14504f');
-  const b=$('theme-btn');if(b)b.textContent=THEME_ICON[th];}
+  const b=$('theme-btn');if(b)b.textContent=THEME_ICON[th];
+  // إعادة رسم جداول الريشو الملوّنة كي تلتقط ألوان الثيم الجديدة (الألوان تُطبَّق سطرياً وقت الرسم)
+  // ملفوف بـ try لأن applyTheme يُستدعى مبكراً قبل تعريف RS_LOADED (منطقة موتها الزمنية)
+  try{if(RS_LOADED&&$('rs-markers')){rsMkCalc();rsRenderSugs();rsColorsCalc();}}catch(e){}}
 function cycleTheme(){const cur=localStorage.getItem('qcTheme')||'light';applyTheme(THEMES[(THEMES.indexOf(cur)+1)%THEMES.length]);}
 
 /* ============ Helpers ============ */
@@ -1777,6 +1780,10 @@ function rsCalc(){if(!$('rs-qty-rows'))return;const uf=rsUF();
   rsMkCalc();rsSaveDraft();}
 /* ---- \u062c\u062f\u0648\u0644 \u0627\u0644\u0645\u0627\u0631\u0643\u0631\u0627\u062a ---- */
 const RS_COLORS=['#d9e8f7','#d9f0d5','#f7d9ec','#f9e0cb','#d5eef4','#eaf4cf','#e6e0f7','#f7f3cf'];
+// نسخ داكنة متناسقة لوضع الدارك — كي يبقى نصّ الثيم الفاتح مقروءاً على خلفية الصفّ
+const RS_COLORS_DK=['#23384a','#1f3a2a','#3c2438','#40331f','#1e3a3f','#333d20','#2e2a46','#3a3620'];
+function rsDark(){return document.documentElement.getAttribute('data-theme')==='dark';}
+function rsRowBg(i){return (rsDark()?RS_COLORS_DK:RS_COLORS)[i%RS_COLORS.length];}
 let RS_MSEQ=0,RS_VALIDN=0;
 // \u0643\u0644 \u0645\u0642\u0627\u0633\u0627\u062a \u062c\u062f\u0648\u0644 \u0627\u0644\u0643\u0645\u064a\u0627\u062a (\u0628\u0635\u0631\u0641 \u0627\u0644\u0646\u0638\u0631 \u0639\u0646 \u0627\u0644\u0643\u0645\u064a\u0629) \u2014 \u0644\u0642\u0627\u0626\u0645\u0629 \u0627\u062e\u062a\u064a\u0627\u0631 \u0627\u0644\u0645\u0642\u0627\u0633 \u062f\u0627\u062e\u0644 \u0627\u0644\u0645\u0627\u0631\u0643\u0631
 function rsAllSizes(){return [...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),cons:+tr.querySelector('.rsq-cons').value||0})).filter(x=>x.size);}
@@ -1933,13 +1940,15 @@ function rsBuildSugs(){if(!$('rs-sug-rows'))return;
   RS_SUG_REM0={};Object.keys(reqMap).forEach(s=>RS_SUG_REM0[s]=reqMap[s]-(produced[s]||0));
   RS_SUGS=rsSolve(RS_SUG_REM0,cons,maxlen,maxsizes,maxpcs).map(s=>({combo:s.combo,sug:s.plies,plies:s.plies,len:s.len})).sort((a,b)=>b.len-a.len);
   rsRenderSugs();}
-function rsRenderSugs(){const tb=$('rs-sug-rows');if(!tb)return;const uf=rsUF();
-  if(!RS_SUGS.length){tb.innerHTML=`<tr><td colspan="15" style="padding:10px;color:#667">${t('rsSugEmpty')}</td></tr>`;return;}
+function rsRenderSugs(){const tb=$('rs-sug-rows');if(!tb)return;const uf=rsUF();const dk=rsDark();
+  if(!RS_SUGS.length){tb.innerHTML=`<tr><td colspan="15" style="padding:10px;color:var(--mut)">${t('rsSugEmpty')}</td></tr>`;return;}
   const rem={...RS_SUG_REM0};let html='';
   RS_SUGS.forEach((s,i)=>{const pcs=s.combo.reduce((a,p)=>a+p.cnt,0);const plies=+s.plies||0;const run=plies*pcs;const fab=s.len*plies;
     s.combo.forEach(p=>rem[p.size]=(rem[p.size]||0)-p.cnt*plies);
     const left=Object.keys(rem).reduce((a,k)=>a+Math.max(0,rem[k]),0);const over=Object.keys(rem).some(k=>rem[k]<0);
-    const bg=RS_COLORS[i%RS_COLORS.length];
+    const bg=rsRowBg(i);
+    const yBg=dk?'#3a3420':'#fffbe8',yBd=dk?'#6b5a2a':'#d8c27a';
+    const leftTx=over?(dk?'#f0a09c':'#c00000'):left===0?(dk?'#7fdca0':'#1e7e40'):'var(--txt)';
     const sz=[0,1,2,3,4,5].map(j=>`<td class="szc" style="background:${bg};font-weight:700">${s.combo[j]?esc(s.combo[j].size):''}</td>`).join('');
     const ct=[0,1,2,3,4,5].map(j=>`<td class="szc" style="background:${bg};font-weight:700">${s.combo[j]?s.combo[j].cnt:''}</td>`).join('');
     html+=`<tr>
@@ -1947,11 +1956,11 @@ function rsRenderSugs(){const tb=$('rs-sug-rows');if(!tb)return;const uf=rsUF();
       <td style="background:${bg};font-weight:700">${t('rsSizesRow')}</td>${sz}
       <td rowspan="2" style="background:${bg};font-weight:800;font-size:15px">${pcs}</td>
       <td rowspan="2" style="background:${bg};font-weight:800">${s.sug}</td>
-      <td rowspan="2" style="background:#fffbe8"><input type="number" min="1" value="${plies}" onchange="rsSugPlies(${i},this.value)" style="width:58px;padding:4px;text-align:center;font-weight:800;border:1px solid #d8c27a;border-radius:6px;background:#fffbe8"></td>
+      <td rowspan="2" style="background:${yBg}"><input type="number" min="1" value="${plies}" onchange="rsSugPlies(${i},this.value)" style="width:58px;padding:4px;text-align:center;font-weight:800;border:1px solid ${yBd};border-radius:6px;background:${yBg};color:var(--txt)"></td>
       <td rowspan="2" style="background:${bg};font-weight:800;font-size:15px">${run}</td>
       <td rowspan="2" class="red" style="background:${bg}">${Math.round(s.len*uf*100)/100}</td>
       <td rowspan="2" class="red" style="background:${bg}">${Math.round(fab*uf*100)/100}</td>
-      <td rowspan="2" style="background:${bg};font-weight:800;color:${over?'#c00000':left===0?'#1e7e40':'#1c1c1c'}">${left}${over?' ⚠':''}</td></tr>
+      <td rowspan="2" style="background:${bg};font-weight:800;color:${leftTx}">${left}${over?' ⚠':''}</td></tr>
      <tr><td style="background:${bg};font-weight:700">${t('rsQtyRow')}</td>${ct}</tr>`;});
   tb.innerHTML=html;}
 function rsSugPlies(i,val){if(!RS_SUGS[i])return;RS_SUGS[i].plies=Math.max(1,Math.round(+normNum(val)||1));rsRenderSugs();}
@@ -2071,11 +2080,12 @@ function rsColorsCalc(){const el=$('rs-colors-sum');if(!el)return;
   const ct=rsColorTotals();if(!ct){el.innerHTML='';return;}
   const uf=rsUF(),u=rsUL();const R=v=>Math.round(v*uf*100)/100;const roll=(+($('rs-rolllen')&&$('rs-rolllen').value)||0)/uf;
   const totalReq=[...document.querySelectorAll('.rsq-row')].reduce((s,tr)=>s+(+tr.querySelector('.rsq-qty').value||0),0);
-  const warn=(totalReq>0&&ct.totalQty!==totalReq)?`<div style="flex:1 1 100%;font-size:12px;color:#8a6d00;background:#fff8e6;border:1px solid #f0dca0;border-radius:8px;padding:6px 10px">🟡 ${tf('rsColMismatch',{c:ct.totalQty,o:totalReq})}</div>`:'';
+  const dk=rsDark();const wTx=dk?'#e6b53a':'#8a6d00',wBg=dk?'#3a3420':'#fff8e6',wBd=dk?'#6b5a2a':'#f0dca0';
+  const warn=(totalReq>0&&ct.totalQty!==totalReq)?`<div style="flex:1 1 100%;font-size:12px;color:${wTx};background:${wBg};border:1px solid ${wBd};border-radius:8px;padding:6px 10px">🟡 ${tf('rsColMismatch',{c:ct.totalQty,o:totalReq})}</div>`:'';
   el.innerHTML=warn+ct.colors.map((c,i)=>{const p=ct.per[c.name];const rolls=roll>0?Math.ceil(Math.round(p.fab*100)/100/roll):0;
-    const bg=RS_COLORS[i%RS_COLORS.length];
+    const bg=rsRowBg(i);
     return `<div style="flex:1 1 150px;min-width:150px;border:1px solid var(--line);border-radius:10px;overflow:hidden">
-      <div style="background:${bg};padding:6px 10px;font-weight:800;color:#1c2530">🎨 ${esc(c.name)}</div>
+      <div style="background:${bg};padding:6px 10px;font-weight:800;color:var(--txt)">🎨 ${esc(c.name)}</div>
       <div style="padding:8px 10px;font-size:12.5px;line-height:1.9;background:var(--card)">
         <div>${t('rsColPcs')}: <b>${p.pcs}</b> · ${t('rsPlies')}: <b>${p.plies}</b></div>
         <div>${t('mkTotalFabric')}: <b>${R(p.fab)} ${u}</b>${rolls?` · ${t('rsRollCount')}: <b>${rolls}</b>`:''}</div></div></div>`;}).join('');}
@@ -2213,21 +2223,22 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();
     const effLen=rsEffLen(len,m.actlen?m.actlen/uf:0);// m.actlen بوحدة العرض الحالية — يُحوَّل لمتر قبل المقارنة/الجمع
     if(st==='st_ok'){run=pcs*plies;fab=effLen*plies;tRun+=run;tFab+=fab;tPlies+=plies;tPcs+=pcs;RS_VALIDN++;
       vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);}
-    const bg=RS_COLORS[i%RS_COLORS.length];const ok=st==='st_ok';
+    const dk=rsDark();const bg=rsRowBg(i);const ok=st==='st_ok';
     tr1.querySelectorAll('td').forEach(td=>td.style.background=bg);
     if(tr2)tr2.querySelectorAll('td').forEach(td=>td.style.background=bg);
     tr1.querySelector('.rsm-code').textContent='M'+String(i+1).padStart(2,'0');
     tr1.querySelector('.rsm-pcs').textContent=pcs;
     tr1.querySelector('.rsm-run').textContent=run;
     const lenCell=tr1.querySelector('.rsm-len');const calcDisp=Math.round(len*uf*100)/100;
-    if(m.actlen>0){const delta=Math.round((m.actlen-calcDisp)*100)/100;const dcol=Math.abs(delta)<=0.05?'#1e7e40':'#c00000';
+    if(m.actlen>0){const delta=Math.round((m.actlen-calcDisp)*100)/100;const dcol=Math.abs(delta)<=0.05?(dk?'#7fdca0':'#1e7e40'):(dk?'#f28b86':'#c00000');
       lenCell.innerHTML=`${calcDisp}<div style="font-size:10px;font-weight:700;color:${dcol};margin-top:2px">${delta>=0?'+':''}${delta}</div>`;}
     else lenCell.textContent=calcDisp;
     tr1.querySelector('.rsm-fab').textContent=Math.round(fab*uf*100)/100;
     const stc=tr1.querySelector('.rsm-st');
     const tip=(st==='st_len')?rsLenFix(vp,cons,len,maxlen):'';
-    stc.innerHTML=esc(t(st))+(tip?`<div class="rsm-tip" style="font-weight:700;font-size:11.5px;margin-top:3px;color:#8a4b00">\ud83d\udca1 ${esc(tip)}</div>`:'');
-    stc.style.cssText='max-width:180px;font-weight:800;background:'+(ok?'#e2f2e2':(st==='st_empty'?bg:'#fbe3e3'))+';color:'+(ok?'#1e7e40':(st==='st_empty'?'#667':'#c00000'));
+    stc.innerHTML=esc(t(st))+(tip?`<div class="rsm-tip" style="font-weight:700;font-size:11.5px;margin-top:3px;color:${dk?'#e6b53a':'#8a4b00'}">\ud83d\udca1 ${esc(tip)}</div>`:'');
+    const okBg=dk?'#1e3a2a':'#e2f2e2',okTx=dk?'#7fdca0':'#1e7e40',erBg=dk?'#3a2422':'#fbe3e3',erTx=dk?'#f0a09c':'#c00000',emTx=dk?'#9fb0c0':'#667';
+    stc.style.cssText='max-width:180px;font-weight:800;background:'+(ok?okBg:(st==='st_empty'?bg:erBg))+';color:'+(ok?okTx:(st==='st_empty'?emTx:erTx));
     MR.push({stc,st,vp,len,pcs,plies,idx:i});});
   // \u0627\u0633\u062a\u0628\u062f\u0627\u0644 \u062a\u0644\u0642\u0627\u0626\u064a: \u0623\u064a \u0645\u0627\u0631\u0643\u0631 \u062a\u062c\u0627\u0648\u0632 \u0627\u0644\u0637\u0648\u0644 \u0648\u0644\u0647 \u0628\u062f\u064a\u0644 \u0623\u0642\u0635\u0631 \u2014 \u064a\u064f\u0637\u0628\u064e\u0651\u0642 \u0627\u0644\u0627\u0633\u062a\u0628\u062f\u0627\u0644 \u062b\u0645 \u064a\u064f\u0639\u0627\u062f \u0627\u0644\u062d\u0633\u0627\u0628 \u0645\u0631\u0629 \u0648\u0627\u062d\u062f\u0629.
   // \u0643\u0644 \u0627\u0633\u062a\u0628\u062f\u0627\u0644 \u064a\u064f\u0642\u0635\u0651\u0631 \u0627\u0644\u0645\u0627\u0631\u0643\u0631 (cNew<cOld) \u0641\u0644\u0627 \u064a\u062a\u0643\u0631\u0631 \u0628\u0644\u0627 \u0646\u0647\u0627\u064a\u0629\u061b \u0645\u0639 \u062d\u062f\u0651 \u062a\u0643\u0631\u0627\u0631 \u0627\u062d\u062a\u0631\u0627\u0632\u064a.
@@ -2242,7 +2253,7 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();
   // \u0627\u0642\u062a\u0631\u0627\u062d \u0625\u0636\u0627\u0641\u0629 \u0645\u0642\u0627\u0633 \u0644\u0644\u0645\u0627\u0631\u0643\u0631\u0627\u062a \u0627\u0644\u0635\u0627\u0644\u062d\u0629 \u0627\u0644\u062a\u064a \u0628\u0647\u0627 \u0645\u062a\u0633\u0651\u0639 (\u0642\u0627\u0628\u0644 \u0644\u0644\u0636\u063a\u0637 \u0644\u0644\u062a\u0637\u0628\u064a\u0642)
   const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]-(produced[s]||0));
   MR.forEach(r=>{if(r.st!=='st_ok')return;const add=rsAddFit(r.vp,cons,r.len,r.pcs,maxlen,maxpcs,maxsizes,rem,r.plies);
-    if(add)r.stc.insertAdjacentHTML('beforeend',`<div class="rsm-tip rsm-addtip" role="button" title="${esc(t('rsAddApply'))}" data-sz="${esc(add.size)}" onclick="rsApplyAdd(${r.idx},this.dataset.sz)" style="font-weight:700;font-size:11.5px;margin-top:3px;color:#0a5;cursor:pointer;text-decoration:underline dotted">\u2795 ${esc(add.msg)}</div>`);});
+    if(add)r.stc.insertAdjacentHTML('beforeend',`<div class="rsm-tip rsm-addtip" role="button" title="${esc(t('rsAddApply'))}" data-sz="${esc(add.size)}" onclick="rsApplyAdd(${r.idx},this.dataset.sz)" style="font-weight:700;font-size:11.5px;margin-top:3px;color:${rsDark()?'#57d99a':'#0a5'};cursor:pointer;text-decoration:underline dotted">\u2795 ${esc(add.msg)}</div>`);});
   // \u062c\u062f\u0648\u0644 \u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0646\u0627\u062a\u062c \u062d\u0633\u0628 \u0627\u0644\u0645\u0642\u0627\u0633
   if($('rs-review')){const srows=[...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),c:+tr.querySelector('.rsq-cons').value||0})).filter(x=>x.size);
     let tReq=0,tProd=0,tRem=0,tCons=0;
