@@ -327,8 +327,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <button type="button" class="mini rsq-hide" style="margin-top:6px" onclick="rsAddQtyRow()">➕ <span data-i18n="mkAddRow">إضافة مقاس</span></button>
         <div class="grid3" style="margin-top:14px">
           <div><label class="inl rsu-h" data-b="حد طول الماركر">حد طول الماركر (متر)</label><input id="rs-maxlen" type="number" step="0.01" value="17" oninput="rsMkCalc()" onchange="rsMaxLenChanged()"></div>
-          <div><label class="inl" data-i18n="rsMaxSizes">أقصى عدد قياسات في الماركر</label><input id="rs-maxsizes" type="number" value="6" oninput="rsMkCalc()"></div>
-          <div><label class="inl" data-i18n="rsMaxPcs">أقصى عدد قطع في الماركر</label><input id="rs-maxpcs" type="number" value="5" oninput="rsMkCalc()"></div></div>
+          <div><label class="inl" data-i18n="rsMaxSizes">أقصى عدد قياسات في الماركر</label><input id="rs-maxsizes" type="number" value="6" oninput="rsMkCalc()" onchange="rsLimitsChanged()"></div>
+          <div><label class="inl" data-i18n="rsMaxPcs">أقصى عدد قطع في الماركر</label><input id="rs-maxpcs" type="number" value="5" oninput="rsMkCalc()" onchange="rsLimitsChanged()"></div></div>
         <div style="margin-top:10px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end">
           <div><label class="inl" data-i18n="rsObjective">هدف تحسين الاقتراح التلقائي</label>
           <select id="rs-objective" onchange="rsObjectiveChanged()" style="padding:7px;font-weight:700;min-width:260px;max-width:100%">
@@ -2050,7 +2050,9 @@ function rsRebuildPlan(){
   added.sort((a,b)=>b.len-a.len);
   $('rs-markers').innerHTML='';added.forEach(a=>rsAddMarker({pairs:a.combo,plies:a.plies}));
   rsMkCalc();rsSaveDraft();return true;}
-function rsMaxLenChanged(){rsSaveDraft();rsRebuildPlan();}
+// تغيّر أي حدّ (طول الماركر / أقصى قياسات / أقصى قطع) → إعادة بناء الخطة ضمن الحدود الجديدة
+function rsLimitsChanged(){rsSaveDraft();rsRebuildPlan();}
+function rsMaxLenChanged(){rsLimitsChanged();}
 /* ---- توزيع الألوان (اختياري): يوزّع طبقات كل ماركر على الألوان حسب حصصها ---- */
 function rsAddColorRow(c){c=c||{};if(!$('rs-colors'))return;
   const row=document.createElement('div');row.className='rs-color-row';row.style.cssText='display:flex;gap:6px;align-items:center';
