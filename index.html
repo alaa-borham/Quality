@@ -1802,7 +1802,7 @@ function rsAddMarker(m){m=m||{};if(!$('rs-markers'))return;RS_MSEQ++;const id='r
      <td rowspan="2" class="rsm-run" style="font-weight:800">0</td>
      <td rowspan="2" class="rsm-st" style="max-width:170px">\u2014</td>
      <td rowspan="2" class="rsm-len red">0</td>
-     <td rowspan="2"><input class="rsm-actlen" type="number" step="0.01" min="0" value="${m.actlen!=null?m.actlen:''}" placeholder="\u2014" style="width:72px;padding:4px;text-align:center;font-weight:800;border:1px solid #cfa53a;border-radius:6px;background:#fffbe8" oninput="rsMkCalc()"></td>
+     <td rowspan="2"><input class="rsm-actlen" type="number" step="0.01" min="0" value="${m.actlen!=null?m.actlen:''}" placeholder="\u2014" style="width:72px;padding:4px;text-align:center;font-weight:800;border:1px solid #cfa53a;border-radius:6px;background:#fffbe8;color:#3a2f00" oninput="rsMkCalc()"></td>
      <td rowspan="2" class="rsm-fab red">0</td>
      <td rowspan="2"><button type="button" class="mini r" onclick="rsDelMarker('${id}')">\u2715</button></td></tr>
     <tr class="rs-mrow2" data-mid="${id}"><td style="font-weight:700">${t('rsQtyRow')}</td>${[0,1,2,3,4,5].map(i=>cntCell(pairs[i])).join('')}</tr>`);
@@ -2261,7 +2261,7 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();
       tReq+=req;tProd+=prod;tRem+=r;tCons+=req*x.c;
       const stW=r===0?t('rsRvMatch'):r>0?t('rsRvShort'):t('rsRvSurplus');
       return `<tr><td style="font-weight:800">${esc(x.size)}</td><td style="font-weight:800;font-size:15px">${req}</td><td style="font-weight:800;font-size:15px">${prod}</td><td style="font-weight:800">${r}</td>
-        <td style="font-weight:800;color:${r===0?'#1e7e40':'#c00000'};background:${r===0?'#e2f2e2':'#fbe3e3'}">${stW}</td>
+        <td style="font-weight:800;color:${r===0?(rsDark()?'#7fdca0':'#1e7e40'):(rsDark()?'#f0a09c':'#c00000')};background:${r===0?(rsDark()?'#1e3a2a':'#e2f2e2'):(rsDark()?'#3a2422':'#fbe3e3')}">${stW}</td>
         <td class="red">${x.c}</td><td class="red">${oc}</td></tr>`;}).join('');
     $('rs-rv-req').textContent=tReq||'\u2014';$('rs-rv-prod').textContent=tProd||'\u2014';$('rs-rv-rem').textContent=srows.length?tRem:'\u2014';
     $('rs-rv-cons').textContent=tCons?Math.round(tCons*uf*100)/100:'\u2014';
