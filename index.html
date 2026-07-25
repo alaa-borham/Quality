@@ -501,7 +501,7 @@ rsCalibBtn:'معايرة استهلاك القياسات',rsCalibTitle:'معاي
 rsMaxLen:'حد طول الماركر (متر)',rsMaxSizes:'أقصى عدد قياسات في الماركر',rsMaxPcs:'أقصى عدد قطع في الماركر',rsNoCons:'تعذّر إعادة البناء: قياسات بلا قيمة استهلاك ({s}) — أدخِل استهلاكها في جدول الكميات',
 rsObjective:'هدف تحسين الاقتراح التلقائي',rsObjPlies:'⬇️ أقل عدد طبقات (ماركرات أقرب للطول)',rsObjMarkers:'⬇️ أقل عدد ماركرات',
 rsPrint:'🖨 طباعة الخطة',rsPlanState:'حالة الخطة',rsReady:'مطابقة وجاهزة',rsReview:'تحتاج مراجعة',rsRemaining:'المتبقي',rsTotalProd:'إجمالي المنتَج',
-rsSumReq:'إجمالي كمية الطلب',rsSumProd:'إجمالي إنتاج الخطة',rsSumRem:'إجمالي المتبقي',rsSumSurplus:'زيادة الإنتاج',rsSumValid:'عدد الماركرات الصالحة',rsSumFabT:'إجمالي استهلاك التشغيل',rsDispUnit:'وحدة العرض',
+rsSumReq:'إجمالي كمية الطلب',rsSumProd:'إجمالي إنتاج الخطة',rsSumRem:'إجمالي المتبقي',rsSumSurplus:'زيادة الإنتاج',rsSumValid:'عدد الماركرات الصالحة',rsSumFabT:'إجمالي استهلاك التشغيل',rsSumPcons:'استهلاك القطعة',rsDispUnit:'وحدة العرض',
 rsPriceLbl:'سعر {u} القماش (اختياري)',rsCostFab:'تكلفة القماش',rsCostPiece:'تكلفة القطعة',
 rsOverProd:'زيادة إنتاج: {n} قطعة فوق المطلوب — قلّل الطبقات أو احذف قياساً من الماركرات ذات «زيادة» في جدول المراجعة',rsUnderProd:'نقص إنتاج: {n} قطعة أقل من المطلوب — أكمل الخطة تلقائياً أو أضف ماركرات',
 rsReviewTbl:'مراجعة الناتج حسب المقاس',rsProdFromMk:'إجمالي القطع من الماركر',rsRemFromOrder:'المتبقي من الأوردر',rsOrderConsM:'إجمالي استهلاك الأوردر (متر)',rsRvShort:'نقص',rsRvMatch:'مطابق',rsRvSurplus:'زيادة',
@@ -653,7 +653,7 @@ rsCalibBtn:'Calibrate size consumption',rsCalibTitle:'Size consumption calibrati
 rsMaxLen:'Marker length limit (m)',rsMaxSizes:'Max sizes per marker',rsMaxPcs:'Max pieces per marker',rsNoCons:'Cannot rebuild: sizes with no consumption value ({s}) — enter it in the quantities table',
 rsObjective:'Auto-suggest optimization goal',rsObjPlies:'⬇️ Fewest plies (fuller markers)',rsObjMarkers:'⬇️ Fewest markers',
 rsPrint:'🖨 Print plan',rsPlanState:'Plan status',rsReady:'Matched & ready',rsReview:'Needs review',rsRemaining:'Remaining',rsTotalProd:'Total produced',
-rsSumReq:'Total order qty',rsSumProd:'Plan production',rsSumRem:'Total remaining',rsSumSurplus:'Overproduction',rsSumValid:'Valid markers',rsSumFabT:'Total run consumption',rsDispUnit:'Display unit',
+rsSumReq:'Total order qty',rsSumProd:'Plan production',rsSumRem:'Total remaining',rsSumSurplus:'Overproduction',rsSumValid:'Valid markers',rsSumFabT:'Total run consumption',rsSumPcons:'Consumption / piece',rsDispUnit:'Display unit',
 rsPriceLbl:'Fabric price / {u} (optional)',rsCostFab:'Fabric cost',rsCostPiece:'Cost / piece',
 rsOverProd:'Overproduction: {n} pcs above required — reduce plies or remove a size from the markers marked “surplus” in the review table',rsUnderProd:'Underproduction: {n} pcs below required — auto-complete the plan or add markers',
 rsReviewTbl:'Output review by size',rsProdFromMk:'Pieces from markers',rsRemFromOrder:'Remaining of order',rsOrderConsM:'Total order consumption (m)',rsRvShort:'short',rsRvMatch:'matched',rsRvSurplus:'surplus',
@@ -2296,7 +2296,8 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();
   const prodAll=tRun+salvTot;
   const price=+($('rs-price')&&$('rs-price').value)||0;const fabDisp=Math.round(tFab*uf*100)/100;
   const cost=price>0?Math.round(fabDisp*price*100)/100:0,pieceCost=(price>0&&prodAll>0)?Math.round(cost/prodAll*100)/100:0;
-  rsRenderSummary({totalReq,prod:prodAll,rem:totalReq-prodAll,valid:RS_VALIDN,fab:fabDisp,ready:totalReq>0&&prodAll===totalReq,price,cost,pieceCost});
+  const pconsAll=(tFab&&tRun)?Math.round(tFab*uf/tRun*100)/100:0;// استهلاك القطعة = إجمالي القماش ÷ إجمالي القطع
+  rsRenderSummary({totalReq,prod:prodAll,rem:totalReq-prodAll,valid:RS_VALIDN,fab:fabDisp,pcons:pconsAll,ready:totalReq>0&&prodAll===totalReq,price,cost,pieceCost});
   rsRollPlan();rsColorsCalc();
   rsSaveDraft();}
 function rsRenderSummary(d){const el=$('rs-summary');if(!el)return;
@@ -2313,6 +2314,7 @@ function rsRenderSummary(d){const el=$('rs-summary');if(!el)return;
     +c(surplus>0?t('rsSumSurplus'):t('rsSumRem'),surplus>0?('+'+surplus):d.rem,d.rem===0?'#1e7e40':'#c00000')
     +c(t('rsSumValid'),d.valid||'\u2014')
     +c(t('rsSumFabT'),(d.fab||0)+' '+rsUL())
+    +c(t('rsSumPcons'),d.pcons?(d.pcons+' '+rsUL()):'—','#1e7e40')
     +(d.price>0?c(t('rsCostFab'),d.cost,'#1e7e40')+c(t('rsCostPiece'),d.pieceCost,'#1e7e40'):'')
     +c(t('rsPlanState'),d.ready?t('rsReady'):t('rsReview'),d.ready?'#1e7e40':'#c00000');}
 /* ---- \u062d\u0641\u0638 / \u0637\u0628\u0627\u0639\u0629 / \u0641\u062a\u062d \u062e\u0637\u0629 \u0627\u0644\u0631\u064a\u0634\u0648 ---- */
