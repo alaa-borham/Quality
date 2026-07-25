@@ -2120,12 +2120,15 @@ function rsCalibrate(){const rows=rsCalibGather();if(rows.length<2)return {err:'
   const A=rows.map(r=>sizes.map(s=>r.counts[s]||0));
   const b=rows.map(r=>r.actLen);
   const c0=sizes.map(s=>c0map[s]||0);
+  const coverage=sizes.map(s=>rows.filter(r=>r.counts[s]).length);
   let diagSum=0;for(let i=0;i<M;i++)for(let a=0;a<S;a++)diagSum+=A[i][a]*A[i][a];
-  const lambda=Math.max(0.01,0.01*(diagSum/S||1));
-  // مجموعة نشطة: نحلّ، وأي قياس يخرج بقيمة غير منطقية (سالب/شبه صفر — أثر نقص البيانات والإفراط في المطابقة)
-  // نُثبّته على قيمته المُدخلة c0 ونُعيد الحلّ للباقي. هكذا نصحّح فقط القياسات الموثوقة ولا نكسر
-  // المعادلات بالقصّ لصفر عند التطبيق (كان الحلّ السالب يُقصّ فتظهر فجوة رغم تقرير مطابقة ممتازة).
-  const FLOOR=0.05;const c=c0.slice();let free=sizes.map((_,i)=>i);
+  // تنعيم Ridge خفيف فقط لثبات عددي — صغير كي لا يحيد القياسات جيّدة التغطية عن قيمتها الحقيقية
+  // لكل قطعة (كان التنعيم القوي يسحبها نحو المُدخَل الغلط، فيتضخّم الخطأ عند زيادة العدد داخل الماركر).
+  const lambda=Math.max(2e-4,5e-4*(diagSum/S||1));
+  // مجموعة نشطة: القياس ذو التغطية <2 (شوهد في أقل من ماركرين) لا يمكن تقديره بثقة → يُثبَّت على قيمته
+  // المُدخلة. وكذلك أي قياس يخرج بقيمة غير منطقية (سالب/شبه صفر) يُثبَّت ويُعاد حلّ الباقي.
+  const FLOOR=0.05;const c=c0.slice();
+  let free=sizes.map((_,i)=>i).filter(i=>coverage[i]>=2);
   for(let iter=0;iter<=S;iter++){
     if(!free.length)break;
     const Af=A.map(row=>free.map(i=>row[i]));
@@ -2135,7 +2138,6 @@ function rsCalibrate(){const rows=rsCalibGather();if(rows.length<2)return {err:'
     const bad=free.filter(i=>c[i]<FLOOR);
     if(!bad.length)break;
     bad.forEach(i=>c[i]=c0[i]);free=free.filter(i=>bad.indexOf(i)<0);}
-  const coverage=sizes.map(s=>rows.filter(r=>r.counts[s]).length);
   // نقرّب إلى القيم المطبَّقة فعلاً؛ وأي تصحيح أصغر من عتبة (أدقّ من القياس اليدوي) نُبقي القيمة
   // المُدخلة كما هي بالضبط — كي تكون المعايرة مستقرة: إعادتها لا تُحرّك القياسات الصحيحة أصلاً.
   const EPS=0.003;
