@@ -2109,19 +2109,22 @@ function rsComboSuggest(){
   // ٠) ابدأ بالتوليفات المقيسة سابقاً في المكتبة — تُعاد قياساتها تلقائياً فلا تحتاج قيماً جديدة
   rsComboSeedLib(active,cons,maxlen,push);
   // ١) توليفات المُحلّل عبر كل عدد قياسات (2..maxsizes) × الهدفين — خيارات واقعية عالية القيمة
-  for(let ms=2;ms<=maxsizes&&combos.length<CAP;ms++)['markers','plies'].forEach(mode=>{
-    const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]);try{rsSolve(rem,cons,maxlen,ms,maxpcs,{mode,sur:0}).forEach(a=>push(a.combo));}catch(e){}});
+  const solverCap=Math.max(6,Math.floor(CAP*0.5)); // نصف السعة لتوليفات المُحلّل الواقعية، والنصف لتوليفات عالية التنوّع (أكثر قياسات)
+  for(let ms=2;ms<=maxsizes&&combos.length<solverCap;ms++)['markers','plies'].forEach(mode=>{
+    if(combos.length>=solverCap)return;const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]);try{rsSolve(rem,cons,maxlen,ms,maxpcs,{mode,sur:0}).forEach(a=>{if(combos.length<solverCap)push(a.combo);});}catch(e){}});
   // ٢) توليفات خام متنوّعة تملأ الماركر (أقرب للطول) — بالتناوب على عدد القياسات لضمان التنوّع (اقتراباً من CAD)
   let raw=[];try{raw=rsCombos(active,maxsizes,maxpcs,cons,maxlen);}catch(e){}
   const byCount={};raw.forEach(c=>{const L=c.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);if(L<maxlen*0.65)return;const k=c.length;(byCount[k]=byCount[k]||[]).push({c,L});});
   Object.keys(byCount).forEach(k=>byCount[k].sort((a,b)=>b.L-a.L)); // الأفضل ملئاً أولاً
-  const cks=Object.keys(byCount);let idx=0,any=true;
-  while(combos.length<CAP&&any){any=false;for(const k of cks){const arr=byCount[k];if(idx<arr.length){const before=combos.length;push(arr[idx].c);if(combos.length>before)any=true;}}idx++;}
+  const cks=Object.keys(byCount).map(Number).sort((a,b)=>b-a);const cur={};cks.forEach(k=>cur[k]=0);let any=true;
+  // تفضيل التوليفات الأكثر قياسات (أقرب لسلوك الكاد): كل عدد قياسات k يأخذ (k−1) اختيارات لكل جولة
+  while(combos.length<CAP&&any){any=false;for(const k of cks){const arr=byCount[k];const picks=Math.max(1,k-1);
+    for(let t=0;t<picks&&combos.length<CAP;t++){if(cur[k]<arr.length){const before=combos.length;push(arr[cur[k]++].c);if(combos.length>before)any=true;}}}}
   // ٣) ضمان تغطية كل القياسات: أي قياس لم يظهر يُضاف كتوليفة قطعة واحدة
   const covered=new Set();combos.forEach(c=>c.forEach(p=>covered.add(p.size)));
   active.filter(s=>!covered.has(s)).forEach(s=>combos.push([{size:s,cnt:1}]));
   RS_COMBOS=combos.map(c=>({combo:c,addLen:c.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0),pcs:c.reduce((a,p)=>a+p.cnt,0),actual:0}))
-    .sort((a,b)=>b.addLen-a.addLen);
+    .sort((a,b)=>(b.combo.length-a.combo.length)||(b.addLen-a.addLen)); // الأكثر قياسات أولاً (أقرب للكاد) ثم الأطول
   const fromLib=rsComboApplyLib(); // تعبئة ما سبق قياسه من مكتبة المنتج
   rsComboRender();toast(fromLib?tf('rsCbGenLib',{n:RS_COMBOS.length,m:fromLib}):tf('rsCbGen',{n:RS_COMBOS.length}));}
 // توليد أكبر عدد ممكن من التوليفات — يراعي طول الماركر وكمية الأوردر (توليفات صالحة فعلاً لهذا الأوردر)
@@ -2142,18 +2145,21 @@ function rsComboLibGen(){
   // ٠) ابدأ بالتوليفات المقيسة سابقاً في المكتبة — تُعاد قياساتها تلقائياً فلا تحتاج قيماً جديدة
   rsComboSeedLib(active,cons,maxlen,push);
   // ١) توليفات المُحلّل — تراعي كمية الأوردر وطول الماركر مباشرةً — عبر كل عدد قياسات × الهدفين
-  for(let ms=2;ms<=maxsizes&&combos.length<CAP;ms++)['markers','plies'].forEach(mode=>{
-    const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]);try{rsSolve(rem,cons,maxlen,ms,maxpcs,{mode,sur:0}).forEach(a=>push(a.combo));}catch(e){}});
+  const solverCap=Math.max(6,Math.floor(CAP*0.5)); // نصف السعة لتوليفات المُحلّل الواقعية، والنصف لتوليفات عالية التنوّع (أكثر قياسات)
+  for(let ms=2;ms<=maxsizes&&combos.length<solverCap;ms++)['markers','plies'].forEach(mode=>{
+    if(combos.length>=solverCap)return;const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]);try{rsSolve(rem,cons,maxlen,ms,maxpcs,{mode,sur:0}).forEach(a=>{if(combos.length<solverCap)push(a.combo);});}catch(e){}});
   // ٢) توليفات خام متنوّعة من مقاسات الأوردر فقط، تملأ الماركر ضمن حدّ الطول — بالتناوب لأقصى تنوّع
   let raw=[];try{raw=rsCombos(active,maxsizes,maxpcs,cons,maxlen);}catch(e){}
   const byCount={};raw.forEach(c=>{const L=c.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);if(L<maxlen*0.6)return;const k=c.length;(byCount[k]=byCount[k]||[]).push({c,L});});
   Object.keys(byCount).forEach(k=>byCount[k].sort((a,b)=>b.L-a.L));
-  const cks=Object.keys(byCount);let idx=0,any=true;
-  while(combos.length<CAP&&any){any=false;for(const k of cks){const arr=byCount[k];if(idx<arr.length){const before=combos.length;push(arr[idx].c);if(combos.length>before)any=true;}}idx++;}
+  const cks=Object.keys(byCount).map(Number).sort((a,b)=>b-a);const cur={};cks.forEach(k=>cur[k]=0);let any=true;
+  // تفضيل التوليفات الأكثر قياسات (أقرب لسلوك الكاد): كل عدد قياسات k يأخذ (k−1) اختيارات لكل جولة
+  while(combos.length<CAP&&any){any=false;for(const k of cks){const arr=byCount[k];const picks=Math.max(1,k-1);
+    for(let t=0;t<picks&&combos.length<CAP;t++){if(cur[k]<arr.length){const before=combos.length;push(arr[cur[k]++].c);if(combos.length>before)any=true;}}}}
   // ٣) ضمان تغطية كل مقاس في الأوردر: أي مقاس لم يظهر يُضاف كتوليفة قطعة واحدة
   const covered=new Set();combos.forEach(c=>c.forEach(p=>covered.add(p.size)));
   active.filter(s=>!covered.has(s)).forEach(s=>{if(combos.length<CAP)combos.push([{size:s,cnt:1}]);});
-  RS_COMBOS=combos.map(c=>({combo:c,addLen:c.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0),pcs:c.reduce((a,p)=>a+p.cnt,0),actual:0})).sort((a,b)=>b.addLen-a.addLen);
+  RS_COMBOS=combos.map(c=>({combo:c,addLen:c.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0),pcs:c.reduce((a,p)=>a+p.cnt,0),actual:0})).sort((a,b)=>(b.combo.length-a.combo.length)||(b.addLen-a.addLen)); // الأكثر قياسات أولاً (أقرب للكاد) ثم الأطول
   const fromLib=rsComboApplyLib();
   rsComboRender();toast(fromLib?tf('rsCbGenLib',{n:RS_COMBOS.length,m:fromLib}):tf('rsCbGen',{n:RS_COMBOS.length}));}
 // ورقة قياس مجمّعة للطباعة: كل التوليفات مع خانة فارغة لكتابة الطول الفعلي المقاس على الطاولة
