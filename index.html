@@ -2081,10 +2081,14 @@ function rsComboRender(){const tb=$('rs-combo-rows');if(!tb)return;const uf=rsUF
     return `<tr>
       <td style="text-align:start;padding:6px 12px;line-height:2.1">${sizesHtml}</td>
       <td class="red">${Math.round(c.addLen*uf*100)/100}</td>
-      <td><input class="rscb-act" data-i="${i}" type="number" step="0.01" min="0" value="${c.actual||''}" placeholder="—" style="width:82px;padding:4px;text-align:center;font-weight:800;border:1px solid #cfa53a;border-radius:6px;background:#fffbe8;color:#3a2f00" oninput="rsComboCalc()"></td>
+      <td><input class="rscb-act" data-i="${i}" type="number" step="0.01" min="0" value="${c.actual||''}" placeholder="—" style="width:82px;padding:4px;text-align:center;font-weight:800;border:1px solid #cfa53a;border-radius:6px;background:#fffbe8;color:#3a2f00" oninput="rsComboCalc()" onkeydown="rsComboNav(event)"></td>
       <td class="rscb-eff" data-i="${i}" style="font-weight:800">—</td>
       <td class="rscb-rank" data-i="${i}" style="font-weight:800">—</td></tr>`;}).join('');
   rsComboCalc();}
+// Enter في خانة الطول الفعلي ينتقل إلى الخانة التالية (إدخال سريع صفّاً صفّاً)
+function rsComboNav(e){if(e.key!=='Enter')return;e.preventDefault();
+  const inputs=[...document.querySelectorAll('.rscb-act')];const cur=inputs.indexOf(e.target);
+  if(cur>=0&&inputs[cur+1]){inputs[cur+1].focus();inputs[cur+1].select&&inputs[cur+1].select();}}
 function rsComboCalc(){const uf=rsUF(),dk=rsDark();
   document.querySelectorAll('.rscb-act').forEach(inp=>{const i=+inp.dataset.i;if(RS_COMBOS[i])RS_COMBOS[i].actual=+inp.value||0;});
   const rows=RS_COMBOS.map((c,i)=>{const addD=Math.round(c.addLen*uf*100)/100;const eff=c.actual>0&&addD>0?c.actual/addD:null;return {i,eff};});
