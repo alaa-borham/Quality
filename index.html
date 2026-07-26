@@ -1921,9 +1921,11 @@ function rsSolve(rem0,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
   const mode=opt.mode||($('rs-objective')&&$('rs-objective').value)||'plies';
   // ملاحظة: «أقل فائض» يأتي بعد التغطية مباشرةً — فالفائض لا يُطبَّق إلا حين يزيد التغطية فعلاً (يوفّر ماركر)،
   // ولا يُطبَّق عبثاً لملء ماركر طويل بينما ماركر أقصر يغطّي بالضبط (كان يرفع الفائض بلا داعٍ مع الأطوال الكبيرة).
+  // spread = تنوّع الحجم داخل التوليفة — يُستعمل كسرّ ترجيح أخير فقط (بعد كل معايير الاستهلاك)،
+  // فلا يرفع الاستهلاك أبداً؛ يحسّن خلط الكبير مع الصغير فقط بين الخيارات المتكافئة تماماً في الاستهلاك
   const better=mode==='markers'
-    ? (a,b)=>(a.covered-b.covered)||(b.surplus-a.surplus)||(a.pcs-b.pcs)||(b.len-a.len)   // أقل ماركرات: أكبر تغطية ثم أقل فائض ثم أكثر قطع ثم أقصر
-    : (a,b)=>(a.pcs-b.pcs)||(a.covered-b.covered)||(b.surplus-a.surplus)||(a.len-b.len);  // أقل طبقات: أكثر قطع/طبقة ثم أكبر تغطية ثم أقل فائض ثم أقرب للطول
+    ? (a,b)=>(a.covered-b.covered)||(b.surplus-a.surplus)||(a.pcs-b.pcs)||(b.len-a.len)||(a.spread-b.spread)   // أقل ماركرات: تغطية ← أقل فائض ← أكثر قطع ← أقصر ← (تعادل) أكثر تنوّعاً
+    : (a,b)=>(a.pcs-b.pcs)||(a.covered-b.covered)||(b.surplus-a.surplus)||(a.len-b.len)||(a.spread-b.spread);  // أقل طبقات: قطع/طبقة ← تغطية ← أقل فائض ← أقرب للطول ← (تعادل) أكثر تنوّعاً
   const SUR=opt.sur!=null?opt.sur:Math.max(0,Math.round(+($('rs-surplus')&&$('rs-surplus').value)||0)); // فائض مسموح لكل قياس (0=تغطية تامة، افتراضي)
   const work={};Object.keys(rem0).forEach(s=>work[s]=rem0[s]);
   const out=[];let guard=0;const t0=Date.now();
@@ -1943,8 +1945,9 @@ function rsSolve(rem0,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
       // «covered» = تغطية الطلب الفعلي فقط (بلا احتساب الفائض)؛ «surplus» = القطع الزائدة عن الطلب في هذا الماركر
       const covered=combo.reduce((a,p)=>a+Math.min(plies*p.cnt,work[p.size]),0);
       const surplus=combo.reduce((a,p)=>a+Math.max(0,plies*p.cnt-work[p.size]),0);
-      const cand={plies,covered,surplus,len,pcs};
-      if(!best||better(cand,best)>0)best={combo:combo.map(p=>({size:p.size,cnt:p.cnt})),plies,covered,surplus,len,pcs};}
+      const cvals=combo.map(p=>cons[p.size]);const spread=Math.max(...cvals)-Math.min(...cvals);// تنوّع الحجم (سرّ ترجيح أخير فقط)
+      const cand={plies,covered,surplus,len,pcs,spread};
+      if(!best||better(cand,best)>0)best={combo:combo.map(p=>({size:p.size,cnt:p.cnt})),plies,covered,surplus,len,pcs,spread};}
     if(!best)break;out.push({combo:best.combo,plies:best.plies,len:best.len});
     best.combo.forEach(p=>work[p.size]-=p.cnt*best.plies);
     Object.keys(work).forEach(s=>{if(work[s]<0)work[s]=0;});} // تصفير الفائض كي لا يُحسب سالباً
