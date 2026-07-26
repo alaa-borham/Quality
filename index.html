@@ -313,7 +313,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div id="rs-summary" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"></div>
         <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
           <button type="button" class="btn g" style="padding:8px 16px;flex:0 0 auto" onclick="rsComboSuggest();document.getElementById('rs-combo-rows').scrollIntoView({behavior:'smooth',block:'center'})">🧩 <span data-i18n="rsCbSuggest">اقترح توليفات أوردرك للمعايرة</span></button>
-          <button type="button" class="btn sec" style="padding:8px 16px;flex:0 0 auto" onclick="rsComboLibGen();document.getElementById('rs-combo-rows').scrollIntoView({behavior:'smooth',block:'center'})" title="يولّد أكبر عدد ممكن من التوليفات لكل مقاسات المنتج مرة واحدة — مكتبة مرجعية دائمة">🗂️ <span data-i18n="rsCbLibBtn">ولّد كل التوليفات (مكتبة مرجعية)</span></button>
+          <button type="button" class="btn sec" style="padding:8px 16px;flex:0 0 auto" onclick="rsComboLibGen();document.getElementById('rs-combo-rows').scrollIntoView({behavior:'smooth',block:'center'})" title="يولّد أكبر عدد ممكن من التوليفات الصالحة لهذا الأوردر مرة واحدة — يراعي حد طول الماركر وكمية الأوردر ونِسب المقاسات">🗂️ <span data-i18n="rsCbLibBtn">ولّد كل التوليفات (مكتبة مرجعية)</span></button>
           <label style="font-size:13px;font-weight:700;white-space:nowrap"><span data-i18n="rsCbCap">عدد التوليفات</span> <input id="rs-combo-cap" type="number" min="20" max="500" value="50" style="width:70px;padding:4px;text-align:center;background:var(--inp)"></label>
           <span class="note" style="margin:0" data-i18n="rsCbBtnHint">كلما زاد العدد والتنوّع، اقتربت النتيجة من CAD (مقابل قياس توليفات أكثر)</span></div>
         <div style="margin-top:12px">
@@ -2105,24 +2105,33 @@ function rsComboSuggest(){
     .sort((a,b)=>b.addLen-a.addLen);
   const fromLib=rsComboApplyLib(); // تعبئة ما سبق قياسه من مكتبة المنتج
   rsComboRender();toast(fromLib?tf('rsCbGenLib',{n:RS_COMBOS.length,m:fromLib}):tf('rsCbGen',{n:RS_COMBOS.length}));}
-// توليد أكبر عدد ممكن من التوليفات لكل مقاسات المنتج (بلا اعتماد على كميات الأوردر) — مكتبة مرجعية دائمة
+// توليد أكبر عدد ممكن من التوليفات — يراعي طول الماركر وكمية الأوردر (توليفات صالحة فعلاً لهذا الأوردر)
 function rsComboLibGen(){
-  const cons={};rsAllSizes().forEach(x=>{if(x.cons>0)cons[x.size]=x.cons;});
-  const pool=Object.keys(cons);
-  if(!pool.length)return toast(t('rsScNoData'));
+  const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  // كميات الأوردر: المصدر الأساسي لتحديد المقاسات ونِسبها (نفس منطق زر الاقتراح)
+  const reqMap={};
+  [...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();const q=+tr.querySelector('.rsq-qty').value||0;if(s&&q>0)reqMap[s]=q;});
+  if(!Object.keys(reqMap).length){rsReadMarkers().forEach(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const pl=+m.plies||0;
+    if(!vp.length||!(pl>0))return;if(new Set(vp.map(p=>p.size)).size<vp.length)return;vp.forEach(p=>reqMap[p.size]=(reqMap[p.size]||0)+p.cnt*pl);});}
+  if(!Object.keys(reqMap).length)return toast(t('rsScNoData'));
+  const active=Object.keys(reqMap).filter(s=>cons[s]>0);
+  if(!active.length)return toast(tf('rsNoCons',{s:Object.keys(reqMap).slice(0,8).join('، ')}));
   const CAP=Math.min(500,Math.max(100,+($('rs-combo-cap')&&$('rs-combo-cap').value)||200)); // مكتبة كبيرة (≥100)
   const seen={};const combos=[];
   const push=(c)=>{if(combos.length>=CAP)return;const key=c.map(p=>p.size+'×'+p.cnt).sort().join('|');if(seen[key])return;seen[key]=1;combos.push(c.map(p=>({size:p.size,cnt:p.cnt})));};
-  // توليفات خام متنوّعة تملأ الماركر عبر كل المقاسات — بالتناوب على عدد القياسات لأقصى تنوّع
-  let raw=[];try{raw=rsCombos(pool,maxsizes,maxpcs,cons,maxlen);}catch(e){}
+  // ١) توليفات المُحلّل — تراعي كمية الأوردر وطول الماركر مباشرةً — عبر كل عدد قياسات × الهدفين
+  for(let ms=2;ms<=maxsizes&&combos.length<CAP;ms++)['markers','plies'].forEach(mode=>{
+    const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]);try{rsSolve(rem,cons,maxlen,ms,maxpcs,{mode,sur:0}).forEach(a=>push(a.combo));}catch(e){}});
+  // ٢) توليفات خام متنوّعة من مقاسات الأوردر فقط، تملأ الماركر ضمن حدّ الطول — بالتناوب لأقصى تنوّع
+  let raw=[];try{raw=rsCombos(active,maxsizes,maxpcs,cons,maxlen);}catch(e){}
   const byCount={};raw.forEach(c=>{const L=c.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);if(L<maxlen*0.6)return;const k=c.length;(byCount[k]=byCount[k]||[]).push({c,L});});
   Object.keys(byCount).forEach(k=>byCount[k].sort((a,b)=>b.L-a.L));
   const cks=Object.keys(byCount);let idx=0,any=true;
   while(combos.length<CAP&&any){any=false;for(const k of cks){const arr=byCount[k];if(idx<arr.length){const before=combos.length;push(arr[idx].c);if(combos.length>before)any=true;}}idx++;}
-  // ضمان تغطية كل مقاس: أي مقاس لم يظهر يُضاف كتوليفة قطعة واحدة
+  // ٣) ضمان تغطية كل مقاس في الأوردر: أي مقاس لم يظهر يُضاف كتوليفة قطعة واحدة
   const covered=new Set();combos.forEach(c=>c.forEach(p=>covered.add(p.size)));
-  pool.filter(s=>!covered.has(s)).forEach(s=>{if(combos.length<CAP)combos.push([{size:s,cnt:1}]);});
+  active.filter(s=>!covered.has(s)).forEach(s=>{if(combos.length<CAP)combos.push([{size:s,cnt:1}]);});
   RS_COMBOS=combos.map(c=>({combo:c,addLen:c.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0),pcs:c.reduce((a,p)=>a+p.cnt,0),actual:0})).sort((a,b)=>b.addLen-a.addLen);
   const fromLib=rsComboApplyLib();
   rsComboRender();toast(fromLib?tf('rsCbGenLib',{n:RS_COMBOS.length,m:fromLib}):tf('rsCbGen',{n:RS_COMBOS.length}));}
