@@ -528,7 +528,7 @@ rsSumReq:'إجمالي كمية الطلب',rsSumProd:'إجمالي إنتاج �
 rsPriceLbl:'سعر {u} القماش (اختياري)',rsCostFab:'تكلفة القماش',rsCostPiece:'تكلفة القطعة',
 rsOverProd:'زيادة إنتاج: {n} قطعة فوق المطلوب — قلّل الطبقات أو احذف قياساً من الماركرات ذات «زيادة» في جدول المراجعة',rsUnderProd:'نقص إنتاج: {n} قطعة أقل من المطلوب — أكمل الخطة تلقائياً أو أضف ماركرات',
 rsReviewTbl:'مراجعة الناتج حسب المقاس',rsProdFromMk:'إجمالي القطع من الماركر',rsRemFromOrder:'المتبقي من الأوردر',rsOrderConsM:'إجمالي استهلاك الأوردر (متر)',rsRvShort:'نقص',rsRvMatch:'مطابق',rsRvSurplus:'زيادة',
-rsAutoBtn:'أكمل الخطة تلقائياً (أقل استهلاك)',rsAutoDone:'الخطة مكتملة — لا كميات متبقية',rsAutoAdded:'أُضيف {n} ماركر تلقائياً',
+rsAutoBtn:'أكمل الخطة تلقائياً (أقل استهلاك)',rsAutoDone:'الخطة مكتملة — لا كميات متبقية',rsAutoAdded:'أُضيف {n} ماركر تلقائياً',rsAutoAddedLib:'أُضيف {n} ماركر تلقائياً — منها {l} من مكتبتك المقيسة (مطابقة للكاد)',
 rsReducePliesBtn:'قلّل الطبقات',rsReduceDone:'قُلّلت الطبقات في {n} ماركر: {a} ← {b} طبقة (القماش والكمية دون تغيير)',rsReduceNone:'لا يمكن تقليل الطبقات أكثر — الماركرات مضبوطة على حدّ الطول أو أقصى قطع',
 rsClearMkBtn:'امسح الماركرات',rsClearMkQ:'حذف كل الماركرات؟ يمكنك بعدها الضغط على «أكمل الخطة تلقائياً» لبناء خطة بلا زيادة إنتاج.',rsSortBtn:'ترتيب حسب الطول',rsSortPcBtn:'الأفضل حسب استهلاك القطعة',
 rsColTitle:'🎨 توزيع الألوان (اختياري)',rsColAdd:'إضافة لون',rsColName:'اسم اللون',rsColQty:'الكمية',rsColUnnamed:'لون',rsColPcs:'القطع',rsColMismatch:'مجموع كميات الألوان ({c}) لا يساوي كمية الطلب ({o})',
@@ -681,7 +681,7 @@ rsSumReq:'Total order qty',rsSumProd:'Plan production',rsSumRem:'Total remaining
 rsPriceLbl:'Fabric price / {u} (optional)',rsCostFab:'Fabric cost',rsCostPiece:'Cost / piece',
 rsOverProd:'Overproduction: {n} pcs above required — reduce plies or remove a size from the markers marked “surplus” in the review table',rsUnderProd:'Underproduction: {n} pcs below required — auto-complete the plan or add markers',
 rsReviewTbl:'Output review by size',rsProdFromMk:'Pieces from markers',rsRemFromOrder:'Remaining of order',rsOrderConsM:'Total order consumption (m)',rsRvShort:'short',rsRvMatch:'matched',rsRvSurplus:'surplus',
-rsAutoBtn:'Auto-complete plan (least consumption)',rsAutoDone:'Plan complete — nothing remaining',rsAutoAdded:'{n} markers added automatically',
+rsAutoBtn:'Auto-complete plan (least consumption)',rsAutoDone:'Plan complete — nothing remaining',rsAutoAdded:'{n} markers added automatically',rsAutoAddedLib:'{n} markers added automatically — {l} from your measured library (CAD-matched)',
 rsReducePliesBtn:'Reduce plies',rsReduceDone:'Plies reduced in {n} marker(s): {a} → {b} plies (fabric & quantity unchanged)',rsReduceNone:'Cannot reduce plies further — markers are capped by length limit or max pieces',
 rsClearMkBtn:'Clear markers',rsClearMkQ:'Delete all markers? You can then press “Auto-complete plan” to build a plan with no overproduction.',rsSortBtn:'Sort by length',rsSortPcBtn:'Best by consumption/piece',
 rsColTitle:'🎨 Color split (optional)',rsColAdd:'Add color',rsColName:'Color name',rsColQty:'Quantity',rsColUnnamed:'Color',rsColPcs:'Pieces',rsColMismatch:'Colors total ({c}) ≠ order quantity ({o})',
@@ -1930,7 +1930,9 @@ function rsSolve(rem0,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
   while(guard++<2000&&Date.now()-t0<3500){
     const active=Object.keys(work).filter(s=>work[s]>0&&cons[s]>0);if(!active.length)break;
     let best=null;
-    for(const combo of rsCombos(active,maxsizes,maxpcs,cons,maxlen)){
+    // مصدر التوليفات: قائمة مقيّدة (مثلاً توليفات المكتبة) إن مُرِّرت، وإلا توليد كل الاحتمالات
+    const src=opt.cands?opt.cands.filter(c=>c.every(p=>work[p.size]>0&&cons[p.size]>0)):rsCombos(active,maxsizes,maxpcs,cons,maxlen);
+    for(const combo of src){
       const len=combo.reduce((a,p)=>a+p.cnt*cons[p.size],0);if(maxlen>0&&len>maxlen+1e-9)continue;
       const flo=Math.min(...combo.map(p=>Math.floor(work[p.size]/p.cnt)));
       // «الإنهاء»: أقل عدد طبقات يُغطّي كل قياسات التوليفة؛ نستعمله إن كان فائضه ≤ SUR لكل قياس فيُنهيها بلا ذيل
@@ -1964,11 +1966,22 @@ function rsAutoPlan(){if(!$('rs-markers'))return;
     if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs))vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);});
   const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]-(produced[s]||0));
   if(!Object.values(rem).some(v=>v>0))return toast(t('rsAutoDone'));
-  const added=rsSolve(rem,cons,maxlen,maxsizes,maxpcs);
+  let added=[],libN=0;
+  // أولاً: غطِّ من مكتبتك المقيسة (لنفس عرض القماش) — فتكون ماركرات خطتك مقيسة ومطابقة للكاد مباشرةً
+  const libRecs=prodComboLib(rsComboProd()).filter(x=>String(x.w||'')===String(rsFabW()||''));
+  const libCands=libRecs.map(x=>x.sizes).filter(c=>c&&c.length&&new Set(c.map(p=>p.size)).size===c.length
+    &&c.length<=maxsizes&&c.reduce((a,p)=>a+p.cnt,0)<=maxpcs
+    &&c.every(p=>reqMap[p.size]!=null&&cons[p.size]>0)
+    &&c.reduce((a,p)=>a+p.cnt*cons[p.size],0)<=maxlen+1e-9);
+  if(libCands.length){const r1=rsSolve(rem,cons,maxlen,maxsizes,maxpcs,{cands:libCands});
+    r1.forEach(a=>{a.combo.forEach(p=>rem[p.size]=(rem[p.size]||0)-p.cnt*a.plies);});
+    Object.keys(rem).forEach(s=>{if(rem[s]<0)rem[s]=0;});added=added.concat(r1);libN=r1.length;}
+  // ثانياً: أكمل ما تبقّى بالمُحلّل العادي (تقدير مُعدَّل بالمعامل)
+  if(Object.values(rem).some(v=>v>0))added=added.concat(rsSolve(rem,cons,maxlen,maxsizes,maxpcs));
   if(!added.length)return toast(t('rsNoSug'));
   added.sort((a,b)=>b.len-a.len);// ترتيب تنازلي حسب طول الماركر (استهلاك الماركر/طبقة)
   added.forEach(a=>rsAddMarker({pairs:a.combo,plies:a.plies}));rsMkCalc();
-  toast(tf('rsAutoAdded',{n:added.length}));}
+  toast(libN?tf('rsAutoAddedLib',{n:added.length,l:libN}):tf('rsAutoAdded',{n:added.length}));}
 /* ---- جدول الاقتراحات التلقائي لباقي الكمية ---- */
 let RS_SUGS=[],RS_SUG_REM0={},RS_SUG_BT=null;
 function rsScheduleSugs(){clearTimeout(RS_SUG_BT);RS_SUG_BT=setTimeout(rsBuildSugs,250);}
