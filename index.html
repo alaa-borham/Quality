@@ -370,6 +370,14 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
             <th class="or" data-i18n="rsPcsRun">إجمالي القطع في التشغيل</th><th class="rsu-h" data-b="استهلاك الماركر/طبقة">استهلاك الماركر/طبقة (متر)</th><th class="or rsu-h" data-b="إجمالي استهلاك التشغيل">إجمالي استهلاك التشغيل (متر)</th><th data-i18n="rsRemWithRun">إجمالي المتبقي مع التشغيل</th></tr>
           <tbody id="rs-sug-rows" class="rss-hide"></tbody></table></div>
         <button type="button" class="btn g rss-hide" style="margin-top:6px" onclick="rsApplySugs()" data-i18n="rsApplyAll">✔ اعتماد كل الاقتراحات كماركر</button>
+        <div style="overflow-x:auto;margin-top:16px"><table class="xtbl" style="min-width:760px">
+          <tr><th colspan="6" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rscb-cv" onclick="rsCollapse('rscb')" title="تصغير/تكبير">–</button><span data-i18n="rsCbTbl">معايرة التوليفات — أفضل توليفة لكل ماركر</span></span></th></tr>
+          <tr class="rscb-hide"><th data-i18n="rsCbCombo">التوليفة</th><th class="rsu-h" data-b="الطول المحسوب">الطول المحسوب (متر)</th><th data-i18n="rsCbActual">الطول الفعلي المقاس</th><th data-i18n="rsCbEff">الكفاءة (فعلي÷محسوب)</th><th class="rsu-h" data-b="استهلاك القطعة">استهلاك القطعة (متر)</th><th data-i18n="rsCbRank">الترتيب</th></tr>
+          <tbody id="rs-combo-rows" class="rscb-hide"></tbody></table></div>
+        <div class="rscb-hide" style="margin-top:6px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <button type="button" class="btn g" style="padding:6px 14px" onclick="rsComboSuggest()">🧩 <span data-i18n="rsCbSuggest">اقترح توليفات أوردرك للمعايرة</span></button>
+          <div id="rs-combo-best" style="font-weight:800"></div></div>
+        <div class="rscb-hide note" style="margin-top:6px" data-i18n="rsCbNote">النظام يقترح توليفات أوردرك؛ قِس طولها الفعلي على الطاولة وأدخِله، فيحسب الكفاءة (فعلي÷محسوب) ويرشّح أفضل توليفة (الأقل استهلاكاً للقطعة). كفاءة أقل من ١ = تداخل جيد يوفّر قماش.</div>
         <div style="overflow-x:auto;margin-top:16px">
           <div style="background:#f0a13c;color:#1c1c1c;font-weight:800;font-size:14px;padding:8px;border-radius:8px 8px 0 0;display:flex;align-items:center;gap:10px">
             <button type="button" class="mini-toggle rso-cv" onclick="rsCollapse('rso')" title="تصغير/تكبير">–</button>
@@ -500,7 +508,8 @@ rsMkTbl:'القياسات والكميات داخل الماركر',rsCode:'ال
 rsPcsLbl:'إجمالي القطع في الماركر',rsPlies:'عدد الطبقات',rsPcsRun:'إجمالي القطع في التشغيل',rsMkStatus:'حالة الماركر وسبب عدم الصلاحية',
 rsMkPerPly:'استهلاك الماركر/طبقة (متر)',rsSumFab:'إجمالي استهلاك التشغيل (متر)',rsAddMarker:'إضافة ماركر',rsActLen:'الطول الفعلي (اختياري)',
 rsCalibBtn:'معايرة استهلاك القياسات',rsCalibTitle:'معايرة استهلاك القياسات',rsCalibNeed2:'أدخل الطول الفعلي لماركرين على الأقل (بمقاسات متنوعة) لحساب المعايرة',rsCalibNoSizes:'لا مقاسات مشتركة كافية بين الماركرات المُدخَل لها طول فعلي',rsCalibInfo:'محسوبة من {n} ماركر (بطول فعلي مُدخَل) تغطّي {s} مقاساً',rsCalibRmseBefore:'خطأ التقدير الحالي',rsCalibRmseAfter:'خطأ التقدير بعد المعايرة',rsCalibImprove:'نسبة التحسّن',rsCalibCurrent:'القيمة الحالية',rsCalibSuggested:'القيمة المصحَّحة',rsCalibDelta:'الفرق',rsCalibCoverage:'عدد الماركرات',rsCalibCovTip:'عدد الماركرات (بطول فعلي مُدخَل) التي استُخدمت لحساب قيمة هذا المقاس — كلما زاد ازدادت الثقة بالتصحيح',rsCalibNote:'💡 المقاسات ذات التغطية المنخفضة (ماركر واحد) قد تحتاج مزيداً من الأطوال الفعلية لتأكيد التصحيح. المقاسات غير الظاهرة هنا لم تُصحَّح (لا بيانات كافية عنها).',rsCalibApply:'تطبيق القيم المصحَّحة',
-rsMaxLen:'حد طول الماركر (متر)',rsMaxSizes:'أقصى عدد قياسات في الماركر',rsMaxPcs:'أقصى عدد قطع في الماركر',rsSurplus:'فائض مسموح (قطعة/قياس)',rsNoCons:'تعذّر إعادة البناء: قياسات بلا قيمة استهلاك ({s}) — أدخِل استهلاكها في جدول الكميات',
+rsMaxLen:'حد طول الماركر (متر)',rsMaxSizes:'أقصى عدد قياسات في الماركر',rsMaxPcs:'أقصى عدد قطع في الماركر',rsSurplus:'فائض مسموح (قطعة/قياس)',
+rsCbTbl:'معايرة التوليفات — أفضل توليفة لكل ماركر',rsCbCombo:'التوليفة',rsCbActual:'الطول الفعلي المقاس',rsCbEff:'الكفاءة (فعلي÷محسوب)',rsCbRank:'الترتيب',rsCbSuggest:'اقترح توليفات أوردرك للمعايرة',rsCbNote:'النظام يقترح توليفات أوردرك (تغطّي كل القياسات)؛ قِس طولها الفعلي على الطاولة وأدخِله، فيحسب الكفاءة (فعلي÷محسوب) ويرشّح أفضل توليفة. كفاءة أقل من ١ = تداخل جيد يوفّر قماش.',rsCbEmpty:'اضغط «اقترح توليفات أوردرك» لتوليد التوليفات المطلوب معايرتها.',rsCbBest:'🏆 أفضل توليفة: {c} (كفاءة {e})',rsCbMeasure:'أدخِل الأطوال الفعلية لترتيب التوليفات حسب الكفاءة.',rsCbGen:'تم توليد {n} توليفة — قِس أطوالها وأدخِلها.',rsNoCons:'تعذّر إعادة البناء: قياسات بلا قيمة استهلاك ({s}) — أدخِل استهلاكها في جدول الكميات',
 rsObjective:'هدف تحسين الاقتراح التلقائي',rsObjPlies:'⬇️ أقل عدد طبقات (ماركرات أقرب للطول)',rsObjMarkers:'⬇️ أقل عدد ماركرات',
 rsPrint:'🖨 طباعة الخطة',rsPlanState:'حالة الخطة',rsReady:'مطابقة وجاهزة',rsReview:'تحتاج مراجعة',rsRemaining:'المتبقي',rsTotalProd:'إجمالي المنتَج',
 rsSumReq:'إجمالي كمية الطلب',rsSumProd:'إجمالي إنتاج الخطة',rsSumRem:'إجمالي المتبقي',rsSumSurplus:'زيادة الإنتاج',rsSumValid:'عدد الماركرات الصالحة',rsSumFabT:'إجمالي استهلاك التشغيل',rsSumPcons:'استهلاك القطعة',rsDispUnit:'وحدة العرض',
@@ -652,7 +661,8 @@ rsMkTbl:'Sizes & quantities per marker',rsCode:'Code',rsDesc:'Item',rsSizesRow:'
 rsPcsLbl:'Total pieces per marker',rsPlies:'Plies',rsPcsRun:'Total run pieces',rsMkStatus:'Marker status & invalid reason',
 rsMkPerPly:'Marker cons/ply (m)',rsSumFab:'Total run consumption (m)',rsAddMarker:'Add marker',rsActLen:'Actual measured length (optional)',
 rsCalibBtn:'Calibrate size consumption',rsCalibTitle:'Size consumption calibration',rsCalibNeed2:'Enter the actual length for at least 2 markers (with varied sizes) to calibrate',rsCalibNoSizes:'Not enough shared sizes between the markers with an actual length entered',rsCalibInfo:'Computed from {n} markers (with actual length entered) covering {s} sizes',rsCalibRmseBefore:'Current estimate error',rsCalibRmseAfter:'Error after calibration',rsCalibImprove:'Improvement',rsCalibCurrent:'Current value',rsCalibSuggested:'Corrected value',rsCalibDelta:'Delta',rsCalibCoverage:'Markers used',rsCalibCovTip:'How many actual-length markers were used to compute this size — more means higher confidence in the correction',rsCalibNote:'💡 Low-coverage sizes (one marker) may need more actual-length entries to confirm the correction. Sizes not listed here were not adjusted (insufficient data).',rsCalibApply:'Apply corrected values',
-rsMaxLen:'Marker length limit (m)',rsMaxSizes:'Max sizes per marker',rsMaxPcs:'Max pieces per marker',rsSurplus:'Allowed surplus (pc/size)',rsNoCons:'Cannot rebuild: sizes with no consumption value ({s}) — enter it in the quantities table',
+rsMaxLen:'Marker length limit (m)',rsMaxSizes:'Max sizes per marker',rsMaxPcs:'Max pieces per marker',rsSurplus:'Allowed surplus (pc/size)',
+rsCbTbl:'Combination calibration — best combination per marker',rsCbCombo:'Combination',rsCbActual:'Measured actual length',rsCbEff:'Efficiency (actual÷calc)',rsCbRank:'Rank',rsCbSuggest:'Suggest your order combinations',rsCbNote:'The system suggests your order combinations (covering all sizes); measure their real length and enter it — it computes efficiency (actual÷calc) and ranks the best. Efficiency < 1 = good nesting that saves fabric.',rsCbEmpty:'Press “Suggest your order combinations” to generate combinations to calibrate.',rsCbBest:'🏆 Best combination: {c} (efficiency {e})',rsCbMeasure:'Enter actual lengths to rank combinations by efficiency.',rsCbGen:'Generated {n} combinations — measure and enter their lengths.',rsNoCons:'Cannot rebuild: sizes with no consumption value ({s}) — enter it in the quantities table',
 rsObjective:'Auto-suggest optimization goal',rsObjPlies:'⬇️ Fewest plies (fuller markers)',rsObjMarkers:'⬇️ Fewest markers',
 rsPrint:'🖨 Print plan',rsPlanState:'Plan status',rsReady:'Matched & ready',rsReview:'Needs review',rsRemaining:'Remaining',rsTotalProd:'Total produced',
 rsSumReq:'Total order qty',rsSumProd:'Plan production',rsSumRem:'Total remaining',rsSumSurplus:'Overproduction',rsSumValid:'Valid markers',rsSumFabT:'Total run consumption',rsSumPcons:'Consumption / piece',rsDispUnit:'Display unit',
@@ -1893,14 +1903,14 @@ function rsCombos(sizes,maxsizes,maxpcs,cons,maxlen){const out=[];const CAP=1500
 // المحرك الموحّد: تغطية جشعة تامة بلا زيادة. الاستهلاك ثابت (مجموع قطع×استهلاك) في كل الأهداف؛
 // «أقل طبقات» يملأ كل ماركر لأقرب ما يمكن من حدّ الطول (أكثر قطع/طبقة) فتقلّ الطبقات؛
 // «أقل ماركرات» يفضّل أكبر تغطية في الماركر الواحد فيقلّ عددها (طبقات أكثر).
-function rsSolve(rem0,cons,maxlen,maxsizes,maxpcs){
-  const mode=($('rs-objective')&&$('rs-objective').value)||'plies';
+function rsSolve(rem0,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
+  const mode=opt.mode||($('rs-objective')&&$('rs-objective').value)||'plies';
   // ملاحظة: «أقل فائض» يأتي بعد التغطية مباشرةً — فالفائض لا يُطبَّق إلا حين يزيد التغطية فعلاً (يوفّر ماركر)،
   // ولا يُطبَّق عبثاً لملء ماركر طويل بينما ماركر أقصر يغطّي بالضبط (كان يرفع الفائض بلا داعٍ مع الأطوال الكبيرة).
   const better=mode==='markers'
     ? (a,b)=>(a.covered-b.covered)||(b.surplus-a.surplus)||(a.pcs-b.pcs)||(b.len-a.len)   // أقل ماركرات: أكبر تغطية ثم أقل فائض ثم أكثر قطع ثم أقصر
     : (a,b)=>(a.pcs-b.pcs)||(a.covered-b.covered)||(b.surplus-a.surplus)||(a.len-b.len);  // أقل طبقات: أكثر قطع/طبقة ثم أكبر تغطية ثم أقل فائض ثم أقرب للطول
-  const SUR=Math.max(0,Math.round(+($('rs-surplus')&&$('rs-surplus').value)||0)); // فائض مسموح لكل قياس (0=تغطية تامة، افتراضي)
+  const SUR=opt.sur!=null?opt.sur:Math.max(0,Math.round(+($('rs-surplus')&&$('rs-surplus').value)||0)); // فائض مسموح لكل قياس (0=تغطية تامة، افتراضي)
   const work={};Object.keys(rem0).forEach(s=>work[s]=rem0[s]);
   const out=[];let guard=0;const t0=Date.now();
   while(guard++<2000&&Date.now()-t0<3500){
@@ -2038,6 +2048,56 @@ function rsSortByPerPiece(){if(!$('rs-markers'))return;
   ms.sort((a,b)=>a.pc-b.pc); // الأقل استهلاكاً للقطعة أولاً = الأفضل توليفةً
   $('rs-markers').innerHTML='';ms.forEach(m=>rsAddMarker({pairs:m.pairs,plies:m.plies,actlen:m.actlen}));
   rsMkCalc();rsSaveDraft();}
+/* ---- معايرة التوليفات: يقترح النظام توليفات الأوردر (تغطّي كل القياسات)، تقيس أطوالها الفعلية،
+   فيحسب الكفاءة (فعلي÷محسوب) ويرشّح الأفضل. كفاءة <1 = تداخل يوفّر قماشاً — إن وُجد فعلاً ---- */
+let RS_COMBOS=[];
+function rsComboSuggest(){
+  const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const reqMap={};
+  [...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();const q=+tr.querySelector('.rsq-qty').value||0;if(s&&q>0)reqMap[s]=q;});
+  if(!Object.keys(reqMap).length){rsReadMarkers().forEach(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const pl=+m.plies||0;
+    if(!vp.length||!(pl>0))return;if(new Set(vp.map(p=>p.size)).size<vp.length)return;vp.forEach(p=>reqMap[p.size]=(reqMap[p.size]||0)+p.cnt*pl);});}
+  if(!Object.keys(reqMap).length)return toast(t('rsScNoData'));
+  const noCons=Object.keys(reqMap).filter(s=>!(cons[s]>0));
+  if(Object.keys(reqMap).every(s=>!(cons[s]>0)))return toast(tf('rsNoCons',{s:noCons.slice(0,8).join('، ')}));
+  const seen={};const combos=[];
+  const add=(added)=>added.forEach(a=>{const key=a.combo.map(p=>p.size+'×'+p.cnt).sort().join('|');if(seen[key])return;seen[key]=1;combos.push(a.combo.map(p=>({size:p.size,cnt:p.cnt})));});
+  [{mode:'markers',ms:maxsizes},{mode:'markers',ms:Math.min(maxsizes,3)},{mode:'markers',ms:2},{mode:'plies',ms:maxsizes}].forEach(cfg=>{
+    const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]);
+    try{add(rsSolve(rem,cons,maxlen,cfg.ms,maxpcs,{mode:cfg.mode,sur:0}));}catch(e){}});
+  // ضمان تغطية كل القياسات: أي قياس لم يظهر يُضاف كتوليفة قطعة واحدة
+  const covered=new Set();combos.forEach(c=>c.forEach(p=>covered.add(p.size)));
+  Object.keys(reqMap).filter(s=>cons[s]>0&&!covered.has(s)).forEach(s=>combos.push([{size:s,cnt:1}]));
+  RS_COMBOS=combos.map(c=>({combo:c,addLen:c.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0),pcs:c.reduce((a,p)=>a+p.cnt,0),actual:0}))
+    .sort((a,b)=>b.addLen-a.addLen);
+  rsComboRender();toast(tf('rsCbGen',{n:RS_COMBOS.length}));}
+function rsComboRender(){const tb=$('rs-combo-rows');if(!tb)return;const uf=rsUF();
+  if(!RS_COMBOS.length){tb.innerHTML=`<tr><td colspan="6" style="padding:10px;color:var(--mut)">${t('rsCbEmpty')}</td></tr>`;if($('rs-combo-best'))$('rs-combo-best').textContent='';return;}
+  tb.innerHTML=RS_COMBOS.map((c,i)=>{const sizes=c.combo.map(p=>p.cnt>1?p.size+'×'+p.cnt:p.size).join(' + ');
+    return `<tr>
+      <td style="font-weight:700;text-align:start;padding:4px 8px">${esc(sizes)}</td>
+      <td class="red">${Math.round(c.addLen*uf*100)/100}</td>
+      <td><input class="rscb-act" data-i="${i}" type="number" step="0.01" min="0" value="${c.actual||''}" placeholder="—" style="width:82px;padding:4px;text-align:center;font-weight:800;border:1px solid #cfa53a;border-radius:6px;background:#fffbe8;color:#3a2f00" oninput="rsComboCalc()"></td>
+      <td class="rscb-eff" data-i="${i}" style="font-weight:800">—</td>
+      <td class="rscb-pc red" data-i="${i}">—</td>
+      <td class="rscb-rank" data-i="${i}" style="font-weight:800">—</td></tr>`;}).join('');
+  rsComboCalc();}
+function rsComboCalc(){const uf=rsUF(),dk=rsDark();
+  document.querySelectorAll('.rscb-act').forEach(inp=>{const i=+inp.dataset.i;if(RS_COMBOS[i])RS_COMBOS[i].actual=+inp.value||0;});
+  const rows=RS_COMBOS.map((c,i)=>{const addD=Math.round(c.addLen*uf*100)/100;const eff=c.actual>0&&addD>0?c.actual/addD:null;const pc=c.actual>0&&c.pcs>0?Math.round(c.actual/c.pcs*100)/100:null;return {i,eff,pc};});
+  const measured=rows.filter(r=>r.eff!=null).slice().sort((a,b)=>a.eff-b.eff); // الأقل كفاءة (أفضل تداخل) أولاً
+  const rankMap={};measured.forEach((r,idx)=>rankMap[r.i]=idx+1);
+  rows.forEach(r=>{const effEl=document.querySelector('.rscb-eff[data-i="'+r.i+'"]');const pcEl=document.querySelector('.rscb-pc[data-i="'+r.i+'"]');const rkEl=document.querySelector('.rscb-rank[data-i="'+r.i+'"]');
+    if(!effEl)return;
+    if(r.eff!=null){effEl.textContent=Math.round(r.eff*1000)/1000;
+      effEl.style.color=r.eff<0.995?(dk?'#7fdca0':'#1e7e40'):(r.eff>1.005?(dk?'#f28b86':'#c00000'):'inherit');
+      pcEl.textContent=r.pc;rkEl.textContent=rankMap[r.i]===1?('🏆 '+rankMap[r.i]):rankMap[r.i];}
+    else{effEl.textContent='—';effEl.style.color='inherit';pcEl.textContent='—';rkEl.textContent='—';}});
+  const bEl=$('rs-combo-best');if(!bEl)return;
+  const best=measured[0];
+  if(best){const c=RS_COMBOS[best.i];bEl.textContent=tf('rsCbBest',{c:c.combo.map(p=>p.cnt>1?p.size+'×'+p.cnt:p.size).join(' + '),e:Math.round(best.eff*1000)/1000});bEl.style.color=dk?'#7fdca0':'#1e7e40';}
+  else bEl.textContent=t('rsCbMeasure');}
 // تغيير هدف التحسين: يعيد بناء كل الماركرات فوراً بالهدف الجديد.
 // الطلب يُؤخذ من جدول الكميات إن كانت مُدخَلة، وإلا يُشتقّ من إنتاج الماركرات الحالية (خطة يدوية بلا كميات).
 function rsObjectiveChanged(){rsSaveDraft();
