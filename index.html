@@ -360,6 +360,15 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <button type="button" class="mini g" onclick="rsSortByPerPiece()" title="ترتيب الماركرات حسب استهلاك القطعة (الأقل/الأفضل أولاً) — يعتمد الطول الفعلي المقاس إن أُدخل، فيشمل تداخل القطع الحقيقي">🏆 <span data-i18n="rsSortPcBtn">الأفضل حسب استهلاك القطعة</span></button>
           <button type="button" class="mini r" onclick="rsClearMarkers()" title="حذف كل الماركرات للبدء من جديد (استخدم بعدها: أكمل الخطة تلقائياً)">🧹 <span data-i18n="rsClearMkBtn">امسح الماركرات</span></button>
           <button type="button" class="btn sec" style="padding:6px 14px" onclick="rsCalibrateOpen()" title="يحسب القيمة الصحيحة لاستهلاك كل مقاس من الأطوال الفعلية المُدخَلة على عدة ماركرات — يحدّد المقاسات ذات القيمة الخاطئة بدقة">🧮 <span data-i18n="rsCalibBtn">معايرة استهلاك القياسات</span></button></div>
+        <div style="overflow-x:auto;margin-top:16px"><table class="xtbl" style="min-width:760px">
+          <tr><th colspan="5" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rscb-cv" onclick="rsCollapse('rscb')" title="تصغير/تكبير">–</button><span data-i18n="rsCbTbl">معايرة التوليفات — أفضل توليفة لكل ماركر</span></span></th></tr>
+          <tr class="rscb-hide"><th data-i18n="rsCbCombo">التوليفة</th><th class="rsu-h" data-b="الطول المحسوب">الطول المحسوب (متر)</th><th data-i18n="rsCbActual">الطول الفعلي المقاس</th><th data-i18n="rsCbEff">الكفاءة (فعلي÷محسوب)</th><th data-i18n="rsCbRank">الترتيب</th></tr>
+          <tbody id="rs-combo-rows" class="rscb-hide"></tbody></table></div>
+        <div class="rscb-hide" style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <button type="button" class="btn g" style="padding:6px 14px" onclick="rsComboSaveLib()">💾 <span data-i18n="rsCbSaveLib">احفظ القياسات في مكتبة المنتج</span></button>
+          <div id="rs-combo-best" style="font-weight:800"></div></div>
+        <div class="rscb-hide note" style="margin-top:4px" data-i18n="rsCbLibNote">القياسات المحفوظة تُعبَّأ تلقائياً في أي أوردر لاحق لنفس المنتج (مرجع دائم).</div>
+        <div class="rscb-hide note" style="margin-top:6px" data-i18n="rsCbNote">النظام يقترح توليفات أوردرك؛ قِس طولها الفعلي على الطاولة وأدخِله، فيحسب الكفاءة (فعلي÷محسوب) ويرشّح أفضل توليفة (الأقل استهلاكاً للقطعة). كفاءة أقل من ١ = تداخل جيد يوفّر قماش.</div>
         <div style="overflow-x:auto;margin-top:12px"><table class="xtbl" style="min-width:560px">
           <tr><th colspan="7" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsr-cv" onclick="rsCollapse('rsr')" title="تصغير/تكبير">–</button><span data-i18n="rsReviewTbl">مراجعة الناتج حسب المقاس</span></span></th></tr>
           <tr class="rsr-hide"><th data-i18n="sizeName">القياس</th><th class="or" data-i18n="mkQtyOrder">المطلوب</th><th data-i18n="rsProdFromMk">إجمالي القطع من الماركر</th><th class="or" data-i18n="rsRemFromOrder">المتبقي من الأوردر</th><th data-i18n="mkStateCol">الحالة</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th class="or rsu-h" data-b="إجمالي استهلاك الأوردر">إجمالي استهلاك الأوردر (متر)</th></tr>
@@ -373,15 +382,6 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
             <th class="or" data-i18n="rsPcsRun">إجمالي القطع في التشغيل</th><th class="rsu-h" data-b="استهلاك الماركر/طبقة">استهلاك الماركر/طبقة (متر)</th><th class="or rsu-h" data-b="إجمالي استهلاك التشغيل">إجمالي استهلاك التشغيل (متر)</th><th data-i18n="rsRemWithRun">إجمالي المتبقي مع التشغيل</th></tr>
           <tbody id="rs-sug-rows" class="rss-hide"></tbody></table></div>
         <button type="button" class="btn g rss-hide" style="margin-top:6px" onclick="rsApplySugs()" data-i18n="rsApplyAll">✔ اعتماد كل الاقتراحات كماركر</button>
-        <div style="overflow-x:auto;margin-top:16px"><table class="xtbl" style="min-width:760px">
-          <tr><th colspan="5" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rscb-cv" onclick="rsCollapse('rscb')" title="تصغير/تكبير">–</button><span data-i18n="rsCbTbl">معايرة التوليفات — أفضل توليفة لكل ماركر</span></span></th></tr>
-          <tr class="rscb-hide"><th data-i18n="rsCbCombo">التوليفة</th><th class="rsu-h" data-b="الطول المحسوب">الطول المحسوب (متر)</th><th data-i18n="rsCbActual">الطول الفعلي المقاس</th><th data-i18n="rsCbEff">الكفاءة (فعلي÷محسوب)</th><th data-i18n="rsCbRank">الترتيب</th></tr>
-          <tbody id="rs-combo-rows" class="rscb-hide"></tbody></table></div>
-        <div class="rscb-hide" style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-          <button type="button" class="btn g" style="padding:6px 14px" onclick="rsComboSaveLib()">💾 <span data-i18n="rsCbSaveLib">احفظ القياسات في مكتبة المنتج</span></button>
-          <div id="rs-combo-best" style="font-weight:800"></div></div>
-        <div class="rscb-hide note" style="margin-top:4px" data-i18n="rsCbLibNote">القياسات المحفوظة تُعبَّأ تلقائياً في أي أوردر لاحق لنفس المنتج (مرجع دائم).</div>
-        <div class="rscb-hide note" style="margin-top:6px" data-i18n="rsCbNote">النظام يقترح توليفات أوردرك؛ قِس طولها الفعلي على الطاولة وأدخِله، فيحسب الكفاءة (فعلي÷محسوب) ويرشّح أفضل توليفة (الأقل استهلاكاً للقطعة). كفاءة أقل من ١ = تداخل جيد يوفّر قماش.</div>
         <div style="overflow-x:auto;margin-top:16px">
           <div style="background:#f0a13c;color:#1c1c1c;font-weight:800;font-size:14px;padding:8px;border-radius:8px 8px 0 0;display:flex;align-items:center;gap:10px">
             <button type="button" class="mini-toggle rso-cv" onclick="rsCollapse('rso')" title="تصغير/تكبير">–</button>
@@ -859,7 +859,7 @@ function go(tb,btn){TAB=tb;['dash','insp','orders','fact','tools','marker','ref'
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');
   $('fab').style.display=(['insp','orders'].includes(tb)||(tb==='fact'&&can('fact')))?'flex':'none';if(tb==='dash')renderDash();if(tb==='ref')renderRef();
   if(tb==='tools')renderToolFactSelects();
-  if(tb==='marker')goMarker('rs');
+  if(tb==='marker'){goMarker('rs');if(!RS_COLLAPSED_INIT){RS_COLLAPSED_INIT=1;rsCollapseAll();}}
   if(tb==='insp')goInsp('list',document.querySelector('#insp-subnav button'));}
 function goInsp(v,btn){['list','toolchk'].forEach(x=>$('insp-wrap-'+x).classList.toggle('hide',x!==v));
   document.querySelectorAll('#insp-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');
@@ -1684,7 +1684,9 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
       <div>${t('repInspector')}: ______________</div><div>QC: ______________</div></div></div>`;
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 /* ============ الريشو ============ */
-let RS_DRAFT=null,RS_LOADED=false,RS_SAVE_T=null,RS_COL={};
+let RS_DRAFT=null,RS_LOADED=false,RS_SAVE_T=null,RS_COL={},RS_COLLAPSED_INIT=0;
+// طيّ كل الأقسام افتراضياً (المستخدم يفتح ما يحتاجه) — يُطبَّق مرة عند أول دخول لصفحة الريشو في الجلسة
+function rsCollapseAll(){['rsc','rsq','rsm','rsr','rss','rscb','rso'].forEach(k=>{if(!RS_COL[k]&&document.querySelector('.'+k+'-cv'))rsCollapse(k);});}
 // طيّ/فتح جدول
 function rsCollapse(key){const on=RS_COL[key]=!RS_COL[key];
   document.querySelectorAll('.'+key+'-hide').forEach(e=>e.style.display=on?'none':'');
