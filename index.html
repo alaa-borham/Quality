@@ -2081,6 +2081,8 @@ function rsSortByPerPiece(){if(!$('rs-markers'))return;
 /* ---- معايرة التوليفات: يقترح النظام توليفات الأوردر (تغطّي كل القياسات)، تقيس أطوالها الفعلية،
    فيحسب الكفاءة (فعلي÷محسوب) ويرشّح الأفضل. كفاءة <1 = تداخل يوفّر قماشاً — إن وُجد فعلاً ---- */
 let RS_COMBOS=[];let RS_HEAVY=[];
+// سياق مؤقّت لتسريع إعادة الحساب: خريطة المكتبة ومعامل التداخل يُبنيان مرة في rsMkCalc ويُعاد استخدامهما في كل الاستدعاءات المتداخلة
+let RS_LIBC=null;
 // توقيع التوليفة (مقاسات+أعداد مرتّبة) للمطابقة مع مكتبة المنتج المحفوظة
 function rsComboSig(combo){return combo.map(p=>p.size+'×'+p.cnt).sort().join('|');}
 function rsComboProd(){return $('rs-product')?$('rs-product').value:'';}
@@ -2348,13 +2350,15 @@ function rsEffLen(calcLen,actlen){return (actlen&&actlen>0)?actlen:calcLen;}
 // عرض القماش الحالي (نص مُطبَّع) — قياسات المكتبة خاصة بكل عرض
 function rsFabW(){return $('rs-fabwidth')?String($('rs-fabwidth').value||'').trim():'';}
 // الطول المقيس من مكتبة المنتج لتوليفة ماركر مطابقة (بالمتر) — مطابقة التوليفة + عرض القماش، وإلا 0
-function rsMarkerLibLen(pairs){const lib=prodComboLib(rsComboProd());if(!lib.length)return 0;
-  const vp=(pairs||[]).filter(p=>p&&p.size&&p.cnt>0);if(!vp.length)return 0;
+function rsMarkerLibLen(pairs){const vp=(pairs||[]).filter(p=>p&&p.size&&p.cnt>0);if(!vp.length)return 0;
+  if(RS_LIBC)return RS_LIBC.map[rsComboSig(vp)]||0;// المسار السريع: خريطة محسوبة مسبقاً
+  const lib=prodComboLib(rsComboProd());if(!lib.length)return 0;
   const sig=rsComboSig(vp),cw=rsFabW();
   for(const x of lib){if(x.sig===sig&&String(x.w||'')===String(cw||'')&&x.actLenM>0)return x.actLenM;}return 0;}
 // معامل التداخل المُتعلَّم لعرض القماش الحالي = متوسط (فعلي÷محسوب) من توليفات المكتبة المقيسة لنفس العرض
 // يُطبَّق على التوليفات غير المقيسة لتقريب تقديرها من الكاد (مقيَّد في نطاق منطقي)
-function rsWidthEff(){const lib=prodComboLib(rsComboProd());if(!lib.length)return 0;
+function rsWidthEff(){if(RS_LIBC)return RS_LIBC.wf;// المسار السريع: معامل محسوب مسبقاً
+  const lib=prodComboLib(rsComboProd());if(!lib.length)return 0;
   const cw=rsFabW();const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);let sum=0,n=0;
   lib.forEach(x=>{if(String(x.w||'')!==String(cw||''))return;const comp=(x.sizes||[]).reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);
     if(comp>0&&x.actLenM>0){sum+=x.actLenM/comp;n++;}});
@@ -2544,6 +2548,11 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
   const raw=rsReadMarkers();let tRun=0,tFab=0,tPlies=0,tPcs=0,tFabMeas=0,nMeasMk=0;RS_VALIDN=0;
+  // تحسين الأداء: نحسب خريطة المكتبة (توليفة→طول مقيس) ومعامل التداخل مرة واحدة، بدل استدعائها لكل ماركر
+  const _cw=rsFabW(),_libRecs=prodComboLib(rsComboProd());const _libMap={};
+  _libRecs.forEach(x=>{if(String(x.w||'')===String(_cw||'')&&x.actLenM>0)_libMap[x.sig]=x.actLenM;});
+  const _wf=rsWidthEff();const _wfOn=_wf>0&&Math.abs(_wf-1)>1e-6;
+  RS_LIBC={map:_libMap,wf:_wf};// تفعيل المسار السريع لكل الاستدعاءات المتداخلة (rsRollPlan…)
   const reqMap={};[...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();if(s)reqMap[s]=+tr.querySelector('.rsq-qty').value||0;});
   const produced={};const MR=[];const swaps=[];
   [...document.querySelectorAll('.rs-mrow1')].forEach((tr1,i)=>{const m=raw[i];const tr2=tr1.nextElementSibling;
@@ -2561,8 +2570,8 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();
         if(maxlen>0&&len>maxlen+1e-9){st='st_len';
           const sw=rsLenSwapPick(vp,cons,len,maxlen);if(sw)swaps.push({idx:i,from:sw.from,to:sw.to});}
         else st='st_ok';}}
-    const libM=rsMarkerLibLen(m.pairs);// الطول المقيس من المكتبة (متر) إن تطابقت التوليفة والعرض
-    const effLen=rsMkEffLen(m.pairs,len,m.actlen,uf);// الأولوية للمقيس من المكتبة ثم الفعلي ثم المحسوب
+    const libM=vp.length?(_libMap[rsComboSig(vp)]||0):0;// الطول المقيس من المكتبة (متر) — بحث في الخريطة المحسوبة مسبقاً
+    const effLen=libM>0?libM:(m.actlen&&m.actlen>0?m.actlen/uf:(_wfOn?len*_wf:len));// المقيس ثم الفعلي ثم المُعدَّل بالمعامل ثم المحسوب
     if(st==='st_ok'){run=pcs*plies;fab=effLen*plies;tRun+=run;tFab+=fab;tPlies+=plies;tPcs+=pcs;RS_VALIDN++;
       if(libM>0){tFabMeas+=fab;nMeasMk++;}// ماركر مقيس من المكتبة = مطابق للكاد
       vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);}
@@ -2578,8 +2587,8 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();
       lenCell.innerHTML=`<span title="${esc(t('rsMkLibLen'))}" style="color:${dk?'#7fdca0':'#1e7e40'};font-weight:800">${measDisp} <span style="font-size:11px">✓📐</span></span><div style="font-size:10px;font-weight:700;color:${dcol};margin-top:2px">${delta>=0?'+':''}${delta} ${esc(t('rsMkVsCalc'))}</div>`;}
     else if(m.actlen>0){const delta=Math.round((m.actlen-calcDisp)*100)/100;const dcol=Math.abs(delta)<=0.05?(dk?'#7fdca0':'#1e7e40'):(dk?'#f28b86':'#c00000');
       lenCell.innerHTML=`${calcDisp}<div style="font-size:10px;font-weight:700;color:${dcol};margin-top:2px">${delta>=0?'+':''}${delta}</div>`;}
-    else{const wf=(st==='st_ok')?rsWidthEff():0;
-      if(wf>0&&Math.abs(wf-1)>1e-6){const adj=Math.round(len*wf*uf*100)/100;const delta=Math.round((adj-calcDisp)*100)/100;const bcol=dk?'#7fb0dc':'#2e75b6';
+    else{const wf=(st==='st_ok'&&_wfOn)?_wf:0;
+      if(wf>0){const adj=Math.round(len*wf*uf*100)/100;const delta=Math.round((adj-calcDisp)*100)/100;const bcol=dk?'#7fb0dc':'#2e75b6';
         lenCell.innerHTML=`<span title="${esc(t('rsMkEffAdj'))}" style="color:${bcol};font-weight:800">${adj} <span style="font-size:11px">≈🧲</span></span><div style="font-size:10px;font-weight:700;color:${dk?'#9fb0c0':'#667'};margin-top:2px">${esc(t('rsMkVsCalc'))} ${delta>=0?'+':''}${delta}</div>`;}
       else lenCell.textContent=calcDisp;}
     tr1.querySelector('.rsm-fab').textContent=Math.round(fab*uf*100)/100;
@@ -2629,8 +2638,8 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();
   const pconsAll=(tFab&&tRun)?Math.round(tFab*uf/tRun*100)/100:0;// استهلاك القطعة = إجمالي القماش ÷ إجمالي القطع
   rsRenderSummary({totalReq,prod:prodAll,rem:totalReq-prodAll,valid:RS_VALIDN,fab:fabDisp,pcons:pconsAll,ready:totalReq>0&&prodAll===totalReq,price,cost,pieceCost});
   rsRollPlan();rsColorsCalc();
-  const en=$('rs-effnote');if(en){const wf=rsWidthEff();const cw=rsFabW();
-    if(wf>0&&Math.abs(wf-1)>1e-6){const nlib=prodComboLib(rsComboProd()).filter(x=>String(x.w||'')===String(cw||'')).length;
+  const en=$('rs-effnote');if(en){const wf=_wf,cw=_cw;
+    if(_wfOn){const nlib=_libRecs.filter(x=>String(x.w||'')===String(cw||'')).length;
       en.innerHTML=`🧲 ${esc(tf('rsMkEffNote',{f:Math.round(wf*1000)/1000,n:nlib,w:cw||'—'}))}`;en.style.display='';}
     else en.style.display='none';}
   const cc=$('rs-cadcov');if(cc){
@@ -2640,6 +2649,7 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();
         `<div style="height:10px;background:var(--line);border-radius:999px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${col};transition:width .3s"></div></div>`+
         `<div class="note" style="margin-top:4px">${esc(tf('rsCadCovNote',{p:pct,q:100-pct}))}</div>`;cc.style.display='';}
     else cc.style.display='none';}
+  RS_LIBC=null;// إنهاء المسار السريع
   rsSaveDraft();}
 function rsRenderSummary(d){const el=$('rs-summary');if(!el)return;
   const c=(l,v,col)=>`<div style="flex:1 1 150px;display:flex;border:1px solid #d8c27a;border-radius:8px;overflow:hidden;min-width:140px">
