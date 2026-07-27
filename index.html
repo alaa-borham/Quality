@@ -1901,8 +1901,9 @@ function rsApplySwap(i,from,to){const tr1=[...document.querySelectorAll('.rs-mro
 // كل توليفات المقاسات ضمن الحدود (عدد قياسات ≤ maxsizes، مجموع قطع ≤ maxpcs)
 // يُقلَّم أثناء التوليد بحدّ الطول (لا بعده) وبحدّ أقصى لعدد التوليفات — لمنع الانفجار التوافقي
 // مع كثرة القياسات (كان يُنتج ملايين التوليفات ويُهدر الذاكرة قبل هذا التقليم)
-function rsCombos(sizes,maxsizes,maxpcs,cons,maxlen){const out=[];const CAP=150000;let full=false;
+function rsCombos(sizes,maxsizes,maxpcs,cons,maxlen,deadline){const out=[];const CAP=150000;let full=false;let _n=0;
   const rec=(start,cur,pcs,len)=>{
+    if(deadline&&((++_n)&511)===0&&Date.now()>deadline){full=true;return;}// إيقاف مبكر عند تجاوز الميزانية الزمنية
     if(cur.length)out.push(cur.slice());
     if(out.length>=CAP){full=true;return;}
     if(cur.length>=maxsizes)return;
@@ -1928,12 +1929,13 @@ function rsSolve(rem0,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
     : (a,b)=>(a.pcs-b.pcs)||(a.covered-b.covered)||(b.surplus-a.surplus)||(a.len-b.len)||(a.spread-b.spread);  // أقل طبقات: قطع/طبقة ← تغطية ← أقل فائض ← أقرب للطول ← (تعادل) أكثر تنوّعاً
   const SUR=opt.sur!=null?opt.sur:Math.max(0,Math.round(+($('rs-surplus')&&$('rs-surplus').value)||0)); // فائض مسموح لكل قياس (0=تغطية تامة، افتراضي)
   const work={};Object.keys(rem0).forEach(s=>work[s]=rem0[s]);
-  const out=[];let guard=0;const t0=Date.now();
-  while(guard++<2000&&Date.now()-t0<3500){
+  const BUDGET=opt.budget||3500;// ميزانية زمنية (مللي ثانية) — تُصغَّر للاقتراحات الحيّة كي لا تُجمّد الواجهة
+  const out=[];let guard=0;const t0=Date.now();const deadline=t0+BUDGET;
+  while(guard++<2000&&Date.now()-t0<BUDGET){
     const active=Object.keys(work).filter(s=>work[s]>0&&cons[s]>0);if(!active.length)break;
     let best=null;
-    // مصدر التوليفات: قائمة مقيّدة (مثلاً توليفات المكتبة) إن مُرِّرت، وإلا توليد كل الاحتمالات
-    const src=opt.cands?opt.cands.filter(c=>c.every(p=>work[p.size]>0&&cons[p.size]>0)):rsCombos(active,maxsizes,maxpcs,cons,maxlen);
+    // مصدر التوليفات: قائمة مقيّدة (مثلاً توليفات المكتبة) إن مُرِّرت، وإلا توليد كل الاحتمالات ضمن الميزانية الزمنية
+    const src=opt.cands?opt.cands.filter(c=>c.every(p=>work[p.size]>0&&cons[p.size]>0)):rsCombos(active,maxsizes,maxpcs,cons,maxlen,deadline);
     for(const combo of src){
       const len=combo.reduce((a,p)=>a+p.cnt*cons[p.size],0);if(maxlen>0&&len>maxlen+1e-9)continue;
       const flo=Math.min(...combo.map(p=>Math.floor(work[p.size]/p.cnt)));
@@ -1987,7 +1989,7 @@ function rsAutoPlan(){if(!$('rs-markers'))return;
   toast(libN?tf('rsAutoAddedLib',{n:added.length,l:libN}):tf('rsAutoAdded',{n:added.length}));}
 /* ---- جدول الاقتراحات التلقائي لباقي الكمية ---- */
 let RS_SUGS=[],RS_SUG_REM0={},RS_SUG_BT=null;
-function rsScheduleSugs(){clearTimeout(RS_SUG_BT);RS_SUG_BT=setTimeout(rsBuildSugs,250);}
+function rsScheduleSugs(){clearTimeout(RS_SUG_BT);RS_SUG_BT=setTimeout(rsBuildSugs,500);}
 function rsBuildSugs(){if(!$('rs-sug-rows'))return;
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
@@ -1995,7 +1997,7 @@ function rsBuildSugs(){if(!$('rs-sug-rows'))return;
   const produced={};rsReadMarkers().forEach(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
     if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs))vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);});
   RS_SUG_REM0={};Object.keys(reqMap).forEach(s=>RS_SUG_REM0[s]=reqMap[s]-(produced[s]||0));
-  RS_SUGS=rsSolve(RS_SUG_REM0,cons,maxlen,maxsizes,maxpcs).map(s=>({combo:s.combo,sug:s.plies,plies:s.plies,len:s.len})).sort((a,b)=>b.len-a.len);
+  RS_SUGS=rsSolve(RS_SUG_REM0,cons,maxlen,maxsizes,maxpcs,{budget:300}).map(s=>({combo:s.combo,sug:s.plies,plies:s.plies,len:s.len})).sort((a,b)=>b.len-a.len);
   rsRenderSugs();}
 function rsRenderSugs(){const tb=$('rs-sug-rows');if(!tb)return;const uf=rsUF();const dk=rsDark();
   if(!RS_SUGS.length){tb.innerHTML=`<tr><td colspan="15" style="padding:10px;color:var(--mut)">${t('rsSugEmpty')}</td></tr>`;return;}
