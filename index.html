@@ -1931,14 +1931,11 @@ function rsSolve(rem0,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
   const work={};Object.keys(rem0).forEach(s=>work[s]=rem0[s]);
   const BUDGET=opt.budget||3500;// ميزانية زمنية (مللي ثانية) — تُصغَّر للاقتراحات الحيّة كي لا تُجمّد الواجهة
   const out=[];let guard=0;const t0=Date.now();const deadline=t0+BUDGET;
-  // تُولَّد التوليفات مرة واحدة (مجموعة شاملة لكل القياسات المطلوبة) ثم تُصفّى كل جولة — بدل إعادة توليد ثقيلة كل جولة
-  const active0=Object.keys(work).filter(s=>work[s]>0&&cons[s]>0);
-  const allC=opt.cands?opt.cands:rsCombos(active0,maxsizes,maxpcs,cons,maxlen,deadline);
   while(guard++<2000&&Date.now()-t0<BUDGET){
-    if(!Object.keys(work).some(s=>work[s]>0&&cons[s]>0))break;
+    const active=Object.keys(work).filter(s=>work[s]>0&&cons[s]>0);if(!active.length)break;
     let best=null;
-    // تصفية التوليفات التي ما زالت كل قياساتها مطلوبة (work>0)
-    const src=allC.filter(c=>c.every(p=>work[p.size]>0&&cons[p.size]>0));
+    // يُعاد توليد التوليفات للقياسات المتبقية فقط كل جولة — يضمن تغطية كل القياسات حتى عند بلوغ سقف التوليد
+    const src=opt.cands?opt.cands.filter(c=>c.every(p=>work[p.size]>0&&cons[p.size]>0)):rsCombos(active,maxsizes,maxpcs,cons,maxlen,deadline);
     for(const combo of src){
       const len=combo.reduce((a,p)=>a+p.cnt*cons[p.size],0);if(maxlen>0&&len>maxlen+1e-9)continue;
       const flo=Math.min(...combo.map(p=>Math.floor(work[p.size]/p.cnt)));
