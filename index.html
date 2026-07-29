@@ -140,6 +140,10 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
 .xtbl .szc select,.xtbl .szc input{min-width:0!important;width:100%}
 .xtbl th.or{background:#f0a13c}
 .xtbl tr.tot td{background:#17696b;color:#fff;font-weight:800}
+#rs-qty-rows{counter-reset:rsqn}
+#rs-qty-rows .rsq-row{counter-increment:rsqn}
+#rs-qty-rows .rsq-seq{width:38px;max-width:38px;font-weight:800;color:var(--mut)}
+#rs-qty-rows .rsq-seq::before{content:counter(rsqn)}
 .xtbl .red{color:#c00000;font-weight:800}
 .xtbl input,.xtbl select{font-family:inherit;font-size:13px}
 .xtbl select{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:none;cursor:pointer}
@@ -326,10 +330,10 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
             <div id="rs-colors" style="display:flex;flex-direction:column;gap:6px;max-width:520px"></div>
             <div id="rs-colors-sum" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div></div></div>
         <div style="overflow-x:auto;margin-top:10px"><table id="rs-qty-tbl" class="xtbl" style="min-width:520px">
-          <tr><th colspan="6" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsq-cv" onclick="rsCollapse('rsq')" title="تصغير/تكبير">–</button><span data-i18n="rsQtyTbl2">الكميات المطلوبة والاستهلاك حسب المقاس</span></span></th></tr>
-          <tr class="rsq-hide"><th data-i18n="sizeName">المقاس</th><th class="or" data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="rsRatio">نسبة بحسب الموديل</th><th class="or rsu-h" data-b="استهلاك الكمية">استهلاك الكمية (متر)</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th></th></tr>
+          <tr><th colspan="7" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsq-cv" onclick="rsCollapse('rsq')" title="تصغير/تكبير">–</button><span data-i18n="rsQtyTbl2">الكميات المطلوبة والاستهلاك حسب المقاس</span></span></th></tr>
+          <tr class="rsq-hide"><th data-i18n="rsCbNo">م</th><th data-i18n="sizeName">المقاس</th><th class="or" data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="rsRatio">نسبة بحسب الموديل</th><th class="or rsu-h" data-b="استهلاك الكمية">استهلاك الكمية (متر)</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th></th></tr>
           <tbody id="rs-qty-rows" class="rsq-hide"></tbody>
-          <tr class="tot rsq-hide"><td data-i18n="total">الإجمالي</td><td id="rs-qt-q">—</td><td id="rs-qt-r">—</td><td id="rs-qt-c">—</td><td>—</td><td></td></tr></table></div>
+          <tr class="tot rsq-hide"><td></td><td data-i18n="total">الإجمالي</td><td id="rs-qt-q">—</td><td id="rs-qt-r">—</td><td id="rs-qt-c">—</td><td>—</td><td></td></tr></table></div>
         <button type="button" class="mini rsq-hide" style="margin-top:6px" onclick="rsAddQtyRow()">➕ <span data-i18n="mkAddRow">إضافة مقاس</span></button>
         <div class="grid3" style="margin-top:14px">
           <div><label class="inl rsu-h" data-b="حد طول الماركر">حد طول الماركر (متر)</label><input id="rs-maxlen" type="number" step="0.01" value="17" oninput="rsMkCalc()" onchange="rsMaxLenChanged()"></div>
@@ -1764,6 +1768,7 @@ function rsAddQtyRow(r){r=r||{};const src=rsSizeSrc();const locked=src.length>0;
     ?`<select class="rsq-size" onchange="rsPickSize(this)" style="min-width:90px;padding:6px;font-weight:800"><option value="">\u2014</option>${sizeOptionsHtml(src,r.size,r.cons)}</select>`
     :`<input class="rsq-size" value="${esc(r.size||'')}" placeholder="L" style="min-width:70px;padding:6px;font-weight:800" oninput="rsCalc()">`;
   $('rs-qty-rows').insertAdjacentHTML('beforeend',`<tr class="rsq-row">
+   <td class="rsq-seq"></td>
    <td>${cell}</td>
    <td><input class="rsq-qty" type="number" min="0" value="${r.qty!=null?r.qty:''}" style="min-width:70px;padding:6px;text-align:center;font-weight:700" oninput="rsCalc()" onkeydown="rsEnter(event,this)"></td>
    <td><input class="rsq-ratio" type="number" step="0.25" min="0" value="${r.ratio!=null&&r.ratio!==0?r.ratio:''}" style="min-width:56px;padding:6px;text-align:center;font-weight:700${locked?';background:#fffbe8;border:none':''}" oninput="rsCalc()" onchange="rsEditVal(this,'ratio')" onkeydown="rsEnter(event,this)"></td>
