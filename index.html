@@ -1716,7 +1716,8 @@ function rsUpdateUnitLabels(){const u=rsUL();document.querySelectorAll('.rsu-h')
   document.querySelectorAll('.rsu-price').forEach(e=>{e.textContent=tf('rsPriceLbl',{u});});}
 function rsUnitChanged(){const to=($('rs-unit')&&$('rs-unit').value)||'متر';const uf=x=>x==='ياردة'?1.0936133:1;
   const cf=uf(to)/uf(RS_PREV_UNIT);
-  ['rs-maxlen','rs-rolllen'].forEach(id=>{const el=$(id);if(el&&el.value)el.value=Math.round(+el.value*cf*100)/100;});
+  // دقّة عالية للحدود (تحويل بلا خسارة حتى لا يتغيّر حدّ الطول فعلياً عند تبديل الوحدة)
+  ['rs-maxlen','rs-rolllen'].forEach(id=>{const el=$(id);if(el&&el.value)el.value=Math.round(+el.value*cf*10000)/10000;});
   document.querySelectorAll('.rsm-actlen').forEach(el=>{if(el.value)el.value=Math.round(+el.value*cf*100)/100;});
   RS_PREV_UNIT=to;rsUpdateUnitLabels();rsCalc();rsSaveDraft();}
 // أول تحميل في الجلسة: استعد المسودة المحفوظة، وإلا املأ مقاسات المنتج
