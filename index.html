@@ -144,6 +144,18 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
 #rs-qty-rows .rsq-row{counter-increment:rsqn}
 #rs-qty-rows .rsq-seq{width:38px;max-width:38px;font-weight:800;color:var(--mut)}
 #rs-qty-rows .rsq-seq::before{content:counter(rsqn)}
+#rs-markers{counter-reset:rsmn}
+#rs-markers .rs-mrow1{counter-increment:rsmn}
+#rs-markers .rsm-seq{width:34px;max-width:34px;font-weight:800;color:var(--mut)}
+#rs-markers .rsm-seq::before{content:counter(rsmn)}
+#rs-review{counter-reset:rsrn}
+#rs-review tr{counter-increment:rsrn}
+#rs-review .rsr-seq{width:34px;max-width:34px;font-weight:800;color:var(--mut)}
+#rs-review .rsr-seq::before{content:counter(rsrn)}
+#rs-combo-rows{counter-reset:rscn}
+#rs-combo-rows tr{counter-increment:rscn}
+#rs-combo-rows .rscb-seq{width:34px;max-width:34px;font-weight:800;color:var(--mut)}
+#rs-combo-rows .rscb-seq::before{content:counter(rscn)}
 .xtbl .red{color:#c00000;font-weight:800}
 .xtbl input,.xtbl select{font-family:inherit;font-size:13px}
 .xtbl select{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:none;cursor:pointer}
@@ -351,8 +363,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <div><label class="inl rsu-price" data-b="سعر متر القماش (اختياري)">سعر متر القماش (اختياري)</label>
           <input id="rs-price" type="number" step="0.01" min="0" placeholder="—" oninput="rsMkCalc();rsSaveDraft()" style="max-width:150px;padding:6px;background:var(--inp)"></div></div>
         <div style="overflow-x:auto;margin-top:10px"><table class="xtbl" style="min-width:1500px">
-          <tr><th colspan="16" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsm-cv" onclick="rsCollapse('rsm')" title="تصغير/تكبير">–</button><span data-i18n="rsMkTbl">القياسات والكميات داخل الماركر</span></span></th></tr>
-          <tr class="rsm-hide"><th data-i18n="rsCode">الكود</th><th data-i18n="rsDesc">البيان</th>
+          <tr><th colspan="17" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsm-cv" onclick="rsCollapse('rsm')" title="تصغير/تكبير">–</button><span data-i18n="rsMkTbl">القياسات والكميات داخل الماركر</span></span></th></tr>
+          <tr class="rsm-hide"><th data-i18n="rsCbNo">م</th><th data-i18n="rsCode">الكود</th><th data-i18n="rsDesc">البيان</th>
             <th class="szc">مقاس١</th><th class="szc">مقاس٢</th><th class="szc">مقاس٣</th><th class="szc">مقاس٤</th><th class="szc">مقاس٥</th><th class="szc">مقاس٦</th>
             <th class="or" data-i18n="rsPcsLbl">إجمالي القطع في الماركر</th><th data-i18n="rsPlies">عدد الطبقات</th>
             <th class="or" data-i18n="rsPcsRun">إجمالي القطع في التشغيل</th><th data-i18n="rsMkStatus">حالة الماركر وسبب عدم الصلاحية</th>
@@ -360,7 +372,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
             <th class="rsu-h" data-b="استهلاك القطعة داخل الماركر" title="متوسط استهلاك القطعة الواحدة في هذا الماركر = استهلاك الماركر ÷ عدد القطع في الماركر">استهلاك القطعة داخل الماركر (متر)</th>
             <th class="or rsu-h" data-b="إجمالي استهلاك التشغيل">إجمالي استهلاك التشغيل (متر)</th><th></th></tr>
           <tbody id="rs-markers" class="rsm-hide"></tbody>
-          <tr class="tot rsm-hide"><td colspan="8" data-i18n="total">الإجمالي</td><td id="rs-mt-pcs">—</td><td id="rs-mt-plies">—</td><td id="rs-mt-run">—</td><td></td><td>—</td><td id="rs-mt-pcons" title="استهلاك القطعة في إجمالي الماركرات = إجمالي القماش ÷ إجمالي القطع">—</td><td id="rs-mt-fab">—</td><td></td></tr></table></div>
+          <tr class="tot rsm-hide"><td colspan="9" data-i18n="total">الإجمالي</td><td id="rs-mt-pcs">—</td><td id="rs-mt-plies">—</td><td id="rs-mt-run">—</td><td></td><td>—</td><td id="rs-mt-pcons" title="استهلاك القطعة في إجمالي الماركرات = إجمالي القماش ÷ إجمالي القطع">—</td><td id="rs-mt-fab">—</td><td></td></tr></table></div>
         <div class="rsm-hide" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
           <button type="button" class="mini" onclick="rsAddMarker()">➕ <span data-i18n="rsAddMarker">إضافة ماركر</span></button>
           <button type="button" class="btn g" style="padding:6px 14px" onclick="rsAutoPlan()">⚡ <span data-i18n="rsAutoBtn">أكمل الخطة تلقائياً (أقل استهلاك)</span></button>
@@ -373,8 +385,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <button type="button" class="btn sec" style="padding:6px 14px" onclick="rsPlanToCombos()" title="ينقل ماركرات هذه الخطة إلى جدول المعايرة كي تقيس الطول الفعلي لما ستستعمله فعلاً — فترتفع نسبة تطابق الكاد إلى ١٠٠٪">🎯 <span data-i18n="rsPlanCbBtn">قِس ماركرات هذه الخطة</span></button></div>
         <div id="rs-heavy-out" class="rsm-hide" style="margin-top:10px"></div>
         <div style="overflow-x:auto;margin-top:16px"><table class="xtbl" style="min-width:760px">
-          <tr><th colspan="5" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rscb-cv" onclick="rsCollapse('rscb')" title="تصغير/تكبير">–</button><span data-i18n="rsCbTbl">معايرة التوليفات — أفضل توليفة لكل ماركر</span></span></th></tr>
-          <tr class="rscb-hide"><th data-i18n="rsCbCombo">التوليفة</th><th class="rsu-h" data-b="الطول المحسوب">الطول المحسوب (متر)</th><th data-i18n="rsCbActual">الطول الفعلي المقاس</th><th data-i18n="rsCbEff">الكفاءة (فعلي÷محسوب)</th><th data-i18n="rsCbRank">الترتيب</th></tr>
+          <tr><th colspan="6" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rscb-cv" onclick="rsCollapse('rscb')" title="تصغير/تكبير">–</button><span data-i18n="rsCbTbl">معايرة التوليفات — أفضل توليفة لكل ماركر</span></span></th></tr>
+          <tr class="rscb-hide"><th data-i18n="rsCbNo">م</th><th data-i18n="rsCbCombo">التوليفة</th><th class="rsu-h" data-b="الطول المحسوب">الطول المحسوب (متر)</th><th data-i18n="rsCbActual">الطول الفعلي المقاس</th><th data-i18n="rsCbEff">الكفاءة (فعلي÷محسوب)</th><th data-i18n="rsCbRank">الترتيب</th></tr>
           <tbody id="rs-combo-rows" class="rscb-hide"></tbody></table></div>
         <div class="rscb-hide" style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
           <button type="button" class="btn g" style="padding:6px 14px" onclick="rsComboSaveLib()">💾 <span data-i18n="rsCbSaveLib">احفظ القياسات في مكتبة المنتج</span></button>
@@ -383,10 +395,10 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div class="rscb-hide note" style="margin-top:4px" data-i18n="rsCbLibNote">القياسات المحفوظة تُعبَّأ تلقائياً في أي أوردر لاحق لنفس المنتج (مرجع دائم).</div>
         <div class="rscb-hide note" style="margin-top:6px" data-i18n="rsCbNote">النظام يقترح توليفات أوردرك؛ قِس طولها الفعلي على الطاولة وأدخِله، فيحسب الكفاءة (فعلي÷محسوب) ويرشّح أفضل توليفة (الأقل استهلاكاً للقطعة). كفاءة أقل من ١ = تداخل جيد يوفّر قماش.</div>
         <div style="overflow-x:auto;margin-top:12px"><table class="xtbl" style="min-width:560px">
-          <tr><th colspan="7" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsr-cv" onclick="rsCollapse('rsr')" title="تصغير/تكبير">–</button><span data-i18n="rsReviewTbl">مراجعة الناتج حسب المقاس</span></span></th></tr>
-          <tr class="rsr-hide"><th data-i18n="sizeName">القياس</th><th class="or" data-i18n="mkQtyOrder">المطلوب</th><th data-i18n="rsProdFromMk">إجمالي القطع من الماركر</th><th class="or" data-i18n="rsRemFromOrder">المتبقي من الأوردر</th><th data-i18n="mkStateCol">الحالة</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th class="or rsu-h" data-b="إجمالي استهلاك الأوردر">إجمالي استهلاك الأوردر (متر)</th></tr>
+          <tr><th colspan="8" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsr-cv" onclick="rsCollapse('rsr')" title="تصغير/تكبير">–</button><span data-i18n="rsReviewTbl">مراجعة الناتج حسب المقاس</span></span></th></tr>
+          <tr class="rsr-hide"><th data-i18n="rsCbNo">م</th><th data-i18n="sizeName">القياس</th><th class="or" data-i18n="mkQtyOrder">المطلوب</th><th data-i18n="rsProdFromMk">إجمالي القطع من الماركر</th><th class="or" data-i18n="rsRemFromOrder">المتبقي من الأوردر</th><th data-i18n="mkStateCol">الحالة</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th class="or rsu-h" data-b="إجمالي استهلاك الأوردر">إجمالي استهلاك الأوردر (متر)</th></tr>
           <tbody id="rs-review" class="rsr-hide"></tbody>
-          <tr class="tot rsr-hide"><td data-i18n="total">الإجمالي</td><td id="rs-rv-req" style="font-size:15px">—</td><td id="rs-rv-prod" style="font-size:15px">—</td><td id="rs-rv-rem">—</td><td id="rs-rv-st">—</td><td>—</td><td id="rs-rv-cons">—</td></tr></table></div>
+          <tr class="tot rsr-hide"><td></td><td data-i18n="total">الإجمالي</td><td id="rs-rv-req" style="font-size:15px">—</td><td id="rs-rv-prod" style="font-size:15px">—</td><td id="rs-rv-rem">—</td><td id="rs-rv-st">—</td><td>—</td><td id="rs-rv-cons">—</td></tr></table></div>
         <div style="overflow-x:auto;margin-top:12px"><table class="xtbl" style="min-width:1500px">
           <tr><th colspan="15" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rss-cv" onclick="rsCollapse('rss')" title="تصغير/تكبير">–</button><span data-i18n="rsSugTbl">اقتراحات تغطية باقي كمية الأوردر (أقل استهلاك)</span></span></th></tr>
           <tr class="rss-hide"><th data-i18n="rsCode">الكود</th><th data-i18n="rsDesc">البيان</th>
@@ -1831,6 +1843,7 @@ function rsAddMarker(m){m=m||{};if(!$('rs-markers'))return;RS_MSEQ++;const id='r
   const cntCell=p=>`<td class="szc"><input class="rsp-cnt" type="number" min="1" value="${p&&p.cnt!=null?p.cnt:''}" style="width:100%;border:none;background:transparent;text-align:center;font-weight:700" oninput="rsMkCalc()"></td>`;
   $('rs-markers').insertAdjacentHTML('beforeend',
    `<tr class="rs-mrow1" data-mid="${id}">
+     <td rowspan="2" class="rsm-seq"></td>
      <td rowspan="2" class="rsm-code" style="font-weight:800">\u2014</td>
      <td style="font-weight:700">${t('rsSizesRow')}</td>${[0,1,2,3,4,5].map(i=>selCell(pairs[i])).join('')}
      <td rowspan="2" class="rsm-pcs" style="font-weight:800">0</td>
@@ -2219,7 +2232,7 @@ function rsComboPrintSheet(){
       ${rowsH}</table></div>`;
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 function rsComboRender(){const tb=$('rs-combo-rows');if(!tb)return;const uf=rsUF();
-  if(!RS_COMBOS.length){tb.innerHTML=`<tr><td colspan="5" style="padding:10px;color:var(--mut)">${t('rsCbEmpty')}</td></tr>`;if($('rs-combo-best'))$('rs-combo-best').textContent='';return;}
+  if(!RS_COMBOS.length){tb.innerHTML=`<tr><td colspan="6" style="padding:10px;color:var(--mut)">${t('rsCbEmpty')}</td></tr>`;if($('rs-combo-best'))$('rs-combo-best').textContent='';return;}
   tb.innerHTML=RS_COMBOS.map((c,i)=>{
     const sizesHtml=c.combo.map((p,k)=>{const nm=esc(p.size);
       const cnt=` <span style="color:var(--teal);font-weight:900;font-size:12px">×${p.cnt}</span>`;
@@ -2228,6 +2241,7 @@ function rsComboRender(){const tb=$('rs-combo-rows');if(!tb)return;const uf=rsUF
     const badge=meas?`<span title="${esc(t('rsCbMeasuredHint'))}" style="color:#1e7e40;font-weight:900;margin-inline-end:6px">✓</span>`:`<span title="${esc(t('rsCbNeedHint'))}" style="color:#cf9a2a;font-weight:900;margin-inline-end:6px">•</span>`;
     const inpStyle=meas?'width:82px;padding:4px;text-align:center;font-weight:800;border:1px solid #4baf6e;border-radius:6px;background:#eafaf0;color:#14532d':'width:82px;padding:4px;text-align:center;font-weight:800;border:1px solid #cfa53a;border-radius:6px;background:#fffbe8;color:#3a2f00';
     return `<tr>
+      <td class="rscb-seq"></td>
       <td style="text-align:start;padding:6px 12px;line-height:2.1">${badge}${sizesHtml}</td>
       <td class="red">${Math.round(c.addLen*uf*100)/100}</td>
       <td><input class="rscb-act" data-i="${i}" type="number" step="0.01" min="0" value="${c.actual||''}" placeholder="—" style="${inpStyle}" oninput="rsComboCalc()" onkeydown="rsComboNav(event)"></td>
@@ -2629,7 +2643,7 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();
     $('rs-review').innerHTML=srows.map(x=>{const req=reqMap[x.size]||0,prod=produced[x.size]||0,r=req-prod,oc=Math.round(req*x.c*uf*100)/100;
       tReq+=req;tProd+=prod;tRem+=r;tCons+=req*x.c;
       const stW=r===0?t('rsRvMatch'):r>0?t('rsRvShort'):t('rsRvSurplus');
-      return `<tr><td style="font-weight:800">${esc(x.size)}</td><td style="font-weight:800;font-size:15px">${req}</td><td style="font-weight:800;font-size:15px">${prod}</td><td style="font-weight:800">${r}</td>
+      return `<tr><td class="rsr-seq"></td><td style="font-weight:800">${esc(x.size)}</td><td style="font-weight:800;font-size:15px">${req}</td><td style="font-weight:800;font-size:15px">${prod}</td><td style="font-weight:800">${r}</td>
         <td style="font-weight:800;color:${r===0?(rsDark()?'#7fdca0':'#1e7e40'):(rsDark()?'#f0a09c':'#c00000')};background:${r===0?(rsDark()?'#1e3a2a':'#e2f2e2'):(rsDark()?'#3a2422':'#fbe3e3')}">${stW}</td>
         <td class="red">${x.c}</td><td class="red">${oc}</td></tr>`;}).join('');
     $('rs-rv-req').textContent=tReq||'\u2014';$('rs-rv-prod').textContent=tProd||'\u2014';$('rs-rv-rem').textContent=srows.length?tRem:'\u2014';
