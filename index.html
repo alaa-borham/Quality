@@ -577,7 +577,7 @@ photosLbl:'الصور (اختياري)',addPhoto:'📷 إضافة صورة',maxP
 repTitle:'تقرير فحص الجودة',repDecision:'القرار النهائي',repNotes:'ملاحظات',repInspector:'المفتش',repDate:'التاريخ',repPhotos:'الصور',repClose:'إغلاق',compressing:'جارٍ معالجة الصورة…',
 selectStage:'— اختر المرحلة من التسلسل —',addDefBtn:'➕ أضف',defLibLbl:'العيوب من الدليل (تزيد العدّاد تلقائياً)',recordInsp:'📝 سجّل فحصاً',colCheckShort:'يُفحص',
 reasonCritical:'وجود عيب حرِج',reasonMajor:'عيوب كبيرة {m} ≥ حد الرفض {r}',reasonMinor:'عيوب صغيرة {m} ≥ حد الرفض {r}',reasonWithin:'ضمن حدود القبول',
-factoryLbl2:'المصنع',saveCheck:'💾 حفظ',selectFactory:'— اختر المصنع —',selectFactoryFirst:'الرجاء اختيار المصنع أولاً',noToolChk:'لا توجد فحوصات محفوظة بعد',
+factoryLbl2:'المصنع',saveCheck:'💾 حفظ',rsSaveNoData:'لا توجد كميات صالحة للحفظ — أدخِل المقاس والكمية والاستهلاك في جدول الكميات أولاً',rsSaveNoWs:'تعذّر الحفظ — لا توجد مساحة عمل نشطة. أعِد تسجيل الدخول ثم حاول',rsSaving:'جارٍ حفظ الخطة…',rsSavedPlan:'✅ تم حفظ الخطة بنجاح',selectFactory:'— اختر المصنع —',selectFactoryFirst:'الرجاء اختيار المصنع أولاً',noToolChk:'لا توجد فحوصات محفوظة بعد',
 toolDescfp:'حاسبة نظام النقاط الأربع لتقييم جودة القماش الخام: تُدخل عيوب القماش المكتشفة موزعة حسب حجمها (أقل من 3 إنش، 3–6، 6–9، أكثر من 9 إنش أو ثقب)، فتحسب عدد النقاط لكل 100 ياردة مربعة وتقارنها بالحد المسموح لتحديد قبول أو رفض اللفة.',
 toolDescsh:'حاسبة انكماش القماش: تقيس نسبة تقلّص الطول والعرض بعد الغسيل أو الكي مقارنة بالمقاس الأصلي، لمعرفة ما إذا كان الانكماش ضمن الحد المسموح المتفق عليه أم يستدعي تعديل الباترون.',
 toolDescaq:'جدول AQL التفاعلي (مستوى فحص II): يحدد حجم العينة المطلوب سحبها حسب حجم الشحنة، وحدود القبول والرفض للعيوب الكبيرة والصغيرة، لاتخاذ قرار قبول أو رفض الشحنة بالكامل إحصائياً.',
@@ -730,7 +730,7 @@ photosLbl:'Photos (optional)',addPhoto:'📷 Add photo',maxPhotos:'Max 4 photos'
 repTitle:'Quality Inspection Report',repDecision:'Final decision',repNotes:'Notes',repInspector:'Inspector',repDate:'Date',repPhotos:'Photos',repClose:'Close',compressing:'Processing image…',
 selectStage:'— select stage from sequence —',addDefBtn:'➕ Add',defLibLbl:'Defects from library (auto-increments counters)',recordInsp:'📝 Record',colCheckShort:'Check',
 reasonCritical:'Critical defect present',reasonMajor:'Major {m} ≥ reject limit {r}',reasonMinor:'Minor {m} ≥ reject limit {r}',reasonWithin:'Within acceptance limits',
-factoryLbl2:'Factory',saveCheck:'💾 Save',selectFactory:'— select factory —',selectFactoryFirst:'Please select a factory first',noToolChk:'No saved checks yet',
+factoryLbl2:'Factory',saveCheck:'💾 Save',rsSaveNoData:'Nothing valid to save — enter size, quantity and consumption in the quantities table first',rsSaveNoWs:'Cannot save — no active workspace. Sign in again and retry',rsSaving:'Saving plan…',rsSavedPlan:'✅ Plan saved successfully',selectFactory:'— select factory —',selectFactoryFirst:'Please select a factory first',noToolChk:'No saved checks yet',
 toolDescfp:'The 4-Point System calculator rates raw fabric quality: enter defects found grouped by size (up to 3in, 3–6, 6–9, over 9in or a hole); it computes points per 100 square yards and compares them to the allowed limit to accept or reject the roll.',
 toolDescsh:'The fabric shrinkage calculator measures how much length and width shrink after washing/pressing versus the original size, to check whether shrinkage is within the agreed limit or the pattern needs adjusting.',
 toolDescaq:'The interactive AQL table (inspection level II) determines the required sample size based on lot size, plus the accept/reject limits for major and minor defects, to make a statistical accept/reject decision for the whole shipment.',
@@ -2728,10 +2728,14 @@ function rsResult(){const qty=rsReadQty();if(!qty.length)return null;
     unit:rsUL(),uf:rsUF(),
     qty,markers,cover,totalReq,totalMade:tRun,totRem:totalReq-tRun,totFab:Math.round(tFab*100)/100,
     valid:markers.filter(m=>m.ok).length,decision:ready?'PASS':'FAIL'};}
-function saveRsPlan(){const result=rsResult();if(!result)return toast(t('mkNeed'));
+function saveRsPlan(){const result=rsResult();
+  if(!result)return toast(t('rsSaveNoData'));
+  if(!MEMBER||!MEMBER.wsId)return toast(t('rsSaveNoWs'));
   const title=$('rs-title')?$('rs-title').value.trim():'';
-  const data={wsId:MEMBER.wsId,type:'rs',title,factoryId:'',factoryName:'',date:today(),inspector:MEMBER.name||ME.email,result};
-  db.collection('qc_toolchecks').add({...data,createdAt:FV.serverTimestamp()}).then(()=>toast(t('saved'))).catch(e=>toast(rulesHint(e)));}
+  const data={wsId:MEMBER.wsId,type:'rs',title:title||'',factoryId:'',factoryName:'',date:today(),inspector:MEMBER.name||(ME&&ME.email)||'',result};
+  toast(t('rsSaving'));
+  try{db.collection('qc_toolchecks').add({...data,createdAt:FV.serverTimestamp()}).then(()=>toast(t('rsSavedPlan'))).catch(e=>toast(rulesHint(e)));}
+  catch(e){toast(rulesHint(e));}}
 function rsOpenInCalc(id){const c=TOOLCHK.find(x=>x.id===id);if(!c||c.type!=='rs')return;const r=c.result;
   go('marker',navBtn('marker'));
   if($('rs-title'))$('rs-title').value=c.title||'';
