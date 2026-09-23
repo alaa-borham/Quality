@@ -316,7 +316,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
       </div>
     </div>
     <div id="p-marker" class="hide">
-      <div class="sec-h">📊 <span data-i18n="rsTitle">الريشو — خطة الماركرات</span></div>
+      <div class="sec-h" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><span>📊 <span data-i18n="rsTitle">الريشو — خطة الماركرات</span></span><button class="btn sec" style="padding:6px 14px;font-size:14px;flex:0 0 auto;width:auto" onclick="rsOpenSaved()" data-i18n="rsSavedPlans">📂 الخطط المحفوظة</button></div>
       <div id="tool-rs" class="card">
         <label class="inl" data-i18n="mkReportName">اسم التقرير (اختياري)</label>
         <input id="rs-title" data-i18n-ph="mkReportNamePh" placeholder="مثال: أوردر رمضان — العميل أحمد" oninput="rsSaveDraft()">
@@ -421,7 +421,6 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
               <option value="continuous" data-i18n="rsRollCont">متصل بوصل الرولات — أقل هدر</option></select>
             <div id="rs-rolls" style="margin-top:12px"></div></div></div>
         <div class="row-btns" style="margin-top:14px"><button class="btn sec" onclick="saveRsPlan()" data-i18n="saveCheck">💾 حفظ</button>
-        <button class="btn sec" onclick="rsOpenSaved()" data-i18n="rsSavedPlans">📂 الخطط المحفوظة</button>
         <button class="btn sec" onclick="printRsPlan()" data-i18n="rsPrint">🖨 طباعة الخطة</button>
         <button class="btn sec" onclick="printRsSpread()" data-i18n="rsSpreadBtn">🧵 أمر الفرد</button>
         <button class="btn sec" onclick="printRsRolls()" data-i18n="rsRollBtn">📦 أمر الرولات</button>
