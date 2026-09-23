@@ -105,6 +105,9 @@ service cloud.firestore {
       allow read, write: if qcIsAdmin();
       allow read:   if request.auth != null;
       allow update: if request.auth != null && resource.data.ownerUid == request.auth.uid;
+      // محرّر الريشو (مستوى ≥ 2) يحفظ في مكتبة التوليفات فقط (حقل comboLib) دون المساس ببقية إعدادات المساحة
+      allow update: if qcIsMember() && wsId == qcWs() && qcLvl('marker') >= 2
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['comboLib']);
     }
     // البيانات التشغيلية: القراءة لأعضاء المساحة؛ الكتابة/الحذف حسب مستوى القسم
     // (تعديل ⇐ مستوى ≥ 2 · حذف ⇐ مستوى ≥ 3 · المالك/الأدمن = 3 دائماً)

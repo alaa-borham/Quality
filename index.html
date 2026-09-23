@@ -390,7 +390,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <tr class="rscb-hide"><th data-i18n="rsCbNo">م</th><th data-i18n="rsCbCombo">التوليفة</th><th class="rsu-h" data-b="الطول المحسوب">الطول المحسوب (متر)</th><th data-i18n="rsCbActual">الطول الفعلي المقاس</th><th data-i18n="rsCbEff">الكفاءة (فعلي÷محسوب)</th><th data-i18n="rsCbRank">الترتيب</th></tr>
           <tbody id="rs-combo-rows" class="rscb-hide"></tbody></table></div>
         <div class="rscb-hide" style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-          <button type="button" class="btn g" style="padding:6px 14px" onclick="rsComboSaveLib()">💾 <span data-i18n="rsCbSaveLib">احفظ القياسات في مكتبة المنتج</span></button>
+          <button type="button" id="rs-savelib-btn" class="btn g" style="padding:6px 14px" onclick="rsComboSaveLib()">💾 <span data-i18n="rsCbSaveLib">احفظ القياسات في مكتبة المنتج</span></button>
           <button type="button" class="btn sec" style="padding:6px 14px" onclick="rsComboPrintSheet()" title="اطبع قائمة بكل التوليفات مع خانة فارغة لكتابة الطول الفعلي المقاس على الطاولة">🖨️ <span data-i18n="rsCbPrintBtn">ورقة قياس للطباعة</span></button>
           <div id="rs-combo-best" style="font-weight:800"></div></div>
         <div class="rscb-hide note" style="margin-top:4px" data-i18n="rsCbLibNote">القياسات المحفوظة تُعبَّأ تلقائياً في أي أوردر لاحق لنفس المنتج (مرجع دائم).</div>
@@ -501,7 +501,7 @@ customCodePrompt:'أدخل الكود المخصص (أحرف إنجليزية و
 badCode:'صيغة الكود غير صحيحة — أحرف إنجليزية وأرقام وشرطة فقط (4–16 خانة)',codeTaken:'هذا الكود مستخدم في مساحة عمل أخرى',codeChanged:'تم تغيير الكود',
 empTitle:'الموظفون (حسابات بصلاحيات)',empNew:'➕ موظف جديد',empName:'اسم الموظف *',empUser:'اسم المستخدم (للدخول) *',empPass:'كلمة المرور *',
 permsLbl:'الصلاحيات',permFact:'إدارة المصانع',permDel:'حذف السجلات',noEmps:'لا موظفون بعد — أنشئ حساباً لكل مفتش',
-usersTitle:'إدارة المستخدمين والصلاحيات',usersManageBtn:'المستخدمون والصلاحيات',permLvl0:'مخفي',permLvl1:'عرض',permLvl2:'عرض + تعديل',permLvl3:'عرض + تعديل + حذف',permView:'عرض',permEdit:'تعديل',permDel2:'حذف',permLegend:'حدّد لكل قسم مستوى الوصول: مخفي / عرض / تعديل / حذف',back:'رجوع',
+usersTitle:'إدارة المستخدمين والصلاحيات',usersManageBtn:'المستخدمون والصلاحيات',permLvl0:'مخفي',permLvl1:'عرض',permLvl2:'عرض + تعديل',permLvl3:'عرض + تعديل + حذف',permView:'عرض',permEdit:'تعديل',permDel2:'حذف',permLegend:'حدّد لكل قسم مستوى الوصول: مخفي / عرض / تعديل / حذف',back:'رجوع',rsNoPerm:'ليس لديك صلاحية التعديل في هذا القسم',
 empHint:'سيدخل الموظف من شاشة تسجيل الدخول باسم المستخدم وكلمة المرور مباشرة (بدون بريد إلكتروني وبدون كود).',
 empCreated:'تم إنشاء حساب الموظف',empUserTaken:'اسم المستخدم مستخدم مسبقاً',enterEmpFields:'أدخل الاسم واسم المستخدم وكلمة المرور',
 badUser:'اسم المستخدم: أحرف إنجليزية صغيرة وأرقام و . _ - فقط (3–20 خانة)',
@@ -655,7 +655,7 @@ customCodePrompt:'Enter a custom code (letters, digits, dash; 4-16 chars):',
 badCode:'Invalid code format — letters, digits, and dash only (4-16 chars)',codeTaken:'This code is used by another workspace',codeChanged:'Code changed',
 empTitle:'Employees (accounts with permissions)',empNew:'➕ New employee',empName:'Employee name *',empUser:'Username (for login) *',empPass:'Password *',
 permsLbl:'Permissions',permFact:'Manage factories',permDel:'Delete records',noEmps:'No employees yet — create an account per inspector',
-usersTitle:'Users & permissions',usersManageBtn:'Users & permissions',permLvl0:'Hidden',permLvl1:'View',permLvl2:'View + edit',permLvl3:'View + edit + delete',permView:'View',permEdit:'Edit',permDel2:'Delete',permLegend:'Set each section access level: Hidden / View / Edit / Delete',back:'Back',
+usersTitle:'Users & permissions',usersManageBtn:'Users & permissions',permLvl0:'Hidden',permLvl1:'View',permLvl2:'View + edit',permLvl3:'View + edit + delete',permView:'View',permEdit:'Edit',permDel2:'Delete',permLegend:'Set each section access level: Hidden / View / Edit / Delete',back:'Back',rsNoPerm:'You do not have edit permission for this section',
 empHint:'The employee signs in from the login screen with username and password directly (no email, no code).',
 empCreated:'Employee account created',empUserTaken:'Username already taken',enterEmpFields:'Enter name, username, and password',
 badUser:'Username: lowercase letters, digits, . _ - only (3-20 chars)',
@@ -907,7 +907,8 @@ function go(tb,btn){applyNavPerms();
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');
   $('fab').style.display=((tb==='insp'&&canEdit('insp'))||(tb==='orders'&&canEdit('orders'))||(tb==='fact'&&canEdit('fact')))?'flex':'none';if(tb==='dash')renderDash();if(tb==='ref')renderRef();
   if(tb==='tools')renderToolFactSelects();
-  if(tb==='marker'){goMarker('rs');if(!RS_COLLAPSED_INIT){RS_COLLAPSED_INIT=1;rsCollapseAll();}}
+  if(tb==='marker'){goMarker('rs');if(!RS_COLLAPSED_INIT){RS_COLLAPSED_INIT=1;rsCollapseAll();}
+    const sb=$('rs-savelib-btn');if(sb)sb.style.display=canEdit('marker')?'':'none';}
   if(tb==='insp')goInsp('list',document.querySelector('#insp-subnav button'));}
 function goInsp(v,btn){['list','toolchk'].forEach(x=>$('insp-wrap-'+x).classList.toggle('hide',x!==v));
   document.querySelectorAll('#insp-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');
@@ -2197,7 +2198,7 @@ function rsComboSeedLib(active,cons,maxlen,push){
     push(combo);n++;});
   return n;}
 // حفظ التوليفات المقاسة في مكتبة المنتج (مرجع دائم للثوب/الثوب الكامل)
-function rsComboSaveLib(){const prod=rsComboProd();if(!prod)return toast(t('rsCbNoProd'));
+function rsComboSaveLib(){if(!canEdit('marker'))return toast(t('rsNoPerm'));const prod=rsComboProd();if(!prod)return toast(t('rsCbNoProd'));
   let w=rsFabW();
   if(!w){const a=prompt(t('rsCbAskW'));if(a==null)return;w=String(a||'').trim();if(w)rsSetFabW(w);}
   if(!w)return toast(t('rsCbNeedW'));
