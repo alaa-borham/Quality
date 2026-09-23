@@ -342,10 +342,10 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
             <div id="rs-colors" style="display:flex;flex-direction:column;gap:6px;max-width:520px"></div>
             <div id="rs-colors-sum" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div></div></div>
         <div style="overflow-x:auto;margin-top:10px"><table id="rs-qty-tbl" class="xtbl" style="min-width:520px">
-          <tr><th colspan="7" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsq-cv" onclick="rsCollapse('rsq')" title="تصغير/تكبير">–</button><span data-i18n="rsQtyTbl2">كميات الأوردر</span></span></th></tr>
-          <tr class="rsq-hide"><th data-i18n="rsCbNo">م</th><th data-i18n="sizeName">المقاس</th><th class="or" data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="rsRatio">نسبة بحسب الموديل</th><th class="or rsu-h" data-b="استهلاك الكمية">استهلاك الكمية (متر)</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th></th></tr>
+          <tr><th colspan="6" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsq-cv" onclick="rsCollapse('rsq')" title="تصغير/تكبير">–</button><span data-i18n="rsQtyTbl2">كميات الأوردر</span></span></th></tr>
+          <tr class="rsq-hide"><th data-i18n="rsCbNo">م</th><th data-i18n="sizeName">المقاس</th><th class="or" data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="rsRatio">نسبة بحسب الموديل</th><th class="or rsu-h" data-b="استهلاك الكمية">استهلاك الكمية (متر)</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th></tr>
           <tbody id="rs-qty-rows" class="rsq-hide"></tbody>
-          <tr class="tot rsq-hide"><td></td><td data-i18n="total">الإجمالي</td><td id="rs-qt-q">—</td><td id="rs-qt-r">—</td><td id="rs-qt-c">—</td><td>—</td><td></td></tr></table></div>
+          <tr class="tot rsq-hide"><td></td><td data-i18n="total">الإجمالي</td><td id="rs-qt-q">—</td><td id="rs-qt-r">—</td><td id="rs-qt-c">—</td><td>—</td></tr></table></div>
         <button type="button" class="mini rsq-hide" style="margin-top:6px" onclick="rsAddQtyRow()">➕ <span data-i18n="mkAddRow">إضافة مقاس</span></button>
         <div class="grid3" style="margin-top:14px">
           <div><label class="inl rsu-h" data-b="حد طول الماركر">حد طول الماركر (متر)</label><input id="rs-maxlen" type="number" step="0.01" value="17" oninput="rsMkCalc()" onchange="rsMaxLenChanged()"></div>
@@ -1889,12 +1889,11 @@ function rsAddQtyRow(r){r=r||{};const src=rsSizeSrc();const locked=src.length>0;
     :`<input class="rsq-size" value="${esc(r.size||'')}" placeholder="L" style="min-width:70px;padding:6px;font-weight:800" oninput="rsCalc()">`;
   $('rs-qty-rows').insertAdjacentHTML('beforeend',`<tr class="rsq-row">
    <td class="rsq-seq"></td>
-   <td>${cell}</td>
+   <td><div style="display:flex;align-items:center;gap:6px">${cell}<button type="button" class="mini r" title="حذف المقاس" onclick="this.closest('tr').remove();rsCalc()" style="flex:0 0 auto;padding:2px 8px">✕</button></div></td>
    <td><input class="rsq-qty" type="number" min="0" value="${r.qty!=null?r.qty:''}" style="min-width:70px;padding:6px;text-align:center;font-weight:700" oninput="rsCalc()" onkeydown="rsEnter(event,this)"></td>
    <td><input class="rsq-ratio" type="number" step="0.25" min="0" value="${r.ratio!=null&&r.ratio!==0?r.ratio:''}" style="min-width:56px;padding:6px;text-align:center;font-weight:700${locked?';background:#fffbe8;border:none':''}" oninput="rsCalc()" onchange="rsEditVal(this,'ratio')" onkeydown="rsEnter(event,this)"></td>
    <td class="rsq-tot red">\u2014</td>
-   <td><input class="rsq-cons" type="number" step="0.01" value="${r.cons!=null?r.cons:''}" style="min-width:70px;padding:6px;text-align:center;color:#c00000;font-weight:800${locked?';background:#fbf3f3;border:none':''}" oninput="rsCalc()" onchange="rsEditVal(this,'cons')" onkeydown="rsEnter(event,this)"></td>
-   <td><button type="button" class="mini r" onclick="this.closest('tr').remove();rsCalc()">\u2715</button></td></tr>`);}
+   <td><input class="rsq-cons" type="number" step="0.01" value="${r.cons!=null?r.cons:''}" style="min-width:70px;padding:6px;text-align:center;color:#c00000;font-weight:800${locked?';background:#fbf3f3;border:none':''}" oninput="rsCalc()" onchange="rsEditVal(this,'cons')" onkeydown="rsEnter(event,this)"></td></tr>`);}
 // Enter \u064a\u0646\u062a\u0642\u0644 \u0625\u0644\u0649 \u0646\u0641\u0633 \u0627\u0644\u0639\u0645\u0648\u062f \u0641\u064a \u0627\u0644\u0635\u0641 \u0627\u0644\u062a\u0627\u0644\u064a
 function rsEnter(e,el){if(e.key!=='Enter')return;e.preventDefault();
   const tr=el.closest('tr'),next=tr.nextElementSibling;
