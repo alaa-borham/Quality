@@ -1821,7 +1821,7 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
 let RS_DRAFT=null,RS_LOADED=false,RS_SAVE_T=null,RS_COL={},RS_COLLAPSED_INIT=0,RS_ROWCOL={};
 // تمييز صفوف المقاسات بلون عبر النقر الأيمن
 const RS_ROWCOLORS=[['#fff3b0','أصفر'],['#c9f0d0','أخضر'],['#cfe4fb','أزرق'],['#f8c9c9','أحمر'],['#ffd9a8','برتقالي'],['#e6cffb','بنفسجي']];
-function rsCloseRowMenu(){const m=$('rs-rowmenu');if(m)m.remove();}
+function rsCloseRowMenu(e){const m=$('rs-rowmenu');if(!m)return;if(e&&e.target&&m.contains(e.target))return;m.remove();document.removeEventListener('mousedown',rsCloseRowMenu,true);}
 function rsRowMenu(e,tr){e.preventDefault();const se=tr.querySelector('.rsq-size');const size=se?se.value.trim():'';if(!size){return false;}
   rsCloseRowMenu();const sq=size.replace(/'/g,"&#39;");
   const m=document.createElement('div');m.id='rs-rowmenu';
@@ -1831,7 +1831,7 @@ function rsRowMenu(e,tr){e.preventDefault();const se=tr.querySelector('.rsq-size
   document.body.appendChild(m);
   m.style.left=Math.max(6,Math.min(e.clientX,innerWidth-158))+'px';
   m.style.top=Math.max(6,Math.min(e.clientY,innerHeight-90))+'px';
-  setTimeout(()=>document.addEventListener('mousedown',rsCloseRowMenu,{once:true}),0);
+  setTimeout(()=>document.addEventListener('mousedown',rsCloseRowMenu,true),0);
   return false;}
 function rsSetRowColor(size,color){if(color)RS_ROWCOL[size]=color;else delete RS_ROWCOL[size];rsCloseRowMenu();rsApplyRowColors();rsSaveDraft();}
 function rsApplyRowColors(){document.querySelectorAll('.rsq-row').forEach(tr=>{const se=tr.querySelector('.rsq-size');const sz=se?se.value.trim():'';const col=(sz&&RS_ROWCOL[sz])||'';
