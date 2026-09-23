@@ -342,7 +342,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
             <div id="rs-colors" style="display:flex;flex-direction:column;gap:6px;max-width:520px"></div>
             <div id="rs-colors-sum" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div></div></div>
         <div style="overflow-x:auto;margin-top:10px"><table id="rs-qty-tbl" class="xtbl" style="min-width:520px">
-          <tr><th colspan="7" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsq-cv" onclick="rsCollapse('rsq')" title="تصغير/تكبير">–</button><span data-i18n="rsQtyTbl2">الكميات المطلوبة والاستهلاك حسب المقاس</span></span></th></tr>
+          <tr><th colspan="7" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsq-cv" onclick="rsCollapse('rsq')" title="تصغير/تكبير">–</button><span data-i18n="rsQtyTbl2">كميات الأوردر</span></span></th></tr>
           <tr class="rsq-hide"><th data-i18n="rsCbNo">م</th><th data-i18n="sizeName">المقاس</th><th class="or" data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="rsRatio">نسبة بحسب الموديل</th><th class="or rsu-h" data-b="استهلاك الكمية">استهلاك الكمية (متر)</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th></th></tr>
           <tbody id="rs-qty-rows" class="rsq-hide"></tbody>
           <tr class="tot rsq-hide"><td></td><td data-i18n="total">الإجمالي</td><td id="rs-qt-q">—</td><td id="rs-qt-r">—</td><td id="rs-qt-c">—</td><td>—</td><td></td></tr></table></div>
@@ -532,7 +532,7 @@ mkAvail:'القماش المتاح (اختياري)',mkEnough:'القماش ال
 fillModelBtn:'تعبئة مقاسات الموديل',selectModelFirst:'اختر الموديل أولاً',openInCalc:'📂 فتح في الحاسبة',restored:'تم التحميل في الحاسبة — عدّل واحسب من جديد',
 mkAvailCol:'المتاح',mkStateCol:'الحالة',mkOver:'فائض تقريب الطبقات',mkActual:'القماش الفعلي بعد القص (اختياري)',mkDev:'الانحراف عن المحسوب',
 spreadOrderBtn:'🖨 أمر فرشة',spreadOrder:'أمر فرشة (تشغيل الفرد)',needMkLen:'أدخل طول الماركر أولاً لحساب الطبقات',signature:'التوقيع',spreadOf:'فرشة رقم',
-rsTitle:'الريشو',rsQtyTbl2:'الكميات المطلوبة والاستهلاك حسب المقاس',rsRatio:'نسبة بحسب الموديل',rsQtyConsM:'استهلاك الكمية (متر)',rsPieceConsM:'استهلاك القطعة الأساسي (متر)',
+rsTitle:'الريشو',rsQtyTbl2:'كميات الأوردر',rsRatio:'نسبة بحسب الموديل',rsQtyConsM:'استهلاك الكمية (متر)',rsPieceConsM:'استهلاك القطعة الأساسي (متر)',
 rsMkTbl:'القياسات والكميات داخل الماركر',rsCode:'الكود',rsDesc:'البيان',rsSizesRow:'المقاسات',rsQtyRow:'الكميات',
 rsPcsLbl:'إجمالي القطع في الماركر',rsPlies:'عدد الطبقات',rsPcsRun:'إجمالي القطع في التشغيل',rsMkStatus:'حالة الماركر وسبب عدم الصلاحية',
 rsMkPerPly:'استهلاك الماركر/طبقة (متر)',rsSumFab:'إجمالي استهلاك التشغيل (متر)',rsAddMarker:'إضافة ماركر',rsActLen:'الطول الفعلي (اختياري)',
@@ -685,7 +685,7 @@ mkAvail:'Available fabric (optional)',mkEnough:'Available fabric is enough',mkSh
 fillModelBtn:'Fill model sizes',selectModelFirst:'Select a model first',openInCalc:'📂 Open in calculator',restored:'Loaded into the calculator — edit and recalculate',
 mkAvailCol:'Available',mkStateCol:'Status',mkOver:'Ply rounding surplus',mkActual:'Actual fabric after cutting (optional)',mkDev:'Deviation from computed',
 spreadOrderBtn:'🖨 Spreading order',spreadOrder:'Spreading order',needMkLen:'Enter the marker length first to compute plies',signature:'Signature',spreadOf:'Spread #',
-rsTitle:'Ratio',rsQtyTbl2:'Required quantities & consumption by size',rsRatio:'Ratio per model',rsQtyConsM:'Qty consumption (m)',rsPieceConsM:'Base piece consumption (m)',
+rsTitle:'Ratio',rsQtyTbl2:'Order quantities',rsRatio:'Ratio per model',rsQtyConsM:'Qty consumption (m)',rsPieceConsM:'Base piece consumption (m)',
 rsMkTbl:'Sizes & quantities per marker',rsCode:'Code',rsDesc:'Item',rsSizesRow:'Sizes',rsQtyRow:'Quantities',
 rsPcsLbl:'Total pieces per marker',rsPlies:'Plies',rsPcsRun:'Total run pieces',rsMkStatus:'Marker status & invalid reason',
 rsMkPerPly:'Marker cons/ply (m)',rsSumFab:'Total run consumption (m)',rsAddMarker:'Add marker',rsActLen:'Actual measured length (optional)',
