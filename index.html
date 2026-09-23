@@ -421,7 +421,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
               <option value="salvage" data-i18n="rsRollSalvage">بلا وصل + استغلال البواقي بقياسات صغيرة</option>
               <option value="continuous" data-i18n="rsRollCont">متصل بوصل الرولات — أقل هدر</option></select>
             <div id="rs-rolls" style="margin-top:12px"></div></div></div>
-        <div class="row-btns" style="margin-top:14px"><button class="btn sec" onclick="saveRsPlan()" data-i18n="saveCheck">💾 حفظ</button>
+        <div class="row-btns" style="margin-top:14px"><button id="rs-saveplan-btn" class="btn sec" onclick="saveRsPlan()" data-i18n="saveCheck">💾 حفظ</button>
         <button class="btn sec" onclick="printRsPlan()" data-i18n="rsPrint">🖨 طباعة الخطة</button>
         <button class="btn sec" onclick="printRsSpread()" data-i18n="rsSpreadBtn">🧵 أمر الفرد</button>
         <button class="btn sec" onclick="printRsRolls()" data-i18n="rsRollBtn">📦 أمر الرولات</button>
@@ -908,7 +908,8 @@ function go(tb,btn){applyNavPerms();
   $('fab').style.display=((tb==='insp'&&canEdit('insp'))||(tb==='orders'&&canEdit('orders'))||(tb==='fact'&&canEdit('fact')))?'flex':'none';if(tb==='dash')renderDash();if(tb==='ref')renderRef();
   if(tb==='tools')renderToolFactSelects();
   if(tb==='marker'){goMarker('rs');if(!RS_COLLAPSED_INIT){RS_COLLAPSED_INIT=1;rsCollapseAll();}
-    const sb=$('rs-savelib-btn');if(sb)sb.style.display=canEdit('marker')?'':'none';}
+    const sb=$('rs-savelib-btn');if(sb)sb.style.display=canEdit('marker')?'':'none';
+    const sp=$('rs-saveplan-btn');if(sp)sp.style.display=(canEdit('marker')||canEdit('insp'))?'':'none';}
   if(tb==='insp')goInsp('list',document.querySelector('#insp-subnav button'));}
 function goInsp(v,btn){['list','toolchk'].forEach(x=>$('insp-wrap-'+x).classList.toggle('hide',x!==v));
   document.querySelectorAll('#insp-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');
@@ -2848,7 +2849,8 @@ function rsResult(){const qty=rsReadQty();if(!qty.length)return null;
     rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,colors:rsColors(),
     qty,markers,cover,totalReq,totalMade:tRun,totRem:totalReq-tRun,totFab:Math.round(tFab*100)/100,
     valid:markers.filter(m=>m.ok).length,decision:ready?'PASS':'FAIL'};}
-function saveRsPlan(){const result=rsResult();
+function saveRsPlan(){if(!(canEdit('marker')||canEdit('insp')))return toast(t('rsNoPerm'));
+  const result=rsResult();
   if(!result)return toast(t('rsSaveNoData'));
   if(!MEMBER||!MEMBER.wsId)return toast(t('rsSaveNoWs'));
   const title=$('rs-title')?$('rs-title').value.trim():'';
@@ -3320,7 +3322,7 @@ const CHECKLISTS=[
 const GLOSS=[['أول الخط','فحص أول قطعة قبل الإنتاج الكمّي'],['أثناء الخط','فحص دوري متنقل أثناء سير الخط (Inline)'],['نهاية الخط','فحص شامل في نهاية الخط (End of line)'],['حرجة','عملية تؤثر مباشرة على الشكل/الوظيفة'],['DHU','عدد العيوب لكل 100 قطعة'],['POM','نقاط القياس (Points of Measure)'],['AQL','الحد المقبول للجودة'],['4-Point','نظام نقاط فحص القماش'],['Shade','دفعة/تدرّج اللون'],['اختبار السحب','شدّ الزر للتأكد من التثبيت']];
 function catTag(c){const cls=c.indexOf('حرِج')>=0||c.indexOf('حرج')>=0?'tg-crit':(c==='كبير'?'tg-maj':'tg-min');return`<span class="tg ${cls}">${esc(c)}</span>`;}
 function curSeq(){return (WSEQ&&WSEQ.length)?WSEQ:SEQ.map(r=>({cat:r[0],op:r[1],en:r[2],timing:r[3],imp:r[4],check:r[5],std:r[6]}));}
-function persistSeq(arr){db.collection('qc_seqcfg').doc(MEMBER.wsId).set({list:arr}).catch(e=>toast(rulesHint(e)));}
+function persistSeq(arr){if(!canEdit('ref'))return toast(t('rsNoPerm'));db.collection('qc_seqcfg').doc(MEMBER.wsId).set({list:arr}).catch(e=>toast(rulesHint(e)));}
 function moveSeqStage(i,dir){const arr=curSeq().slice();const j=i+dir;if(j<0||j>=arr.length)return;[arr[i],arr[j]]=[arr[j],arr[i]];persistSeq(arr);}
 function seqForm(){modal(`<h3>${t('seqNew')}</h3>
   <label class="inl">${t('seqCatLbl')}</label><input id="sq-cat" placeholder="${t('seqCatPh')}">
@@ -3353,24 +3355,24 @@ function defForm(d){d=d||{};DEF_ORIG=d.orig||(d.built?d.name:'');
   <label class="inl">${t('defActionLbl')}</label><input id="d-action" value="${esc(d.action||'')}">
   <div class="row-btns"><button class="btn" onclick="saveDef('${d.id||''}')">${t('save')}</button>
   <button class="btn sec" onclick="closeModal()">${t('cancel')}</button></div>`);}
-function saveDef(id){const name=$('d-name').value.trim();if(!name)return toast(t('enterDefName'));
+function saveDef(id){if(!canEdit('ref'))return toast(t('rsNoPerm'));const name=$('d-name').value.trim();if(!name)return toast(t('enterDefName'));
   const data={wsId:MEMBER.wsId,name,cat:$('d-cat').value,desc:$('d-desc').value.trim(),cause:$('d-cause').value.trim(),action:$('d-action').value.trim()};
   if(DEF_ORIG)data.orig=DEF_ORIG;
   const p=id?db.collection('qc_defects').doc(id).update(data):db.collection('qc_defects').add({...data,createdAt:FV.serverTimestamp()});
   p.then(()=>{closeModal();toast(t('saved'));}).catch(e=>toast(rulesHint(e)));}
-function delDef(id){if(!confirm(t('delDefQ')))return;db.collection('qc_defects').doc(id).delete().catch(e=>toast(rulesHint(e)));}
-function hideDef(name){if(!confirm(t('delDefQ')))return;
+function delDef(id){if(!canDel('ref'))return toast(t('rsNoPerm'));if(!confirm(t('delDefQ')))return;db.collection('qc_defects').doc(id).delete().catch(e=>toast(rulesHint(e)));}
+function hideDef(name){if(!canDel('ref'))return toast(t('rsNoPerm'));if(!confirm(t('delDefQ')))return;
   db.collection('qc_defects').add({wsId:MEMBER.wsId,orig:name,hidden:true,createdAt:FV.serverTimestamp()}).catch(e=>toast(rulesHint(e)));}
 let REFSUB='seq',CHKSUB=0;
 function goRef(id,btn){REFSUB=id;document.querySelectorAll('#ref-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');renderRef();}
 function goChk(i,btn){CHKSUB=i;document.querySelectorAll('#chk-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');renderChk();}
 function chkInfo(i,e){e.preventDefault();modal(`<h3>${esc(curChk()[i].title)}</h3><p style="line-height:1.7;color:var(--mut)">${esc(t('chkDesc'+i))}</p>
   <div class="row-btns"><button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);return false;}
-function renderChk(){const el=$('chk-body');if(!el)return;const cl=curChk()[CHKSUB];
-  el.innerHTML=`<button class="mini g" style="margin-bottom:8px" onclick="chkItemForm()">${t('addChkItem')}</button>
+function renderChk(){const el=$('chk-body');if(!el)return;const cl=curChk()[CHKSUB];const ce=canEdit('ref');
+  el.innerHTML=`${ce?`<button class="mini g" style="margin-bottom:8px" onclick="chkItemForm()">${t('addChkItem')}</button>`:''}
   <table class="rtbl" style="min-width:480px"><tr><th>${t('colItem')}</th><th>${t('critsCol')}</th><th>${t('colTool')}</th><th></th></tr>
     ${cl.items.map((r,i)=>`<tr><td>${esc(r.name)}${r.desc?` <span style="cursor:pointer" onclick="chkItemInfo(${i})">ℹ️</span>`:''}</td><td>${r.crits.map(c=>'• '+esc(c)).join('<br>')}</td><td>${esc(r.tool)}</td>
-    <td style="white-space:nowrap"><button class="mini" onclick="chkItemForm(${i})">${t('edit')}</button>
+    <td style="white-space:nowrap">${ce?`<button class="mini" onclick="chkItemForm(${i})">${t('edit')}</button>`:''}
     ${canDel('ref')?`<button class="mini" onclick="delChkItem(${i})">${t('del')}</button>`:''}</td></tr>`).join('')}</table>`;}
 function chkItemInfo(i){const r=curChk()[CHKSUB].items[i];if(!r)return;
   modal(`<h3>${esc(r.name)}</h3>
@@ -3387,23 +3389,23 @@ function chkItemForm(i){const cl=curChk()[CHKSUB];const r=(i!=null)?cl.items[i]:
   <div class="row-btns"><button class="btn" onclick="saveChkItem(${i==null?'null':i})">${t('save')}</button>
   <button class="btn sec" onclick="closeModal()">${t('cancel')}</button></div>`);}
 function chkCopy(){return curChk().map(c=>({title:c.title,items:c.items.map(x=>({name:x.name,crits:x.crits.slice(),tool:x.tool||'',desc:x.desc||''}))}));}
-function saveChkItem(i){const name=$('ci-name').value.trim();if(!name)return toast(t('enterItemName'));
+function saveChkItem(i){if(!canEdit('ref'))return toast(t('rsNoPerm'));const name=$('ci-name').value.trim();if(!name)return toast(t('enterItemName'));
   const crits=$('ci-crits').value.split('\n').map(s=>s.trim()).filter(Boolean);
   const lists=chkCopy();const item={name,crits,tool:$('ci-tool').value.trim(),desc:$('ci-desc').value.trim()};
   if(i==null)lists[CHKSUB].items.push(item);else lists[CHKSUB].items[i]=item;
   db.collection('qc_chkcfg').doc(MEMBER.wsId).set({lists}).then(()=>{closeModal();toast(t('saved'));}).catch(e=>toast(rulesHint(e)));}
-function delChkItem(i){if(!confirm(t('delItemQ')))return;
+function delChkItem(i){if(!canDel('ref'))return toast(t('rsNoPerm'));if(!confirm(t('delItemQ')))return;
   const lists=chkCopy();lists[CHKSUB].items.splice(i,1);
   db.collection('qc_chkcfg').doc(MEMBER.wsId).set({lists}).then(()=>toast(t('deleted'))).catch(e=>toast(rulesHint(e)));}
-function renderRef(){const el=$('ref-body');if(!el)return;
+function renderRef(){const el=$('ref-body');if(!el)return;const ce=canEdit('ref');
   if(REFSUB==='seq'){
     const list=curSeq();
     const seqRows=list.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.cat)}</td><td>${esc(r.op)}<div class="en">${esc(r.en)}</div></td>
       <td>${esc(r.timing)}</td><td>${r.imp==='حرجة'?catTag('حرِج'):esc(r.imp)}</td><td>${esc(r.check)}</td><td>${esc(r.std)}</td>
       <td style="white-space:nowrap"><button class="mini" onclick="inspFromRef('${esc(r.op).replace(/'/g,"&#39;")}')">${t('recordInsp')}</button>
-      <button class="mini" ${i===0?'disabled':''} onclick="moveSeqStage(${i},-1)">▲</button>
-      <button class="mini" ${i===list.length-1?'disabled':''} onclick="moveSeqStage(${i},1)">▼</button></td></tr>`).join('');
-    el.innerHTML=`<button class="btn" style="margin-bottom:12px" onclick="seqForm()">${t('addSeqNew')}</button>
+      ${ce?`<button class="mini" ${i===0?'disabled':''} onclick="moveSeqStage(${i},-1)">▲</button>
+      <button class="mini" ${i===list.length-1?'disabled':''} onclick="moveSeqStage(${i},1)">▼</button>`:''}</td></tr>`).join('');
+    el.innerHTML=`${ce?`<button class="btn" style="margin-bottom:12px" onclick="seqForm()">${t('addSeqNew')}</button>`:''}
       <table class="rtbl"><tr><th>م</th><th>${t('colStage')}</th><th>${t('colOp')}</th><th>توقيت</th><th>${t('colImp')}</th><th>${t('colCheck')}</th><th>${t('colStd')}</th><th></th></tr>${seqRows}</table>`;
   }else if(REFSUB==='def'){
     const all=allDefects();
@@ -3411,9 +3413,10 @@ function renderRef(){const el=$('ref-body');if(!el)return;
       const delBtn=!canDel('ref')?'':(d.built
         ?`<button class="mini" onclick="hideDef('${esc(d.name).replace(/'/g,"&#39;")}')">${t('del')}</button>`
         :`<button class="mini" onclick="delDef('${d.id}')">${t('del')}</button>`);
+      const editBtn=ce?`<button class="mini" onclick='defForm(${esc(JSON.stringify(d)).replace(/'/g,"&#39;")})'>${t('edit')}</button> `:'';
       return `<tr><td>${i+1}</td><td>${esc(d.name)}</td><td>${catTag(d.cat)}</td><td>${esc(d.desc)}</td><td>${esc(d.cause)}</td><td>${esc(d.action)}</td>
-      <td><button class="mini" onclick='defForm(${esc(JSON.stringify(d)).replace(/'/g,"&#39;")})'>${t('edit')}</button> ${delBtn}</td></tr>`;}).join('');
-    el.innerHTML=`<button class="btn" style="margin-bottom:12px" onclick="defForm()">${t('addDefNew')}</button>
+      <td>${editBtn}${delBtn}</td></tr>`;}).join('');
+    el.innerHTML=`${ce?`<button class="btn" style="margin-bottom:12px" onclick="defForm()">${t('addDefNew')}</button>`:''}
       <table class="rtbl"><tr><th>م</th><th>${t('colDefect')}</th><th>${t('colCat')}</th><th>الوصف</th><th>${t('colCause')}</th><th>${t('colAction')}</th><th></th></tr>${defRows}</table>`;
   }else if(REFSUB==='chk'){
     el.innerHTML=`<div class="subnav" id="chk-subnav">${CHECKLISTS.map((c,i)=>`<button class="${i===CHKSUB?'on':''}" onclick="goChk(${i},this)" oncontextmenu="return chkInfo(${i},event)">${esc(c[0])}</button>`).join('')}</div><div id="chk-body"></div>`;

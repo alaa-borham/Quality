@@ -57,9 +57,7 @@ match /qc_members/{uid} {
   // تعديل ذاتي: الاسم فقط (لا الدور ولا الصلاحيات ولا مساحة العمل)
   allow update: if request.auth != null && request.auth.uid == uid
                 && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name']);
-  // مغادرة المستخدم لمساحته
-  allow delete: if request.auth != null && request.auth.uid == uid;
-  // المالك يمنح الصلاحيات/الدور ويزيل أعضاء مساحته
+  // الحذف والإزالة للمالك فقط (يمنع إعادة ضبط الصلاحيات عبر حذف السجل وإعادة إنشائه)
   allow update, delete: if qcIsOwner() && resource.data.wsId == qcWs();
 }
 
@@ -99,8 +97,8 @@ match /qc_inspections/{id} {
 match /qc_defects/{id} {
   allow read, write: if qcIsAdmin();
   allow read:   if qcIsMember() && resource.data.wsId == qcWs();
-  allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
-  allow update: if qcIsMember() && resource.data.wsId == qcWs();
+  allow create: if qcIsMember() && request.resource.data.wsId == qcWs() && qcLvl('ref') >= 2;
+  allow update: if qcIsMember() && resource.data.wsId == qcWs() && qcLvl('ref') >= 2;
   allow delete: if qcIsMember() && resource.data.wsId == qcWs() && qcLvl('ref') >= 3;
 }
 
@@ -113,16 +111,18 @@ match /qc_models/{id} {
   allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
 }
 
-// تسلسل الخياطة القابل للتخصيص: مستند واحد لكل مساحة عمل (معرّفه = wsId)
+// تسلسل الخياطة القابل للتخصيص: القراءة لأي عضو، والكتابة بمستوى «المراجع» ≥ 2
 match /qc_seqcfg/{wsId} {
   allow read, write: if qcIsAdmin();
-  allow read, write: if qcIsMember() && wsId == qcWs();
+  allow read:  if qcIsMember() && wsId == qcWs();
+  allow write: if qcIsMember() && wsId == qcWs() && qcLvl('ref') >= 2;
 }
 
-// قوائم فحص المراحل القابلة للتخصيص (بنود ومعايير): مستند واحد لكل مساحة عمل
+// قوائم فحص المراحل القابلة للتخصيص: القراءة لأي عضو، والكتابة بمستوى «المراجع» ≥ 2
 match /qc_chkcfg/{wsId} {
   allow read, write: if qcIsAdmin();
-  allow read, write: if qcIsMember() && wsId == qcWs();
+  allow read:  if qcIsMember() && wsId == qcWs();
+  allow write: if qcIsMember() && wsId == qcWs() && qcLvl('ref') >= 2;
 }
 
 // فحوصات أدوات الجودة المحفوظة (نقاط أربع/انكماش/AQL) وخطط الريشو — قسم الفحوصات أو الريشو
