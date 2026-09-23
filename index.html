@@ -1835,7 +1835,10 @@ function rsRowMenu(e,tr){e.preventDefault();const se=tr.querySelector('.rsq-size
   return false;}
 function rsSetRowColor(size,color){if(color)RS_ROWCOL[size]=color;else delete RS_ROWCOL[size];rsCloseRowMenu();rsApplyRowColors();rsSaveDraft();}
 function rsApplyRowColors(){document.querySelectorAll('.rsq-row').forEach(tr=>{const se=tr.querySelector('.rsq-size');const sz=se?se.value.trim():'';const col=(sz&&RS_ROWCOL[sz])||'';
-  tr.querySelectorAll('td').forEach(td=>{td.style.background=col;});});}
+  tr.querySelectorAll('td').forEach(td=>{td.style.background=col;});
+  // اجعل حقول الإدخال شفافة ليظهر لون الصف خلفها، مع حفظ خلفيتها الأصلية لاستعادتها عند الإلغاء
+  tr.querySelectorAll('input,select').forEach(inp=>{if(inp.dataset.bg0===undefined)inp.dataset.bg0=inp.style.backgroundColor||'';
+    inp.style.backgroundColor=col?'transparent':inp.dataset.bg0;});});}
 // طيّ كل الأقسام افتراضياً (المستخدم يفتح ما يحتاجه) — يُطبَّق مرة عند أول دخول لصفحة الريشو في الجلسة
 function rsCollapseAll(){['rsc','rsq','rsm','rsr','rss','rscb','rso'].forEach(k=>{if(!RS_COL[k]&&document.querySelector('.'+k+'-cv'))rsCollapse(k);});}
 // طيّ/فتح جدول
