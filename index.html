@@ -2726,6 +2726,9 @@ function rsResult(){const qty=rsReadQty();if(!qty.length)return null;
   const ready=totalReq>0&&cover.every(c=>c.rem===0);
   return {product:($('rs-product')&&$('rs-product').value)||'',maxlen,maxlenDisp:+($('rs-maxlen')&&$('rs-maxlen').value)||0,maxsizes,maxpcs,
     unit:rsUL(),uf:rsUF(),
+    surplus:+($('rs-surplus')&&$('rs-surplus').value)||0,objective:($('rs-objective')&&$('rs-objective').value)||'plies',
+    fabwidth:($('rs-fabwidth')?$('rs-fabwidth').value:''),rolllen:+($('rs-rolllen')&&$('rs-rolllen').value)||0,
+    rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,colors:rsColors(),
     qty,markers,cover,totalReq,totalMade:tRun,totRem:totalReq-tRun,totFab:Math.round(tFab*100)/100,
     valid:markers.filter(m=>m.ok).length,decision:ready?'PASS':'FAIL'};}
 function saveRsPlan(){const result=rsResult();
@@ -2757,6 +2760,13 @@ function rsOpenInCalc(id){const c=TOOLCHK.find(x=>x.id===id);if(!c||c.type!=='rs
   if(r.product&&prodNames().includes(r.product))$('rs-product').value=r.product;
   if($('rs-unit')){$('rs-unit').value=r.unit||'متر';RS_PREV_UNIT=$('rs-unit').value;}
   $('rs-maxlen').value=(r.maxlenDisp!=null?r.maxlenDisp:r.maxlen)||'';$('rs-maxsizes').value=r.maxsizes||6;$('rs-maxpcs').value=r.maxpcs||5;
+  if($('rs-surplus'))$('rs-surplus').value=(r.surplus!=null?r.surplus:0);
+  if(r.objective&&$('rs-objective'))$('rs-objective').value=r.objective;
+  if($('rs-fabwidth'))$('rs-fabwidth').value=(r.fabwidth!=null?r.fabwidth:'');
+  if(r.rolllen&&$('rs-rolllen'))$('rs-rolllen').value=r.rolllen;
+  if(r.rollmode&&$('rs-rollmode'))$('rs-rollmode').value=r.rollmode;
+  if(r.price&&$('rs-price'))$('rs-price').value=r.price;
+  if($('rs-colors')){$('rs-colors').innerHTML='';(r.colors||[]).forEach(cc=>rsAddColorRow(cc));}
   $('rs-qty-rows').innerHTML='';(r.qty||[]).forEach(x=>rsAddQtyRow(x));
   $('rs-markers').innerHTML='';(r.markers||[]).forEach(m=>rsAddMarker({pairs:m.pairs,plies:m.plies,actlen:m.actlen||0}));
   rsUpdateUnitLabels();rsCalc();toast(t('restored'));}
