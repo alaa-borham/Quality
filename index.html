@@ -572,7 +572,7 @@ sizeName:'اسم المقاس',sizeLen:'طول المقاس',sizeCons:'استه�
 enterModel:'أدخل اسم الموديل ومقاساً واحداً على الأقل',badSizeRow:'كل صف يحتاج اسم المقاس واستهلاكاً أكبر من صفر',delModelQ:'حذف هذا الموديل؟',
 factOpt:'المصنع (اختياري)',unitLbl:'الوحدة',
 sizesListLbl:'قائمة المقاسات والاستهلاك المشتركة (لكل الموديلات)',sizePh:'المقاس (M أو 54)',sizeConsPh:'الاستهلاك',addSizeBtn:'أضف',noSizes:'لا مقاسات بعد — أضِف المقاس واستهلاكه لتظهر في كل الموديلات',modelsListLbl:'الموديلات',
-productLbl:'المنتج',productPh:'منتج جديد (قميص، عباية، بنطلون...)',addProductBtn:'أضف منتج',noProducts:'أضِف منتجاً أولاً (ثوب، قميص، عباية...) ثم أضِف مقاساته واستهلاكها',delProductQ:'حذف هذا المنتج وكل مقاساته؟',
+productLbl:'المنتج',productPh:'منتج جديد (قميص، عباية، بنطلون...)',addProductBtn:'أضف منتج',noProducts:'أضِف منتجاً أولاً (ثوب، قميص، عباية...) ثم أضِف مقاساته واستهلاكها',delProductQ:'حذف المنتج «{p}» وكل مقاساته وأعراضه نهائياً؟',delProductBtn:'حذف المنتج',
 sizesImportBtn:'📥 استيراد من إكسيل',sizesImportHint:'اختر عرض القماش أولاً، ثم انسخ عمودَي المقاس والاستهلاك من الإكسيل والصقهما هنا، أو ارفع ملف CSV. كل سطر: المقاس ثم الاستهلاك.',sizesImportW:'عرض القماش لهذه القياسات:',sizesImportPick:'— اختر العرض —',sizesImportNeedW:'إجباري: اختر عرض القماش أولاً — كل عرض مستقل ولا يُخلط بغيره',sizesImportPh:'M\t3.10\nL\t3.20\nXL\t3.35',importApply:'استيراد القائمة',importedN:'تم استيراد {n} قياس',importSkipped:' (تم تجاهل {n} سطر غير صالح)',importNone:'لم يتم التعرف على أي سطر صالح — تأكد أن كل سطر يحتوي المقاس ثم رقم الاستهلاك',importFileBtn:'📄 ملف CSV',
 toolDescmk:'حاسبة استهلاك الأوردر: تُدخل مقاسات الأوردر (المقاس · استهلاك القطعة · الكمية · اللون) في جدول واحد، فيحسب النظام لكل لون إجمالي القطع وإجمالي القماش المطلوب، ومجموع القماش الكلي. ويمكنك إدخال القماش المتاح لمعرفة هل يكفي أم ينقص. الموديل المحفوظ اختياري يملأ المقاسات والاستهلاك تلقائياً.',
 inspSaved:'تم حفظ الفحص',dhuShort:'DHU',acBig:'حد قبول كبير',acSmall:'صغير',sampleShort:'العينة',
@@ -727,7 +727,7 @@ sizeName:'Size',sizeLen:'Size length',sizeCons:'Consumption',sizeAdd:'Add size',
 enterModel:'Enter the model name and at least one size',badSizeRow:'Each row needs a size name and consumption greater than zero',delModelQ:'Delete this model?',
 factOpt:'Factory (optional)',unitLbl:'Unit',
 sizesListLbl:'Shared sizes & consumption list (for all models)',sizePh:'Size (M or 54)',sizeConsPh:'Consumption',addSizeBtn:'Add',noSizes:'No sizes yet — add a size and its consumption to appear in every model',modelsListLbl:'Models',
-productLbl:'Product',productPh:'New product (shirt, abaya, trousers...)',addProductBtn:'Add product',noProducts:'Add a product first (thobe, shirt, abaya...) then add its sizes',delProductQ:'Delete this product and all its sizes?',
+productLbl:'Product',productPh:'New product (shirt, abaya, trousers...)',addProductBtn:'Add product',noProducts:'Add a product first (thobe, shirt, abaya...) then add its sizes',delProductQ:'Permanently delete product “{p}” with all its sizes and widths?',delProductBtn:'Delete product',
 sizesImportBtn:'📥 Import from Excel',sizesImportHint:'Choose the fabric width first, then copy the size & consumption columns from Excel and paste here, or upload a CSV file. Each line: size then consumption.',sizesImportW:'Fabric width for these numbers:',sizesImportPick:'— choose width —',sizesImportNeedW:'Required: choose the fabric width first — each width is independent and never mixed',sizesImportPh:'M\t3.10\nL\t3.20\nXL\t3.35',importApply:'Import list',importedN:'{n} sizes imported',importSkipped:' ({n} invalid lines skipped)',importNone:'No valid lines found — each line must have the size then a consumption number',importFileBtn:'📄 CSV file',
 toolDescmk:'Order consumption calculator: enter the order lines (size, per-piece consumption, quantity, color) in one table; the system totals pieces and fabric per color and overall. Enter available fabric to see if it is enough or short. A saved model optionally fills sizes and consumption.',
 inspSaved:'Inspection saved',dhuShort:'DHU',acBig:'Major Ac',acSmall:'Minor',sampleShort:'Sample',
@@ -1584,7 +1584,7 @@ function renderSizesManager(){const el=$('sizes-list');if(!el)return;
   if(bar)bar.innerHTML=`<select onchange="SM_PROD=this.value;renderSizesManager()" style="flex:1;min-width:110px;padding:8px">${ps.length?ps.map(p=>`<option ${p.name===SM_PROD?'selected':''}>${esc(p.name)}</option>`).join(''):`<option value="">—</option>`}</select>
     <input id="new-prod" placeholder="${t('productPh')}" style="flex:1;min-width:120px" onkeydown="if(event.key==='Enter')addProduct()">
     <button class="mini" onclick="addProduct()">${t('addProductBtn')}</button>
-    ${SM_PROD&&can('del')?`<button class="mini r" onclick="delProduct()">🗑</button>`:''}`;
+    ${SM_PROD&&isOwner()?`<button class="mini r" onclick="delProduct()" style="white-space:nowrap">🗑 ${t('delProductBtn')}</button>`:''}`;
   if(!SM_PROD){el.innerHTML=`<span class="note">${t('noProducts')}</span>`;return;}
   const list=sizeList(SM_PROD);
   if(!list.length){el.innerHTML=`<span class="note">${t('noSizes')}</span>`;return;}
@@ -1615,7 +1615,7 @@ function addProduct(){const name=$('new-prod').value.trim();if(!name)return;
   const nl=sizeListsN();if(!nl.some(p=>p.name===name))nl.push({name,sizes:[]});
   SM_PROD=name;
   db.collection('qc_workspaces').doc(MEMBER.wsId).update({sizeLists:nl}).then(()=>{const e=$('new-prod');if(e)e.value='';renderSizesManager();}).catch(e=>toast(rulesHint(e)));}
-function delProduct(){if(!SM_PROD||!confirm(t('delProductQ')))return;
+function delProduct(){if(!SM_PROD)return;if(!isOwner())return toast(t('rsNoPerm'));if(!confirm(tf('delProductQ',{p:SM_PROD})))return;
   const nl=sizeListsN().filter(p=>p.name!==SM_PROD);SM_PROD='';
   db.collection('qc_workspaces').doc(MEMBER.wsId).update({sizeLists:nl}).then(()=>renderSizesManager()).catch(e=>toast(rulesHint(e)));}
 function addSize(){const name=$('new-size').value.trim();if(!name)return;
