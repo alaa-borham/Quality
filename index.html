@@ -573,7 +573,7 @@ enterModel:'أدخل اسم الموديل ومقاساً واحداً على ا
 factOpt:'المصنع (اختياري)',unitLbl:'الوحدة',
 sizesListLbl:'قائمة المقاسات والاستهلاك المشتركة (لكل الموديلات)',sizePh:'المقاس (M أو 54)',sizeConsPh:'الاستهلاك',addSizeBtn:'أضف',noSizes:'لا مقاسات بعد — أضِف المقاس واستهلاكه لتظهر في كل الموديلات',modelsListLbl:'الموديلات',
 productLbl:'المنتج',productPh:'منتج جديد (قميص، عباية، بنطلون...)',addProductBtn:'أضف منتج',noProducts:'أضِف منتجاً أولاً (ثوب، قميص، عباية...) ثم أضِف مقاساته واستهلاكها',delProductQ:'حذف هذا المنتج وكل مقاساته؟',
-sizesImportBtn:'📥 استيراد من إكسيل',sizesImportHint:'اختر عرض القماش أولاً، ثم انسخ عمودَي المقاس والاستهلاك من الإكسيل والصقهما هنا، أو ارفع ملف CSV. كل سطر: المقاس ثم الاستهلاك.',sizesImportW:'عرض القماش لهذه القياسات:',sizesImportPh:'M\t3.10\nL\t3.20\nXL\t3.35',importApply:'استيراد القائمة',importedN:'تم استيراد {n} قياس',importSkipped:' (تم تجاهل {n} سطر غير صالح)',importNone:'لم يتم التعرف على أي سطر صالح — تأكد أن كل سطر يحتوي المقاس ثم رقم الاستهلاك',importFileBtn:'📄 ملف CSV',
+sizesImportBtn:'📥 استيراد من إكسيل',sizesImportHint:'اختر عرض القماش أولاً، ثم انسخ عمودَي المقاس والاستهلاك من الإكسيل والصقهما هنا، أو ارفع ملف CSV. كل سطر: المقاس ثم الاستهلاك.',sizesImportW:'عرض القماش لهذه القياسات:',sizesImportPick:'— اختر العرض —',sizesImportNeedW:'إجباري: اختر عرض القماش أولاً — كل عرض مستقل ولا يُخلط بغيره',sizesImportPh:'M\t3.10\nL\t3.20\nXL\t3.35',importApply:'استيراد القائمة',importedN:'تم استيراد {n} قياس',importSkipped:' (تم تجاهل {n} سطر غير صالح)',importNone:'لم يتم التعرف على أي سطر صالح — تأكد أن كل سطر يحتوي المقاس ثم رقم الاستهلاك',importFileBtn:'📄 ملف CSV',
 toolDescmk:'حاسبة استهلاك الأوردر: تُدخل مقاسات الأوردر (المقاس · استهلاك القطعة · الكمية · اللون) في جدول واحد، فيحسب النظام لكل لون إجمالي القطع وإجمالي القماش المطلوب، ومجموع القماش الكلي. ويمكنك إدخال القماش المتاح لمعرفة هل يكفي أم ينقص. الموديل المحفوظ اختياري يملأ المقاسات والاستهلاك تلقائياً.',
 inspSaved:'تم حفظ الفحص',dhuShort:'DHU',acBig:'حد قبول كبير',acSmall:'صغير',sampleShort:'العينة',
 photosLbl:'الصور (اختياري)',addPhoto:'📷 إضافة صورة',maxPhotos:'الحد الأقصى 4 صور',reportBtn:'تقرير',exportCsv:'⬇ تصدير Excel',printBtn:'🖨 طباعة / حفظ PDF',
@@ -728,7 +728,7 @@ enterModel:'Enter the model name and at least one size',badSizeRow:'Each row nee
 factOpt:'Factory (optional)',unitLbl:'Unit',
 sizesListLbl:'Shared sizes & consumption list (for all models)',sizePh:'Size (M or 54)',sizeConsPh:'Consumption',addSizeBtn:'Add',noSizes:'No sizes yet — add a size and its consumption to appear in every model',modelsListLbl:'Models',
 productLbl:'Product',productPh:'New product (shirt, abaya, trousers...)',addProductBtn:'Add product',noProducts:'Add a product first (thobe, shirt, abaya...) then add its sizes',delProductQ:'Delete this product and all its sizes?',
-sizesImportBtn:'📥 Import from Excel',sizesImportHint:'Choose the fabric width first, then copy the size & consumption columns from Excel and paste here, or upload a CSV file. Each line: size then consumption.',sizesImportW:'Fabric width for these numbers:',sizesImportPh:'M\t3.10\nL\t3.20\nXL\t3.35',importApply:'Import list',importedN:'{n} sizes imported',importSkipped:' ({n} invalid lines skipped)',importNone:'No valid lines found — each line must have the size then a consumption number',importFileBtn:'📄 CSV file',
+sizesImportBtn:'📥 Import from Excel',sizesImportHint:'Choose the fabric width first, then copy the size & consumption columns from Excel and paste here, or upload a CSV file. Each line: size then consumption.',sizesImportW:'Fabric width for these numbers:',sizesImportPick:'— choose width —',sizesImportNeedW:'Required: choose the fabric width first — each width is independent and never mixed',sizesImportPh:'M\t3.10\nL\t3.20\nXL\t3.35',importApply:'Import list',importedN:'{n} sizes imported',importSkipped:' ({n} invalid lines skipped)',importNone:'No valid lines found — each line must have the size then a consumption number',importFileBtn:'📄 CSV file',
 toolDescmk:'Order consumption calculator: enter the order lines (size, per-piece consumption, quantity, color) in one table; the system totals pieces and fabric per color and overall. Enter available fabric to see if it is enough or short. A saved model optionally fills sizes and consumption.',
 inspSaved:'Inspection saved',dhuShort:'DHU',acBig:'Major Ac',acSmall:'Minor',sampleShort:'Sample',
 photosLbl:'Photos (optional)',addPhoto:'📷 Add photo',maxPhotos:'Max 4 photos',reportBtn:'Report',exportCsv:'⬇ Export Excel',printBtn:'🖨 Print / save PDF',
@@ -1520,9 +1520,9 @@ function modelsManager(){modal(`<h3>${t('mkManage')}</h3>
   <div id="sizes-import" class="hide" style="margin-top:8px;padding:10px;border:1px dashed var(--line,#cdd8d7);border-radius:10px">
     <div class="note" style="margin-bottom:6px">${t('sizesImportHint')}</div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
-      <span style="font-weight:800;font-size:13px;color:#14504f">${t('sizesImportW')}</span>
-      <select id="sizes-import-w" style="padding:6px 8px;font-size:13px;border:1px solid #cfe0df;border-radius:8px">
-        <option value="">${t('smWBase')}</option>
+      <span style="font-weight:800;font-size:13px;color:#c00000">${t('sizesImportW')} *</span>
+      <select id="sizes-import-w" style="padding:6px 8px;font-size:13px;border:1px solid #e6a5a2;border-radius:8px">
+        <option value="">${t('sizesImportPick')}</option>
         ${['96','98','100','142','144','146','148'].map(w=>`<option value="${w}">${w}</option>`).join('')}
       </select></div>
     <textarea id="sizes-paste" rows="5" placeholder="${t('sizesImportPh')}" style="width:100%;direction:ltr;font-family:monospace"></textarea>
@@ -1664,18 +1664,18 @@ function parseSizeLines(text){const ok=[];let skipped=0;
 function importSizes(text){if(!SM_PROD)return toast(t('noProducts'));
   const {ok,skipped}=parseSizeLines(text);
   if(!ok.length)return toast(t('importNone'));
-  const w=($('sizes-import-w')&&$('sizes-import-w').value||'').trim();// عرض القماش المختار لهذه القياسات
+  const w=($('sizes-import-w')&&$('sizes-import-w').value||'').trim();// عرض القماش المختار لهذه القياسات (إجباري)
+  if(!w)return toast(t('sizesImportNeedW'));
   const names=new Set(ok.map(s=>s.size));
   const old={};sizeList(SM_PROD).forEach(s=>old[s.size]=s);
   const nl=sizeList(SM_PROD).filter(s=>!names.has(s.size));// المقاسات غير المتأثرة تبقى كما هي
   const seen={};ok.forEach(s=>seen[s.size]=s);
+  // كل عرض مستقل تماماً: القيم تُكتب فقط في جدول هذا العرض (consW[w])، ولا تُخلط بالأساسي ولا بعرض آخر
   Object.values(seen).forEach(s=>{const o=old[s.size]||{};const cw={...(o.consW||{})};
-    const val=Math.round((+s.cons||0)*10000)/10000;const ratio=s.ratio||o.ratio||0;let base=o.cons||0;
-    if(w){cw[w]=val;if(!(base>0))base=val;}// عرض محدد: يذهب لجدول العرض، والأساسي يُملأ إن كان فارغاً (أول استيراد)
-    else base=val;// بلا عرض: الاستهلاك الأساسي
-    nl.push({size:s.size,cons:base,ratio,consW:cw});});
+    cw[w]=Math.round((+s.cons||0)*10000)/10000;const ratio=s.ratio||o.ratio||0;
+    nl.push({size:s.size,cons:o.cons||0,ratio,consW:cw});});
   setProdSizes(SM_PROD,nl).then(()=>{
-    $('sizes-paste').value='';toast(tf('importedN',{n:Object.keys(seen).length})+(w?' · '+t('rsFabW')+' '+w:'')+(skipped?tf('importSkipped',{n:skipped}):''));
+    $('sizes-paste').value='';toast(tf('importedN',{n:Object.keys(seen).length})+' · '+t('rsFabW')+' '+w+(skipped?tf('importSkipped',{n:skipped}):''));
   }).catch(e=>toast(rulesHint(e)));}
 function importSizesFile(inp){const f=inp.files&&inp.files[0];if(!f)return;
   const rd=new FileReader();rd.onload=()=>{importSizes(rd.result);inp.value='';};rd.readAsText(f);}
