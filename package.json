@@ -1,0 +1,16 @@
+{
+  "name": "quality-qc",
+  "version": "1.0.0",
+  "private": true,
+  "description": "نظام متابعة الجودة (PWA) — تدقيق ثابت واختبارات قواعد Firestore",
+  "scripts": {
+    "audit": "node audit.js",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-qc \"node tests/rules.test.mjs\"",
+    "test": "npm run audit && npm run test:rules"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
+    "firebase": "^12.19.0",
+    "firebase-tools": "^15.30.2"
+  }
+}
