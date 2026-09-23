@@ -2015,8 +2015,10 @@ function rsAutoPlan(){if(!$('rs-markers'))return;
   const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]-(produced[s]||0));
   if(!Object.values(rem).some(v=>v>0))return toast(t('rsAutoDone'));
   let added=[],libN=0;
-  // أولاً: غطِّ من مكتبتك المقيسة (لنفس عرض القماش) — فتكون ماركرات خطتك مقيسة ومطابقة للكاد مباشرةً
-  const libRecs=prodComboLib(rsComboProd()).filter(x=>String(x.w||'')===String(rsFabW()||''));
+  // أولاً: اتّبع نمط توليفات مكتبتك — هيكل التوليفات مشترك عبر كل الأعراض (تُدخل مرة واحدة على العرض الأساسي)؛
+  // نأخذ تراكيب توليفات كل الأعراض بلا تكرار، والطول المقيس يبقى خاصاً بعرض القماش الحالي (يُطبَّق لاحقاً في الحساب).
+  const _seenSig=new Set();
+  const libRecs=prodComboLib(rsComboProd()).filter(x=>{const sg=x.sig||'';if(!sg||_seenSig.has(sg))return false;_seenSig.add(sg);return true;});
   const libCands=libRecs.map(x=>x.sizes).filter(c=>c&&c.length&&new Set(c.map(p=>p.size)).size===c.length
     &&c.length<=maxsizes&&c.reduce((a,p)=>a+p.cnt,0)<=maxpcs
     &&c.every(p=>reqMap[p.size]!=null&&cons[p.size]>0)
