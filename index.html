@@ -1818,22 +1818,28 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
       <div>${t('repInspector')}: ______________</div><div>QC: ______________</div></div></div>`;
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 /* ============ الريشو ============ */
-let RS_DRAFT=null,RS_LOADED=false,RS_SAVE_T=null,RS_COL={},RS_COLLAPSED_INIT=0,RS_ROWCOL={};
-// تمييز صفوف المقاسات بلون عبر النقر الأيمن
+let RS_DRAFT=null,RS_LOADED=false,RS_SAVE_T=null,RS_COL={},RS_COLLAPSED_INIT=0,RS_ROWCOL={},RS_COMBOCOL={};
+// تمييز الصفوف بلون عبر النقر الأيمن (يُستخدم لجدولي الكميات والتوليفات)
 const RS_ROWCOLORS=[['#fff3b0','أصفر'],['#c9f0d0','أخضر'],['#cfe4fb','أزرق'],['#f8c9c9','أحمر'],['#ffd9a8','برتقالي'],['#e6cffb','بنفسجي']];
 function rsCloseRowMenu(e){const m=$('rs-rowmenu');if(!m)return;if(e&&e.target&&m.contains(e.target))return;m.remove();document.removeEventListener('mousedown',rsCloseRowMenu,true);}
-function rsRowMenu(e,tr){e.preventDefault();const se=tr.querySelector('.rsq-size');const size=se?se.value.trim():'';if(!size){return false;}
-  rsCloseRowMenu();const sq=size.replace(/'/g,"&#39;");
+// بناء قائمة الألوان — fnName: اسم الدالة التي تُستدعى بالمفتاح واللون
+function rsBuildColorMenu(e,fnName,keyArg){e.preventDefault();if(!keyArg)return false;rsCloseRowMenu();const kq=String(keyArg).replace(/'/g,"&#39;");
   const m=document.createElement('div');m.id='rs-rowmenu';
   m.style.cssText='position:fixed;z-index:99999;background:var(--card,#fff);border:1px solid var(--line,#ccc);border-radius:10px;padding:8px;box-shadow:0 8px 26px rgba(0,0,0,.2);display:flex;gap:6px;flex-wrap:wrap;max-width:150px';
-  m.innerHTML=RS_ROWCOLORS.map(c=>`<button type="button" title="${c[1]}" onclick="rsSetRowColor('${sq}','${c[0]}')" style="width:26px;height:26px;border-radius:6px;border:1px solid #0003;cursor:pointer;background:${c[0]}"></button>`).join('')
-    +`<button type="button" title="${esc(t('rsRowClear'))}" onclick="rsSetRowColor('${sq}','')" style="width:26px;height:26px;border-radius:6px;border:1px dashed #999;cursor:pointer;background:transparent;font-weight:800;color:#c00">✕</button>`;
+  m.innerHTML=RS_ROWCOLORS.map(c=>`<button type="button" title="${c[1]}" onclick="${fnName}('${kq}','${c[0]}')" style="width:26px;height:26px;border-radius:6px;border:1px solid #0003;cursor:pointer;background:${c[0]}"></button>`).join('')
+    +`<button type="button" title="${esc(t('rsRowClear'))}" onclick="${fnName}('${kq}','')" style="width:26px;height:26px;border-radius:6px;border:1px dashed #999;cursor:pointer;background:transparent;font-weight:800;color:#c00">✕</button>`;
   document.body.appendChild(m);
   m.style.left=Math.max(6,Math.min(e.clientX,innerWidth-158))+'px';
   m.style.top=Math.max(6,Math.min(e.clientY,innerHeight-90))+'px';
   setTimeout(()=>document.addEventListener('mousedown',rsCloseRowMenu,true),0);
   return false;}
+function rsRowMenu(e,tr){const se=tr.querySelector('.rsq-size');const size=se?se.value.trim():'';return rsBuildColorMenu(e,'rsSetRowColor',size);}
+function rsComboMenu(e,tr){return rsBuildColorMenu(e,'rsSetComboColor',tr.getAttribute('data-sig')||'');}
 function rsSetRowColor(size,color){if(color)RS_ROWCOL[size]=color;else delete RS_ROWCOL[size];rsCloseRowMenu();rsApplyRowColors();rsSaveDraft();}
+function rsSetComboColor(sig,color){if(color)RS_COMBOCOL[sig]=color;else delete RS_COMBOCOL[sig];rsCloseRowMenu();rsComboApplyColors();rsSaveDraft();}
+function rsTintRow(tr,col){tr.querySelectorAll('td').forEach(td=>{td.style.background=col;});
+  tr.querySelectorAll('input,select,span[dir="ltr"]').forEach(el=>{if(el.dataset.bg0===undefined)el.dataset.bg0=el.style.backgroundColor||'';el.style.backgroundColor=col?'transparent':el.dataset.bg0;});}
+function rsComboApplyColors(){document.querySelectorAll('#rs-combo-rows tr[data-sig]').forEach(tr=>{const sig=tr.getAttribute('data-sig');rsTintRow(tr,(sig&&RS_COMBOCOL[sig])||'');});}
 function rsApplyRowColors(){document.querySelectorAll('.rsq-row').forEach(tr=>{const se=tr.querySelector('.rsq-size');const sz=se?se.value.trim():'';const col=(sz&&RS_ROWCOL[sz])||'';
   tr.querySelectorAll('td').forEach(td=>{td.style.background=col;});
   // اجعل حقول الإدخال شفافة ليظهر لون الصف خلفها، مع حفظ خلفيتها الأصلية لاستعادتها عند الإلغاء
@@ -1873,6 +1879,7 @@ function rsInit(){if(RS_LOADED||!$('rs-qty-rows'))return;if(!prodNames().length)
   rsUpdateUnitLabels();RS_LOADED=true;}
 function rsApplyDraft(d){
   RS_ROWCOL=(d.rowcol&&typeof d.rowcol==='object')?d.rowcol:{};
+  RS_COMBOCOL=(d.combocol&&typeof d.combocol==='object')?d.combocol:{};
   if($('rs-title'))$('rs-title').value=d.title||'';
   if(d.product&&prodNames().includes(d.product))$('rs-product').value=d.product;
   if($('rs-unit')){$('rs-unit').value=d.unit||'متر';RS_PREV_UNIT=$('rs-unit').value;}
@@ -1902,7 +1909,7 @@ function rsSaveDraft(){if(!RS_LOADED||!MEMBER||!$('rs-qty-rows'))return;
       maxlen:+$('rs-maxlen').value||0,maxsizes:+$('rs-maxsizes').value||6,maxpcs:+$('rs-maxpcs').value||5,surplus:+($('rs-surplus')&&$('rs-surplus').value)||0,fabwidth:($('rs-fabwidth')?$('rs-fabwidth').value:''),
       objective:($('rs-objective')?$('rs-objective').value:'plies'),rolllen:+($('rs-rolllen')&&$('rs-rolllen').value)||0,rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,colors:rsColors(),
       qty:[...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0})).filter(x=>x.size),
-      rowcol:RS_ROWCOL,
+      rowcol:RS_ROWCOL,combocol:RS_COMBOCOL,
       markers:rsReadMarkers().filter(m=>m.pairs.length||m.plies).map(m=>({pairs:m.pairs,plies:+m.plies||0,actlen:m.actlen||0}))};
     db.collection('qc_workspaces').doc(MEMBER.wsId).update({rishoDraft:draft}).catch(()=>{});
   },700);}
@@ -2409,14 +2416,14 @@ function rsComboRender(){const tb=$('rs-combo-rows');if(!tb)return;const uf=rsUF
     const meas=c.actual>0;
     const badge=meas?`<span title="${esc(t('rsCbMeasuredHint'))}" style="color:#1e7e40;font-weight:900;margin-inline-end:6px">✓</span>`:`<span title="${esc(t('rsCbNeedHint'))}" style="color:#cf9a2a;font-weight:900;margin-inline-end:6px">•</span>`;
     const inpStyle=meas?'width:82px;padding:4px;text-align:center;font-weight:800;border:1px solid #4baf6e;border-radius:6px;background:#eafaf0;color:#14532d':'width:82px;padding:4px;text-align:center;font-weight:800;border:1px solid #cfa53a;border-radius:6px;background:#fffbe8;color:#3a2f00';
-    return `<tr>
+    return `<tr data-sig="${esc(rsComboSig(c.combo))}" oncontextmenu="return rsComboMenu(event,this)">
       <td class="rscb-seq"></td>
       <td style="text-align:start;padding:6px 12px;line-height:2.1">${badge}${sizesHtml}</td>
       <td class="red">${Math.round(c.addLen*uf*100)/100}</td>
       <td><input class="rscb-act" data-i="${i}" type="number" step="0.01" min="0" value="${c.actual||''}" placeholder="—" style="${inpStyle}" oninput="rsComboCalc()" onkeydown="rsComboNav(event)"></td>
       <td class="rscb-eff" data-i="${i}" style="font-weight:800">—</td>
       <td class="rscb-rank" data-i="${i}" style="font-weight:800">—</td></tr>`;}).join('');
-  rsComboCalc();}
+  rsComboCalc();rsComboApplyColors();}
 // Enter في خانة الطول الفعلي ينتقل إلى الخانة التالية (إدخال سريع صفّاً صفّاً)
 function rsComboNav(e){if(e.key!=='Enter')return;e.preventDefault();
   const inputs=[...document.querySelectorAll('.rscb-act')];const cur=inputs.indexOf(e.target);
@@ -2918,7 +2925,7 @@ function rsResult(){const qty=rsReadQty();if(!qty.length)return null;
     unit:rsUL(),uf:rsUF(),
     surplus:+($('rs-surplus')&&$('rs-surplus').value)||0,objective:($('rs-objective')&&$('rs-objective').value)||'plies',
     fabwidth:($('rs-fabwidth')?$('rs-fabwidth').value:''),rolllen:+($('rs-rolllen')&&$('rs-rolllen').value)||0,
-    rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,colors:rsColors(),rowcol:RS_ROWCOL,
+    rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,colors:rsColors(),rowcol:RS_ROWCOL,combocol:RS_COMBOCOL,
     qty,markers,cover,totalReq,totalMade:tRun,totRem:totalReq-tRun,totFab:Math.round(tFab*100)/100,
     valid:markers.filter(m=>m.ok).length,decision:ready?'PASS':'FAIL'};}
 function saveRsPlan(){if(!(canEdit('marker')||canEdit('insp')))return toast(t('rsNoPerm'));
@@ -2947,6 +2954,7 @@ function rsDelSaved(id){if(!confirm(t('rsDelPlanQ')))return;
   if(TOOLCHK.filter(c=>c.type==='rs').length)rsOpenSaved();else closeModal();}
 function rsOpenInCalc(id){const c=TOOLCHK.find(x=>x.id===id);if(!c||c.type!=='rs')return;const r=c.result;
   RS_ROWCOL=(r.rowcol&&typeof r.rowcol==='object')?r.rowcol:{};
+  RS_COMBOCOL=(r.combocol&&typeof r.combocol==='object')?r.combocol:{};
   go('marker',navBtn('marker'));
   if($('rs-title'))$('rs-title').value=c.title||'';
   if(r.product&&prodNames().includes(r.product))$('rs-product').value=r.product;
