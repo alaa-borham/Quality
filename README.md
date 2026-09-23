@@ -15,7 +15,10 @@
 `qc_members` · `qc_workspaces` · `qc_factories` · `qc_orders` · `qc_inspections` · `qc_defects` · `qc_models` · `qc_seqcfg` · `qc_chkcfg` · `qc_toolchecks`
 
 ## خطوات التشغيل (مرة واحدة)
-1. **نشر قواعد الأمان:** افتح ملف `firestore-qc.rules`، وانسخ محتواه داخل قواعد مشروع `level7alaa` في Firebase Console (**Firestore → Rules**) بجانب قواعدك الحالية، ثم **Publish**. بدون هذه الخطوة ستظهر رسالة «صلاحيات غير مفعّلة».
+1. **نشر قواعد الأمان:** في Firebase Console (**Firestore → Rules**) لمشروع `level7alaa`:
+   - إن كان المشروع لنظام الجودة فقط: الصق كامل ملف **`firestore-full.rules`** (بديل كامل).
+   - أو إن كانت لديك قواعد أخرى: ادمج كتل **`firestore-qc.rules`** داخل بلوك `match /databases/{database}/documents { … }` الحالي بجانب قواعدك.
+   ثم **Publish**. بدون هذه الخطوة ستظهر رسالة «صلاحيات غير مفعّلة». **بعد أي تعديل على القواعد شغّل `npm test` ثم أعد النشر.**
 2. **تفعيل تسجيل الدخول بالبريد:** Firebase Console → Authentication → Sign-in method → **Email/Password → Enable** (غالباً مفعّل مسبقاً).
 3. **الاستضافة:** فعّل GitHub Pages للمستودع، وسيكون التطبيق على مسار `/qc/`. أضف نطاق `github.io` في Firebase → Authentication → **Authorized domains** إن لزم.
 
