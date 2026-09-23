@@ -347,6 +347,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <tbody id="rs-qty-rows" class="rsq-hide"></tbody>
           <tr class="tot rsq-hide"><td></td><td data-i18n="total">الإجمالي</td><td id="rs-qt-q">—</td><td id="rs-qt-r">—</td><td id="rs-qt-c">—</td><td>—</td></tr></table></div>
         <button type="button" class="mini rsq-hide" style="margin-top:6px" onclick="rsAddQtyRow()">➕ <span data-i18n="mkAddRow">إضافة مقاس</span></button>
+        <span class="rsq-hide note" style="margin-inline-start:10px" data-i18n="rsRowHint">💡 نقرة يمين على أي صف مقاس لتمييزه بلون</span>
         <div class="grid3" style="margin-top:14px">
           <div><label class="inl rsu-h" data-b="حد طول الماركر">حد طول الماركر (متر)</label><input id="rs-maxlen" type="number" step="0.01" value="17" oninput="rsMkCalc()" onchange="rsMaxLenChanged()"></div>
           <div><label class="inl" data-i18n="rsMaxSizes">أقصى عدد قياسات في الماركر</label><input id="rs-maxsizes" type="number" value="6" oninput="rsMkCalc()" onchange="rsLimitsChanged()"></div>
@@ -501,7 +502,7 @@ customCodePrompt:'أدخل الكود المخصص (أحرف إنجليزية و
 badCode:'صيغة الكود غير صحيحة — أحرف إنجليزية وأرقام وشرطة فقط (4–16 خانة)',codeTaken:'هذا الكود مستخدم في مساحة عمل أخرى',codeChanged:'تم تغيير الكود',
 empTitle:'الموظفون (حسابات بصلاحيات)',empNew:'➕ موظف جديد',empName:'اسم الموظف *',empUser:'اسم المستخدم (للدخول) *',empPass:'كلمة المرور *',
 permsLbl:'الصلاحيات',permFact:'إدارة المصانع',permDel:'حذف السجلات',noEmps:'لا موظفون بعد — أنشئ حساباً لكل مفتش',
-usersTitle:'إدارة المستخدمين والصلاحيات',usersManageBtn:'المستخدمون والصلاحيات',permLvl0:'مخفي',permLvl1:'عرض',permLvl2:'عرض + تعديل',permLvl3:'عرض + تعديل + حذف',permView:'عرض',permEdit:'تعديل',permDel2:'حذف',permLegend:'حدّد لكل قسم مستوى الوصول: مخفي / عرض / تعديل / حذف',back:'رجوع',rsNoPerm:'ليس لديك صلاحية التعديل في هذا القسم',rsLibBtn:'إدارة مكتبة التوليفات',rsLibTitle:'مكتبة التوليفات المحفوظة',rsLibHint:'التوليفات المقيسة المحفوظة لكل منتج وعرض قماش — عدّل الطول أو احذف توليفة خاطئة.',rsLibEmpty:'المكتبة فارغة — احفظ قياسات من «مطور المراكر» أولاً',rsLibNoneP:'لا توليفات محفوظة لهذا المنتج',rsLibBadLen:'أدخل طولاً صحيحاً أكبر من صفر',rsLibDelQ:'حذف هذه التوليفة من المكتبة نهائياً؟',
+usersTitle:'إدارة المستخدمين والصلاحيات',usersManageBtn:'المستخدمون والصلاحيات',permLvl0:'مخفي',permLvl1:'عرض',permLvl2:'عرض + تعديل',permLvl3:'عرض + تعديل + حذف',permView:'عرض',permEdit:'تعديل',permDel2:'حذف',permLegend:'حدّد لكل قسم مستوى الوصول: مخفي / عرض / تعديل / حذف',back:'رجوع',rsNoPerm:'ليس لديك صلاحية التعديل في هذا القسم',rsRowClear:'بلا لون',rsRowHint:'💡 نقرة يمين على أي صف مقاس لتمييزه بلون',rsLibBtn:'إدارة مكتبة التوليفات',rsLibTitle:'مكتبة التوليفات المحفوظة',rsLibHint:'التوليفات المقيسة المحفوظة لكل منتج وعرض قماش — عدّل الطول أو احذف توليفة خاطئة.',rsLibEmpty:'المكتبة فارغة — احفظ قياسات من «مطور المراكر» أولاً',rsLibNoneP:'لا توليفات محفوظة لهذا المنتج',rsLibBadLen:'أدخل طولاً صحيحاً أكبر من صفر',rsLibDelQ:'حذف هذه التوليفة من المكتبة نهائياً؟',
 cpwBtn:'تغيير كلمة المرور',cpwTitle:'تغيير كلمة المرور',cpwNew:'كلمة المرور الجديدة',cpwConfirm:'تأكيد كلمة المرور',cpwHint:'٦ أحرف على الأقل. لأمانك قد يُطلب منك إدخال كلمة مرورك الحالية.',cpwMismatch:'كلمتا المرور غير متطابقتين',cpwNoUser:'لا يوجد مستخدم مسجّل دخوله',cpwReauth:'لأمانك، أدخل كلمة مرورك الحالية للمتابعة:',cpwDone:'تم تغيير كلمة المرور',pwShow:'إظهار كلمة المرور',pwHide:'إخفاء كلمة المرور',usersPwNote:'لا يمكن للمالك تغيير كلمة مرور موظف مباشرةً؛ يغيّرها كل مستخدم بنفسه من الإعدادات ← «تغيير كلمة المرور».',
 empHint:'سيدخل الموظف من شاشة تسجيل الدخول باسم المستخدم وكلمة المرور مباشرة (بدون بريد إلكتروني وبدون كود).',
 empCreated:'تم إنشاء حساب الموظف',empUserTaken:'اسم المستخدم مستخدم مسبقاً',enterEmpFields:'أدخل الاسم واسم المستخدم وكلمة المرور',
@@ -656,7 +657,7 @@ customCodePrompt:'Enter a custom code (letters, digits, dash; 4-16 chars):',
 badCode:'Invalid code format — letters, digits, and dash only (4-16 chars)',codeTaken:'This code is used by another workspace',codeChanged:'Code changed',
 empTitle:'Employees (accounts with permissions)',empNew:'➕ New employee',empName:'Employee name *',empUser:'Username (for login) *',empPass:'Password *',
 permsLbl:'Permissions',permFact:'Manage factories',permDel:'Delete records',noEmps:'No employees yet — create an account per inspector',
-usersTitle:'Users & permissions',usersManageBtn:'Users & permissions',permLvl0:'Hidden',permLvl1:'View',permLvl2:'View + edit',permLvl3:'View + edit + delete',permView:'View',permEdit:'Edit',permDel2:'Delete',permLegend:'Set each section access level: Hidden / View / Edit / Delete',back:'Back',rsNoPerm:'You do not have edit permission for this section',rsLibBtn:'Manage combo library',rsLibTitle:'Saved combo library',rsLibHint:'Measured combos saved per product and fabric width — edit a length or delete a wrong one.',rsLibEmpty:'Library is empty — save measurements from Marker developer first',rsLibNoneP:'No saved combos for this product',rsLibBadLen:'Enter a valid length greater than zero',rsLibDelQ:'Permanently delete this combo from the library?',
+usersTitle:'Users & permissions',usersManageBtn:'Users & permissions',permLvl0:'Hidden',permLvl1:'View',permLvl2:'View + edit',permLvl3:'View + edit + delete',permView:'View',permEdit:'Edit',permDel2:'Delete',permLegend:'Set each section access level: Hidden / View / Edit / Delete',back:'Back',rsNoPerm:'You do not have edit permission for this section',rsRowClear:'No color',rsRowHint:'💡 Right-click any size row to highlight it with a color',rsLibBtn:'Manage combo library',rsLibTitle:'Saved combo library',rsLibHint:'Measured combos saved per product and fabric width — edit a length or delete a wrong one.',rsLibEmpty:'Library is empty — save measurements from Marker developer first',rsLibNoneP:'No saved combos for this product',rsLibBadLen:'Enter a valid length greater than zero',rsLibDelQ:'Permanently delete this combo from the library?',
 cpwBtn:'Change password',cpwTitle:'Change password',cpwNew:'New password',cpwConfirm:'Confirm password',cpwHint:'At least 6 characters. For security you may be asked for your current password.',cpwMismatch:'Passwords do not match',cpwNoUser:'No signed-in user',cpwReauth:'For security, enter your current password to continue:',cpwDone:'Password changed',pwShow:'Show password',pwHide:'Hide password',usersPwNote:'An owner cannot change an employee password directly; each user changes their own from Settings → Change password.',
 empHint:'The employee signs in from the login screen with username and password directly (no email, no code).',
 empCreated:'Employee account created',empUserTaken:'Username already taken',enterEmpFields:'Enter name, username, and password',
@@ -1817,7 +1818,24 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
       <div>${t('repInspector')}: ______________</div><div>QC: ______________</div></div></div>`;
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 /* ============ الريشو ============ */
-let RS_DRAFT=null,RS_LOADED=false,RS_SAVE_T=null,RS_COL={},RS_COLLAPSED_INIT=0;
+let RS_DRAFT=null,RS_LOADED=false,RS_SAVE_T=null,RS_COL={},RS_COLLAPSED_INIT=0,RS_ROWCOL={};
+// تمييز صفوف المقاسات بلون عبر النقر الأيمن
+const RS_ROWCOLORS=[['#fff3b0','أصفر'],['#c9f0d0','أخضر'],['#cfe4fb','أزرق'],['#f8c9c9','أحمر'],['#ffd9a8','برتقالي'],['#e6cffb','بنفسجي']];
+function rsCloseRowMenu(){const m=$('rs-rowmenu');if(m)m.remove();}
+function rsRowMenu(e,tr){e.preventDefault();const se=tr.querySelector('.rsq-size');const size=se?se.value.trim():'';if(!size){return false;}
+  rsCloseRowMenu();const sq=size.replace(/'/g,"&#39;");
+  const m=document.createElement('div');m.id='rs-rowmenu';
+  m.style.cssText='position:fixed;z-index:99999;background:var(--card,#fff);border:1px solid var(--line,#ccc);border-radius:10px;padding:8px;box-shadow:0 8px 26px rgba(0,0,0,.2);display:flex;gap:6px;flex-wrap:wrap;max-width:150px';
+  m.innerHTML=RS_ROWCOLORS.map(c=>`<button type="button" title="${c[1]}" onclick="rsSetRowColor('${sq}','${c[0]}')" style="width:26px;height:26px;border-radius:6px;border:1px solid #0003;cursor:pointer;background:${c[0]}"></button>`).join('')
+    +`<button type="button" title="${esc(t('rsRowClear'))}" onclick="rsSetRowColor('${sq}','')" style="width:26px;height:26px;border-radius:6px;border:1px dashed #999;cursor:pointer;background:transparent;font-weight:800;color:#c00">✕</button>`;
+  document.body.appendChild(m);
+  m.style.left=Math.max(6,Math.min(e.clientX,innerWidth-158))+'px';
+  m.style.top=Math.max(6,Math.min(e.clientY,innerHeight-90))+'px';
+  setTimeout(()=>document.addEventListener('mousedown',rsCloseRowMenu,{once:true}),0);
+  return false;}
+function rsSetRowColor(size,color){if(color)RS_ROWCOL[size]=color;else delete RS_ROWCOL[size];rsCloseRowMenu();rsApplyRowColors();rsSaveDraft();}
+function rsApplyRowColors(){document.querySelectorAll('.rsq-row').forEach(tr=>{const se=tr.querySelector('.rsq-size');const sz=se?se.value.trim():'';const col=(sz&&RS_ROWCOL[sz])||'';
+  tr.querySelectorAll('td').forEach(td=>{td.style.background=col;});});}
 // طيّ كل الأقسام افتراضياً (المستخدم يفتح ما يحتاجه) — يُطبَّق مرة عند أول دخول لصفحة الريشو في الجلسة
 function rsCollapseAll(){['rsc','rsq','rsm','rsr','rss','rscb','rso'].forEach(k=>{if(!RS_COL[k]&&document.querySelector('.'+k+'-cv'))rsCollapse(k);});}
 // طيّ/فتح جدول
@@ -1851,6 +1869,7 @@ function rsInit(){if(RS_LOADED||!$('rs-qty-rows'))return;if(!prodNames().length)
   else{if(!$('rs-qty-rows').children.length)rsAddQtyRow();rsCalc();}
   rsUpdateUnitLabels();RS_LOADED=true;}
 function rsApplyDraft(d){
+  RS_ROWCOL=(d.rowcol&&typeof d.rowcol==='object')?d.rowcol:{};
   if($('rs-title'))$('rs-title').value=d.title||'';
   if(d.product&&prodNames().includes(d.product))$('rs-product').value=d.product;
   if($('rs-unit')){$('rs-unit').value=d.unit||'متر';RS_PREV_UNIT=$('rs-unit').value;}
@@ -1880,6 +1899,7 @@ function rsSaveDraft(){if(!RS_LOADED||!MEMBER||!$('rs-qty-rows'))return;
       maxlen:+$('rs-maxlen').value||0,maxsizes:+$('rs-maxsizes').value||6,maxpcs:+$('rs-maxpcs').value||5,surplus:+($('rs-surplus')&&$('rs-surplus').value)||0,fabwidth:($('rs-fabwidth')?$('rs-fabwidth').value:''),
       objective:($('rs-objective')?$('rs-objective').value:'plies'),rolllen:+($('rs-rolllen')&&$('rs-rolllen').value)||0,rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,colors:rsColors(),
       qty:[...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0})).filter(x=>x.size),
+      rowcol:RS_ROWCOL,
       markers:rsReadMarkers().filter(m=>m.pairs.length||m.plies).map(m=>({pairs:m.pairs,plies:+m.plies||0,actlen:m.actlen||0}))};
     db.collection('qc_workspaces').doc(MEMBER.wsId).update({rishoDraft:draft}).catch(()=>{});
   },700);}
@@ -1887,7 +1907,7 @@ function rsAddQtyRow(r){r=r||{};const src=rsSizeSrc();const locked=src.length>0;
   const cell=locked
     ?`<select class="rsq-size" onchange="rsPickSize(this)" style="min-width:90px;padding:6px;font-weight:800"><option value="">\u2014</option>${sizeOptionsHtml(src,r.size,r.cons)}</select>`
     :`<input class="rsq-size" value="${esc(r.size||'')}" placeholder="L" style="min-width:70px;padding:6px;font-weight:800" oninput="rsCalc()">`;
-  $('rs-qty-rows').insertAdjacentHTML('beforeend',`<tr class="rsq-row">
+  $('rs-qty-rows').insertAdjacentHTML('beforeend',`<tr class="rsq-row" oncontextmenu="return rsRowMenu(event,this)">
    <td class="rsq-seq"></td>
    <td><div style="display:flex;align-items:center;gap:6px">${cell}<button type="button" class="mini r" title="حذف المقاس" onclick="this.closest('tr').remove();rsCalc()" style="flex:0 0 auto;padding:2px 8px">✕</button></div></td>
    <td><input class="rsq-qty" type="number" min="0" value="${r.qty!=null?r.qty:''}" style="min-width:70px;padding:6px;text-align:center;font-weight:700" oninput="rsCalc()" onkeydown="rsEnter(event,this)"></td>
@@ -1936,7 +1956,7 @@ function rsCalc(){if(!$('rs-qty-rows'))return;const uf=rsUF();
   $('rs-qt-q').textContent=q||'\u2014';
   $('rs-qt-r').textContent=rsum?Math.round(rsum*100)/100:'\u2014';
   $('rs-qt-c').textContent=csum?Math.round(csum*uf*100)/100:'\u2014';
-  rsMkCalc();rsSaveDraft();}
+  rsApplyRowColors();rsMkCalc();rsSaveDraft();}
 /* ---- \u062c\u062f\u0648\u0644 \u0627\u0644\u0645\u0627\u0631\u0643\u0631\u0627\u062a ---- */
 const RS_COLORS=['#d9e8f7','#d9f0d5','#f7d9ec','#f9e0cb','#d5eef4','#eaf4cf','#e6e0f7','#f7f3cf'];
 // نسخ داكنة متناسقة لوضع الدارك — كي يبقى نصّ الثيم الفاتح مقروءاً على خلفية الصفّ
@@ -2895,7 +2915,7 @@ function rsResult(){const qty=rsReadQty();if(!qty.length)return null;
     unit:rsUL(),uf:rsUF(),
     surplus:+($('rs-surplus')&&$('rs-surplus').value)||0,objective:($('rs-objective')&&$('rs-objective').value)||'plies',
     fabwidth:($('rs-fabwidth')?$('rs-fabwidth').value:''),rolllen:+($('rs-rolllen')&&$('rs-rolllen').value)||0,
-    rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,colors:rsColors(),
+    rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,colors:rsColors(),rowcol:RS_ROWCOL,
     qty,markers,cover,totalReq,totalMade:tRun,totRem:totalReq-tRun,totFab:Math.round(tFab*100)/100,
     valid:markers.filter(m=>m.ok).length,decision:ready?'PASS':'FAIL'};}
 function saveRsPlan(){if(!(canEdit('marker')||canEdit('insp')))return toast(t('rsNoPerm'));
@@ -2923,6 +2943,7 @@ function rsDelSaved(id){if(!confirm(t('rsDelPlanQ')))return;
   TOOLCHK=TOOLCHK.filter(c=>c.id!==id);
   if(TOOLCHK.filter(c=>c.type==='rs').length)rsOpenSaved();else closeModal();}
 function rsOpenInCalc(id){const c=TOOLCHK.find(x=>x.id===id);if(!c||c.type!=='rs')return;const r=c.result;
+  RS_ROWCOL=(r.rowcol&&typeof r.rowcol==='object')?r.rowcol:{};
   go('marker',navBtn('marker'));
   if($('rs-title'))$('rs-title').value=c.title||'';
   if(r.product&&prodNames().includes(r.product))$('rs-product').value=r.product;
