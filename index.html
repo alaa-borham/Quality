@@ -189,7 +189,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
     <div class="brand"><div class="logo">🧵</div><h1 data-i18n="appTitle">نظام متابعة الجودة</h1><p>QC Tracking · الشياكة</p></div>
     <div id="auth-msg"></div>
     <div class="field"><label id="a-email-lbl" data-i18n="loginIdLbl">البريد الإلكتروني أو اسم المستخدم</label><input id="a-email" type="text" autocomplete="username" data-i18n-ph="loginIdPh" placeholder="you@example.com أو اسم المستخدم"></div>
-    <div class="field"><label data-i18n="password">كلمة المرور</label><input id="a-pass" type="password" autocomplete="current-password" placeholder="••••••" onkeydown="if(event.key==='Enter')doAuth()"></div>
+    <div class="field"><label data-i18n="password">كلمة المرور</label><div style="position:relative"><input id="a-pass" type="password" autocomplete="current-password" placeholder="••••••" style="padding-right:40px" onkeydown="if(event.key==='Enter')doAuth()"><button type="button" onclick="pwEye(this)" tabindex="-1" title="إظهار كلمة المرور" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:17px;padding:2px 4px;line-height:1">👁</button></div></div>
     <div class="field hide" id="a-name-f"><label data-i18n="name">الاسم</label><input id="a-name" data-i18n-ph="namePh" placeholder="اسمك الكامل"></div>
     <button class="btn" id="a-btn" onclick="doAuth()" data-i18n="loginBtn">دخول</button>
     <div id="a-forgot" style="text-align:center;margin-top:12px">
@@ -1049,7 +1049,7 @@ function renderEmps(){const el=$('emp-list');if(!el)return;
 function empForm(){modal(`<h3>${t('empNew')}</h3>
   <label class="inl">${t('empName')}</label><input id="e-name">
   <label class="inl">${t('empUser')}</label><input id="e-user" placeholder="ahmed" style="direction:ltr;text-align:left" autocapitalize="none">
-  <label class="inl">${t('empPass')}</label><input id="e-pass" type="text" placeholder="••••••" style="direction:ltr;text-align:left">
+  <label class="inl">${t('empPass')}</label>${pwField('e-pass',{ph:'••••••'})}
   <label class="inl">${t('permsLbl')}</label>
   <div class="note" style="margin-bottom:8px">${t('permLegend')}</div>
   <div id="perm-box">${permRows(null)}</div>
@@ -1134,7 +1134,8 @@ function delItem(v){db.collection('qc_workspaces').doc(MEMBER.wsId).update({item
 function saveMyName(){const n=$('set-name').value.trim();if(!n)return toast(t('enterNameMsg'));
   db.collection('qc_members').doc(ME.uid).update({name:n}).then(()=>{MEMBER.name=n;if(ME.updateProfile)ME.updateProfile({displayName:n});updateWsLabel();toast(t('nameChanged'));}).catch(e=>toast(rulesHint(e)));}
 // تغيير كلمة مرور المستخدم الحالي نفسه (يعمل للأدمن/المالك/الموظف) — مع إعادة مصادقة عند الحاجة
-function pwField(id){return `<div style="position:relative"><input id="${id}" type="password" autocomplete="new-password" style="direction:ltr;text-align:left;padding-right:40px"><button type="button" onclick="pwEye(this)" tabindex="-1" title="${t('pwShow')}" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:17px;padding:2px 4px;line-height:1">👁</button></div>`;}
+function pwField(id,o){o=o||{};const ph=o.ph!=null?` placeholder="${esc(o.ph)}"`:'';const ac=o.ac||'new-password';const kd=o.kd?` onkeydown="${o.kd}"`:'';
+  return `<div style="position:relative"><input id="${id}" type="password" autocomplete="${ac}"${ph}${kd} style="direction:ltr;text-align:left;padding-right:40px"><button type="button" onclick="pwEye(this)" tabindex="-1" title="${t('pwShow')}" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:17px;padding:2px 4px;line-height:1">👁</button></div>`;}
 function pwEye(btn){const inp=btn.parentElement.querySelector('input');if(!inp)return;const show=inp.type==='password';inp.type=show?'text':'password';btn.textContent=show?'🙈':'👁';btn.title=show?t('pwHide'):t('pwShow');}
 function changePwForm(){modal(`<h3>🔑 ${t('cpwTitle')}</h3>
   <label class="inl">${t('cpwNew')}</label>${pwField('cpw-new')}
