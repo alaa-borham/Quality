@@ -392,6 +392,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div class="rscb-hide" style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
           <button type="button" id="rs-savelib-btn" class="btn g" style="padding:6px 14px" onclick="rsComboSaveLib()">💾 <span data-i18n="rsCbSaveLib">احفظ القياسات في مكتبة المنتج</span></button>
           <button type="button" class="btn sec" style="padding:6px 14px" onclick="rsComboPrintSheet()" title="اطبع قائمة بكل التوليفات مع خانة فارغة لكتابة الطول الفعلي المقاس على الطاولة">🖨️ <span data-i18n="rsCbPrintBtn">ورقة قياس للطباعة</span></button>
+          <button type="button" class="btn sec" style="padding:6px 14px" onclick="rsLibManage()">📚 <span data-i18n="rsLibBtn">إدارة مكتبة التوليفات</span></button>
           <div id="rs-combo-best" style="font-weight:800"></div></div>
         <div class="rscb-hide note" style="margin-top:4px" data-i18n="rsCbLibNote">القياسات المحفوظة تُعبَّأ تلقائياً في أي أوردر لاحق لنفس المنتج (مرجع دائم).</div>
         <div class="rscb-hide note" style="margin-top:6px" data-i18n="rsCbNote">النظام يقترح توليفات أوردرك؛ قِس طولها الفعلي على الطاولة وأدخِله، فيحسب الكفاءة (فعلي÷محسوب) ويرشّح أفضل توليفة (الأقل استهلاكاً للقطعة). كفاءة أقل من ١ = تداخل جيد يوفّر قماش.</div>
@@ -501,7 +502,8 @@ customCodePrompt:'أدخل الكود المخصص (أحرف إنجليزية و
 badCode:'صيغة الكود غير صحيحة — أحرف إنجليزية وأرقام وشرطة فقط (4–16 خانة)',codeTaken:'هذا الكود مستخدم في مساحة عمل أخرى',codeChanged:'تم تغيير الكود',
 empTitle:'الموظفون (حسابات بصلاحيات)',empNew:'➕ موظف جديد',empName:'اسم الموظف *',empUser:'اسم المستخدم (للدخول) *',empPass:'كلمة المرور *',
 permsLbl:'الصلاحيات',permFact:'إدارة المصانع',permDel:'حذف السجلات',noEmps:'لا موظفون بعد — أنشئ حساباً لكل مفتش',
-usersTitle:'إدارة المستخدمين والصلاحيات',usersManageBtn:'المستخدمون والصلاحيات',permLvl0:'مخفي',permLvl1:'عرض',permLvl2:'عرض + تعديل',permLvl3:'عرض + تعديل + حذف',permView:'عرض',permEdit:'تعديل',permDel2:'حذف',permLegend:'حدّد لكل قسم مستوى الوصول: مخفي / عرض / تعديل / حذف',back:'رجوع',rsNoPerm:'ليس لديك صلاحية التعديل في هذا القسم',
+usersTitle:'إدارة المستخدمين والصلاحيات',usersManageBtn:'المستخدمون والصلاحيات',permLvl0:'مخفي',permLvl1:'عرض',permLvl2:'عرض + تعديل',permLvl3:'عرض + تعديل + حذف',permView:'عرض',permEdit:'تعديل',permDel2:'حذف',permLegend:'حدّد لكل قسم مستوى الوصول: مخفي / عرض / تعديل / حذف',back:'رجوع',rsNoPerm:'ليس لديك صلاحية التعديل في هذا القسم',rsLibBtn:'إدارة مكتبة التوليفات',rsLibTitle:'مكتبة التوليفات المحفوظة',rsLibHint:'التوليفات المقيسة المحفوظة لكل منتج وعرض قماش — عدّل الطول أو احذف توليفة خاطئة.',rsLibEmpty:'المكتبة فارغة — احفظ قياسات من «مطور المراكر» أولاً',rsLibNoneP:'لا توليفات محفوظة لهذا المنتج',rsLibBadLen:'أدخل طولاً صحيحاً أكبر من صفر',rsLibDelQ:'حذف هذه التوليفة من المكتبة نهائياً؟',
+cpwBtn:'تغيير كلمة المرور',cpwTitle:'تغيير كلمة المرور',cpwNew:'كلمة المرور الجديدة',cpwConfirm:'تأكيد كلمة المرور',cpwHint:'٦ أحرف على الأقل. لأمانك قد يُطلب منك إدخال كلمة مرورك الحالية.',cpwMismatch:'كلمتا المرور غير متطابقتين',cpwNoUser:'لا يوجد مستخدم مسجّل دخوله',cpwReauth:'لأمانك، أدخل كلمة مرورك الحالية للمتابعة:',cpwDone:'تم تغيير كلمة المرور',usersPwNote:'لا يمكن للمالك تغيير كلمة مرور موظف مباشرةً؛ يغيّرها كل مستخدم بنفسه من الإعدادات ← «تغيير كلمة المرور».',
 empHint:'سيدخل الموظف من شاشة تسجيل الدخول باسم المستخدم وكلمة المرور مباشرة (بدون بريد إلكتروني وبدون كود).',
 empCreated:'تم إنشاء حساب الموظف',empUserTaken:'اسم المستخدم مستخدم مسبقاً',enterEmpFields:'أدخل الاسم واسم المستخدم وكلمة المرور',
 badUser:'اسم المستخدم: أحرف إنجليزية صغيرة وأرقام و . _ - فقط (3–20 خانة)',
@@ -655,7 +657,8 @@ customCodePrompt:'Enter a custom code (letters, digits, dash; 4-16 chars):',
 badCode:'Invalid code format — letters, digits, and dash only (4-16 chars)',codeTaken:'This code is used by another workspace',codeChanged:'Code changed',
 empTitle:'Employees (accounts with permissions)',empNew:'➕ New employee',empName:'Employee name *',empUser:'Username (for login) *',empPass:'Password *',
 permsLbl:'Permissions',permFact:'Manage factories',permDel:'Delete records',noEmps:'No employees yet — create an account per inspector',
-usersTitle:'Users & permissions',usersManageBtn:'Users & permissions',permLvl0:'Hidden',permLvl1:'View',permLvl2:'View + edit',permLvl3:'View + edit + delete',permView:'View',permEdit:'Edit',permDel2:'Delete',permLegend:'Set each section access level: Hidden / View / Edit / Delete',back:'Back',rsNoPerm:'You do not have edit permission for this section',
+usersTitle:'Users & permissions',usersManageBtn:'Users & permissions',permLvl0:'Hidden',permLvl1:'View',permLvl2:'View + edit',permLvl3:'View + edit + delete',permView:'View',permEdit:'Edit',permDel2:'Delete',permLegend:'Set each section access level: Hidden / View / Edit / Delete',back:'Back',rsNoPerm:'You do not have edit permission for this section',rsLibBtn:'Manage combo library',rsLibTitle:'Saved combo library',rsLibHint:'Measured combos saved per product and fabric width — edit a length or delete a wrong one.',rsLibEmpty:'Library is empty — save measurements from Marker developer first',rsLibNoneP:'No saved combos for this product',rsLibBadLen:'Enter a valid length greater than zero',rsLibDelQ:'Permanently delete this combo from the library?',
+cpwBtn:'Change password',cpwTitle:'Change password',cpwNew:'New password',cpwConfirm:'Confirm password',cpwHint:'At least 6 characters. For security you may be asked for your current password.',cpwMismatch:'Passwords do not match',cpwNoUser:'No signed-in user',cpwReauth:'For security, enter your current password to continue:',cpwDone:'Password changed',usersPwNote:'An owner cannot change an employee password directly; each user changes their own from Settings → Change password.',
 empHint:'The employee signs in from the login screen with username and password directly (no email, no code).',
 empCreated:'Employee account created',empUserTaken:'Username already taken',enterEmpFields:'Enter name, username, and password',
 badUser:'Username: lowercase letters, digits, . _ - only (3-20 chars)',
@@ -925,6 +928,7 @@ function openMenu(){const owner=isOwner();modal(`<h3>${t('settings')}</h3>
   <label class="inl">${t('yourName')}</label>
   <div style="display:flex;gap:8px"><input id="set-name" value="${esc(MEMBER.name||'')}" placeholder="${t('namePh')}">
     <button class="mini" onclick="saveMyName()">${t('save')}</button></div>
+  <button class="btn sec" style="margin-top:8px" onclick="changePwForm()">🔑 ${t('cpwBtn')}</button>
   ${owner?`<label class="inl">${t('wsNameSet')}</label>
   <div style="display:flex;gap:8px"><input id="set-ws" value="${esc(MEMBER.wsName||'')}" placeholder="${t('wsNamePh')}">
     <button class="mini" onclick="saveWsName()">${t('save')}</button></div>
@@ -968,6 +972,7 @@ function usersPanel(){if(!isOwner())return;
   modal(`<h3>👥 ${t('usersTitle')}</h3>
     <button class="btn" onclick="empForm()">${t('empNew')}</button>
     <div id="emp-list" style="margin-top:10px"><span class="note">…</span></div>
+    <div class="note" style="margin-top:8px">🔑 ${t('usersPwNote')}</div>
     <div class="row-btns"><button class="btn sec" onclick="openMenu()">${t('back')}</button></div>`);
   renderEmps();}
 /* ============ Super Admin ============ */
@@ -1129,6 +1134,27 @@ function addItem(){const v=$('new-item').value.trim();if(!v)return;
 function delItem(v){db.collection('qc_workspaces').doc(MEMBER.wsId).update({items:FV.arrayRemove(v)}).catch(e=>toast(rulesHint(e)));}
 function saveMyName(){const n=$('set-name').value.trim();if(!n)return toast(t('enterNameMsg'));
   db.collection('qc_members').doc(ME.uid).update({name:n}).then(()=>{MEMBER.name=n;if(ME.updateProfile)ME.updateProfile({displayName:n});updateWsLabel();toast(t('nameChanged'));}).catch(e=>toast(rulesHint(e)));}
+// تغيير كلمة مرور المستخدم الحالي نفسه (يعمل للأدمن/المالك/الموظف) — مع إعادة مصادقة عند الحاجة
+function changePwForm(){modal(`<h3>🔑 ${t('cpwTitle')}</h3>
+  <label class="inl">${t('cpwNew')}</label><input id="cpw-new" type="password" autocomplete="new-password" style="direction:ltr;text-align:left">
+  <label class="inl">${t('cpwConfirm')}</label><input id="cpw-conf" type="password" autocomplete="new-password" style="direction:ltr;text-align:left">
+  <div class="note" style="margin-top:6px">${t('cpwHint')}</div>
+  <div class="row-btns"><button class="btn" id="cpw-save" onclick="changePw()">${t('save')}</button>
+  <button class="btn sec" onclick="openMenu()">${t('cancel')}</button></div>`);}
+function changePw(){const np=($('cpw-new')&&$('cpw-new').value)||'',cf=($('cpw-conf')&&$('cpw-conf').value)||'';
+  if(np.length<6)return toast(t('e_weak'));
+  if(np!==cf)return toast(t('cpwMismatch'));
+  const usr=firebase.auth().currentUser;if(!usr)return toast(t('cpwNoUser'));
+  const btn=$('cpw-save');if(btn)btn.disabled=true;const done=()=>{if(btn)btn.disabled=false;};
+  usr.updatePassword(np).then(()=>{toast(t('cpwDone'));openMenu();})
+    .catch(err=>{
+      if(err&&err.code==='auth/requires-recent-login'){
+        const cur=prompt(t('cpwReauth'));if(cur==null){done();return;}
+        const cred=firebase.auth.EmailAuthProvider.credential(usr.email,cur);
+        usr.reauthenticateWithCredential(cred).then(()=>usr.updatePassword(np))
+          .then(()=>{toast(t('cpwDone'));openMenu();}).catch(e=>{done();toast(mapErr(e));});
+      } else {done();toast(mapErr(err));}
+    });}
 function saveWsName(){const n=$('set-ws').value.trim();if(!n)return toast(t('enterWsMsg'));
   Promise.all([db.collection('qc_workspaces').doc(MEMBER.wsId).update({name:n}),db.collection('qc_members').doc(ME.uid).update({wsName:n})])
     .then(()=>{MEMBER.wsName=n;updateWsLabel();toast(t('wsChanged'));}).catch(e=>toast(rulesHint(e)));}
@@ -2209,6 +2235,39 @@ function rsComboSaveLib(){if(!canEdit('marker'))return toast(t('rsNoPerm'));cons
   if(!saved)return toast(t('rsCbNothingToSave'));
   const nl={...(COMBOLIB||{})};nl[prod]=lib;
   db.collection('qc_workspaces').doc(MEMBER.wsId).update({comboLib:nl}).then(()=>{COMBOLIB=nl;rsMkCalc();toast(tf('rsCbSavedW',{n:saved,p:prod,w}));}).catch(e=>toast(rulesHint(e)));}
+/* ---- إدارة مكتبة التوليفات: عرض/تعديل طول/حذف التوليفات المحفوظة لكل منتج وعرض ---- */
+let RS_LIB_PROD='';
+function rsLibManage(){const prods=Object.keys(COMBOLIB||{}).filter(p=>((COMBOLIB[p]||[]).length));
+  if(!prods.length)return toast(t('rsLibEmpty'));
+  if(!RS_LIB_PROD||!prods.includes(RS_LIB_PROD))RS_LIB_PROD=prods.includes(rsComboProd())?rsComboProd():prods[0];
+  const sel=prods.length>1?`<select onchange="RS_LIB_PROD=this.value;rsLibRender()" style="padding:7px;width:100%;margin-bottom:10px">${prods.map(p=>`<option ${p===RS_LIB_PROD?'selected':''}>${esc(p)}</option>`).join('')}</select>`:`<div style="font-weight:800;margin-bottom:8px">📦 ${esc(RS_LIB_PROD)}</div>`;
+  modal(`<h3>📚 ${t('rsLibTitle')}</h3><div class="note" style="margin-bottom:8px">${t('rsLibHint')}</div>${sel}<div id="rs-lib-body"></div>
+    <div class="row-btns"><button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);
+  rsLibRender();}
+function rsLibRender(){const el=$('rs-lib-body');if(!el)return;const uf=rsUF();const u=($('rs-unit')&&$('rs-unit').value)||'متر';const ce=canEdit('marker');
+  const lib=(COMBOLIB&&COMBOLIB[RS_LIB_PROD])||[];
+  if(!lib.length){el.innerHTML=`<span class="note">${t('rsLibNoneP')}</span>`;return;}
+  const byW={};lib.forEach(x=>{const w=String(x.w||'')||'—';(byW[w]=byW[w]||[]).push(x);});
+  const widths=Object.keys(byW).sort();
+  el.innerHTML=widths.map(w=>{
+    const rows=byW[w].map(x=>{const sg=esc(x.sig).replace(/'/g,"&#39;");
+      const pills=(x.sizes||[]).map(p=>`<span dir="ltr" style="display:inline-block;font-weight:800;font-size:12px;margin:1px 3px;padding:1px 7px;border:1px solid var(--line);border-radius:999px;background:var(--inp)">${esc(p.size)}×${p.cnt}</span>`).join('');
+      const lenDisp=Math.round((x.actLenM||0)*uf*100)/100;
+      const lenCell=ce?`<input type="number" step="0.01" value="${lenDisp}" onchange="rsLibEditLen('${sg}','${esc(w)}',this.value)" style="width:78px;padding:4px;text-align:center;font-weight:800">`:`<b>${lenDisp}</b>`;
+      const del=ce?`<button class="mini r" onclick="rsLibDel('${sg}','${esc(w)}')">🗑</button>`:'';
+      return `<div class="item" style="margin-bottom:5px"><div class="h"><div style="flex:1;line-height:2">${pills}</div><div style="display:flex;align-items:center;gap:6px;white-space:nowrap">${lenCell}<span style="font-size:11px;color:var(--mut)">${esc(u)}</span>${del}</div></div></div>`;
+    }).join('');
+    return `<div style="margin-bottom:12px"><div style="font-weight:800;color:var(--teal);margin-bottom:4px">${t('rsFabW')}: ${esc(w)} <span class="note" style="font-weight:400">(${byW[w].length})</span></div>${rows}</div>`;
+  }).join('');}
+function rsLibWrite(nl,msg){db.collection('qc_workspaces').doc(MEMBER.wsId).update({comboLib:nl}).then(()=>{COMBOLIB=nl;rsMkCalc();if(msg)toast(msg);rsLibRender();}).catch(e=>toast(rulesHint(e)));}
+function rsLibEditLen(sig,w,val){if(!canEdit('marker'))return toast(t('rsNoPerm'));const m=+normNum(val);if(!(m>0)){rsLibRender();return toast(t('rsLibBadLen'));}
+  const uf=rsUF();const actLenM=Math.round(m/uf*10000)/10000;const wv=(w==='—'?'':w);
+  const nl={...(COMBOLIB||{})};nl[RS_LIB_PROD]=(nl[RS_LIB_PROD]||[]).map(x=>(x.sig===sig&&String(x.w||'')===String(wv))?{...x,actLenM}:x);
+  rsLibWrite(nl,t('saved'));}
+function rsLibDel(sig,w){if(!canEdit('marker'))return toast(t('rsNoPerm'));if(!confirm(t('rsLibDelQ')))return;
+  const wv=(w==='—'?'':w);const nl={...(COMBOLIB||{})};
+  nl[RS_LIB_PROD]=(nl[RS_LIB_PROD]||[]).filter(x=>!(x.sig===sig&&String(x.w||'')===String(wv)));
+  rsLibWrite(nl,t('deleted'));}
 function rsComboSuggest(){
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
