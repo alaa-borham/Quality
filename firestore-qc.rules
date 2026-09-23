@@ -22,11 +22,44 @@ function qcIsAdmin() {
   return request.auth != null && request.auth.uid == 'I2Stgz5hPVM6qeG19NCmgj4GCck1';
 }
 
-// العضوية: كل مستخدم يكتب/يقرأ مستنده — والمالك يدير (يعدّل/يحذف) أعضاء مساحته
+// ═══ الصلاحيات المفصّلة لكل قسم: 0 مخفي · 1 عرض · 2 تعديل · 3 حذف ═══
+// مستند عضوية المستخدم الحالي
+function qcMe() {
+  return get(/databases/$(database)/documents/qc_members/$(request.auth.uid)).data;
+}
+// توافق مع النظام القديم (صلاحيتان: fact, del) — نفس منطق العميل
+function qcLegacy(m, section) {
+  return (section == 'fact')
+      ? ( m.get('perms', {}).get('fact', false) == true ? (m.get('perms', {}).get('del', false) == true ? 3 : 2) : 1 )
+      : (section == 'dash' || section == 'ref' || section == 'tools') ? 1
+      : ( m.get('perms', {}).get('del', false) == true ? 3 : 2 );
+}
+// مستوى قسم للعضو m (المالك = 3؛ الصلاحيات الجديدة _v>=2 وإلا القديمة)
+function qcSecLvl(m, section) {
+  return (m.get('role', '') == 'owner') ? 3
+    : (m.get('perms', {}).get('_v', 0) >= 2)
+      ? m.get('perms', {}).get(section, 0)
+      : qcLegacy(m, section);
+}
+// مستوى القسم للمستخدم الحالي (يشمل السوبر أدمن)
+function qcLvl(section) {
+  return qcIsAdmin() ? 3 : ( qcIsMember() ? qcSecLvl(qcMe(), section) : 0 );
+}
+
+// العضوية: المستخدم ينشئ سجله كمفتّش بلا صلاحيات، ويعدّل اسمه فقط — والمالك يمنح الصلاحيات ويدير الأعضاء
 match /qc_members/{uid} {
   allow read, write: if qcIsAdmin();
   allow read:  if request.auth != null;
-  allow create, update, delete: if request.auth != null && request.auth.uid == uid;
+  // إنشاء ذاتي: مفتّش فقط وبلا حقل صلاحيات (يمنع رفع الصلاحيات على النفس)
+  allow create: if request.auth != null && request.auth.uid == uid
+                && request.resource.data.get('role', '') == 'inspector'
+                && !request.resource.data.keys().hasAny(['perms']);
+  // تعديل ذاتي: الاسم فقط (لا الدور ولا الصلاحيات ولا مساحة العمل)
+  allow update: if request.auth != null && request.auth.uid == uid
+                && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name']);
+  // مغادرة المستخدم لمساحته
+  allow delete: if request.auth != null && request.auth.uid == uid;
+  // المالك يمنح الصلاحيات/الدور ويزيل أعضاء مساحته
   allow update, delete: if qcIsOwner() && resource.data.wsId == qcWs();
 }
 
@@ -37,34 +70,35 @@ match /qc_workspaces/{wsId} {
   allow update: if request.auth != null && resource.data.ownerUid == request.auth.uid;
 }
 
-// البيانات التشغيلية: مقصورة على أعضاء نفس مساحة العمل
-// (إدارة المصانع للمالك فقط — والحذف عموماً للمالك فقط)
+// البيانات التشغيلية: القراءة لأعضاء المساحة؛ والكتابة/الحذف حسب مستوى القسم
+// (تعديل ⇐ مستوى ≥ 2 · حذف ⇐ مستوى ≥ 3 · المالك/الأدمن = 3 دائماً)
 match /qc_factories/{id} {
   allow read, write: if qcIsAdmin();
   allow read:   if qcIsMember() && resource.data.wsId == qcWs();
-  allow create: if qcIsOwner() && request.resource.data.wsId == qcWs();
-  allow update, delete: if qcIsOwner() && resource.data.wsId == qcWs();
+  allow create: if qcIsMember() && request.resource.data.wsId == qcWs() && qcLvl('fact') >= 2;
+  allow update: if qcIsMember() && resource.data.wsId == qcWs() && qcLvl('fact') >= 2;
+  allow delete: if qcIsMember() && resource.data.wsId == qcWs() && qcLvl('fact') >= 3;
 }
 match /qc_orders/{id} {
   allow read, write: if qcIsAdmin();
   allow read:   if qcIsMember() && resource.data.wsId == qcWs();
-  allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
-  allow update: if qcIsMember() && resource.data.wsId == qcWs();
-  allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
+  allow create: if qcIsMember() && request.resource.data.wsId == qcWs() && qcLvl('orders') >= 2;
+  allow update: if qcIsMember() && resource.data.wsId == qcWs() && qcLvl('orders') >= 2;
+  allow delete: if qcIsMember() && resource.data.wsId == qcWs() && qcLvl('orders') >= 3;
 }
 match /qc_inspections/{id} {
   allow read, write: if qcIsAdmin();
   allow read:   if qcIsMember() && resource.data.wsId == qcWs();
-  allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
-  allow update: if qcIsMember() && resource.data.wsId == qcWs();
-  allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
+  allow create: if qcIsMember() && request.resource.data.wsId == qcWs() && qcLvl('insp') >= 2;
+  allow update: if qcIsMember() && resource.data.wsId == qcWs() && qcLvl('insp') >= 2;
+  allow delete: if qcIsMember() && resource.data.wsId == qcWs() && qcLvl('insp') >= 3;
 }
 match /qc_defects/{id} {
   allow read, write: if qcIsAdmin();
   allow read:   if qcIsMember() && resource.data.wsId == qcWs();
   allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
   allow update: if qcIsMember() && resource.data.wsId == qcWs();
-  allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
+  allow delete: if qcIsMember() && resource.data.wsId == qcWs() && qcLvl('ref') >= 3;
 }
 
 // موديلات المقاسات والاستهلاك (لحاسبة الماركر)
@@ -88,11 +122,11 @@ match /qc_chkcfg/{wsId} {
   allow read, write: if qcIsMember() && wsId == qcWs();
 }
 
-// فحوصات أدوات الجودة المحفوظة (نقاط أربع/انكماش/AQL) المرتبطة بمورد
+// فحوصات أدوات الجودة المحفوظة (نقاط أربع/انكماش/AQL) وخطط الريشو — قسم الفحوصات أو الريشو
 match /qc_toolchecks/{id} {
   allow read, write: if qcIsAdmin();
   allow read:   if qcIsMember() && resource.data.wsId == qcWs();
-  allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
-  allow update: if qcIsMember() && resource.data.wsId == qcWs();
-  allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
+  allow create: if qcIsMember() && request.resource.data.wsId == qcWs() && (qcLvl('insp') >= 2 || qcLvl('marker') >= 2);
+  allow update: if qcIsMember() && resource.data.wsId == qcWs() && (qcLvl('insp') >= 2 || qcLvl('marker') >= 2);
+  allow delete: if qcIsMember() && resource.data.wsId == qcWs() && (qcLvl('insp') >= 3 || qcLvl('marker') >= 3);
 }

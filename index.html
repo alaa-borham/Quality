@@ -1057,10 +1057,14 @@ function saveEmp(){const name=$('e-name').value.trim(),user=$('e-user').value.tr
   const perms=readPermSels();
   const email=user+'@qc.local';const btn=$('e-save');if(btn)btn.disabled=true;
   let app2;try{app2=firebase.app('emp');}catch(_){app2=firebase.initializeApp(FB_CONFIG,'emp');}
-  app2.auth().createUserWithEmailAndPassword(email,pass).then(c=>
-    app2.firestore().collection('qc_members').doc(c.user.uid).set({wsId:MEMBER.wsId,wsName:MEMBER.wsName||'',name,username:user,email,role:'inspector',perms,createdAt:firebase.firestore.FieldValue.serverTimestamp()})
-    .then(()=>app2.auth().signOut())
-  ).then(()=>{toast(t('empCreated'));usersPanel();})
+  // ينشئ الموظف حساب دخوله وسجله (مفتّش بلا صلاحيات) — ثم يمنحه المالك الصلاحيات بجلسته
+  // (لا تُكتب الصلاحيات ذاتياً، فلا يستطيع أحد رفع صلاحياته على نفسه — القواعد تفرض ذلك)
+  let newUid='';
+  app2.auth().createUserWithEmailAndPassword(email,pass).then(c=>{newUid=c.user.uid;
+    return app2.firestore().collection('qc_members').doc(newUid).set({wsId:MEMBER.wsId,wsName:MEMBER.wsName||'',name,username:user,email,role:'inspector',createdAt:firebase.firestore.FieldValue.serverTimestamp()})
+      .then(()=>app2.auth().signOut());
+  }).then(()=>db.collection('qc_members').doc(newUid).update({perms}))
+  .then(()=>{toast(t('empCreated'));usersPanel();})
   .catch(e=>{if(btn)btn.disabled=false;toast(e&&e.code==='auth/email-already-in-use'?t('empUserTaken'):mapErr(e));});}
 function empPerms(uid){const m=EMPS.find(x=>x.id===uid);if(!m)return;
   modal(`<h3>${t('permsLbl')} — ${esc(m.name||'')}</h3>
