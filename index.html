@@ -421,6 +421,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
               <option value="continuous" data-i18n="rsRollCont">متصل بوصل الرولات — أقل هدر</option></select>
             <div id="rs-rolls" style="margin-top:12px"></div></div></div>
         <div class="row-btns" style="margin-top:14px"><button class="btn sec" onclick="saveRsPlan()" data-i18n="saveCheck">💾 حفظ</button>
+        <button class="btn sec" onclick="rsOpenSaved()" data-i18n="rsSavedPlans">📂 الخطط المحفوظة</button>
         <button class="btn sec" onclick="printRsPlan()" data-i18n="rsPrint">🖨 طباعة الخطة</button>
         <button class="btn sec" onclick="printRsSpread()" data-i18n="rsSpreadBtn">🧵 أمر الفرد</button>
         <button class="btn sec" onclick="printRsRolls()" data-i18n="rsRollBtn">📦 أمر الرولات</button>
@@ -577,7 +578,7 @@ photosLbl:'الصور (اختياري)',addPhoto:'📷 إضافة صورة',maxP
 repTitle:'تقرير فحص الجودة',repDecision:'القرار النهائي',repNotes:'ملاحظات',repInspector:'المفتش',repDate:'التاريخ',repPhotos:'الصور',repClose:'إغلاق',compressing:'جارٍ معالجة الصورة…',
 selectStage:'— اختر المرحلة من التسلسل —',addDefBtn:'➕ أضف',defLibLbl:'العيوب من الدليل (تزيد العدّاد تلقائياً)',recordInsp:'📝 سجّل فحصاً',colCheckShort:'يُفحص',
 reasonCritical:'وجود عيب حرِج',reasonMajor:'عيوب كبيرة {m} ≥ حد الرفض {r}',reasonMinor:'عيوب صغيرة {m} ≥ حد الرفض {r}',reasonWithin:'ضمن حدود القبول',
-factoryLbl2:'المصنع',saveCheck:'💾 حفظ',rsSaveNoData:'لا توجد كميات صالحة للحفظ — أدخِل المقاس والكمية والاستهلاك في جدول الكميات أولاً',rsSaveNoWs:'تعذّر الحفظ — لا توجد مساحة عمل نشطة. أعِد تسجيل الدخول ثم حاول',rsSaving:'جارٍ حفظ الخطة…',rsSavedPlan:'✅ تم حفظ الخطة بنجاح',selectFactory:'— اختر المصنع —',selectFactoryFirst:'الرجاء اختيار المصنع أولاً',noToolChk:'لا توجد فحوصات محفوظة بعد',
+factoryLbl2:'المصنع',saveCheck:'💾 حفظ',rsSaveNoData:'لا توجد كميات صالحة للحفظ — أدخِل المقاس والكمية والاستهلاك في جدول الكميات أولاً',rsSaveNoWs:'تعذّر الحفظ — لا توجد مساحة عمل نشطة. أعِد تسجيل الدخول ثم حاول',rsSaving:'جارٍ حفظ الخطة…',rsSavedPlan:'✅ تم حفظ الخطة بنجاح',rsSavedPlans:'📂 الخطط المحفوظة',rsSavedPlansHint:'اختر خطة لفتحها في الحاسبة (تُحمَّل كل بياناتها للتعديل وإعادة الحساب).',rsNoSavedPlans:'لا توجد خطط محفوظة بعد — احفظ خطة أولاً بزر «حفظ».',selectFactory:'— اختر المصنع —',selectFactoryFirst:'الرجاء اختيار المصنع أولاً',noToolChk:'لا توجد فحوصات محفوظة بعد',
 toolDescfp:'حاسبة نظام النقاط الأربع لتقييم جودة القماش الخام: تُدخل عيوب القماش المكتشفة موزعة حسب حجمها (أقل من 3 إنش، 3–6، 6–9، أكثر من 9 إنش أو ثقب)، فتحسب عدد النقاط لكل 100 ياردة مربعة وتقارنها بالحد المسموح لتحديد قبول أو رفض اللفة.',
 toolDescsh:'حاسبة انكماش القماش: تقيس نسبة تقلّص الطول والعرض بعد الغسيل أو الكي مقارنة بالمقاس الأصلي، لمعرفة ما إذا كان الانكماش ضمن الحد المسموح المتفق عليه أم يستدعي تعديل الباترون.',
 toolDescaq:'جدول AQL التفاعلي (مستوى فحص II): يحدد حجم العينة المطلوب سحبها حسب حجم الشحنة، وحدود القبول والرفض للعيوب الكبيرة والصغيرة، لاتخاذ قرار قبول أو رفض الشحنة بالكامل إحصائياً.',
@@ -730,7 +731,7 @@ photosLbl:'Photos (optional)',addPhoto:'📷 Add photo',maxPhotos:'Max 4 photos'
 repTitle:'Quality Inspection Report',repDecision:'Final decision',repNotes:'Notes',repInspector:'Inspector',repDate:'Date',repPhotos:'Photos',repClose:'Close',compressing:'Processing image…',
 selectStage:'— select stage from sequence —',addDefBtn:'➕ Add',defLibLbl:'Defects from library (auto-increments counters)',recordInsp:'📝 Record',colCheckShort:'Check',
 reasonCritical:'Critical defect present',reasonMajor:'Major {m} ≥ reject limit {r}',reasonMinor:'Minor {m} ≥ reject limit {r}',reasonWithin:'Within acceptance limits',
-factoryLbl2:'Factory',saveCheck:'💾 Save',rsSaveNoData:'Nothing valid to save — enter size, quantity and consumption in the quantities table first',rsSaveNoWs:'Cannot save — no active workspace. Sign in again and retry',rsSaving:'Saving plan…',rsSavedPlan:'✅ Plan saved successfully',selectFactory:'— select factory —',selectFactoryFirst:'Please select a factory first',noToolChk:'No saved checks yet',
+factoryLbl2:'Factory',saveCheck:'💾 Save',rsSaveNoData:'Nothing valid to save — enter size, quantity and consumption in the quantities table first',rsSaveNoWs:'Cannot save — no active workspace. Sign in again and retry',rsSaving:'Saving plan…',rsSavedPlan:'✅ Plan saved successfully',rsSavedPlans:'📂 Saved plans',rsSavedPlansHint:'Pick a plan to open in the calculator (all its data loads for editing and recalculation).',rsNoSavedPlans:'No saved plans yet — save one first with the “Save” button.',selectFactory:'— select factory —',selectFactoryFirst:'Please select a factory first',noToolChk:'No saved checks yet',
 toolDescfp:'The 4-Point System calculator rates raw fabric quality: enter defects found grouped by size (up to 3in, 3–6, 6–9, over 9in or a hole); it computes points per 100 square yards and compares them to the allowed limit to accept or reject the roll.',
 toolDescsh:'The fabric shrinkage calculator measures how much length and width shrink after washing/pressing versus the original size, to check whether shrinkage is within the agreed limit or the pattern needs adjusting.',
 toolDescaq:'The interactive AQL table (inspection level II) determines the required sample size based on lot size, plus the accept/reject limits for major and minor defects, to make a statistical accept/reject decision for the whole shipment.',
@@ -2736,6 +2737,14 @@ function saveRsPlan(){const result=rsResult();
   toast(t('rsSaving'));
   try{db.collection('qc_toolchecks').add({...data,createdAt:FV.serverTimestamp()}).then(()=>toast(t('rsSavedPlan'))).catch(e=>toast(rulesHint(e)));}
   catch(e){toast(rulesHint(e));}}
+// قائمة الخطط المحفوظة (سجل الريشو) — اختر خطة لفتحها في الحاسبة مباشرةً
+function rsOpenSaved(){const plans=TOOLCHK.filter(c=>c.type==='rs');
+  if(!plans.length)return toast(t('rsNoSavedPlans'));
+  const rows=plans.map(c=>{const r=c.result||{};return `<button type="button" style="display:block;width:100%;text-align:start;cursor:pointer;margin-bottom:8px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--card)" onclick="closeModal();rsOpenInCalc('${c.id}')">
+    <div style="font-weight:800">${c.title?esc(c.title):esc(toolTypeLabel('rs'))}</div>
+    <div style="font-size:12.5px;color:var(--mut);margin-top:2px">${r.product?'📦 '+esc(r.product)+' · ':''}${fmtDate(c.date)} · ${r.decision==='PASS'?t('rsReady'):t('rsReview')} · ${t('rsTotalProd')} ${r.totalMade||0}/${r.totalReq||0} · ${t('mkTotalFabric')} ${r.totFab||0} ${r.unit||'م'}</div></button>`;}).join('');
+  modal(`<h3>📂 ${t('rsSavedPlans')}</h3><div class="note" style="margin-bottom:10px">${t('rsSavedPlansHint')}</div>${rows}
+    <div class="row-btns" style="margin-top:12px"><button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);}
 function rsOpenInCalc(id){const c=TOOLCHK.find(x=>x.id===id);if(!c||c.type!=='rs')return;const r=c.result;
   go('marker',navBtn('marker'));
   if($('rs-title'))$('rs-title').value=c.title||'';
