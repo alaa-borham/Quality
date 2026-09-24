@@ -1896,6 +1896,7 @@ function rsApplyDraft(d){
   if(d.fabwidth!=null)rsSetFabW(d.fabwidth);
   if(d.objective&&$('rs-objective'))$('rs-objective').value=d.objective;
   if(d.spread!=null&&$('rs-spread'))$('rs-spread').value=d.spread;
+  RS_CBACT=(d.comboAct&&typeof d.comboAct==='object')?d.comboAct:{};
   const src=rsSizeSrc(),cm={},rm={};src.forEach(s=>{cm[s.size]=s.cons;rm[s.size]=s.ratio;});
   $('rs-qty-rows').innerHTML='';
   const q=(d.qty&&d.qty.length)?d.qty:src.map(s=>({size:s.size}));
@@ -1912,7 +1913,7 @@ function rsSaveDraft(){if(!RS_LOADED||!MEMBER||!$('rs-qty-rows'))return;
       maxlen:+$('rs-maxlen').value||0,maxsizes:+$('rs-maxsizes').value||6,maxpcs:+$('rs-maxpcs').value||5,surplus:+($('rs-surplus')&&$('rs-surplus').value)||0,fabwidth:($('rs-fabwidth')?$('rs-fabwidth').value:''),
       objective:($('rs-objective')?$('rs-objective').value:'plies'),rolllen:+($('rs-rolllen')&&$('rs-rolllen').value)||0,rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,spread:+($('rs-spread')&&$('rs-spread').value)||0,colors:rsColors(),
       qty:[...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0})).filter(x=>x.size),
-      rowcol:RS_ROWCOL,combocol:RS_COMBOCOL,
+      rowcol:RS_ROWCOL,combocol:RS_COMBOCOL,comboAct:rsComboActMap(),
       markers:rsReadMarkers().filter(m=>m.pairs.length||m.plies).map(m=>({pairs:m.pairs,plies:+m.plies||0,actlen:m.actlen||0}))};
     db.collection('qc_workspaces').doc(MEMBER.wsId).update({rishoDraft:draft}).catch(()=>{});
   },700);}
@@ -2256,6 +2257,8 @@ function rsSortByPerPiece(){if(!$('rs-markers'))return;
 /* ---- معايرة التوليفات: يقترح النظام توليفات الأوردر (تغطّي كل القياسات)، تقيس أطوالها الفعلية،
    فيحسب الكفاءة (فعلي÷محسوب) ويرشّح الأفضل. كفاءة <1 = تداخل يوفّر قماشاً — إن وُجد فعلاً ---- */
 let RS_COMBOS=[];let RS_HEAVY=[];
+// قياسات التوليفات المُدخَلة في المسودة (توقيع → الطول بالمتر) — تبقى بعد التحديث ولا تُستبدل بقيم المكتبة القديمة
+let RS_CBACT={};
 // سياق مؤقّت لتسريع إعادة الحساب: خريطة المكتبة ومعامل التداخل يُبنيان مرة في rsMkCalc ويُعاد استخدامهما في كل الاستدعاءات المتداخلة
 let RS_LIBC=null;
 // توقيع التوليفة (مقاسات+أعداد مرتّبة) للمطابقة مع مكتبة المنتج المحفوظة
@@ -2264,9 +2267,20 @@ function rsComboProd(){return $('rs-product')?$('rs-product').value:'';}
 // مكتبة توليفات المنتج المحفوظة (اسم المنتج → [{sig,sizes,actLenM}]) — actLenM بالمتر (مستقل عن الوحدة)
 function prodComboLib(prod){return (COMBOLIB&&COMBOLIB[prod])||[];}
 // تعبئة الطول الفعلي للتوليفات المتطابقة من المكتبة (مرجع دائم يُعاد استخدامه عبر الأوردرات)
-function rsComboApplyLib(){const lib=prodComboLib(rsComboProd());if(!lib.length||!RS_COMBOS.length)return 0;
-  const cw=rsFabW();const byS={};lib.forEach(x=>{if(String(x.w||'')===String(cw||''))byS[x.sig]=x.actLenM;});const uf=rsUF();let n=0;
-  RS_COMBOS.forEach(c=>{const v=byS[rsComboSig(c.combo)];if(v!=null){c.actual=Math.round(v*uf*100)/100;n++;}});return n;}
+function rsComboApplyLib(){if(!RS_COMBOS.length)return 0;const uf=rsUF();let n=0;
+  const lib=prodComboLib(rsComboProd());
+  if(lib.length){const cw=rsFabW();const byS={};lib.forEach(x=>{if(String(x.w||'')===String(cw||''))byS[x.sig]=x.actLenM;});
+    RS_COMBOS.forEach(c=>{const v=byS[rsComboSig(c.combo)];if(v!=null){c.actual=Math.round(v*uf*100)/100;n++;}});}
+  // قياسات المستخدم المحفوظة في المسودة تُقدَّم على المكتبة كي لا تُستبدل بقيم قديمة عند التحديث
+  if(RS_CBACT)RS_COMBOS.forEach(c=>{const v=RS_CBACT[rsComboSig(c.combo)];if(v!=null&&v>0){c.actual=Math.round(v*uf*100)/100;n++;}});
+  return n;}
+// خريطة قياسات التوليفات للحفظ في المسودة (توقيع → متر)
+function rsComboActMap(){return {...(RS_CBACT||{})};}
+// إدخال المستخدم لطول توليفة: يُسجَّل في المسودة (بالمتر) فوراً كي لا يضيع، ثم يُعاد الحساب
+function rsComboActInput(inp){const i=+inp.dataset.i,c=RS_COMBOS[i];
+  if(c&&c.combo.reduce((a,p)=>a+p.cnt,0)!==1){const sig=rsComboSig(c.combo),v=+inp.value||0,uf=rsUF();
+    if(v>0)RS_CBACT[sig]=Math.round(v/uf*10000)/10000;else delete RS_CBACT[sig];}
+  rsComboCalc();rsSaveDraft();}
 // بذر التوليفات المقيسة سابقاً من مكتبة المنتج أولاً (مقاسات الأوردر فقط + نفس عرض القماش + ضمن حد الطول) — لإعادة استخدام قياساتها بلا إعادة قياس
 function rsComboSeedLib(active,cons,maxlen,push){
   const lib=prodComboLib(rsComboProd());if(!lib.length)return 0;const aset=new Set(active);const cw=rsFabW();let n=0;
@@ -2433,7 +2447,7 @@ function rsComboRender(){const tb=$('rs-combo-rows');if(!tb)return;const uf=rsUF
       <td class="rscb-seq"></td>
       <td style="text-align:start;padding:6px 12px;line-height:2.1">${badge}${sizesHtml}</td>
       <td class="red">${Math.round(c.addLen*uf*100)/100}</td>
-      <td><input class="rscb-act" data-i="${i}" type="number" step="0.01" min="0" value="${pcs1?compDisp:(c.actual||'')}"${pcs1?' readonly title="'+esc(t('rsCbSingle'))+'"':''} placeholder="—" style="${inpStyle}" oninput="rsComboCalc()" onkeydown="rsComboNav(event)"></td>
+      <td><input class="rscb-act" data-i="${i}" type="number" step="0.01" min="0" value="${pcs1?compDisp:(c.actual||'')}"${pcs1?' readonly title="'+esc(t('rsCbSingle'))+'"':''} placeholder="—" style="${inpStyle}" oninput="rsComboActInput(this)" onkeydown="rsComboNav(event)"></td>
       <td class="rscb-eff" data-i="${i}" style="font-weight:800">—</td>
       <td class="rscb-rank" data-i="${i}" style="font-weight:800">—</td></tr>`;}).join('');
   rsComboCalc();rsComboApplyColors();}
