@@ -316,7 +316,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
       </div>
     </div>
     <div id="p-marker" class="hide">
-      <div class="sec-h" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><span>📊 <span data-i18n="rsTitle">الريشو — خطة الماركرات</span></span><button class="btn sec" style="padding:6px 14px;font-size:14px;flex:0 0 auto;width:auto" onclick="rsOpenSaved()" data-i18n="rsSavedPlans">📂 الخطط المحفوظة</button></div>
+      <div class="sec-h" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><span>📊 <span data-i18n="rsTitle">الريشو — خطة الماركرات</span></span><span style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span id="rs-autosave" style="font-size:12px;color:var(--mut);font-weight:700;transition:opacity .4s" title="حفظ تلقائي كل دقيقة وعند كل تغيير"></span><button class="btn sec" style="padding:6px 14px;font-size:14px;flex:0 0 auto;width:auto" onclick="rsOpenSaved()" data-i18n="rsSavedPlans">📂 الخطط المحفوظة</button></span></div>
       <div id="tool-rs" class="card">
         <label class="inl" data-i18n="mkReportName">اسم التقرير (اختياري)</label>
         <input id="rs-title" data-i18n-ph="mkReportNamePh" placeholder="مثال: أوردر رمضان — العميل أحمد" oninput="rsSaveDraft()">
@@ -583,7 +583,7 @@ photosLbl:'الصور (اختياري)',addPhoto:'📷 إضافة صورة',maxP
 repTitle:'تقرير فحص الجودة',repDecision:'القرار النهائي',repNotes:'ملاحظات',repInspector:'المفتش',repDate:'التاريخ',repPhotos:'الصور',repClose:'إغلاق',compressing:'جارٍ معالجة الصورة…',
 selectStage:'— اختر المرحلة من التسلسل —',addDefBtn:'➕ أضف',defLibLbl:'العيوب من الدليل (تزيد العدّاد تلقائياً)',recordInsp:'📝 سجّل فحصاً',colCheckShort:'يُفحص',
 reasonCritical:'وجود عيب حرِج',reasonMajor:'عيوب كبيرة {m} ≥ حد الرفض {r}',reasonMinor:'عيوب صغيرة {m} ≥ حد الرفض {r}',reasonWithin:'ضمن حدود القبول',
-factoryLbl2:'المصنع',saveCheck:'💾 حفظ',rsSaveNoData:'لا توجد كميات صالحة للحفظ — أدخِل المقاس والكمية والاستهلاك في جدول الكميات أولاً',rsSaveNoWs:'تعذّر الحفظ — لا توجد مساحة عمل نشطة. أعِد تسجيل الدخول ثم حاول',rsSaving:'جارٍ حفظ الخطة…',rsSavedPlan:'✅ تم حفظ الخطة بنجاح',rsSavedPlans:'📂 الخطط المحفوظة',rsSavedPlansHint:'اختر خطة لفتحها في الحاسبة (تُحمَّل كل بياناتها للتعديل وإعادة الحساب).',rsNoSavedPlans:'لا توجد خطط محفوظة بعد — احفظ خطة أولاً بزر «حفظ».',rsDelPlanQ:'حذف هذه الخطة المحفوظة نهائياً؟',selectFactory:'— اختر المصنع —',selectFactoryFirst:'الرجاء اختيار المصنع أولاً',noToolChk:'لا توجد فحوصات محفوظة بعد',
+factoryLbl2:'المصنع',saveCheck:'💾 حفظ',rsSaveNoData:'لا توجد كميات صالحة للحفظ — أدخِل المقاس والكمية والاستهلاك في جدول الكميات أولاً',rsSaveNoWs:'تعذّر الحفظ — لا توجد مساحة عمل نشطة. أعِد تسجيل الدخول ثم حاول',rsSaving:'جارٍ حفظ الخطة…',rsSavedPlan:'✅ تم حفظ الخطة بنجاح',rsSavedPlans:'📂 الخطط المحفوظة',rsSavedAt:'حُفظ {t}',rsSavedPlansHint:'اختر خطة لفتحها في الحاسبة (تُحمَّل كل بياناتها للتعديل وإعادة الحساب).',rsNoSavedPlans:'لا توجد خطط محفوظة بعد — احفظ خطة أولاً بزر «حفظ».',rsDelPlanQ:'حذف هذه الخطة المحفوظة نهائياً؟',selectFactory:'— اختر المصنع —',selectFactoryFirst:'الرجاء اختيار المصنع أولاً',noToolChk:'لا توجد فحوصات محفوظة بعد',
 toolDescfp:'حاسبة نظام النقاط الأربع لتقييم جودة القماش الخام: تُدخل عيوب القماش المكتشفة موزعة حسب حجمها (أقل من 3 إنش، 3–6، 6–9، أكثر من 9 إنش أو ثقب)، فتحسب عدد النقاط لكل 100 ياردة مربعة وتقارنها بالحد المسموح لتحديد قبول أو رفض اللفة.',
 toolDescsh:'حاسبة انكماش القماش: تقيس نسبة تقلّص الطول والعرض بعد الغسيل أو الكي مقارنة بالمقاس الأصلي، لمعرفة ما إذا كان الانكماش ضمن الحد المسموح المتفق عليه أم يستدعي تعديل الباترون.',
 toolDescaq:'جدول AQL التفاعلي (مستوى فحص II): يحدد حجم العينة المطلوب سحبها حسب حجم الشحنة، وحدود القبول والرفض للعيوب الكبيرة والصغيرة، لاتخاذ قرار قبول أو رفض الشحنة بالكامل إحصائياً.',
@@ -738,7 +738,7 @@ photosLbl:'Photos (optional)',addPhoto:'📷 Add photo',maxPhotos:'Max 4 photos'
 repTitle:'Quality Inspection Report',repDecision:'Final decision',repNotes:'Notes',repInspector:'Inspector',repDate:'Date',repPhotos:'Photos',repClose:'Close',compressing:'Processing image…',
 selectStage:'— select stage from sequence —',addDefBtn:'➕ Add',defLibLbl:'Defects from library (auto-increments counters)',recordInsp:'📝 Record',colCheckShort:'Check',
 reasonCritical:'Critical defect present',reasonMajor:'Major {m} ≥ reject limit {r}',reasonMinor:'Minor {m} ≥ reject limit {r}',reasonWithin:'Within acceptance limits',
-factoryLbl2:'Factory',saveCheck:'💾 Save',rsSaveNoData:'Nothing valid to save — enter size, quantity and consumption in the quantities table first',rsSaveNoWs:'Cannot save — no active workspace. Sign in again and retry',rsSaving:'Saving plan…',rsSavedPlan:'✅ Plan saved successfully',rsSavedPlans:'📂 Saved plans',rsSavedPlansHint:'Pick a plan to open in the calculator (all its data loads for editing and recalculation).',rsNoSavedPlans:'No saved plans yet — save one first with the “Save” button.',rsDelPlanQ:'Permanently delete this saved plan?',selectFactory:'— select factory —',selectFactoryFirst:'Please select a factory first',noToolChk:'No saved checks yet',
+factoryLbl2:'Factory',saveCheck:'💾 Save',rsSaveNoData:'Nothing valid to save — enter size, quantity and consumption in the quantities table first',rsSaveNoWs:'Cannot save — no active workspace. Sign in again and retry',rsSaving:'Saving plan…',rsSavedPlan:'✅ Plan saved successfully',rsSavedPlans:'📂 Saved plans',rsSavedAt:'Saved {t}',rsSavedPlansHint:'Pick a plan to open in the calculator (all its data loads for editing and recalculation).',rsNoSavedPlans:'No saved plans yet — save one first with the “Save” button.',rsDelPlanQ:'Permanently delete this saved plan?',selectFactory:'— select factory —',selectFactoryFirst:'Please select a factory first',noToolChk:'No saved checks yet',
 toolDescfp:'The 4-Point System calculator rates raw fabric quality: enter defects found grouped by size (up to 3in, 3–6, 6–9, over 9in or a hole); it computes points per 100 square yards and compares them to the allowed limit to accept or reject the roll.',
 toolDescsh:'The fabric shrinkage calculator measures how much length and width shrink after washing/pressing versus the original size, to check whether shrinkage is within the agreed limit or the pattern needs adjusting.',
 toolDescaq:'The interactive AQL table (inspection level II) determines the required sample size based on lot size, plus the accept/reject limits for major and minor defects, to make a statistical accept/reject decision for the whole shipment.',
@@ -1820,7 +1820,7 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
       <div>${t('repInspector')}: ______________</div><div>QC: ______________</div></div></div>`;
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 /* ============ الريشو ============ */
-let RS_DRAFT=null,RS_LOADED=false,RS_SAVE_T=null,RS_COL={},RS_COLLAPSED_INIT=0,RS_ROWCOL={},RS_COMBOCOL={};
+let RS_DRAFT=null,RS_LOADED=false,RS_SAVE_T=null,RS_SAVED_FADE=null,RS_COL={},RS_COLLAPSED_INIT=0,RS_ROWCOL={},RS_COMBOCOL={};
 // تمييز الصفوف بلون عبر النقر الأيمن (يُستخدم لجدولي الكميات والتوليفات)
 const RS_ROWCOLORS=[['#fff3b0','أصفر'],['#c9f0d0','أخضر'],['#cfe4fb','أزرق'],['#f8c9c9','أحمر'],['#ffd9a8','برتقالي'],['#e6cffb','بنفسجي']];
 function rsCloseRowMenu(e){const m=$('rs-rowmenu');if(!m)return;if(e&&e.target&&m.contains(e.target))return;m.remove();document.removeEventListener('mousedown',rsCloseRowMenu,true);}
@@ -1878,7 +1878,7 @@ function rsInit(){if(RS_LOADED||!$('rs-qty-rows'))return;if(!prodNames().length)
   if(RS_DRAFT&&((RS_DRAFT.qty&&RS_DRAFT.qty.length)||(RS_DRAFT.markers&&RS_DRAFT.markers.length)))rsApplyDraft(RS_DRAFT);
   else if(rsSizeSrc().length){$('rs-qty-rows').innerHTML='';rsFillProduct();}
   else{if(!$('rs-qty-rows').children.length)rsAddQtyRow();rsCalc();}
-  rsUpdateUnitLabels();RS_LOADED=true;}
+  rsUpdateUnitLabels();RS_LOADED=true;rsStartAutosave();}
 function rsApplyDraft(d){
   RS_ROWCOL=(d.rowcol&&typeof d.rowcol==='object')?d.rowcol:{};
   RS_COMBOCOL=(d.combocol&&typeof d.combocol==='object')?d.combocol:{};
@@ -1906,17 +1906,29 @@ function rsApplyDraft(d){
 function rsProductChanged(){RS_LOADED=true;$('rs-qty-rows').innerHTML='';if($('rs-markers'))$('rs-markers').innerHTML='';
   if(rsSizeSrc().length)rsFillProduct();else{rsAddQtyRow();rsCalc();}}
 // حفظ تلقائي دائم (مسودة العمل) داخل مساحة العمل — تبقى بعد التحديث وإعادة الدخول
+function rsBuildDraft(){return {title:($('rs-title')?$('rs-title').value.trim():''),product:($('rs-product')?$('rs-product').value:''),
+  unit:($('rs-unit')?$('rs-unit').value:'متر'),
+  maxlen:+$('rs-maxlen').value||0,maxsizes:+$('rs-maxsizes').value||6,maxpcs:+$('rs-maxpcs').value||5,surplus:+($('rs-surplus')&&$('rs-surplus').value)||0,fabwidth:($('rs-fabwidth')?$('rs-fabwidth').value:''),
+  objective:($('rs-objective')?$('rs-objective').value:'plies'),rolllen:+($('rs-rolllen')&&$('rs-rolllen').value)||0,rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,spread:+($('rs-spread')&&$('rs-spread').value)||0,colors:rsColors(),
+  qty:[...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0})).filter(x=>x.size),
+  rowcol:RS_ROWCOL,combocol:RS_COMBOCOL,comboAct:rsComboActMap(),
+  markers:rsReadMarkers().filter(m=>m.pairs.length||m.plies).map(m=>({pairs:m.pairs,plies:+m.plies||0,actlen:m.actlen||0}))};}
+// كتابة فورية للمسودة + تحديث مؤشّر آخر حفظ (تتجاوز الكتابة إن لم يتغيّر شيء)
+let RS_LAST_SAVED='';
+function rsWriteDraft(silent){if(!RS_LOADED||!MEMBER||!$('rs-qty-rows'))return;
+  const draft=rsBuildDraft(),s=JSON.stringify(draft);
+  if(s===RS_LAST_SAVED)return;// لا تغيير منذ آخر حفظ — لا داعي للكتابة
+  RS_LAST_SAVED=s;
+  db.collection('qc_workspaces').doc(MEMBER.wsId).update({rishoDraft:draft}).then(()=>rsMarkSaved(silent)).catch(()=>{RS_LAST_SAVED='';});}
+function rsMarkSaved(silent){const el=$('rs-autosave');if(!el)return;const d=new Date();
+  const hh=String(d.getHours()).padStart(2,'0'),mm=String(d.getMinutes()).padStart(2,'0'),ss=String(d.getSeconds()).padStart(2,'0');
+  el.textContent='💾 '+tf('rsSavedAt',{t:hh+':'+mm+':'+ss});el.style.opacity='1';
+  clearTimeout(RS_SAVED_FADE);RS_SAVED_FADE=setTimeout(()=>{if(el)el.style.opacity='0.55';},silent?100:2500);}
 function rsSaveDraft(){if(!RS_LOADED||!MEMBER||!$('rs-qty-rows'))return;
-  clearTimeout(RS_SAVE_T);RS_SAVE_T=setTimeout(()=>{
-    const draft={title:($('rs-title')?$('rs-title').value.trim():''),product:($('rs-product')?$('rs-product').value:''),
-      unit:($('rs-unit')?$('rs-unit').value:'متر'),
-      maxlen:+$('rs-maxlen').value||0,maxsizes:+$('rs-maxsizes').value||6,maxpcs:+$('rs-maxpcs').value||5,surplus:+($('rs-surplus')&&$('rs-surplus').value)||0,fabwidth:($('rs-fabwidth')?$('rs-fabwidth').value:''),
-      objective:($('rs-objective')?$('rs-objective').value:'plies'),rolllen:+($('rs-rolllen')&&$('rs-rolllen').value)||0,rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,spread:+($('rs-spread')&&$('rs-spread').value)||0,colors:rsColors(),
-      qty:[...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0})).filter(x=>x.size),
-      rowcol:RS_ROWCOL,combocol:RS_COMBOCOL,comboAct:rsComboActMap(),
-      markers:rsReadMarkers().filter(m=>m.pairs.length||m.plies).map(m=>({pairs:m.pairs,plies:+m.plies||0,actlen:m.actlen||0}))};
-    db.collection('qc_workspaces').doc(MEMBER.wsId).update({rishoDraft:draft}).catch(()=>{});
-  },700);}
+  clearTimeout(RS_SAVE_T);RS_SAVE_T=setTimeout(()=>rsWriteDraft(true),700);}
+// نبضة حفظ تلقائي كل دقيقة (شبكة أمان تضمن الحفظ الدوري حتى لو تعطّل حفظ التغييرات)
+let RS_AUTOSAVE_IV=null;
+function rsStartAutosave(){if(RS_AUTOSAVE_IV)return;RS_AUTOSAVE_IV=setInterval(()=>{if(RS_LOADED&&MEMBER&&$('rs-qty-rows'))rsWriteDraft(false);},60000);}
 function rsAddQtyRow(r){r=r||{};const src=rsSizeSrc();const locked=src.length>0;
   const cell=locked
     ?`<select class="rsq-size" onchange="rsPickSize(this)" style="min-width:90px;padding:6px;font-weight:800"><option value="">\u2014</option>${sizeOptionsHtml(src,r.size,r.cons)}</select>`
