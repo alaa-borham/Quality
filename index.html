@@ -342,10 +342,11 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
             <div id="rs-colors" style="display:flex;flex-direction:column;gap:6px;max-width:520px"></div>
             <div id="rs-colors-sum" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div></div></div>
         <div style="overflow-x:auto;margin-top:10px"><table id="rs-qty-tbl" class="xtbl" style="min-width:520px">
-          <tr><th colspan="6" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsq-cv" onclick="rsCollapse('rsq')" title="تصغير/تكبير">–</button><span data-i18n="rsQtyTbl2">كميات الأوردر</span></span></th></tr>
-          <tr class="rsq-hide"><th data-i18n="rsCbNo">م</th><th data-i18n="sizeName">المقاس</th><th class="or" data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="rsRatio">نسبة بحسب الموديل</th><th class="or rsu-h" data-b="استهلاك الكمية">استهلاك الكمية (متر)</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th></tr>
+          <tr><th colspan="7" class="ttl"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsq-cv" onclick="rsCollapse('rsq')" title="تصغير/تكبير">–</button><span data-i18n="rsQtyTbl2">كميات الأوردر</span></span></th></tr>
+          <tr class="rsq-hide"><th data-i18n="rsCbNo">م</th><th data-i18n="sizeName">المقاس</th><th class="or" data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="rsRatio">نسبة بحسب الموديل</th><th class="or rsu-h" data-b="استهلاك الكمية">استهلاك الكمية (متر)</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th class="or rsu-h" data-b="استهلاك مع الفرد" title="الكمية × (استهلاك القطعة + مسافة الفرد)">استهلاك مع الفرد (متر)</th></tr>
           <tbody id="rs-qty-rows" class="rsq-hide"></tbody>
-          <tr class="tot rsq-hide"><td></td><td data-i18n="total">الإجمالي</td><td id="rs-qt-q">—</td><td id="rs-qt-r">—</td><td id="rs-qt-c">—</td><td>—</td></tr></table></div>
+          <tr class="tot rsq-hide"><td></td><td data-i18n="total">الإجمالي</td><td id="rs-qt-q">—</td><td id="rs-qt-r">—</td><td id="rs-qt-c">—</td><td>—</td><td id="rs-qt-cf">—</td></tr></table></div>
+        <div class="rsq-hide" style="margin-top:6px;font-size:13px;color:var(--mut)"><span data-i18n="rsSpreadLbl">مسافة الفرد لكل قطعة</span>: <input id="rs-spread" type="number" step="0.5" min="0" value="4" oninput="rsCalc();rsSaveDraft()" style="width:56px;padding:4px;text-align:center;font-weight:800"> <span data-i18n="rsCm">سم</span></div>
         <button type="button" class="mini rsq-hide" style="margin-top:6px" onclick="rsAddQtyRow()">➕ <span data-i18n="mkAddRow">إضافة مقاس</span></button>
         <span class="rsq-hide note" style="margin-inline-start:10px" data-i18n="rsRowHint">💡 نقرة يمين على أي صف مقاس لتمييزه بلون</span>
         <div class="grid3" style="margin-top:14px">
@@ -536,7 +537,7 @@ mkAvail:'القماش المتاح (اختياري)',mkEnough:'القماش ال
 fillModelBtn:'تعبئة مقاسات الموديل',selectModelFirst:'اختر الموديل أولاً',openInCalc:'📂 فتح في الحاسبة',restored:'تم التحميل في الحاسبة — عدّل واحسب من جديد',
 mkAvailCol:'المتاح',mkStateCol:'الحالة',mkOver:'فائض تقريب الطبقات',mkActual:'القماش الفعلي بعد القص (اختياري)',mkDev:'الانحراف عن المحسوب',
 spreadOrderBtn:'🖨 أمر فرشة',spreadOrder:'أمر فرشة (تشغيل الفرد)',needMkLen:'أدخل طول الماركر أولاً لحساب الطبقات',signature:'التوقيع',spreadOf:'فرشة رقم',
-rsTitle:'الريشو',rsQtyTbl2:'كميات الأوردر',rsRatio:'نسبة بحسب الموديل',rsQtyConsM:'استهلاك الكمية (متر)',rsPieceConsM:'استهلاك القطعة الأساسي (متر)',
+rsTitle:'الريشو',rsQtyTbl2:'كميات الأوردر',rsRatio:'نسبة بحسب الموديل',rsQtyConsM:'استهلاك الكمية (متر)',rsPieceConsM:'استهلاك القطعة الأساسي (متر)',rsQtyConsF:'استهلاك مع الفرد',rsSpreadLbl:'مسافة الفرد لكل قطعة',
 rsMkTbl:'القياسات والكميات داخل الماركر',rsMkTblTtl:'مراكر الأوردر',rsCode:'الكود',rsDesc:'البيان',rsSizesRow:'المقاسات',rsQtyRow:'الكميات',
 rsPcsLbl:'إجمالي القطع في الماركر',rsPlies:'عدد الطبقات',rsPcsRun:'إجمالي القطع في التشغيل',rsMkStatus:'حالة الماركر وسبب عدم الصلاحية',
 rsMkPerPly:'استهلاك الماركر/طبقة (متر)',rsSumFab:'إجمالي استهلاك التشغيل (متر)',rsAddMarker:'إضافة ماركر',rsActLen:'الطول الفعلي (اختياري)',
@@ -691,7 +692,7 @@ mkAvail:'Available fabric (optional)',mkEnough:'Available fabric is enough',mkSh
 fillModelBtn:'Fill model sizes',selectModelFirst:'Select a model first',openInCalc:'📂 Open in calculator',restored:'Loaded into the calculator — edit and recalculate',
 mkAvailCol:'Available',mkStateCol:'Status',mkOver:'Ply rounding surplus',mkActual:'Actual fabric after cutting (optional)',mkDev:'Deviation from computed',
 spreadOrderBtn:'🖨 Spreading order',spreadOrder:'Spreading order',needMkLen:'Enter the marker length first to compute plies',signature:'Signature',spreadOf:'Spread #',
-rsTitle:'Ratio',rsQtyTbl2:'Order quantities',rsRatio:'Ratio per model',rsQtyConsM:'Qty consumption (m)',rsPieceConsM:'Base piece consumption (m)',
+rsTitle:'Ratio',rsQtyTbl2:'Order quantities',rsRatio:'Ratio per model',rsQtyConsM:'Qty consumption (m)',rsPieceConsM:'Base piece consumption (m)',rsQtyConsF:'Consumption incl. spread',rsSpreadLbl:'Spread margin per piece',
 rsMkTbl:'Sizes & quantities per marker',rsMkTblTtl:'Order markers',rsCode:'Code',rsDesc:'Item',rsSizesRow:'Sizes',rsQtyRow:'Quantities',
 rsPcsLbl:'Total pieces per marker',rsPlies:'Plies',rsPcsRun:'Total run pieces',rsMkStatus:'Marker status & invalid reason',
 rsMkPerPly:'Marker cons/ply (m)',rsSumFab:'Total run consumption (m)',rsAddMarker:'Add marker',rsActLen:'Actual measured length (optional)',
@@ -1893,6 +1894,7 @@ function rsApplyDraft(d){
   if(d.surplus!=null&&$('rs-surplus'))$('rs-surplus').value=d.surplus;
   if(d.fabwidth!=null)rsSetFabW(d.fabwidth);
   if(d.objective&&$('rs-objective'))$('rs-objective').value=d.objective;
+  if(d.spread!=null&&$('rs-spread'))$('rs-spread').value=d.spread;
   const src=rsSizeSrc(),cm={},rm={};src.forEach(s=>{cm[s.size]=s.cons;rm[s.size]=s.ratio;});
   $('rs-qty-rows').innerHTML='';
   const q=(d.qty&&d.qty.length)?d.qty:src.map(s=>({size:s.size}));
@@ -1907,7 +1909,7 @@ function rsSaveDraft(){if(!RS_LOADED||!MEMBER||!$('rs-qty-rows'))return;
     const draft={title:($('rs-title')?$('rs-title').value.trim():''),product:($('rs-product')?$('rs-product').value:''),
       unit:($('rs-unit')?$('rs-unit').value:'متر'),
       maxlen:+$('rs-maxlen').value||0,maxsizes:+$('rs-maxsizes').value||6,maxpcs:+$('rs-maxpcs').value||5,surplus:+($('rs-surplus')&&$('rs-surplus').value)||0,fabwidth:($('rs-fabwidth')?$('rs-fabwidth').value:''),
-      objective:($('rs-objective')?$('rs-objective').value:'plies'),rolllen:+($('rs-rolllen')&&$('rs-rolllen').value)||0,rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,colors:rsColors(),
+      objective:($('rs-objective')?$('rs-objective').value:'plies'),rolllen:+($('rs-rolllen')&&$('rs-rolllen').value)||0,rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,spread:+($('rs-spread')&&$('rs-spread').value)||0,colors:rsColors(),
       qty:[...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0})).filter(x=>x.size),
       rowcol:RS_ROWCOL,combocol:RS_COMBOCOL,
       markers:rsReadMarkers().filter(m=>m.pairs.length||m.plies).map(m=>({pairs:m.pairs,plies:+m.plies||0,actlen:m.actlen||0}))};
@@ -1923,7 +1925,8 @@ function rsAddQtyRow(r){r=r||{};const src=rsSizeSrc();const locked=src.length>0;
    <td><input class="rsq-qty" type="number" min="0" value="${r.qty!=null?r.qty:''}" style="min-width:70px;padding:6px;text-align:center;font-weight:700" oninput="rsCalc()" onkeydown="rsEnter(event,this)"></td>
    <td><input class="rsq-ratio" type="number" step="0.25" min="0" value="${r.ratio!=null&&r.ratio!==0?r.ratio:''}" style="min-width:56px;padding:6px;text-align:center;font-weight:700${locked?';background:#fffbe8;border:none':''}" oninput="rsCalc()" onchange="rsEditVal(this,'ratio')" onkeydown="rsEnter(event,this)"></td>
    <td class="rsq-tot red">\u2014</td>
-   <td><input class="rsq-cons" type="number" step="0.01" value="${r.cons!=null?r.cons:''}" style="min-width:70px;padding:6px;text-align:center;color:#c00000;font-weight:800${locked?';background:#fbf3f3;border:none':''}" oninput="rsCalc()" onchange="rsEditVal(this,'cons')" onkeydown="rsEnter(event,this)"></td></tr>`);}
+   <td><input class="rsq-cons" type="number" step="0.01" value="${r.cons!=null?r.cons:''}" style="min-width:70px;padding:6px;text-align:center;color:#c00000;font-weight:800${locked?';background:#fbf3f3;border:none':''}" oninput="rsCalc()" onchange="rsEditVal(this,'cons')" onkeydown="rsEnter(event,this)"></td>
+   <td class="rsq-totf" style="color:#b45309;font-weight:800">—</td></tr>`);}
 // Enter \u064a\u0646\u062a\u0642\u0644 \u0625\u0644\u0649 \u0646\u0641\u0633 \u0627\u0644\u0639\u0645\u0648\u062f \u0641\u064a \u0627\u0644\u0635\u0641 \u0627\u0644\u062a\u0627\u0644\u064a
 function rsEnter(e,el){if(e.key!=='Enter')return;e.preventDefault();
   const tr=el.closest('tr'),next=tr.nextElementSibling;
@@ -1955,17 +1958,22 @@ function rsReadQty(){return [...document.querySelectorAll('.rsq-row')].map(tr=>(
   size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0,
   cons:+tr.querySelector('.rsq-cons').value||0,
   ratio:+tr.querySelector('.rsq-ratio').value||0})).filter(x=>x.size&&x.qty>0&&x.cons>0);}
-function rsCalc(){if(!$('rs-qty-rows'))return;const uf=rsUF();
-  let q=0,rsum=0,csum=0;
+// \u0645\u0633\u0627\u0641\u0629 \u0627\u0644\u0641\u0631\u062f \u0644\u0643\u0644 \u0642\u0637\u0639\u0629 \u0628\u0627\u0644\u0645\u062a\u0631 (\u062a\u064f\u062f\u062e\u064e\u0644 \u0628\u0627\u0644\u0633\u0646\u062a\u064a\u0645\u062a\u0631) \u2014 \u062a\u064f\u0636\u0627\u0641 \u0639\u0644\u0649 \u0627\u0633\u062a\u0647\u0644\u0627\u0643 \u0643\u0644 \u0642\u0637\u0639\u0629 \u0644\u062d\u0633\u0627\u0628 \u00ab\u0627\u0633\u062a\u0647\u0644\u0627\u0643 \u0645\u0639 \u0627\u0644\u0641\u0631\u062f\u00bb
+function rsSpreadM(){return (+($('rs-spread')&&$('rs-spread').value)||0)/100;}
+function rsCalc(){if(!$('rs-qty-rows'))return;const uf=rsUF();const sp=rsSpreadM();
+  let q=0,rsum=0,csum=0,cfsum=0;
   document.querySelectorAll('.rsq-row').forEach(tr=>{
     const qty=+tr.querySelector('.rsq-qty').value||0;
     const cons=+tr.querySelector('.rsq-cons').value||0;
     const ratio=+tr.querySelector('.rsq-ratio').value||0;
     tr.querySelector('.rsq-tot').textContent=(qty>0&&cons>0)?Math.round(qty*cons*uf*100)/100:'\u2014';
-    q+=qty;rsum+=ratio;csum+=qty*cons;});
+    const totf=tr.querySelector('.rsq-totf');
+    if(totf)totf.textContent=(qty>0&&cons>0)?Math.round(qty*(cons+sp)*uf*100)/100:'\u2014';
+    q+=qty;rsum+=ratio;csum+=qty*cons;if(cons>0)cfsum+=qty*(cons+sp);});
   $('rs-qt-q').textContent=q||'\u2014';
   $('rs-qt-r').textContent=rsum?Math.round(rsum*100)/100:'\u2014';
   $('rs-qt-c').textContent=csum?Math.round(csum*uf*100)/100:'\u2014';
+  const cf=$('rs-qt-cf');if(cf)cf.textContent=cfsum?Math.round(cfsum*uf*100)/100:'\u2014';
   rsApplyRowColors();rsMkCalc();rsSaveDraft();}
 /* ---- \u062c\u062f\u0648\u0644 \u0627\u0644\u0645\u0627\u0631\u0643\u0631\u0627\u062a ---- */
 const RS_COLORS=['#d9e8f7','#d9f0d5','#f7d9ec','#f9e0cb','#d5eef4','#eaf4cf','#e6e0f7','#f7f3cf'];
@@ -2934,7 +2942,7 @@ function rsResult(){const qty=rsReadQty();if(!qty.length)return null;
     unit:rsUL(),uf:rsUF(),
     surplus:+($('rs-surplus')&&$('rs-surplus').value)||0,objective:($('rs-objective')&&$('rs-objective').value)||'plies',
     fabwidth:($('rs-fabwidth')?$('rs-fabwidth').value:''),rolllen:+($('rs-rolllen')&&$('rs-rolllen').value)||0,
-    rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,colors:rsColors(),rowcol:RS_ROWCOL,combocol:RS_COMBOCOL,
+    rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,spread:+($('rs-spread')&&$('rs-spread').value)||0,colors:rsColors(),rowcol:RS_ROWCOL,combocol:RS_COMBOCOL,
     qty,markers,cover,totalReq,totalMade:tRun,totRem:totalReq-tRun,totFab:Math.round(tFab*100)/100,
     valid:markers.filter(m=>m.ok).length,decision:ready?'PASS':'FAIL'};}
 function saveRsPlan(){if(!(canEdit('marker')||canEdit('insp')))return toast(t('rsNoPerm'));
@@ -2975,6 +2983,7 @@ function rsOpenInCalc(id){const c=TOOLCHK.find(x=>x.id===id);if(!c||c.type!=='rs
   if(r.rolllen&&$('rs-rolllen'))$('rs-rolllen').value=r.rolllen;
   if(r.rollmode&&$('rs-rollmode'))$('rs-rollmode').value=r.rollmode;
   if(r.price&&$('rs-price'))$('rs-price').value=r.price;
+  if(r.spread!=null&&$('rs-spread'))$('rs-spread').value=r.spread;
   if($('rs-colors')){$('rs-colors').innerHTML='';(r.colors||[]).forEach(cc=>rsAddColorRow(cc));}
   $('rs-qty-rows').innerHTML='';(r.qty||[]).forEach(x=>rsAddQtyRow(x));
   $('rs-markers').innerHTML='';(r.markers||[]).forEach(m=>rsAddMarker({pairs:m.pairs,plies:m.plies,actlen:m.actlen||0}));
@@ -2989,9 +2998,10 @@ function rsPlanTablesHtml(r){const uf=r.uf||1,u=r.unit||'\u0645\u062a\u0631';con
   const zb=i=>i%2?'#f6faf9':'#fff';
   const chips=pairs=>pairs.map(p=>`<span style="display:inline-block;background:#fff;border:1.5px solid #cfe0df;border-radius:999px;padding:2px 9px;margin:2px;font-weight:800;white-space:nowrap">${esc(p.size)} <span style="color:#1f6e6e">\u00d7${p.cnt}</span></span>`).join('')||'\u2014';
   const badge=code=>`<span style="display:inline-block;background:#14504f;color:#fff;font-weight:800;padding:3px 9px;border-radius:7px">${esc(code)}</span>`;
-  const qt=sec(t('rsQtyTbl2'))+open+hd([[t('sizeName'),'s'],[t('mkQtyOrder')],[t('rsRatio')],[t('rsPieceConsM')],[uL('rsQtyConsM')]])
-    +(r.qty||[]).map((x,i)=>`<tr style="background:${zb(i)}"><td style="padding:7px 8px;font-weight:700;text-align:${st('s')}">${esc(x.size)}</td><td style="padding:7px;text-align:center;font-weight:700">${x.qty}</td><td style="padding:7px;text-align:center">${x.ratio||'\u2014'}</td><td style="padding:7px;text-align:center;color:#c00000;font-weight:700">${x.cons}</td><td style="padding:7px;text-align:center">${R(x.qty*x.cons)}</td></tr>`).join('')
-    +totr([[t('total'),'s'],[r.totalReq],[(r.qty||[]).reduce((s,x)=>s+(x.ratio||0),0)||'\u2014'],['\u2014'],[R((r.qty||[]).reduce((s,x)=>s+x.qty*x.cons,0))]])+`</table>`;
+  const spM=(r.spread||0)/100;
+  const qt=sec(t('rsQtyTbl2'))+open+hd([[t('sizeName'),'s'],[t('mkQtyOrder')],[t('rsRatio')],[t('rsPieceConsM')],[uL('rsQtyConsM')],[uL('rsQtyConsF')]])
+    +(r.qty||[]).map((x,i)=>`<tr style="background:${zb(i)}"><td style="padding:7px 8px;font-weight:700;text-align:${st('s')}">${esc(x.size)}</td><td style="padding:7px;text-align:center;font-weight:700">${x.qty}</td><td style="padding:7px;text-align:center">${x.ratio||'\u2014'}</td><td style="padding:7px;text-align:center;color:#c00000;font-weight:700">${x.cons}</td><td style="padding:7px;text-align:center">${R(x.qty*x.cons)}</td><td style="padding:7px;text-align:center;color:#b45309;font-weight:700">${R(x.qty*(x.cons+spM))}</td></tr>`).join('')
+    +totr([[t('total'),'s'],[r.totalReq],[(r.qty||[]).reduce((s,x)=>s+(x.ratio||0),0)||'\u2014'],['\u2014'],[R((r.qty||[]).reduce((s,x)=>s+x.qty*x.cons,0))],[R((r.qty||[]).reduce((s,x)=>s+x.qty*(x.cons+spM),0))]])+`</table>`;
   const mk=sec(t('rsMkTbl'))+open+hd([[t('rsCode')],[t('rsMkTbl'),'s'],[t('rsPcsLbl')],[t('rsPlies')],[t('rsPcsRun')],[t('rsMkStatus')],[uL('rsMkPerPly')],[uL('rsSumFab')]])
     +(r.markers||[]).map((m,i)=>`<tr style="background:${zb(i)}"><td style="padding:7px;text-align:center">${badge(m.code)}</td><td style="padding:7px 8px;text-align:${st('s')}">${chips(m.pairs)}</td><td style="padding:7px;text-align:center;font-weight:700">${m.pcs}</td><td style="padding:7px;text-align:center;font-weight:800">${m.plies}</td><td style="padding:7px;text-align:center;font-weight:700">${m.run}</td><td style="padding:7px;text-align:center;color:${m.ok?'#1e7e40':'#c00000'};font-weight:700">${esc(m.status)}</td><td style="padding:7px;text-align:center">${R(m.len)}</td><td style="padding:7px;text-align:center;font-weight:700">${R(m.fab)}</td></tr>`).join('')
     +totr([[t('total'),'s',4],[r.totalMade],[''],[''],[R(r.totFab)]])+`</table>`;
@@ -3224,10 +3234,10 @@ function exportRsExcel(){
     rows.push([tf('rsPriceLbl',{u}).replace(' (اختياري)','').replace(' (optional)',''),_price],[t('rsCostFab'),_cost],[t('rsCostPiece'),_pc]);}
   rows.push([]);
   // الكميات
-  if(qty.length){rows.push([t('rsQtyTbl2')]);
-    rows.push([t('sizeName'),t('mkQtyOrder'),t('rsRatio'),t('rsPieceConsM'),t('rsQtyConsM').replace('متر',u).replace('(m)','('+u+')')]);
-    let sQ=0,sC=0;qty.forEach(x=>{rows.push([x.size,x.qty||'',x.ratio||'',x.cons||'',R(x.qty*x.cons)]);sQ+=x.qty;sC+=x.qty*x.cons;});
-    rows.push([t('total'),sQ,'','',R(sC)]);rows.push([]);}
+  if(qty.length){rows.push([t('rsQtyTbl2')]);const spF=rsSpreadM();
+    rows.push([t('sizeName'),t('mkQtyOrder'),t('rsRatio'),t('rsPieceConsM'),t('rsQtyConsM').replace('متر',u).replace('(m)','('+u+')'),t('rsQtyConsF')]);
+    let sQ=0,sC=0,sCf=0;qty.forEach(x=>{rows.push([x.size,x.qty||'',x.ratio||'',x.cons||'',R(x.qty*x.cons),R(x.qty*(x.cons+spF))]);sQ+=x.qty;sC+=x.qty*x.cons;sCf+=x.qty*(x.cons+spF);});
+    rows.push([t('total'),sQ,'','',R(sC),R(sCf)]);rows.push([]);}
   // الماركرات
   rows.push([t('rsMkTbl')]);
   rows.push([t('rsCode'),t('rsDesc'),t('rsPcsLbl'),t('rsPlies'),t('rsPcsRun'),t('rsMkPerPly').replace('متر',u).replace('(m)','('+u+')'),t('rsActLen'),t('rsSumFab').replace('متر',u).replace('(m)','('+u+')'),t('rsMkStatus')]);
