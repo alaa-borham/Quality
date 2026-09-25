@@ -399,6 +399,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <button type="button" class="btn r" style="padding:6px 14px" onclick="rsClearProductLib()" title="يمسح كل أطوال الكاد المحفوظة لهذا المنتج (كل الأعراض) لتبدأ القياس من جديد">🧹 <span data-i18n="rsClearLibBtn">مسح قياسات الكاد لهذا المنتج</span></button>
           <button type="button" class="btn sec" style="padding:6px 14px" onclick="rsLibExport()" title="حفظ كل مكتبة التوليفات (كل المنتجات والأعراض) في ملف على جهازك — نسخة احتياطية">📤 <span data-i18n="rsLibExportBtn">تصدير المكتبة</span></button>
           <button type="button" class="btn sec" style="padding:6px 14px" onclick="rsLibImportClick()" title="استعادة المكتبة من ملف سبق تصديره (يدمج مع الموجود بلا حذف)">📥 <span data-i18n="rsLibImportBtn">استيراد المكتبة</span></button>
+          <button type="button" class="btn sec" style="padding:6px 14px" onclick="rsAutoBakList()" title="نسخ احتياطية تلقائية محفوظة على هذا الجهاز مرتين يومياً (٥ مساءً و١ صباحاً)">🕒 <span data-i18n="rsAutoBakBtn">النسخ التلقائية</span></button>
           <input id="rs-lib-file" type="file" accept="application/json,.json" style="display:none" onchange="rsLibImportFile(this)">
           <div id="rs-combo-best" style="font-weight:800"></div></div>
         <div class="rscb-hide note" style="margin-top:4px" data-i18n="rsCbLibNote">القياسات المحفوظة تُعبَّأ تلقائياً في أي أوردر لاحق لنفس المنتج (مرجع دائم).</div>
@@ -508,7 +509,7 @@ customCodePrompt:'أدخل الكود المخصص (أحرف إنجليزية و
 badCode:'صيغة الكود غير صحيحة — أحرف إنجليزية وأرقام وشرطة فقط (4–16 خانة)',codeTaken:'هذا الكود مستخدم في مساحة عمل أخرى',codeChanged:'تم تغيير الكود',
 empTitle:'الموظفون (حسابات بصلاحيات)',empNew:'➕ موظف جديد',empName:'اسم الموظف *',empUser:'اسم المستخدم (للدخول) *',empPass:'كلمة المرور *',
 permsLbl:'الصلاحيات',permFact:'إدارة المصانع',permDel:'حذف السجلات',noEmps:'لا موظفون بعد — أنشئ حساباً لكل مفتش',
-usersTitle:'إدارة المستخدمين والصلاحيات',usersManageBtn:'المستخدمون والصلاحيات',permLvl0:'مخفي',permLvl1:'عرض',permLvl2:'عرض + تعديل',permLvl3:'عرض + تعديل + حذف',permView:'عرض',permEdit:'تعديل',permDel2:'حذف',permLegend:'حدّد لكل قسم مستوى الوصول: مخفي / عرض / تعديل / حذف',back:'رجوع',rsNoPerm:'ليس لديك صلاحية التعديل في هذا القسم',rsRowClear:'بلا لون',rsRowHint:'💡 نقرة يمين على أي صف مقاس لتمييزه بلون',rsLibBtn:'إدارة مكتبة التوليفات',rsClearLibBtn:'مسح قياسات الكاد لهذا المنتج',rsClearLibQ:'مسح كل قياسات الكاد المحفوظة للمنتج «{p}» ({n} توليفة)؟\n\nسيُمسح كل طول مقاس محفوظ (كل الأعراض) لهذا المنتج، وتبدأ المطابقة من جديد. لا يمكن التراجع.',rsClearLibDone:'مُسحت قياسات الكاد للمنتج «{p}» — ابدأ القياس من جديد وسيُحفظ تلقائياً',rsClearLibNone:'لا توجد قياسات محفوظة لهذا المنتج',rsLibExportBtn:'تصدير المكتبة',rsLibImportBtn:'استيراد المكتبة',rsLibExported:'تم تصدير {n} توليفة إلى ملف',rsLibImportBad:'ملف غير صالح — يجب أن يكون ملف مكتبة مُصدَّراً من النظام',rsLibImportEmpty:'لا توجد توليفات في الملف',rsLibImportQ:'استيراد المكتبة؟\n\nإضافة: {a} · تحديث: {u} · في {p} منتج.\n(يُدمج مع الموجود ولا يُحذف شيء)',rsLibImportDone:'تم الاستيراد — أُضيف {a} وحُدّث {u}',rsLibTitle:'مكتبة التوليفات المحفوظة',rsLibHint:'التوليفات المقيسة المحفوظة لكل منتج وعرض قماش — عدّل الطول أو احذف توليفة خاطئة.',rsLibEmpty:'المكتبة فارغة — احفظ قياسات من «مطور المراكر» أولاً',rsLibNoneP:'لا توليفات محفوظة لهذا المنتج',rsLibBadLen:'أدخل طولاً صحيحاً أكبر من صفر',rsLibDelQ:'حذف هذه التوليفة من المكتبة نهائياً؟',
+usersTitle:'إدارة المستخدمين والصلاحيات',usersManageBtn:'المستخدمون والصلاحيات',permLvl0:'مخفي',permLvl1:'عرض',permLvl2:'عرض + تعديل',permLvl3:'عرض + تعديل + حذف',permView:'عرض',permEdit:'تعديل',permDel2:'حذف',permLegend:'حدّد لكل قسم مستوى الوصول: مخفي / عرض / تعديل / حذف',back:'رجوع',rsNoPerm:'ليس لديك صلاحية التعديل في هذا القسم',rsRowClear:'بلا لون',rsRowHint:'💡 نقرة يمين على أي صف مقاس لتمييزه بلون',rsLibBtn:'إدارة مكتبة التوليفات',rsClearLibBtn:'مسح قياسات الكاد لهذا المنتج',rsClearLibQ:'مسح كل قياسات الكاد المحفوظة للمنتج «{p}» ({n} توليفة)؟\n\nسيُمسح كل طول مقاس محفوظ (كل الأعراض) لهذا المنتج، وتبدأ المطابقة من جديد. لا يمكن التراجع.',rsClearLibDone:'مُسحت قياسات الكاد للمنتج «{p}» — ابدأ القياس من جديد وسيُحفظ تلقائياً',rsClearLibNone:'لا توجد قياسات محفوظة لهذا المنتج',rsLibExportBtn:'تصدير نسخة احتياطية',rsLibImportBtn:'استيراد نسخة',rsLibExported:'تم تصدير {n} توليفة و{p} منتج إلى ملف',rsLibImportBad:'ملف غير صالح — يجب أن يكون ملف نسخة احتياطية مُصدَّراً من النظام',rsLibImportEmpty:'لا توجد بيانات في الملف',rsLibImportQ:'استيراد النسخة الاحتياطية؟\n\nتوليفات — إضافة: {a} · تحديث: {u} · في {p} منتج.\n(يُدمج مع الموجود ولا يُحذف شيء)',rsLibImportDone:'تم الاستيراد — أُضيف {a} وحُدّث {u}',rsAutoBakBtn:'النسخ التلقائية',rsAutoBakDone:'💾 نسخة احتياطية تلقائية ({n} توليفة)',rsAutoBakTitle:'النسخ الاحتياطية التلقائية (هذا الجهاز)',rsAutoBakHint:'تُحفظ تلقائياً مرتين يومياً (٥ مساءً و١ صباحاً) عند فتح التطبيق على هذا الجهاز. للأمان الكامل صدّر ملفاً واحفظه خارج الجهاز.',rsAutoBakNone:'لا توجد نسخ احتياطية تلقائية بعد',rsAutoBakMeta:'{c} توليفة · {p} منتج',rsAutoBakRestoreBtn:'استرجاع',rsAutoBakRestoreQ:'استرجاع هذه النسخة؟ ستحل محل المكتبة الحالية (والمقاسات إن كنت المالك).',rsAutoBakRestored:'تم الاسترجاع من النسخة الاحتياطية',rsLibTitle:'مكتبة التوليفات المحفوظة',rsLibHint:'التوليفات المقيسة المحفوظة لكل منتج وعرض قماش — عدّل الطول أو احذف توليفة خاطئة.',rsLibEmpty:'المكتبة فارغة — احفظ قياسات من «مطور المراكر» أولاً',rsLibNoneP:'لا توليفات محفوظة لهذا المنتج',rsLibBadLen:'أدخل طولاً صحيحاً أكبر من صفر',rsLibDelQ:'حذف هذه التوليفة من المكتبة نهائياً؟',
 cpwBtn:'تغيير كلمة المرور',cpwTitle:'تغيير كلمة المرور',cpwNew:'كلمة المرور الجديدة',cpwConfirm:'تأكيد كلمة المرور',cpwHint:'٦ أحرف على الأقل. لأمانك قد يُطلب منك إدخال كلمة مرورك الحالية.',cpwMismatch:'كلمتا المرور غير متطابقتين',cpwNoUser:'لا يوجد مستخدم مسجّل دخوله',cpwReauth:'لأمانك، أدخل كلمة مرورك الحالية للمتابعة:',cpwDone:'تم تغيير كلمة المرور',pwShow:'إظهار كلمة المرور',pwHide:'إخفاء كلمة المرور',usersPwNote:'لا يمكن للمالك تغيير كلمة مرور موظف مباشرةً؛ يغيّرها كل مستخدم بنفسه من الإعدادات ← «تغيير كلمة المرور».',
 empHint:'سيدخل الموظف من شاشة تسجيل الدخول باسم المستخدم وكلمة المرور مباشرة (بدون بريد إلكتروني وبدون كود).',
 empCreated:'تم إنشاء حساب الموظف',empUserTaken:'اسم المستخدم مستخدم مسبقاً',enterEmpFields:'أدخل الاسم واسم المستخدم وكلمة المرور',
@@ -663,7 +664,7 @@ customCodePrompt:'Enter a custom code (letters, digits, dash; 4-16 chars):',
 badCode:'Invalid code format — letters, digits, and dash only (4-16 chars)',codeTaken:'This code is used by another workspace',codeChanged:'Code changed',
 empTitle:'Employees (accounts with permissions)',empNew:'➕ New employee',empName:'Employee name *',empUser:'Username (for login) *',empPass:'Password *',
 permsLbl:'Permissions',permFact:'Manage factories',permDel:'Delete records',noEmps:'No employees yet — create an account per inspector',
-usersTitle:'Users & permissions',usersManageBtn:'Users & permissions',permLvl0:'Hidden',permLvl1:'View',permLvl2:'View + edit',permLvl3:'View + edit + delete',permView:'View',permEdit:'Edit',permDel2:'Delete',permLegend:'Set each section access level: Hidden / View / Edit / Delete',back:'Back',rsNoPerm:'You do not have edit permission for this section',rsRowClear:'No color',rsRowHint:'💡 Right-click any size row to highlight it with a color',rsLibBtn:'Manage combo library',rsClearLibBtn:'Clear CAD measurements for this product',rsClearLibQ:'Clear all saved CAD measurements for product “{p}” ({n} combos)?\n\nEvery saved measured length (all widths) for this product will be erased and matching starts fresh. This cannot be undone.',rsClearLibDone:'CAD measurements cleared for “{p}” — start measuring again and it will auto-save',rsClearLibNone:'No saved measurements for this product',rsLibExportBtn:'Export library',rsLibImportBtn:'Import library',rsLibExported:'Exported {n} combos to a file',rsLibImportBad:'Invalid file — must be a library file exported from the system',rsLibImportEmpty:'No combos in the file',rsLibImportQ:'Import library?\n\nAdd: {a} · update: {u} · across {p} product(s).\n(Merges with existing, deletes nothing)',rsLibImportDone:'Imported — added {a}, updated {u}',rsLibTitle:'Saved combo library',rsLibHint:'Measured combos saved per product and fabric width — edit a length or delete a wrong one.',rsLibEmpty:'Library is empty — save measurements from Marker developer first',rsLibNoneP:'No saved combos for this product',rsLibBadLen:'Enter a valid length greater than zero',rsLibDelQ:'Permanently delete this combo from the library?',
+usersTitle:'Users & permissions',usersManageBtn:'Users & permissions',permLvl0:'Hidden',permLvl1:'View',permLvl2:'View + edit',permLvl3:'View + edit + delete',permView:'View',permEdit:'Edit',permDel2:'Delete',permLegend:'Set each section access level: Hidden / View / Edit / Delete',back:'Back',rsNoPerm:'You do not have edit permission for this section',rsRowClear:'No color',rsRowHint:'💡 Right-click any size row to highlight it with a color',rsLibBtn:'Manage combo library',rsClearLibBtn:'Clear CAD measurements for this product',rsClearLibQ:'Clear all saved CAD measurements for product “{p}” ({n} combos)?\n\nEvery saved measured length (all widths) for this product will be erased and matching starts fresh. This cannot be undone.',rsClearLibDone:'CAD measurements cleared for “{p}” — start measuring again and it will auto-save',rsClearLibNone:'No saved measurements for this product',rsLibExportBtn:'Export backup',rsLibImportBtn:'Import backup',rsLibExported:'Exported {n} combos and {p} product(s) to a file',rsLibImportBad:'Invalid file — must be a backup file exported from the system',rsLibImportEmpty:'No data in the file',rsLibImportQ:'Import backup?\n\nCombos — add: {a} · update: {u} · across {p} product(s).\n(Merges with existing, deletes nothing)',rsLibImportDone:'Imported — added {a}, updated {u}',rsAutoBakBtn:'Auto backups',rsAutoBakDone:'💾 Auto backup saved ({n} combos)',rsAutoBakTitle:'Automatic backups (this device)',rsAutoBakHint:'Saved automatically twice daily (5 PM and 1 AM) when the app is open on this device. For full safety, export a file and keep it off-device.',rsAutoBakNone:'No automatic backups yet',rsAutoBakMeta:'{c} combos · {p} products',rsAutoBakRestoreBtn:'Restore',rsAutoBakRestoreQ:'Restore this backup? It will replace the current library (and sizes if you are the owner).',rsAutoBakRestored:'Restored from backup',rsLibTitle:'Saved combo library',rsLibHint:'Measured combos saved per product and fabric width — edit a length or delete a wrong one.',rsLibEmpty:'Library is empty — save measurements from Marker developer first',rsLibNoneP:'No saved combos for this product',rsLibBadLen:'Enter a valid length greater than zero',rsLibDelQ:'Permanently delete this combo from the library?',
 cpwBtn:'Change password',cpwTitle:'Change password',cpwNew:'New password',cpwConfirm:'Confirm password',cpwHint:'At least 6 characters. For security you may be asked for your current password.',cpwMismatch:'Passwords do not match',cpwNoUser:'No signed-in user',cpwReauth:'For security, enter your current password to continue:',cpwDone:'Password changed',pwShow:'Show password',pwHide:'Hide password',usersPwNote:'An owner cannot change an employee password directly; each user changes their own from Settings → Change password.',
 empHint:'The employee signs in from the login screen with username and password directly (no email, no code).',
 empCreated:'Employee account created',empUserTaken:'Username already taken',enterEmpFields:'Enter name, username, and password',
@@ -1882,7 +1883,7 @@ function rsInit(){if(RS_LOADED||!$('rs-qty-rows'))return;if(!prodNames().length)
   if(RS_DRAFT&&((RS_DRAFT.qty&&RS_DRAFT.qty.length)||(RS_DRAFT.markers&&RS_DRAFT.markers.length)))rsApplyDraft(RS_DRAFT);
   else if(rsSizeSrc().length){$('rs-qty-rows').innerHTML='';rsFillProduct();}
   else{if(!$('rs-qty-rows').children.length)rsAddQtyRow();rsCalc();}
-  rsUpdateUnitLabels();RS_LOADED=true;rsStartAutosave();}
+  rsUpdateUnitLabels();RS_LOADED=true;rsStartAutosave();rsAutoBackupCheck();}
 function rsApplyDraft(d){
   RS_ROWCOL=(d.rowcol&&typeof d.rowcol==='object')?d.rowcol:{};
   RS_COMBOCOL=(d.combocol&&typeof d.combocol==='object')?d.combocol:{};
@@ -1947,7 +1948,7 @@ function rsSaveDraft(){if(!RS_LOADED||!MEMBER||!$('rs-qty-rows'))return;
   clearTimeout(RS_SAVE_T);RS_SAVE_T=setTimeout(()=>rsWriteDraft(true),700);}
 // نبضة حفظ تلقائي كل دقيقة (شبكة أمان تضمن الحفظ الدوري حتى لو تعطّل حفظ التغييرات)
 let RS_AUTOSAVE_IV=null;
-function rsStartAutosave(){if(RS_AUTOSAVE_IV)return;RS_AUTOSAVE_IV=setInterval(()=>{if(RS_LOADED&&MEMBER&&$('rs-qty-rows'))rsWriteDraft(false);},60000);}
+function rsStartAutosave(){if(RS_AUTOSAVE_IV)return;RS_AUTOSAVE_IV=setInterval(()=>{if(RS_LOADED&&MEMBER&&$('rs-qty-rows')){rsWriteDraft(false);rsAutoBackupCheck();}},60000);}
 function rsAddQtyRow(r){r=r||{};const src=rsSizeSrc();const locked=src.length>0;
   const cell=locked
     ?`<select class="rsq-size" onchange="rsPickSize(this)" style="min-width:90px;padding:6px;font-weight:800"><option value="">\u2014</option>${sizeOptionsHtml(src,r.size,r.cons)}</select>`
@@ -2343,14 +2344,15 @@ function rsClearProductLib(){if(!canEdit('marker'))return toast(t('rsNoPerm'));
   const nl={...(COMBOLIB||{})};nl[prod]=[];
   const ref=db.collection('qc_workspaces').doc(MEMBER.wsId);
   ref.update({comboLib:nl}).then(()=>{COMBOLIB=nl;RS_LAST_SAVED='';rsComboRender();rsMkCalc();rsSaveDraft();toast(tf('rsClearLibDone',{p:prod}));}).catch(e=>toast(rulesHint(e)));}
-// تصدير كل مكتبة التوليفات كملف JSON (نسخة احتياطية كاملة — كل المنتجات والأعراض)
-function rsLibExport(){const lib=COMBOLIB||{};
+// بناء كائن النسخة الاحتياطية الشاملة (المقاسات/الاستهلاك + مكتبة التوليفات)
+function rsBuildBackup(){return {app:'qc-combolib',version:2,exportedAt:new Date().toISOString(),ws:(MEMBER&&MEMBER.wsName)||'',sizeLists:SIZELS||[],comboLib:COMBOLIB||{}};}
+// تصدير نسخة احتياطية شاملة كملف JSON
+function rsLibExport(){const lib=COMBOLIB||{},sl=SIZELS||[];
   const total=Object.keys(lib).reduce((s,p)=>s+((lib[p]||[]).length),0);
-  if(!total)return toast(t('rsLibEmpty'));
-  const out={app:'qc-combolib',version:1,exportedAt:new Date().toISOString(),ws:(MEMBER&&MEMBER.wsName)||'',comboLib:lib};
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:'application/json'}));
-  a.download='combo_library_'+(((MEMBER&&MEMBER.wsName)||'ws').replace(/\s+/g,'_'))+'_'+today()+'.json';a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast(tf('rsLibExported',{n:total}));}
+  if(!total&&!sl.length)return toast(t('rsLibEmpty'));
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(rsBuildBackup(),null,2)],{type:'application/json'}));
+  a.download='qc_backup_'+(((MEMBER&&MEMBER.wsName)||'ws').replace(/\s+/g,'_'))+'_'+today()+'.json';a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast(tf('rsLibExported',{n:total,p:sl.length}));}
 function rsLibImportClick(){if(!canEdit('marker'))return toast(t('rsNoPerm'));const inp=$('rs-lib-file');if(inp)inp.click();}
 // استيراد ملف مكتبة (دمج: يضيف الجديد ويحدّث المطابق بحسب التوقيع+العرض، بلا حذف الموجود)
 function rsLibImportFile(inp){const f=inp.files&&inp.files[0];inp.value='';if(!f)return;
@@ -2364,10 +2366,45 @@ function rsLibImportFile(inp){const f=inp.files&&inp.files[0];inp.value='';if(!f
         const rec={sig:x.sig,w:x.w||'',sizes:Array.isArray(x.sizes)?x.sizes:[],actLenM:Math.round((+x.actLenM||0)*10000)/10000};
         if(byS[key]!=null){arr[byS[key]]=rec;updated++;}else{byS[key]=arr.length;arr.push(rec);added++;}touched=true;});
       if(touched){cur[p]=arr;prods++;}});
-    if(!added&&!updated)return toast(t('rsLibImportEmpty'));
+    // قوائم المقاسات/الاستهلاك: للمالك فقط (قواعد الأمان) — دمج بحسب اسم المنتج
+    let slNew=null,slAdd=0;
+    if(Array.isArray(bk.sizeLists)&&bk.sizeLists.length&&isOwner()){
+      const curSL=(SIZELS||[]).slice(),byN={};curSL.forEach((p,i)=>byN[p.name]=i);
+      bk.sizeLists.forEach(p=>{if(!p||!p.name)return;const rec={name:p.name,sizes:Array.isArray(p.sizes)?p.sizes:[]};
+        if(byN[p.name]!=null)curSL[byN[p.name]]=rec;else{byN[p.name]=curSL.length;curSL.push(rec);slAdd++;}});
+      slNew=curSL;}
+    if(!added&&!updated&&!slNew)return toast(t('rsLibImportEmpty'));
     if(!confirm(tf('rsLibImportQ',{a:added,u:updated,p:prods})))return;
-    db.collection('qc_workspaces').doc(MEMBER.wsId).update({comboLib:cur}).then(()=>{COMBOLIB=cur;rsMkCalc();if($('rs-lib-body'))rsLibRender();toast(tf('rsLibImportDone',{a:added,u:updated}));}).catch(e=>toast(rulesHint(e)));
+    const ref=db.collection('qc_workspaces').doc(MEMBER.wsId);
+    ref.update({comboLib:cur}).then(()=>{COMBOLIB=cur;rsMkCalc();if($('rs-lib-body'))rsLibRender();toast(tf('rsLibImportDone',{a:added,u:updated}));}).catch(e=>toast(rulesHint(e)));
+    if(slNew)ref.update({sizeLists:slNew}).then(()=>{SIZELS=slNew;if($('sizes-list'))renderSizesManager();}).catch(()=>{});
   };r.readAsText(f);}
+// ── نسخ احتياطي تلقائي مرتين يومياً (٥ مساءً و١ صباحاً) على هذا الجهاز (localStorage) ──
+function rsBakKey(){return 'qc_autobak_'+((MEMBER&&MEMBER.wsId)||'ws');}
+function rsBakLoad(){try{return JSON.parse(localStorage.getItem(rsBakKey())||'null')||{lastSlot:'',items:[]};}catch(_){return {lastSlot:'',items:[]};}}
+function rsBakStore(o){try{localStorage.setItem(rsBakKey(),JSON.stringify(o));}catch(_){}}
+// آخر موعد نسخ مرّ (17:00 أو 01:00) كتوقيت محلي
+function rsBakSlot(t){const d=new Date(t),h=d.getHours(),mk=(x,hh)=>new Date(x.getFullYear(),x.getMonth(),x.getDate(),hh,0,0);
+  if(h>=17)return mk(d,17);if(h>=1)return mk(d,1);const y=new Date(d.getTime()-864e5);return mk(y,17);}
+function rsAutoBackupCheck(){if(!MEMBER||!MEMBER.wsId)return;
+  const iso=rsBakSlot(Date.now()).toISOString(),store=rsBakLoad();
+  if(store.lastSlot===iso)return;// نُسخت هذه الفترة سلفاً
+  const cl=COMBOLIB||{},sl=SIZELS||[];
+  if(!Object.keys(cl).some(p=>(cl[p]||[]).length)&&!sl.length){store.lastSlot=iso;rsBakStore(store);return;}// لا بيانات بعد
+  store.items.unshift({at:new Date().toISOString(),slot:iso,ws:(MEMBER.wsName||''),sizeLists:sl,comboLib:cl});
+  store.items=store.items.slice(0,10);store.lastSlot=iso;rsBakStore(store);
+  const n=Object.keys(cl).reduce((a,p)=>a+((cl[p]||[]).length),0);toast(tf('rsAutoBakDone',{n}));}
+function rsAutoBakList(){const store=rsBakLoad();
+  if(!store.items.length)return toast(t('rsAutoBakNone'));
+  const rows=store.items.map((s,i)=>{const nC=Object.keys(s.comboLib||{}).reduce((a,p)=>a+((s.comboLib[p]||[]).length),0),nP=(s.sizeLists||[]).length;
+    return `<div class="item" style="margin-bottom:6px"><div class="h" style="display:flex;align-items:center;gap:10px"><div style="flex:1"><b>${esc(new Date(s.at).toLocaleString('ar-EG'))}</b><div class="note">${esc(tf('rsAutoBakMeta',{c:nC,p:nP}))}</div></div><button type="button" class="btn g" style="padding:5px 12px" onclick="rsAutoBakRestore(${i})">${t('rsAutoBakRestoreBtn')}</button></div></div>`;}).join('');
+  modal(`<h3>🕒 ${t('rsAutoBakTitle')}</h3><div class="note" style="margin-bottom:8px">${t('rsAutoBakHint')}</div>${rows}<div class="row-btns"><button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);}
+function rsAutoBakRestore(i){if(!canEdit('marker'))return toast(t('rsNoPerm'));
+  const s=rsBakLoad().items[i];if(!s)return;
+  if(!confirm(t('rsAutoBakRestoreQ')))return;
+  const ref=db.collection('qc_workspaces').doc(MEMBER.wsId);
+  ref.update({comboLib:s.comboLib||{}}).then(()=>{COMBOLIB=s.comboLib||{};RS_LAST_SAVED='';rsMkCalc();closeModal();toast(t('rsAutoBakRestored'));}).catch(e=>toast(rulesHint(e)));
+  if(isOwner()&&Array.isArray(s.sizeLists))ref.update({sizeLists:s.sizeLists}).then(()=>{SIZELS=s.sizeLists;if($('sizes-list'))renderSizesManager();}).catch(()=>{});}
 /* ---- إدارة مكتبة التوليفات: عرض/تعديل طول/حذف التوليفات المحفوظة لكل منتج وعرض ---- */
 let RS_LIB_PROD='';
 function rsLibManage(){const prods=Object.keys(COMBOLIB||{}).filter(p=>((COMBOLIB[p]||[]).length));
