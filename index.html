@@ -1683,7 +1683,9 @@ function importSizes(text){if(!SM_PROD)return toast(t('noProducts'));
     cw[w]=Math.round((+s.cons||0)*10000)/10000;const ratio=s.ratio||o.ratio||0;
     nl.push({size:s.size,cons:o.cons||0,ratio,consW:cw});});
   setProdSizes(SM_PROD,nl).then(()=>{
-    $('sizes-paste').value='';toast(tf('importedN',{n:Object.keys(seen).length})+' · '+t('rsFabW')+' '+w+(skipped?tf('importSkipped',{n:skipped}):''));
+    $('sizes-paste').value='';SM_W=w;// اعرض عرض القماش المستورَد كي تظهر قيم الاستهلاك مباشرةً بدل شاشة «الأساسي» الفارغة
+    if($('sizes-list'))renderSizesManager();
+    toast(tf('importedN',{n:Object.keys(seen).length})+' · '+t('rsFabW')+' '+w+(skipped?tf('importSkipped',{n:skipped}):''));
   }).catch(e=>toast(rulesHint(e)));}
 function importSizesFile(inp){const f=inp.files&&inp.files[0];if(!f)return;
   const rd=new FileReader();rd.onload=()=>{importSizes(rd.result);inp.value='';};rd.readAsText(f);}
