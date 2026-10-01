@@ -2188,6 +2188,7 @@ function rsAutoPlan(){if(!$('rs-markers'))return;
     if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs))vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);});
   const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]-(produced[s]||0));
   if(!Object.values(rem).some(v=>v>0))return toast(t('rsAutoDone'));
+  const remOrig={};Object.keys(rem).forEach(s=>remOrig[s]=rem[s]);// نسخة للحلّال الحر (المقارنة)
   let added=[],libN=0;
   // أولاً: اتّبع نمط توليفات مكتبتك — هيكل التوليفات مشترك عبر كل الأعراض (تُدخل مرة واحدة على العرض الأساسي)؛
   // نأخذ تراكيب توليفات كل الأعراض بلا تكرار، والطول المقيس يبقى خاصاً بعرض القماش الحالي (يُطبَّق لاحقاً في الحساب).
@@ -2202,6 +2203,10 @@ function rsAutoPlan(){if(!$('rs-markers'))return;
     Object.keys(rem).forEach(s=>{if(rem[s]<0)rem[s]=0;});added=added.concat(r1);libN=r1.length;}
   // ثانياً: أكمل ما تبقّى بالمُحلّل العادي (تقدير مُعدَّل بالمعامل)
   if(Object.values(rem).some(v=>v>0))added=added.concat(rsSolve(rem,cons,maxlen,maxsizes,maxpcs));
+  // ثالثاً: البديل الحرّ (بلا تقيّد بتوليفات المكتبة) — إن أعطى عدد مراكر أقل فعلاً فهو أفضل (مراكر أكبر = تداخل أقل = استهلاك أقل).
+  // لا نخسر دقّة الكاد: الأطوال المقيسة تُطبَّق تلقائياً على أي ماركر يطابق المكتبة في rsMkCalc.
+  if(libN){const addedFree=rsSolve(remOrig,cons,maxlen,maxsizes,maxpcs);
+    if(addedFree.length&&addedFree.length<added.length){added=addedFree;libN=0;}}
   if(!added.length)return toast(t('rsNoSug'));
   added.sort((a,b)=>b.len-a.len);// ترتيب تنازلي حسب طول الماركر (استهلاك الماركر/طبقة)
   added.forEach(a=>rsAddMarker({pairs:a.combo,plies:a.plies}));rsMkCalc();
