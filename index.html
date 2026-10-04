@@ -76,6 +76,9 @@ border-bottom:3px solid transparent;border-radius:0;white-space:nowrap}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 @media(max-width:560px){.grid3{grid-template-columns:1fr 1fr}}
+.grid5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+@media(max-width:900px){.grid5{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:560px){.grid5{grid-template-columns:1fr 1fr}}
 .row-btns{display:flex;gap:8px;margin-top:6px}
 .mini{padding:8px 12px;font-size:13px;border-radius:9px;background:var(--teal);color:#fff;font-weight:600}
 .mini.g{background:#eef2f5;color:var(--txt)} .mini.r{background:#fdecea;color:#b02a26}
@@ -350,12 +353,12 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
         <div class="rsq-hide" style="margin-top:6px;font-size:13px;color:var(--mut)"><span data-i18n="rsSpreadLbl">مسافة الفرد لكل قطعة</span>: <input id="rs-spread" type="number" step="0.5" min="0" value="4" oninput="rsCalc();rsSaveDraft()" style="width:56px;padding:4px;text-align:center;font-weight:800"> <span data-i18n="rsCm">سم</span></div>
         <button type="button" class="mini rsq-hide" style="margin-top:6px" onclick="rsAddQtyRow()">➕ <span data-i18n="mkAddRow">إضافة مقاس</span></button>
         <span class="rsq-hide note" style="margin-inline-start:10px" data-i18n="rsRowHint">💡 نقرة يمين على أي صف مقاس لتمييزه بلون</span>
-        <div class="grid3" style="margin-top:14px">
+        <div class="grid5" style="margin-top:14px">
           <div><label class="inl rsu-h" data-b="حد طول الماركر">حد طول الماركر (متر)</label><input id="rs-maxlen" type="number" step="0.01" value="17" oninput="rsMkCalc()" onchange="rsMaxLenChanged()"></div>
           <div><label class="inl" data-i18n="rsMaxSizes">أقصى عدد قياسات في الماركر</label><input id="rs-maxsizes" type="number" value="6" oninput="rsMkCalc()" onchange="rsLimitsChanged()"></div>
           <div><label class="inl" data-i18n="rsMaxPcs">أقصى عدد قطع في الماركر</label><input id="rs-maxpcs" type="number" value="5" oninput="rsMkCalc()" onchange="rsLimitsChanged()"></div>
-          <div><label class="inl" data-i18n="rsSurplus" title="فائض إنتاج مسموح لكل قياس لتقليل عدد الماركرات — 0 = تغطية تامة بلا أي زيادة إنتاج (افتراضي)">فائض مسموح (قطعة/قياس)</label><input id="rs-surplus" type="number" min="0" step="1" value="0" oninput="rsMkCalc()" onchange="rsLimitsChanged()"></div>
-          <div><label class="inl" data-i18n="rsFabW" title="عرض القماش الفعلي — قياسات المكتبة خاصة بكل عرض؛ عند تطابق التوليفة يُستخدم الطول المقيس لهذا العرض بدل التقدير">عرض القماش (سم)</label><select id="rs-fabwidth" onchange="rsFabWSel()" style="padding:7px 8px"><option value="">—</option><option value="96">96</option><option value="98">98</option><option value="100">100</option><option value="142">142</option><option value="144">144</option><option value="146">146</option><option value="148">148</option><option value="__other">➕ عرض آخر…</option></select></div></div>
+          <div><label class="inl" data-i18n="rsFabW" title="عرض القماش الفعلي — قياسات المكتبة خاصة بكل عرض؛ عند تطابق التوليفة يُستخدم الطول المقيس لهذا العرض بدل التقدير">عرض القماش (سم)</label><select id="rs-fabwidth" onchange="rsFabWSel()" style="padding:7px 8px"><option value="">—</option><option value="96">96</option><option value="98">98</option><option value="100">100</option><option value="142">142</option><option value="144">144</option><option value="146">146</option><option value="148">148</option><option value="__other">➕ عرض آخر…</option></select></div>
+          <div><label class="inl" data-i18n="rsSurplus" title="فائض إنتاج مسموح لكل قياس لتقليل عدد الماركرات — 0 = تغطية تامة بلا أي زيادة إنتاج (افتراضي)">فائض مسموح (قطعة/قياس)</label><input id="rs-surplus" type="number" min="0" step="1" value="0" oninput="rsMkCalc()" onchange="rsLimitsChanged()"></div></div>
         <div id="rs-fabwarn" style="display:none;margin-top:8px;border-radius:8px;padding:8px 12px;font-size:13px;font-weight:800"></div>
         <div id="rs-effnote" style="display:none;margin-top:8px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:13px;font-weight:700"></div>
         <div id="rs-cadcov" style="display:none;margin-top:8px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px 12px"></div>
