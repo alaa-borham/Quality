@@ -141,6 +141,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
 .xtbl th.or{background:#f0a13c}
 .xtbl tr.tot td{background:#17696b;color:#fff;font-weight:800}
 #rs-qty-rows{counter-reset:rsqn}
+.rs-size-opt:hover{background:var(--inp)!important}
 #rs-qty-rows .rsq-row{counter-increment:rsqn}
 #rs-qty-rows .rsq-seq{width:38px;max-width:38px;font-weight:800;color:var(--mut)}
 #rs-qty-rows .rsq-seq::before{content:counter(rsqn)}
@@ -544,7 +545,7 @@ mkAvail:'القماش المتاح (اختياري)',mkEnough:'القماش ال
 fillModelBtn:'تعبئة مقاسات الموديل',selectModelFirst:'اختر الموديل أولاً',openInCalc:'📂 فتح في الحاسبة',restored:'تم التحميل في الحاسبة — عدّل واحسب من جديد',
 mkAvailCol:'المتاح',mkStateCol:'الحالة',mkOver:'فائض تقريب الطبقات',mkActual:'القماش الفعلي بعد القص (اختياري)',mkDev:'الانحراف عن المحسوب',
 spreadOrderBtn:'🖨 أمر فرشة',spreadOrder:'أمر فرشة (تشغيل الفرد)',needMkLen:'أدخل طول الماركر أولاً لحساب الطبقات',signature:'التوقيع',spreadOf:'فرشة رقم',
-rsTitle:'الريشو',rsQtyTbl2:'كميات الأوردر',rsRatio:'نسبة بحسب الموديل',rsQtyConsM:'استهلاك الكمية (متر)',rsPieceConsM:'استهلاك القطعة الأساسي (متر)',rsQtyConsF:'استهلاك مع الفرد',rsSpreadLbl:'مسافة الفرد لكل قطعة',
+rsTitle:'الريشو',rsQtyTbl2:'كميات الأوردر',rsRatio:'نسبة بحسب الموديل',rsQtyConsM:'استهلاك الكمية (متر)',rsPieceConsM:'استهلاك القطعة الأساسي (متر)',rsQtyConsF:'استهلاك مع الفرد',rsSizeSearchPh:'🔍 ابحث عن مقاس…',rsSpreadLbl:'مسافة الفرد لكل قطعة',
 rsMkTbl:'القياسات والكميات داخل الماركر',rsMkTblTtl:'مراكر الأوردر',rsCode:'الكود',rsDesc:'البيان',rsSizesRow:'المقاسات',rsQtyRow:'الكميات',
 rsPcsLbl:'إجمالي القطع في الماركر',rsPlies:'عدد الطبقات',rsPcsRun:'إجمالي القطع في التشغيل',rsMkStatus:'حالة الماركر وسبب عدم الصلاحية',
 rsMkPerPly:'استهلاك الماركر/طبقة (متر)',rsSumFab:'إجمالي استهلاك التشغيل (متر)',rsAddMarker:'إضافة ماركر',rsActLen:'الطول الفعلي (اختياري)',
@@ -699,7 +700,7 @@ mkAvail:'Available fabric (optional)',mkEnough:'Available fabric is enough',mkSh
 fillModelBtn:'Fill model sizes',selectModelFirst:'Select a model first',openInCalc:'📂 Open in calculator',restored:'Loaded into the calculator — edit and recalculate',
 mkAvailCol:'Available',mkStateCol:'Status',mkOver:'Ply rounding surplus',mkActual:'Actual fabric after cutting (optional)',mkDev:'Deviation from computed',
 spreadOrderBtn:'🖨 Spreading order',spreadOrder:'Spreading order',needMkLen:'Enter the marker length first to compute plies',signature:'Signature',spreadOf:'Spread #',
-rsTitle:'Ratio',rsQtyTbl2:'Order quantities',rsRatio:'Ratio per model',rsQtyConsM:'Qty consumption (m)',rsPieceConsM:'Base piece consumption (m)',rsQtyConsF:'Consumption incl. spread',rsSpreadLbl:'Spread margin per piece',
+rsTitle:'Ratio',rsQtyTbl2:'Order quantities',rsRatio:'Ratio per model',rsQtyConsM:'Qty consumption (m)',rsPieceConsM:'Base piece consumption (m)',rsQtyConsF:'Consumption incl. spread',rsSizeSearchPh:'🔍 Search size…',rsSpreadLbl:'Spread margin per piece',
 rsMkTbl:'Sizes & quantities per marker',rsMkTblTtl:'Order markers',rsCode:'Code',rsDesc:'Item',rsSizesRow:'Sizes',rsQtyRow:'Quantities',
 rsPcsLbl:'Total pieces per marker',rsPlies:'Plies',rsPcsRun:'Total run pieces',rsMkStatus:'Marker status & invalid reason',
 rsMkPerPly:'Marker cons/ply (m)',rsSumFab:'Total run consumption (m)',rsAddMarker:'Add marker',rsActLen:'Actual measured length (optional)',
@@ -1964,7 +1965,7 @@ let RS_AUTOSAVE_IV=null;
 function rsStartAutosave(){if(RS_AUTOSAVE_IV)return;RS_AUTOSAVE_IV=setInterval(()=>{if(RS_LOADED&&MEMBER&&$('rs-qty-rows')){rsWriteDraft(false);rsAutoBackupCheck();}},60000);}
 function rsAddQtyRow(r){r=r||{};const src=rsSizeSrc();const locked=src.length>0;
   const cell=locked
-    ?`<select class="rsq-size" onchange="rsPickSize(this)" style="min-width:90px;padding:6px;font-weight:800"><option value="">\u2014</option>${sizeOptionsHtml(src,r.size,r.cons)}</select>`
+    ?`<input class="rsq-size" value="${esc(r.size||'')}" autocomplete="off" placeholder="${esc(t('rsSizeSearchPh'))}" style="min-width:110px;padding:6px;font-weight:800" oninput="rsSizeFilter(this)" onfocus="this.select();rsSizeFilter(this)" onblur="rsSizeBlur(this)" onkeydown="rsSizeKey(event,this)">`
     :`<input class="rsq-size" value="${esc(r.size||'')}" placeholder="L" style="min-width:70px;padding:6px;font-weight:800" oninput="rsCalc()">`;
   $('rs-qty-rows').insertAdjacentHTML('beforeend',`<tr class="rsq-row" oncontextmenu="return rsRowMenu(event,this)">
    <td class="rsq-seq"></td>
@@ -1996,6 +1997,38 @@ function rsPickSize(sel){const o=sel.selectedOptions[0];const tr=sel.closest('tr
   const rr=o?o.dataset.ratio:'';const re=tr.querySelector('.rsq-ratio');
   if(re)re.value=(rr&&+rr>0)?rr:'';
   rsCalc();}
+/* ---- قائمة بحث القياسات: اكتب فيُفلتَر فوراً (أسرع من قائمة طويلة) ---- */
+let RS_SIZE_INP=null;
+function rsSizePop(){let p=$('rs-size-pop');if(!p){p=document.createElement('div');p.id='rs-size-pop';
+  p.style.cssText='display:none;position:fixed;z-index:99999;max-height:240px;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 28px rgba(0,0,0,.22);min-width:150px;font-size:14px';
+  document.body.appendChild(p);}return p;}
+function rsSizeFilter(inp){RS_SIZE_INP=inp;const src=rsSizeSrc();const q=inp.value.trim().toLowerCase();
+  const used=new Set([...document.querySelectorAll('.rsq-size')].filter(e=>e!==inp).map(e=>e.value.trim()).filter(Boolean));
+  const list=src.filter(s=>!used.has(s.size)&&(!q||s.size.toLowerCase().includes(q)));
+  const p=rsSizePop();
+  if(!list.length){p.style.display='none';return;}
+  p.innerHTML=list.slice(0,80).map((s,i)=>`<div class="rs-size-opt" data-sz="${esc(s.size)}" data-cons="${s.cons||''}" data-ratio="${s.ratio||''}"${i===0?' data-active="1"':''} onmousedown="rsSizePick(event,this)" style="padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between;gap:16px;align-items:center${i===0?';background:var(--inp)':''}"><b>${esc(s.size)}</b><span style="color:#c00000;font-weight:700">${s.cons||'—'}</span></div>`).join('');
+  const r=inp.getBoundingClientRect();p.style.left=Math.max(4,Math.min(r.left,innerWidth-p.offsetWidth-4))+'px';p.style.top=(r.bottom+2)+'px';p.style.minWidth=Math.max(150,r.width)+'px';p.style.display='';}
+function rsSizePick(e,el){if(e&&e.preventDefault)e.preventDefault();const inp=RS_SIZE_INP;if(!inp||!el)return;
+  inp.value=el.dataset.sz;const tr=inp.closest('tr');
+  const ci=tr.querySelector('.rsq-cons');if(ci&&el.dataset.cons)ci.value=el.dataset.cons;
+  const re=tr.querySelector('.rsq-ratio');if(re)re.value=(el.dataset.ratio&&+el.dataset.ratio>0)?el.dataset.ratio:'';
+  const p=$('rs-size-pop');if(p)p.style.display='none';RS_SIZE_INP=null;
+  rsCalc();const qt=tr.querySelector('.rsq-qty');if(qt){qt.focus();if(qt.select)qt.select();}}
+function rsSizeBlur(inp){setTimeout(()=>{const p=$('rs-size-pop');if(p)p.style.display='none';
+  const src=rsSizeSrc();const s=src.find(x=>x.size===inp.value.trim());const tr=inp.closest('tr');
+  if(s&&tr){const ci=tr.querySelector('.rsq-cons');if(ci&&!ci.value&&s.cons)ci.value=s.cons;const re=tr.querySelector('.rsq-ratio');if(re&&!re.value&&s.ratio>0)re.value=s.ratio;}
+  rsCalc();},160);}
+function rsSizeKey(e,inp){const p=$('rs-size-pop');
+  if(!p||p.style.display==='none'){if(e.key==='Enter')rsEnter(e,inp);return;}
+  const opts=[...p.querySelectorAll('.rs-size-opt')];if(!opts.length)return;
+  let idx=opts.findIndex(o=>o.dataset.active==='1');
+  if(e.key==='ArrowDown'){e.preventDefault();idx=Math.min(opts.length-1,(idx<0?-1:idx)+1);}
+  else if(e.key==='ArrowUp'){e.preventDefault();idx=Math.max(0,(idx<0?1:idx)-1);}
+  else if(e.key==='Enter'){e.preventDefault();rsSizePick(null,opts[idx<0?0:idx]);return;}
+  else if(e.key==='Escape'){p.style.display='none';return;}
+  else return;
+  opts.forEach(o=>{o.dataset.active='0';o.style.background='';});opts[idx].dataset.active='1';opts[idx].style.background='var(--inp)';opts[idx].scrollIntoView({block:'nearest'});}
 function rsFillProduct(){const src=rsSizeSrc();if(!src.length)return toast(t('noSizes'));
   const have=new Set([...document.querySelectorAll('.rsq-size')].map(e=>e.value.trim()).filter(Boolean));
   [...document.querySelectorAll('.rsq-row')].forEach(tr=>{const sz=tr.querySelector('.rsq-size').value.trim();
