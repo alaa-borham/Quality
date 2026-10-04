@@ -381,13 +381,14 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
             <th class="or rsu-h" data-b="استهلاك مع الفرد" title="طول الماركر + مسافة الفرد لكل طبقة، مضروباً في عدد الطبقات">استهلاك مع الفرد (متر)</th></tr>
           <tbody id="rs-markers" class="rsm-hide"></tbody>
           <tr class="tot rsm-hide"><td></td><td colspan="9" data-i18n="total">الإجمالي</td><td id="rs-mt-pcs">—</td><td id="rs-mt-plies">—</td><td id="rs-mt-run">—</td><td></td><td>—</td><td id="rs-mt-pcons" title="استهلاك القطعة في إجمالي الماركرات = إجمالي القماش ÷ إجمالي القطع">—</td><td id="rs-mt-fab">—</td><td id="rs-mt-fabf">—</td></tr></table></div>
+        <div class="rsm-hide" style="margin-top:6px">
+          <button type="button" class="mini" onclick="rsAddMarker()">➕ <span data-i18n="rsAddMarker">إضافة ماركر</span></button></div>
         <div class="rsm-hide" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
           <button type="button" class="btn sec" style="padding:6px 14px" onclick="rsCalibrateOpen()" title="يحسب القيمة الصحيحة لاستهلاك كل مقاس من الأطوال الفعلية المُدخَلة على عدة ماركرات — يحدّد المقاسات ذات القيمة الخاطئة بدقة">🧮 <span data-i18n="rsCalibBtn">معايرة استهلاك القياسات</span></button>
           <button type="button" class="btn g" style="padding:6px 14px" onclick="rsAutoPlan()">⚡ <span data-i18n="rsAutoBtn">أكمل الخطة تلقائياً (أقل استهلاك)</span></button>
           <button type="button" class="btn g" style="padding:6px 14px" onclick="rsReviewHeavy()" title="يراجع الماركرات ذات استهلاك القطعة الأعلى ويقترح دمجها مع قياسات أخرى لتقليل الاستهلاك — مع إعطاء الأولوية للماركرات كبيرة الكمية">🔎 <span data-i18n="rsHeavyBtn">راجع الماركرات عالية الاستهلاك</span></button>
           <button type="button" class="btn sec" style="padding:6px 14px" onclick="rsPlanToCombos()" title="ينقل ماركرات هذه الخطة إلى جدول المعايرة كي تقيس الطول الفعلي لما ستستعمله فعلاً — فترتفع نسبة تطابق الكاد إلى ١٠٠٪">🎯 <span data-i18n="rsPlanCbBtn">قِس ماركرات هذه الخطة</span></button></div>
         <div class="rsm-hide" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
-          <button type="button" class="mini" onclick="rsAddMarker()">➕ <span data-i18n="rsAddMarker">إضافة ماركر</span></button>
           <button type="button" class="mini g" onclick="rsReducePlies()" title="تكرار القياسات لتقليل الطبقات دون تغيير القماش أو الكمية">🔽 <span data-i18n="rsReducePliesBtn">قلّل الطبقات</span></button>
           <button type="button" class="mini g" onclick="rsSortMarkers()" title="ترتيب الماركرات من الأكبر إلى الأصغر حسب طول الماركر (استهلاك الماركر/طبقة)">↓ <span data-i18n="rsSortBtn">ترتيب حسب الطول</span></button>
           <button type="button" class="mini g" onclick="rsSortByPerPiece()" title="ترتيب الماركرات حسب استهلاك القطعة (الأقل/الأفضل أولاً) — يعتمد الطول الفعلي المقاس إن أُدخل، فيشمل تداخل القطع الحقيقي">🏆 <span data-i18n="rsSortPcBtn">الأفضل حسب استهلاك القطعة</span></button>
