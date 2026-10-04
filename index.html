@@ -2588,6 +2588,9 @@ function rsComboPrintSheet(){
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 function rsComboRender(){const tb=$('rs-combo-rows');if(!tb)return;const uf=rsUF();
   if(!RS_COMBOS.length){tb.innerHTML=`<tr><td colspan="6" style="padding:10px;color:var(--mut)">${t('rsCbEmpty')}</td></tr>`;if($('rs-combo-best'))$('rs-combo-best').textContent='';return;}
+  // التوليفات التي تحتاج قياساً (ليست قطعة واحدة ولم تُقَس بعد) تتصدّر القائمة لتسهيل قياسها، مع حفظ الترتيب داخل كل مجموعة
+  const _needM=c=>c.combo.reduce((a,p)=>a+p.cnt,0)!==1&&!(c.actual>0);
+  const _nd=[],_rs=[];RS_COMBOS.forEach(c=>(_needM(c)?_nd:_rs).push(c));RS_COMBOS=_nd.concat(_rs);
   tb.innerHTML=RS_COMBOS.map((c,i)=>{
     const sizesHtml=c.combo.map((p,k)=>{const nm=esc(p.size);
       const cnt=` <span style="color:var(--teal);font-weight:900;font-size:12px">×${p.cnt}</span>`;
