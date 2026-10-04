@@ -317,6 +317,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
       </div>
     </div>
     <div id="p-marker" class="hide">
+      <button type="button" id="rs-fab-save" onclick="saveRsPlan()" title="حفظ الخطة" style="display:none;position:fixed;bottom:18px;left:18px;z-index:9000;background:var(--teal);color:#fff;border:none;border-radius:999px;padding:12px 20px;font-weight:800;font-size:15px;box-shadow:0 6px 20px rgba(0,0,0,.28);cursor:pointer">💾 <span data-i18n="saveCheck">حفظ</span></button>
       <div class="sec-h" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><span>📊 <span data-i18n="rsTitle">الريشو — خطة الماركرات</span></span><span style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span id="rs-autosave" style="font-size:12px;color:var(--mut);font-weight:700;transition:opacity .4s" title="حفظ تلقائي كل دقيقة وعند كل تغيير"></span><button class="btn sec" style="padding:6px 14px;font-size:14px;flex:0 0 auto;width:auto" onclick="rsOpenSaved()" data-i18n="rsSavedPlans">📂 الخطط المحفوظة</button></span></div>
       <div id="tool-rs" class="card">
         <label class="inl" data-i18n="mkReportName">اسم التقرير (اختياري)</label>
@@ -391,7 +392,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <button type="button" class="btn sec" style="padding:6px 14px" onclick="rsPlanToCombos()" title="ينقل ماركرات هذه الخطة إلى جدول المعايرة كي تقيس الطول الفعلي لما ستستعمله فعلاً — فترتفع نسبة تطابق الكاد إلى ١٠٠٪">🎯 <span data-i18n="rsPlanCbBtn">قِس ماركرات هذه الخطة</span></button></div>
         <div id="rs-heavy-out" class="rsm-hide" style="margin-top:10px"></div>
         <div style="overflow-x:auto;margin-top:16px"><table class="xtbl" style="min-width:760px">
-          <tr><th colspan="6" class="ttl"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rscb-cv" onclick="rsCollapse('rscb')" title="تصغير/تكبير">–</button><span data-i18n="rsCbTbl">مطور المراكر</span></span><button type="button" id="rs-savelib-btn" class="btn g" style="padding:5px 14px;font-size:13px;flex:0 0 auto;width:auto" onclick="rsComboSaveLib()">📚 <span data-i18n="rsCbSaveLib">احفظ القياسات في مكتبة المنتج</span></button></div></th></tr>
+          <tr><th colspan="6" class="ttl"><div style="display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap"><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rscb-cv" onclick="rsCollapse('rscb')" title="تصغير/تكبير">–</button><span data-i18n="rsCbTbl">مطور المراكر</span></span><button type="button" id="rs-savelib-btn" class="btn g rscb-hide" style="padding:5px 14px;font-size:13px;flex:0 0 auto;width:auto" onclick="rsComboSaveLib()">📚 <span data-i18n="rsCbSaveLib">احفظ القياسات في مكتبة المنتج</span></button></div></th></tr>
           <tr class="rscb-hide"><th data-i18n="rsCbNo">م</th><th data-i18n="rsCbCombo">التوليفة</th><th class="rsu-h" data-b="الطول المحسوب">الطول المحسوب (متر)</th><th data-i18n="rsCbActual">الطول الفعلي المقاس</th><th data-i18n="rsCbEff">الكفاءة (فعلي÷محسوب)</th><th data-i18n="rsCbRank">الترتيب</th></tr>
           <tbody id="rs-combo-rows" class="rscb-hide"></tbody></table></div>
         <div class="rscb-hide" style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
@@ -920,7 +921,8 @@ function go(tb,btn){applyNavPerms();
   if(tb==='tools')renderToolFactSelects();
   if(tb==='marker'){goMarker('rs');if(!RS_COLLAPSED_INIT){RS_COLLAPSED_INIT=1;rsCollapseAll();}
     const sb=$('rs-savelib-btn');if(sb)sb.style.display=canEdit('marker')?'':'none';
-    const sp=$('rs-saveplan-btn');if(sp)sp.style.display=(canEdit('marker')||canEdit('insp'))?'':'none';}
+    const sp=$('rs-saveplan-btn');if(sp)sp.style.display=(canEdit('marker')||canEdit('insp'))?'':'none';
+    const fsv=$('rs-fab-save');if(fsv)fsv.style.display=(canEdit('marker')||canEdit('insp'))?'':'none';}
   if(tb==='insp')goInsp('list',document.querySelector('#insp-subnav button'));}
 function goInsp(v,btn){['list','toolchk'].forEach(x=>$('insp-wrap-'+x).classList.toggle('hide',x!==v));
   document.querySelectorAll('#insp-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');
