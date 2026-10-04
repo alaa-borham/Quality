@@ -335,14 +335,12 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
           <button type="button" class="mini g" style="margin-inline-start:8px" onclick="modelsManager()" data-i18n="mkManage">⚙️ إدارة الموديلات والمقاسات</button></div>
         <div id="rs-summary" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"></div>
         <div id="rs-coverwarn" style="display:none;margin-top:10px;border-radius:10px;padding:10px 14px;font-weight:800"></div>
-        <div style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-          <label style="font-size:13px;font-weight:700;white-space:nowrap"><span data-i18n="rsCbCap">عدد التوليفات</span> <input id="rs-combo-cap" type="number" min="20" max="500" value="50" style="width:70px;padding:4px;text-align:center;background:var(--inp)"></label>
-          <span class="note" style="margin:0" data-i18n="rsCbBtnHint">كلما زاد العدد والتنوّع، اقتربت النتيجة من CAD (مقابل قياس توليفات أكثر)</span></div>
-        <div style="margin-top:12px">
+        <div style="margin-top:8px">
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
             <button type="button" class="mini-toggle rsc-cv" onclick="rsCollapse('rsc')" title="تصغير/تكبير">–</button>
             <span style="font-weight:800" data-i18n="rsColTitle">🎨 توزيع الألوان (اختياري)</span>
-            <button type="button" class="mini" onclick="rsAddColorRow()">➕ <span data-i18n="rsColAdd">إضافة لون</span></button></div>
+            <button type="button" class="mini" onclick="rsAddColorRow()">➕ <span data-i18n="rsColAdd">إضافة لون</span></button>
+            <span style="display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;margin-inline-start:24px"><label style="font-size:13px;font-weight:700;white-space:nowrap"><span data-i18n="rsCbCap">عدد التوليفات</span> <input id="rs-combo-cap" type="number" min="20" max="500" value="50" style="width:70px;padding:4px;text-align:center;background:var(--inp)"></label><span class="note" style="margin:0" data-i18n="rsCbBtnHint">كلما زاد العدد والتنوّع، اقتربت النتيجة من CAD (مقابل قياس توليفات أكثر)</span></span></div>
           <div class="rsc-hide" style="margin-top:8px">
             <div id="rs-colors" style="display:flex;flex-direction:column;gap:6px;max-width:520px"></div>
             <div id="rs-colors-sum" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div></div></div>
