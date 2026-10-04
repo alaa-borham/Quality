@@ -77,6 +77,9 @@ border-bottom:3px solid transparent;border-radius:0;white-space:nowrap}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 @media(max-width:560px){.grid3{grid-template-columns:1fr 1fr}}
 .grid5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.grid4{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:end}
+@media(max-width:900px){.grid4{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.grid4{grid-template-columns:1fr}}
 @media(max-width:900px){.grid5{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:560px){.grid5{grid-template-columns:1fr 1fr}}
 .row-btns{display:flex;gap:8px;margin-top:6px}
@@ -323,9 +326,8 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
       <button type="button" id="rs-fab-save" onclick="saveRsPlan()" title="حفظ الخطة" style="display:none;position:fixed;bottom:18px;left:18px;z-index:9000;background:var(--teal);color:#fff;border:none;border-radius:999px;padding:12px 20px;font-weight:800;font-size:15px;box-shadow:0 6px 20px rgba(0,0,0,.28);cursor:pointer">💾 <span data-i18n="saveCheck">حفظ</span></button>
       <div class="sec-h" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><span>📊 <span data-i18n="rsTitle">الريشو — خطة الماركرات</span></span><span style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span id="rs-autosave" style="font-size:12px;color:var(--mut);font-weight:700;transition:opacity .4s" title="حفظ تلقائي كل دقيقة وعند كل تغيير"></span><button class="btn sec" style="padding:6px 14px;font-size:14px;flex:0 0 auto;width:auto" onclick="rsOpenSaved()" data-i18n="rsSavedPlans">📂 الخطط المحفوظة</button></span></div>
       <div id="tool-rs" class="card">
-        <label class="inl" data-i18n="mkReportName">اسم التقرير (اختياري)</label>
-        <input id="rs-title" data-i18n-ph="mkReportNamePh" placeholder="مثال: أوردر رمضان — العميل أحمد" oninput="rsSaveDraft()">
-        <div class="grid3" style="margin-top:8px"><div><label class="inl" data-i18n="productLbl">المنتج</label><select id="rs-product" onchange="rsProductChanged()"></select></div>
+        <div class="grid4" style="margin-top:4px"><div><label class="inl" data-i18n="mkReportName">اسم التقرير (اختياري)</label><input id="rs-title" data-i18n-ph="mkReportNamePh" placeholder="مثال: أوردر رمضان — العميل أحمد" oninput="rsSaveDraft()"></div>
+          <div><label class="inl" data-i18n="productLbl">المنتج</label><select id="rs-product" onchange="rsProductChanged()"></select></div>
           <div><label class="inl" data-i18n="rsDispUnit">وحدة العرض</label><select id="rs-unit" onchange="rsUnitChanged()"><option value="متر">متر</option><option value="ياردة">ياردة</option></select></div>
           <div style="display:flex;align-items:flex-end"><button type="button" class="mini g" onclick="modelsManager()" data-i18n="rsEditList">⚙️ إضافة / تعديل قائمة المقاسات</button></div></div>
         <div id="rs-nosizes" class="hide" style="margin:8px 0;padding:10px;border:1px dashed #d8a03c;background:#fff8e6;border-radius:10px">
