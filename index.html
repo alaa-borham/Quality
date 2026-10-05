@@ -1429,22 +1429,77 @@ function renderInsp(){const el=$('insp-list');if(!el)return;if(!INSP.length){el.
     <div class="row-btns"><button class="mini" onclick="printInsp('${i.id}')">${t('reportBtn')}</button>
     ${canEdit('insp')?`<button class="mini g" onclick="editInsp('${i.id}')">${t('edit')}</button>`:''}
     ${canDel('insp')?`<button class="mini r" onclick="delInsp('${i.id}')">${t('del')}</button>`:''}</div></div>`;}).join('')+'</div>';}
-function csvCell(v){v=(v==null?'':String(v));return '"'+v.replace(/"/g,'""')+'"';}
+/* ---- كاتب Excel حقيقي (.xlsx) بلا مكتبات: أعمدة منفصلة وحدود واتجاه يمين-يسار ----
+   (ملف CSV يفتحه Excel العربي في عمود واحد لأن فاصل القوائم عنده «;» لا «,»)
+   rows: مصفوفة صفوف؛ الصف إما مصفوفة خلايا (بيانات) أو {s:'title'|'sec'|'head'|'data'|'total'|'kv', c:[...]} */
+const XL_CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}return t;})();
+function xlCrc(b){let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=XL_CRC[(c^b[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0;}
+function xlZip(files){const enc=new TextEncoder(),parts=[],cen=[];let off=0;
+  const u16=v=>[v&255,(v>>>8)&255],u32=v=>[v&255,(v>>>8)&255,(v>>>16)&255,(v>>>24)&255];
+  files.forEach(f=>{const name=enc.encode(f.name),data=enc.encode(f.data),crc=xlCrc(data);
+    const loc=new Uint8Array([...u32(0x04034b50),...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(0x21),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0)]);
+    parts.push(loc,name,data);
+    cen.push(new Uint8Array([...u32(0x02014b50),...u16(20),...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(0x21),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(off)]),name);
+    off+=loc.length+name.length+data.length;});
+  const cenLen=cen.reduce((a,x)=>a+x.length,0);
+  const end=new Uint8Array([...u32(0x06054b50),...u16(0),...u16(0),...u16(files.length),...u16(files.length),...u32(cenLen),...u32(off),...u16(0)]);
+  return new Blob([...parts,...cen,end],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});}
+function xlsxDownload(filename,rows,opt){opt=opt||{};const rtl=opt.rtl!=null?opt.rtl:LANG==='ar';
+  const X=v=>String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,'');
+  const col=i=>{let s='';i++;while(i>0){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26);}return s;};
+  const ST={title:6,sec:4,head:2,data:1,total:3,kv:5};
+  const norm=rows.map(r=>Array.isArray(r)?{s:r.length?'data':'',c:r}:r);
+  const ncol=Math.max(1,...norm.map(r=>(r.c||[]).length));
+  // تمديد صفوف الجداول (رأس/بيانات/إجمالي) إلى عرض جدولها كي تُرسم حدود كل الخلايا
+  let tw=0;norm.forEach(r=>{if(r.s==='head')tw=r.c.length;else if(r.s!=='data'&&r.s!=='total')tw=0;
+    if((r.s==='data'||r.s==='total')&&tw&&r.c.length<tw)r.c=r.c.concat(Array(tw-r.c.length).fill(''));});
+  const wid=Array(ncol).fill(8);norm.forEach(r=>{if(r.s==='title'||r.s==='sec')return;(r.c||[]).forEach((v,i)=>{let l=String(v==null?'':v).length;if(r.s==='head')l=Math.ceil(l/2)+1;// الرأس يلتفّ على سطرين
+    if(l+3>wid[i])wid[i]=Math.min(48,l+3);});});
+  const merges=[];
+  const sheetRows=norm.map((r,ri)=>{const cells=(r.c||[]).map((v,ci)=>{const ref=col(ci)+(ri+1);
+      let st=ST[r.s]||0;if(r.s==='kv')st=ci===0?5:1;
+      if(v==null||v===''){return st?`<c r="${ref}" s="${st}"/>`:'';}
+      const isNum=typeof v==='number'&&isFinite(v);
+      return isNum?`<c r="${ref}" s="${st}"><v>${v}</v></c>`:`<c r="${ref}" s="${st}" t="inlineStr"><is><t xml:space="preserve">${X(v)}</t></is></c>`;}).join('');
+    if((r.s==='title'||r.s==='sec')&&ncol>1)merges.push(`A${ri+1}:${col(Math.min(ncol,r.s==='title'?ncol:4)-1)}${ri+1}`);
+    const ht=r.s==='head'?' ht="30" customHeight="1"':r.s==='title'?' ht="24" customHeight="1"':'';
+    return `<row r="${ri+1}"${ht}>${cells}</row>`;}).join('');
+  const sheet=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheetViews><sheetView workbookViewId="0"${rtl?' rightToLeft="1"':''}/></sheetViews><cols>${wid.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('')}</cols><sheetData>${sheetRows}</sheetData>${merges.length?`<mergeCells count="${merges.length}">${merges.map(m=>`<mergeCell ref="${m}"/>`).join('')}</mergeCells>`:''}<pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.3" footer="0.3"/><pageSetup paperSize="9" orientation="landscape" fitToHeight="0"/></worksheet>`;
+  const bd='<left style="thin"><color rgb="FF9FB6B5"/></left><right style="thin"><color rgb="FF9FB6B5"/></right><top style="thin"><color rgb="FF9FB6B5"/></top><bottom style="thin"><color rgb="FF9FB6B5"/></bottom><diagonal/>';
+  const al='<alignment horizontal="center" vertical="center" wrapText="1"/>';
+  const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+<fonts count="4"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FF0E3F3E"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font><font><b/><sz val="15"/><color rgb="FF14504F"/><name val="Calibri"/></font></fonts>
+<fills count="5"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFE6EFEE"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FF14504F"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFF7FAF9"/></patternFill></fill></fills>
+<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border>${bd}</border></borders>
+<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+<cellXfs count="7"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
+<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1">${al}</xf>
+<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1">${al}</xf>
+<xf numFmtId="0" fontId="2" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1">${al}</xf>
+<xf numFmtId="0" fontId="2" fillId="3" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment vertical="center"/></xf>
+<xf numFmtId="0" fontId="1" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="center"/></xf>
+<xf numFmtId="0" fontId="3" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="center"/></xf></cellXfs>
+<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+  const sname=X(String(opt.sheet||'Sheet1').replace(/[\[\]:*?\/\\]/g,' ').slice(0,31)||'Sheet1');
+  const blob=xlZip([
+    {name:'[Content_Types].xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'},
+    {name:'_rels/.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'},
+    {name:'xl/workbook.xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="${sname}" sheetId="1" r:id="rId1"/></sheets></workbook>`},
+    {name:'xl/_rels/workbook.xml.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'},
+    {name:'xl/worksheets/sheet1.xml',data:sheet},{name:'xl/styles.xml',data:styles}]);
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);}
 function exportCSV(){const list=filteredInsp();if(!list.length)return toast(t('noData'));
   const head=['التاريخ / Date','الطلبية / PO','المصنع / Factory','النوع / Type','العينة / Sample','كبير / Major','صغير / Minor','حرِج / Critical','DHU','البنود / Items','بنود غير مطابقة / Failed items','القرار / Decision','المفتش / Inspector','ملاحظات / Notes'];
   const rows=list.map(i=>[i.date,i.po,i.factoryName,typeLabel(i.type),i.sampleSize,i.major,i.minor,i.critical,i.dhu,
     (i.checklist&&i.checklist.length)?i.checklist.filter(x=>x.status==='pass').length+'/'+i.checklist.length:'',
     (i.checklist||[]).filter(x=>x.status==='fail').map(x=>x.name).join(' | '),
     i.decision,i.inspector,i.notes]);
-  const csv='﻿'+[head,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
-  a.download='inspections_'+today()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
+  xlsxDownload('inspections_'+today()+'.xlsx',[{s:'head',c:head},...rows],{sheet:'Inspections'});}
 function exportToolChk(){const src=TOOLCHK.filter(c=>c.type!=='mk');if(!src.length)return;
   const head=['التاريخ / Date','اسم التقرير / Report','النوع / Type','المصنع / Factory','النتيجة / Result','القرار / Decision','المفتش / Inspector'];
   const rows=src.map(c=>[c.date,c.title||'',toolTypeLabel(c.type),c.factoryName,toolResultSummary(c),c.result.decision,c.inspector]);
-  const csv='﻿'+[head,...rows].map(r=>r.map(csvCell).join(',')).join('\r\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
-  a.download='tool_checks_'+today()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);}
+  xlsxDownload('tool_checks_'+today()+'.xlsx',[{s:'head',c:head},...rows],{sheet:'Tool checks'});}
 function printInsp(id){const i=INSP.find(x=>x.id===id);if(!i)return;const a=aqlFor(i.sampleSize||0);
   const isChk=!!(i.checklist&&i.checklist.length);
   const row=(l,v)=>`<tr><td style="font-weight:700;background:#f2f6f6;width:38%">${l}</td><td>${esc(v)}</td></tr>`;
@@ -3497,40 +3552,37 @@ function exportRsExcel(){
   const qty=[...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0,ratio:+tr.querySelector('.rsq-ratio').value||0,cons:+tr.querySelector('.rsq-cons').value||0})).filter(x=>x.size);
   const hasQty=qty.some(x=>x.qty>0);
   const rows=[];
-  rows.push([t('rsTitle'),MEMBER.wsName||'']);
-  if(title)rows.push([t('mkReportName'),title]);
-  if(product)rows.push([t('productLbl'),product]);
-  rows.push([t('dateLbl'),fmtDate(today())],[t('rsDispUnit'),u],[t('rsObjective'),objTxt.replace(/^⬇️\s*/,'')]);
+  rows.push({s:'title',c:[(MEMBER.wsName?MEMBER.wsName+' — ':'')+t('rsTitle')]});
+  if(title)rows.push({s:'kv',c:[t('mkReportName'),title]});
+  if(product)rows.push({s:'kv',c:[t('productLbl'),product]});
+  rows.push({s:'kv',c:[t('dateLbl'),fmtDate(today())]},{s:'kv',c:[t('rsDispUnit'),u]},{s:'kv',c:[t('rsObjective'),objTxt.replace(/^⬇️\s*/,'')]});
   const _price=+($('rs-price')&&$('rs-price').value)||0;
   if(_price>0){const _cost=Math.round(R(tFab)*_price*100)/100,_pc=tRun>0?Math.round(_cost/tRun*100)/100:0;
-    rows.push([tf('rsPriceLbl',{u}).replace(' (اختياري)','').replace(' (optional)',''),_price],[t('rsCostFab'),_cost],[t('rsCostPiece'),_pc]);}
+    rows.push({s:'kv',c:[tf('rsPriceLbl',{u}).replace(' (اختياري)','').replace(' (optional)',''),_price]},{s:'kv',c:[t('rsCostFab'),_cost]},{s:'kv',c:[t('rsCostPiece'),_pc]});}
   rows.push([]);
   // الكميات
-  if(qty.length){rows.push([t('rsQtyTbl2')]);const spF=rsSpreadM();
-    rows.push([t('sizeName'),t('mkQtyOrder'),t('rsRatio'),t('rsPieceConsM'),t('rsQtyConsM').replace('متر',u).replace('(m)','('+u+')'),t('rsQtyConsF')]);
+  if(qty.length){rows.push({s:'sec',c:[t('rsQtyTbl2')]});const spF=rsSpreadM();
+    rows.push({s:'head',c:[t('sizeName'),t('mkQtyOrder'),t('rsRatio'),t('rsPieceConsM'),t('rsQtyConsM').replace('متر',u).replace('(m)','('+u+')'),t('rsQtyConsF')]});
     let sQ=0,sC=0,sCf=0;qty.forEach(x=>{rows.push([x.size,x.qty||'',x.ratio||'',x.cons||'',R(x.qty*x.cons),R(x.qty*(x.cons+spF))]);sQ+=x.qty;sC+=x.qty*x.cons;sCf+=x.qty*(x.cons+spF);});
-    rows.push([t('total'),sQ,'','',R(sC),R(sCf)]);rows.push([]);}
+    rows.push({s:'total',c:[t('total'),sQ,'','',R(sC),R(sCf)]});rows.push([]);}
   // الماركرات
-  rows.push([t('rsMkTbl')]);
-  rows.push([t('rsCode'),t('rsDesc'),t('rsPcsLbl'),t('rsPlies'),t('rsPcsRun'),t('rsMkPerPly').replace('متر',u).replace('(m)','('+u+')'),t('rsActLen'),t('rsSumFab').replace('متر',u).replace('(m)','('+u+')'),t('rsQtyConsF'),t('rsMkStatus')]);
+  rows.push({s:'sec',c:[t('rsMkTbl')]});
+  rows.push({s:'head',c:[t('rsCode'),t('rsDesc'),t('rsPcsLbl'),t('rsPlies'),t('rsPcsRun'),t('rsMkPerPly').replace('متر',u).replace('(m)','('+u+')'),t('rsActLen'),t('rsSumFab').replace('متر',u).replace('(m)','('+u+')'),t('rsQtyConsF'),t('rsMkStatus')]});
   markers.forEach(m=>rows.push([m.code,m.mix,m.pcs,m.plies,m.run,m.len,m.actlen,m.fab,m.fabf,m.ok?t('st_ok'):t('rsReview')]));
-  rows.push([t('total'),'','',tPlies,tRun,'','',R(tFab),R(tFabf)]);rows.push([]);
+  rows.push({s:'total',c:[t('total'),'','',tPlies,tRun,'','',R(tFab),R(tFabf),'']});rows.push([]);
   // المراجعة
-  if(hasQty){rows.push([t('rsReviewTbl')]);
-    rows.push([t('sizeName'),t('mkQtyOrder'),t('rsProdFromMk'),t('rsRemFromOrder')]);
+  if(hasQty){rows.push({s:'sec',c:[t('rsReviewTbl')]});
+    rows.push({s:'head',c:[t('sizeName'),t('mkQtyOrder'),t('rsProdFromMk'),t('rsRemFromOrder')]});
     let sr=0,sp=0;qty.forEach(x=>{const pr=produced[x.size]||0;rows.push([x.size,x.qty,pr,x.qty-pr]);sr+=x.qty;sp+=pr;});
-    rows.push([t('total'),sr,sp,sr-sp]);rows.push([]);}
+    rows.push({s:'total',c:[t('total'),sr,sp,sr-sp]});rows.push([]);}
   // خطة الأثواب
   const rp=rsRollCompute();
-  if(!rp.err){rows.push([t('rsRollTbl').replace(/^📦\s*/,'')]);
-    rows.push([t('rsRollLenLbl'),R(rp.roll),t('rsRollCount'),rp.nRolls,t('rsRollWaste'),R(rp.loss),t('rsRollEff'),rp.eff+'%']);
+  if(!rp.err){rows.push({s:'sec',c:[t('rsRollTbl').replace(/^📦\s*/,'')]});
+    rows.push({s:'kv',c:[t('rsRollLenLbl'),R(rp.roll),t('rsRollCount'),rp.nRolls,t('rsRollWaste'),R(rp.loss),t('rsRollEff'),rp.eff+'%']});
     if(rp.mode==='salvage'&&rp.extraTotal>0)rows.push([t('rsRollExtra').replace('{n}',rp.extraTotal).replace('{l}',R(rp.salvLen)+' '+u),Object.entries(rp.extra).map(([s,n])=>s+' +'+n).join(' · ')]);
-    rows.push([t('rsRollNo2'),t('rsRollPlies'),t('rsPlies'),t('rsRollUsed')+' ('+u+')',t('rsRollRem')+' ('+u+')']);
+    rows.push({s:'head',c:[t('rsRollNo2'),t('rsRollPlies'),t('rsPlies'),t('rsRollUsed')+' ('+u+')',t('rsRollRem')+' ('+u+')']});
     rp.rolls.forEach((r,i)=>rows.push([t('rsRollNo')+' '+(i+1),Object.entries(r.by).map(([c,n])=>c+' ×'+n).join(' · ')+(r.salv&&Object.keys(r.salv).length?' 🎁 '+Object.entries(r.salv).map(([s,n])=>s+' ×'+n).join(' · '):''),r.plies,R(r.used),R(r.rem)]));}
-  const csv='﻿'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
-  a.download='risho_'+(title?title.replace(/[^\w؀-ۿ]+/g,'_').slice(0,30)+'_':'')+today()+'.csv';
-  a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast(t('saved'));}
+  xlsxDownload('risho_'+(title?title.replace(/[^\w؀-ۿ]+/g,'_').slice(0,30)+'_':'')+today()+'.xlsx',rows,{sheet:t('rsTitle')});toast(t('saved'));}
 /* ---- مقارنة سيناريوهات الريشو: اختيار خطط محفوظة ومقارنتها جنبًا إلى جنب ---- */
 function rsComparePick(){const plans=TOOLCHK.filter(c=>c.type==='rs');
   if(plans.length<2)return toast(t('rsCmpNone'));
