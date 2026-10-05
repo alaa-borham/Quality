@@ -352,6 +352,8 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
         <div style="overflow-x:auto;margin-top:8px"><table id="rs-qty-tbl" class="xtbl" style="min-width:520px">
           <tr><th colspan="7" class="ttl"><div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap"><button type="button" class="btn g" style="padding:6px 14px;font-size:14px;flex:0 0 auto;width:auto" onclick="rsComboSuggest();document.getElementById('rs-combo-rows').scrollIntoView({behavior:'smooth',block:'center'})">🧩 <span data-i18n="rsCbSuggest">اقترح توليفات أوردرك للمعايرة</span></button><span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rsq-cv" onclick="rsCollapse('rsq')" title="تصغير/تكبير">–</button><span data-i18n="rsQtyTbl2">كميات الأوردر</span></span><button type="button" class="btn sec" style="padding:6px 14px;font-size:14px;flex:0 0 auto;width:auto" onclick="rsComboLibGen();document.getElementById('rs-combo-rows').scrollIntoView({behavior:'smooth',block:'center'})" title="يولّد أكبر عدد ممكن من التوليفات الصالحة لهذا الأوردر مرة واحدة — يراعي حد طول الماركر وكمية الأوردر ونِسب المقاسات">🗂️ <span data-i18n="rsCbLibBtn">ولّد كل التوليفات (مكتبة مرجعية)</span></button></div></th></tr>
           <tr class="rsq-hide"><th data-i18n="rsCbNo">م</th><th data-i18n="sizeName">المقاس</th><th class="or" data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="rsRatio">نسبة بحسب الموديل</th><th class="or rsu-h" data-b="استهلاك الكمية">استهلاك الكمية (متر)</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th class="or rsu-h" data-b="استهلاك مع الفرد" title="الكمية × (استهلاك القطعة + مسافة الفرد)">استهلاك مع الفرد (متر)</th></tr>
+          <tr class="rsq-show" style="display:none"><th colspan="4" style="background:transparent;border:none"></th><th class="or rsu-h" data-b="استهلاك الكمية" style="width:200px;min-width:200px;white-space:nowrap">استهلاك الكمية (متر)</th><th style="background:transparent;border:none;width:24px"></th><th class="or rsu-h" data-b="استهلاك مع الفرد" style="width:200px;min-width:200px;white-space:nowrap">استهلاك مع الفرد (متر)</th></tr>
+          <tr class="tot rsq-show" style="display:none"><td colspan="4" style="background:transparent;border:none"></td><td id="rs-qt-c2">—</td><td style="background:transparent;border:none"></td><td id="rs-qt-cf2">—</td></tr>
           <tbody id="rs-qty-rows" class="rsq-hide"></tbody>
           <tr class="tot rsq-hide"><td></td><td data-i18n="total">الإجمالي</td><td id="rs-qt-q">—</td><td id="rs-qt-r">—</td><td id="rs-qt-c">—</td><td>—</td><td id="rs-qt-cf">—</td></tr></table></div>
         <div class="rsq-hide" style="margin-top:6px;font-size:13px;color:var(--mut)"><span data-i18n="rsSpreadLbl">مسافة الفرد لكل قطعة</span>: <input id="rs-spread" type="number" step="0.5" min="0" value="4" oninput="rsCalc();rsSaveDraft()" style="width:56px;padding:4px;text-align:center;font-weight:800"> <span data-i18n="rsCm">سم</span></div>
@@ -1860,6 +1862,7 @@ function rsCollapseAll(){['rsc','rsq','rsm','rsr','rss','rscb','rso'].forEach(k=
 function rsCollapse(key){const on=RS_COL[key]=!RS_COL[key];
   document.querySelectorAll('.'+key+'-hide').forEach(e=>e.style.display=on?'none':'');
   document.querySelectorAll('.'+key+'-cv').forEach(e=>e.textContent=on?'+':'–');
+  document.querySelectorAll('.'+key+'-show').forEach(e=>e.style.display=on?'':'none');// ملخّص يظهر عند التصغير فقط
 }
 function renderRsProducts(){const el=$('rs-product');if(!el)return;const cur=el.value;const ns=prodNames();
   el.innerHTML=ns.length?ns.map(n=>`<option ${n===cur?'selected':''}>${esc(n)}</option>`).join(''):`<option value="">\u2014</option>`;
@@ -2056,6 +2059,7 @@ function rsCalc(){if(!$('rs-qty-rows'))return;const uf=rsUF();const sp=rsSpreadM
   $('rs-qt-r').textContent=rsum?Math.round(rsum*100)/100:'\u2014';
   $('rs-qt-c').textContent=csum?Math.round(csum*uf*100)/100:'\u2014';
   const cf=$('rs-qt-cf');if(cf)cf.textContent=cfsum?Math.round(cfsum*uf*100)/100:'\u2014';
+  if($('rs-qt-c2'))$('rs-qt-c2').textContent=$('rs-qt-c').textContent;if($('rs-qt-cf2')&&cf)$('rs-qt-cf2').textContent=cf.textContent;
   rsApplyRowColors();rsMkCalc();rsSaveDraft();}
 /* ---- \u062c\u062f\u0648\u0644 \u0627\u0644\u0645\u0627\u0631\u0643\u0631\u0627\u062a ---- */
 const RS_COLORS=['#d9e8f7','#d9f0d5','#f7d9ec','#f9e0cb','#d5eef4','#eaf4cf','#e6e0f7','#f7f3cf'];
