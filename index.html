@@ -432,8 +432,7 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
               <option value="salvage" data-i18n="rsRollSalvage">بلا وصل + استغلال البواقي بقياسات صغيرة</option>
               <option value="continuous" data-i18n="rsRollCont">متصل بوصل الرولات — أقل هدر</option></select>
             <div id="rs-rolls" style="margin-top:12px"></div></div></div>
-        <div class="row-btns" style="margin-top:14px"><button id="rs-saveplan-btn" class="btn sec" onclick="saveRsPlan()" data-i18n="saveCheck">💾 حفظ</button>
-        <button class="btn sec rs-exp" data-exp="plan" onclick="printRsPlan()" oncontextmenu="return rsExpMenu(event,'plan')" title="كليك يمين (أو ضغطة مطوّلة): تصدير PDF أو Excel" data-i18n="rsPrint">🖨 طباعة الخطة</button>
+        <div class="row-btns" style="margin-top:14px"><button class="btn sec rs-exp" data-exp="plan" onclick="printRsPlan()" oncontextmenu="return rsExpMenu(event,'plan')" title="كليك يمين (أو ضغطة مطوّلة): تصدير PDF أو Excel" data-i18n="rsPrint">🖨 طباعة الخطة</button>
         <button class="btn sec rs-exp" data-exp="spread" onclick="printRsSpread()" oncontextmenu="return rsExpMenu(event,'spread')" title="كليك يمين (أو ضغطة مطوّلة): تصدير PDF أو Excel" data-i18n="rsSpreadBtn">🧵 أمر الفرد</button>
         <button class="btn sec rs-exp" data-exp="rolls" onclick="printRsRolls()" oncontextmenu="return rsExpMenu(event,'rolls')" title="كليك يمين (أو ضغطة مطوّلة): تصدير PDF أو Excel" data-i18n="rsRollBtn">📦 أمر الرولات</button></div>
       </div>
@@ -921,7 +920,6 @@ function go(tb,btn){applyNavPerms();
   if(tb==='tools')renderToolFactSelects();
   if(tb==='marker'){goMarker('rs');if(!RS_COLLAPSED_INIT){RS_COLLAPSED_INIT=1;rsCollapseAll();}
     const sb=$('rs-savelib-btn');if(sb)sb.style.display=canEdit('marker')?'':'none';
-    const sp=$('rs-saveplan-btn');if(sp)sp.style.display=(canEdit('marker')||canEdit('insp'))?'':'none';
     const fsv=$('rs-fab-save');if(fsv)fsv.style.display=(canEdit('marker')||canEdit('insp'))?'':'none';}
   if(tb==='insp')goInsp('list',document.querySelector('#insp-subnav button'));}
 function goInsp(v,btn){['list','toolchk'].forEach(x=>$('insp-wrap-'+x).classList.toggle('hide',x!==v));
