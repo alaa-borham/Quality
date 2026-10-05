@@ -2284,6 +2284,21 @@ function rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,rawPairs){
   if(maxlen>0&&len>maxlen+1e-9)return false;
   if(rawPairs&&rawPairs.some(p=>(!p.size&&p.cnt>0)||(p.size&&(!(p.cnt>0)||p.cnt%1!==0))))return false;
   return true;}
+// حلّ الكميات المتبقية (دالة نقية بلا DOM — تُختبر في tests/solver.test.mjs):
+// ١) توليفات المكتبة أولاً ثم الحلّال الحر للباقي، ٢) مقارنة بالحلّال الحر وحده واختيار الأقل عدد مراكر
+function rsPlanSolve(rem0,cons,maxlen,maxsizes,maxpcs,libCands,opt){opt=opt||{};
+  const rem={},remOrig={};Object.keys(rem0).forEach(s=>{rem[s]=rem0[s];remOrig[s]=rem0[s];});
+  let added=[],libN=0;
+  if(libCands&&libCands.length){const r1=rsSolve(rem,cons,maxlen,maxsizes,maxpcs,{...opt,cands:libCands});
+    r1.forEach(a=>{a.combo.forEach(p=>rem[p.size]=(rem[p.size]||0)-p.cnt*a.plies);});
+    Object.keys(rem).forEach(s=>{if(rem[s]<0)rem[s]=0;});added=added.concat(r1);libN=r1.length;}
+  // ثانياً: أكمل ما تبقّى بالمُحلّل العادي (تقدير مُعدَّل بالمعامل)
+  if(Object.values(rem).some(v=>v>0))added=added.concat(rsSolve(rem,cons,maxlen,maxsizes,maxpcs,opt));
+  // ثالثاً: البديل الحرّ (بلا تقيّد بتوليفات المكتبة) — إن أعطى عدد مراكر أقل فعلاً فهو أفضل (مراكر أكبر = تداخل أقل = استهلاك أقل).
+  // لا نخسر دقّة الكاد: الأطوال المقيسة تُطبَّق تلقائياً على أي ماركر يطابق المكتبة في rsMkCalc.
+  if(libN){const addedFree=rsSolve(remOrig,cons,maxlen,maxsizes,maxpcs,opt);
+    if(addedFree.length&&addedFree.length<added.length){added=addedFree;libN=0;}}
+  return {added,libN};}
 function rsAutoPlan(){if(!$('rs-markers'))return;
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
@@ -2293,8 +2308,6 @@ function rsAutoPlan(){if(!$('rs-markers'))return;
     if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs))vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);});
   const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]-(produced[s]||0));
   if(!Object.values(rem).some(v=>v>0))return toast(t('rsAutoDone'));
-  const remOrig={};Object.keys(rem).forEach(s=>remOrig[s]=rem[s]);// نسخة للحلّال الحر (المقارنة)
-  let added=[],libN=0;
   // أولاً: اتّبع نمط توليفات مكتبتك — هيكل التوليفات مشترك عبر كل الأعراض (تُدخل مرة واحدة على العرض الأساسي)؛
   // نأخذ تراكيب توليفات كل الأعراض بلا تكرار، والطول المقيس يبقى خاصاً بعرض القماش الحالي (يُطبَّق لاحقاً في الحساب).
   const _seenSig=new Set();
@@ -2303,15 +2316,7 @@ function rsAutoPlan(){if(!$('rs-markers'))return;
     &&c.length<=maxsizes&&c.reduce((a,p)=>a+p.cnt,0)<=maxpcs
     &&c.every(p=>reqMap[p.size]!=null&&cons[p.size]>0)
     &&c.reduce((a,p)=>a+p.cnt*cons[p.size],0)<=maxlen+1e-9);
-  if(libCands.length){const r1=rsSolve(rem,cons,maxlen,maxsizes,maxpcs,{cands:libCands});
-    r1.forEach(a=>{a.combo.forEach(p=>rem[p.size]=(rem[p.size]||0)-p.cnt*a.plies);});
-    Object.keys(rem).forEach(s=>{if(rem[s]<0)rem[s]=0;});added=added.concat(r1);libN=r1.length;}
-  // ثانياً: أكمل ما تبقّى بالمُحلّل العادي (تقدير مُعدَّل بالمعامل)
-  if(Object.values(rem).some(v=>v>0))added=added.concat(rsSolve(rem,cons,maxlen,maxsizes,maxpcs));
-  // ثالثاً: البديل الحرّ (بلا تقيّد بتوليفات المكتبة) — إن أعطى عدد مراكر أقل فعلاً فهو أفضل (مراكر أكبر = تداخل أقل = استهلاك أقل).
-  // لا نخسر دقّة الكاد: الأطوال المقيسة تُطبَّق تلقائياً على أي ماركر يطابق المكتبة في rsMkCalc.
-  if(libN){const addedFree=rsSolve(remOrig,cons,maxlen,maxsizes,maxpcs);
-    if(addedFree.length&&addedFree.length<added.length){added=addedFree;libN=0;}}
+  let {added,libN}=rsPlanSolve(rem,cons,maxlen,maxsizes,maxpcs,libCands);
   if(!added.length)return toast(t('rsNoSug'));
   added.sort((a,b)=>b.len-a.len);// ترتيب تنازلي حسب طول الماركر (استهلاك الماركر/طبقة)
   added.forEach(a=>rsAddMarker({pairs:a.combo,plies:a.plies}));rsMkCalc();

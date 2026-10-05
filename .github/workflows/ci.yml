@@ -16,6 +16,17 @@ jobs:
       - name: audit.js
         run: node audit.js
 
+  solver:
+    name: اختبارات الحلّال التلقائي (الريشو)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: tests/solver.test.mjs
+        run: node tests/solver.test.mjs
+
   rules:
     name: اختبارات قواعد Firestore
     runs-on: ubuntu-latest
