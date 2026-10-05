@@ -71,6 +71,17 @@ match /qc_workspaces/{wsId} {
                 && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['comboLib']);
 }
 
+// نسخ احتياطية سحابية لمكتبة التوليفات والمقاسات والمسودة (نسخة لكل موعد: ٥ مساءً/١ صباحاً أو يدوية)
+// القراءة لأعضاء المساحة · الإنشاء لمحرّر الريشو (≥ 2) بحقول محدّدة فقط · لا تعديل · الحذف (تنظيف القديم) لمستوى ≥ 3
+match /qc_workspaces/{wsId}/backups/{bid} {
+  allow read, write: if qcIsAdmin();
+  allow read:   if qcIsMember() && wsId == qcWs();
+  allow create: if qcIsMember() && wsId == qcWs() && qcLvl('marker') >= 2
+                && request.resource.data.keys().hasOnly(['at', 'slot', 'by', 'byName', 'nC', 'nP', 'data'])
+                && request.resource.data.data is string
+                && request.resource.data.by == request.auth.uid;
+  allow delete: if qcIsMember() && wsId == qcWs() && qcLvl('marker') >= 3;
+}
 // البيانات التشغيلية: القراءة لأعضاء المساحة؛ والكتابة/الحذف حسب مستوى القسم
 // (تعديل ⇐ مستوى ≥ 2 · حذف ⇐ مستوى ≥ 3 · المالك/الأدمن = 3 دائماً)
 match /qc_factories/{id} {

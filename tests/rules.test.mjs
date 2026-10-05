@@ -88,6 +88,19 @@ await chk('marker-editor comboLib+extra field DENIED', assertFails(updateDoc(doc
 await chk('marker-viewer writes comboLib DENIED', assertFails(updateDoc(doc(refView, 'qc_workspaces', WS), { comboLib: { x: 1 } })));
 await chk('owner updates sizeLists OK', assertSucceeds(updateDoc(doc(owner, 'qc_workspaces', WS), { sizeLists: [{ name: 'ok' }] })));
 
+// ── القسم ج٢: النسخ الاحتياطية السحابية (qc_workspaces/{ws}/backups) ──
+const bk = (by, extra) => ({ at: 1, slot: '2026-10-05_17', by, byName: 'x', nC: 1, nP: 1, data: '{}', ...(extra || {}) });
+await chk('marker-editor creates backup', assertSucceeds(setDoc(doc(refEd, 'qc_workspaces', WS, 'backups', 'b1'), bk('refEdU'))));
+await chk('member reads backup', assertSucceeds(getDoc(doc(refView, 'qc_workspaces', WS, 'backups', 'b1'))));
+await chk('other-ws reads backup DENIED', assertFails(getDoc(doc(as('outU'), 'qc_workspaces', WS, 'backups', 'b1'))));
+await chk('marker-viewer creates backup DENIED', assertFails(setDoc(doc(refView, 'qc_workspaces', WS, 'backups', 'b2'), bk('refViewU'))));
+await chk('backup forged author DENIED', assertFails(setDoc(doc(refEd, 'qc_workspaces', WS, 'backups', 'b3'), bk('ownerU'))));
+await chk('backup extra field DENIED', assertFails(setDoc(doc(refEd, 'qc_workspaces', WS, 'backups', 'b4'), bk('refEdU', { evil: 1 }))));
+await chk('backup data non-string DENIED', assertFails(setDoc(doc(refEd, 'qc_workspaces', WS, 'backups', 'b5'), bk('refEdU', { data: { a: 1 } }))));
+await chk('backup overwrite DENIED', assertFails(setDoc(doc(refEd, 'qc_workspaces', WS, 'backups', 'b1'), bk('refEdU', { nC: 9 }))));
+await chk('marker-editor deletes backup DENIED', assertFails(deleteDoc(doc(refEd, 'qc_workspaces', WS, 'backups', 'b1'))));
+await chk('owner deletes backup', assertSucceeds(deleteDoc(doc(owner, 'qc_workspaces', WS, 'backups', 'b1'))));
+
 // ── القسم د: إعدادات المرجع (seqcfg/chkcfg/defects) ──
 await chk('ref-editor writes seqcfg', assertSucceeds(setDoc(doc(refEd, 'qc_seqcfg', WS), { list: [{ op: 'x' }] })));
 await chk('ref-editor writes chkcfg', assertSucceeds(setDoc(doc(refEd, 'qc_chkcfg', WS), { lists: [{ title: 'a', items: [] }] })));
