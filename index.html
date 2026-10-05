@@ -331,7 +331,7 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
       </div>
     </div>
     <div id="p-marker" class="hide">
-      <button type="button" id="rs-fab-save" onclick="saveRsPlan()" title="حفظ الخطة" style="display:none;position:fixed;bottom:18px;left:18px;z-index:9000;background:var(--teal);color:#fff;border:none;border-radius:999px;padding:12px 20px;font-weight:800;font-size:15px;box-shadow:0 6px 20px rgba(0,0,0,.28);cursor:pointer">💾 <span data-i18n="saveCheck">حفظ</span></button>
+      <button type="button" id="rs-fab-save" onclick="saveRsPlan()" title="حفظ الخطة" style="display:none;position:fixed;bottom:18px;left:18px;z-index:9000;background:var(--teal);color:#fff;border:none;border-radius:999px;padding:12px 20px;font-weight:800;font-size:15px;box-shadow:0 6px 20px rgba(0,0,0,.28);cursor:pointer"><span data-i18n="saveCheck">💾 حفظ</span></button>
       <div class="sec-h" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><span>📊 <span data-i18n="rsTitle">الريشو — خطة الماركرات</span></span><span style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span id="rs-autosave" style="font-size:12px;color:var(--mut);font-weight:700;transition:opacity .4s" title="حفظ تلقائي كل دقيقة وعند كل تغيير"></span><button class="btn sec" style="padding:6px 14px;font-size:14px;flex:0 0 auto;width:auto" onclick="rsOpenSaved()" data-i18n="rsSavedPlans">📂 الخطط المحفوظة</button></span></div>
       <div id="tool-rs" class="card">
         <div class="grid4" style="margin-top:4px"><div><label class="inl" data-i18n="mkReportName">اسم التقرير (اختياري)</label><input id="rs-title" data-i18n-ph="mkReportNamePh" placeholder="مثال: أوردر رمضان — العميل أحمد" oninput="rsSaveDraft()"></div>
@@ -435,8 +435,7 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
         <div class="row-btns" style="margin-top:14px"><button id="rs-saveplan-btn" class="btn sec" onclick="saveRsPlan()" data-i18n="saveCheck">💾 حفظ</button>
         <button class="btn sec rs-exp" data-exp="plan" onclick="printRsPlan()" oncontextmenu="return rsExpMenu(event,'plan')" title="كليك يمين (أو ضغطة مطوّلة): تصدير PDF أو Excel" data-i18n="rsPrint">🖨 طباعة الخطة</button>
         <button class="btn sec rs-exp" data-exp="spread" onclick="printRsSpread()" oncontextmenu="return rsExpMenu(event,'spread')" title="كليك يمين (أو ضغطة مطوّلة): تصدير PDF أو Excel" data-i18n="rsSpreadBtn">🧵 أمر الفرد</button>
-        <button class="btn sec rs-exp" data-exp="rolls" onclick="printRsRolls()" oncontextmenu="return rsExpMenu(event,'rolls')" title="كليك يمين (أو ضغطة مطوّلة): تصدير PDF أو Excel" data-i18n="rsRollBtn">📦 أمر الرولات</button>
-        <button class="btn sec" onclick="exportRsExcel()" data-i18n="rsExcelBtn">📊 تصدير Excel</button></div>
+        <button class="btn sec rs-exp" data-exp="rolls" onclick="printRsRolls()" oncontextmenu="return rsExpMenu(event,'rolls')" title="كليك يمين (أو ضغطة مطوّلة): تصدير PDF أو Excel" data-i18n="rsRollBtn">📦 أمر الرولات</button></div>
       </div>
     </div>
     <div id="p-ref" class="hide">
