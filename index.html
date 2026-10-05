@@ -3361,6 +3361,7 @@ function printRsPlan(){const r=rsResult();if(!r)return toast(t('mkNeed'));
     <div style="margin-top:26px;display:flex;gap:16px">${sigBox(t('repInspector')+(MEMBER.name?' \u2014 '+esc(MEMBER.name):''))}${sigBox('QC')}</div></div>`;
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 // أمر الفرد: ورقة تشغيل لعامل الفرشة — ماركر لكل صف مع الطبقات وطول الماركر وخانة توقيع
+const RS_SPREAD_HI=40;// ماركر بطبقات كثيرة يُميَّز في أمر الفرد (أولوية في التشغيل)
 function printRsSpread(){const r=rsResult();if(!r)return toast(t('mkNeed'));
   const mk=(r.markers||[]).filter(m=>m.ok);if(!mk.length)return toast(t('rsNoValidMk'));
   const uf=r.uf||1,u=r.unit||'متر';const R=v=>Math.round(v*uf*100)/100;
@@ -3368,16 +3369,18 @@ function printRsSpread(){const r=rsResult();if(!r)return toast(t('mkNeed'));
   const colors=rsColors();
   const clrBreak=m=>colors.length?`<div style="margin-top:4px;font-size:10.5px;color:#44515e;line-height:1.6">${rsDistribute(m.plies,colors).map(d=>`${esc(d.name)} <b>${d.plies}</b>`).join(' · ')}</div>`:'';
   const totPlies=mk.reduce((s,m)=>s+m.plies,0),totRun=mk.reduce((s,m)=>s+m.run,0),totFab=mk.reduce((s,m)=>s+m.fab,0);
-  const th=(txt,al)=>`<th style="padding:9px 8px;text-align:${al||'center'};font-weight:800;font-size:12.5px;color:#0e3f3e;border-bottom:2px solid #14504f;white-space:nowrap">${txt}</th>`;
-  const rows=mk.map((m,i)=>`<tr style="background:${i%2?'#f6faf9':'#fff'}">
-    <td style="text-align:center;color:#9aa7b4;font-weight:800;font-size:12px;padding:9px 6px">${i+1}</td>
-    <td style="text-align:center;padding:9px 6px"><span style="display:inline-block;background:#14504f;color:#fff;font-weight:800;font-size:14px;padding:4px 11px;border-radius:8px;letter-spacing:.5px">${esc(m.code)}</span></td>
-    <td style="padding:9px 8px;line-height:2">${m.pairs.map(p=>`<span style="display:inline-block;background:#fff;border:1.5px solid #cfe0df;border-radius:999px;padding:3px 11px;margin:2px 3px;font-weight:800;font-size:13px;white-space:nowrap">${esc(p.size)} <span style="color:#1f6e6e">×${p.cnt}</span></span>`).join('')}</td>
-    <td style="text-align:center;padding:9px 6px"><span style="display:inline-block;min-width:32px;background:#eef5f4;border:1px solid #bcd4d2;border-radius:8px;padding:4px 9px;font-weight:800;font-size:17px;color:#14504f">${m.plies}</span>${clrBreak(m)}</td>
-    <td style="text-align:center;padding:9px 6px;font-weight:700;font-size:13px;white-space:nowrap">${R(m.len)} <span style="color:#93a0ab;font-size:11px">${u}</span></td>
-    <td style="text-align:center;padding:9px 6px;font-weight:800;font-size:15px">${m.run}</td>
-    <td style="text-align:center;padding:9px 6px;color:#c3ccd4;font-size:19px">☐</td>
-    <td style="padding:9px 6px;border-bottom:1px solid #e2e7ec"></td></tr>`).join('');
+  // نمط جدول الإكسيل: حدود داكنة، ترقيم أحمر، تمييز الماركرات كثيرة الطبقات (≥ RS_SPREAD_HI) بلون خوخي
+  const spM=(r.spread||0)/100,uL=k=>t(k).replace('متر',u).replace('(m)','('+u+')');
+  const totFabf=mk.reduce((s,m)=>s+m.fab+spM*m.plies,0);
+  const bd='border:1px solid #6b6b6b';
+  const th=(txt,w)=>`<th style="${bd};padding:7px 6px;text-align:center;vertical-align:middle;font-weight:800;font-size:12.5px;color:#111;background:#fff;line-height:1.35${w?';width:'+w:''}">${txt}</th>`;
+  const td=(v,x)=>`<td style="${bd};padding:6px 6px;text-align:center;vertical-align:middle;font-weight:800;font-size:13.5px;${x||''}">${v}</td>`;
+  const rows=mk.map((m,i)=>{const hi=m.plies>=RS_SPREAD_HI;
+    return `<tr style="background:${hi?'#fbe1d6':'#fff'}">
+    ${td(i+1,'color:#d40000;font-size:19px')}${td(esc(m.code),'font-size:14px')}
+    ${td(`<span dir="ltr">${m.pairs.map(p=>esc(p.size)+' ×'+p.cnt).join(' · ')}</span>`,'white-space:nowrap')}
+    ${td(m.pcs)}${td(m.plies+clrBreak(m),'font-size:15px')}${td(m.run)}${td(R(m.len))}${td(R(m.fab))}${td(R(m.fab+spM*m.plies))}
+    ${td('☐','color:#777;font-size:18px;font-weight:400')}</tr>`;}).join('');
   const card=(label,val,sub)=>`<div style="flex:1;min-width:96px;border:1px solid #dbe5e4;border-radius:11px;padding:9px 8px;text-align:center;background:#f7faf9">
     <div style="font-size:10.5px;color:#6b7683;font-weight:700">${label}</div>
     <div style="font-size:19px;color:#14504f;font-weight:800;line-height:1.2;margin-top:2px">${val}${sub?`<span style="font-size:11px;color:#93a0ab;font-weight:700"> ${sub}</span>`:''}</div></div>`;
@@ -3390,13 +3393,10 @@ function printRsSpread(){const r=rsResult();if(!r)return toast(t('mkNeed'));
         <div>📅 ${fmtDate(today())}</div>${r.product?`<div>📦 ${esc(r.product)}</div>`:''}${title?`<div>📝 ${esc(title)}</div>`:''}</div></div>
     <div style="display:flex;gap:8px;margin-top:12px">
       ${card(t('rsSpreadJobs'),mk.length)}${card(t('rsPlies'),totPlies)}${card(t('rsPcsRun'),totRun)}${card(t('mkTotalFabric'),R(totFab),u)}</div>
-    <table class="prt-grid" style="width:100%;border-collapse:collapse;margin-top:14px;border:1px solid #d5dee2;border-radius:10px;overflow:hidden">
-      <thead><tr style="background:#e6efee">${th('#')}${th(t('rsCode'))}${th(t('rsMkTbl'),LANG==='ar'?'right':'left')}${th(t('rsPlies'))}${th(t('rsMkLenH'))}${th(t('rsPcsRun'))}${th(t('rsSpreadDone'))}${th(t('rsFarradSig'))}</tr></thead>
+    <table style="width:100%;border-collapse:collapse;margin-top:14px;border:1.5px solid #333;-webkit-print-color-adjust:exact;print-color-adjust:exact">
+      <thead><tr>${th('#','34px')}${th(t('rsCode'),'52px')}${th(t('rsDesc'))}${th(t('rsPcsLbl'),'66px')}${th(t('rsPlies'),'60px')}${th(t('rsPcsRun'),'70px')}${th(uL('rsMkPerPly'),'72px')}${th(uL('rsSumFab'),'80px')}${th(t('rsQtyConsF'),'78px')}${th(t('rsSpreadDone'),'46px')}</tr></thead>
       <tbody>${rows}
-      <tr style="background:#14504f;color:#fff;font-weight:800"><td colspan="3" style="padding:10px 10px;text-align:${LANG==='ar'?'right':'left'};font-size:13px">${t('total')}</td>
-      <td style="text-align:center;padding:10px 6px;font-size:15px">${totPlies}</td>
-      <td style="text-align:center;padding:10px 6px;font-size:12px">${R(totFab)} ${u}</td>
-      <td style="text-align:center;padding:10px 6px;font-size:15px">${totRun}</td><td></td><td></td></tr></tbody></table>
+      <tr style="background:#fff">${td('')}${td(t('total'))}${td('')}${td('')}${td(totPlies)}${td(totRun)}${td('')}${td(R(totFab))}${td(R(totFabf))}${td('')}</tr></tbody></table>
     <div style="margin-top:10px;font-size:11.5px;color:#8a6d00;background:#fff8e6;border:1px solid #f0dca0;border-radius:8px;padding:7px 11px">💡 ${t('rsSpreadHint')}</div>
     <div style="margin-top:30px;display:flex;gap:16px">${sigBox(t('rsFarradSig'))}${sigBox(t('rsCutSupSig'))}${sigBox(t('repInspector')+(MEMBER.name?' — '+esc(MEMBER.name):''))}</div></div>`;
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
