@@ -3510,12 +3510,13 @@ function printRsSpread(){const d=rsSpreadForm();if(d.err)return toast(t(d.err));
   const td=(v,x)=>`<td style="${bd};padding:4px 5px;text-align:center;vertical-align:middle;font-size:12.5px;${x||''}">${v}</td>`;
   const clrBreak=pl=>colors.length?`<div style="font-size:9.5px;color:#44515e;font-weight:600;line-height:1.5">${rsDistribute(pl,colors).map(c=>`${esc(c.name)} <b>${c.plies}</b>`).join(' · ')}</div>`:'';
   const rows=d.rows.map((x,k)=>{const bg=x.color?`background:${x.color};`:'',pct=Math.round(x.run/maxRun*100),top=d.top.has(k);
-    return `<tr>${td(k+1,bg+`color:#${C.red};font-weight:800;font-size:14px`)}${td(esc(x.code),bg+`color:#${C.navy};font-weight:800`)}
-      ${td(`<span dir="ltr">${esc(x.desc)}</span>`,bg+`color:#${C.ink};white-space:nowrap`)}${td(x.pcs,bg+`color:#${C.ink}`)}
-      ${td(x.plies+clrBreak(x.plies),bg+`color:#${C.ink};font-weight:700`)}
-      ${td(I(x.run),`background-color:${x.color||'#fff'};background-image:linear-gradient(to ${LANG==='ar'?'left':'right'},#${C.bar} ${pct}%,transparent ${pct}%);font-weight:700`)}
-      ${td(x.len.toFixed(2),bg+`color:#${C.ink}`)}${td(x.meas.toFixed(2),`background:#${C.grn}`)}
-      ${td(N(x.fabf),top?`background:#${C.pinkF};color:#${C.pinkT};font-weight:800`:bg+'font-weight:800')}</tr>`;}).join('')
+    // لون الصف من النظام يظهر شريطاً في خانتي الرقم والكود فقط — كي لا يختلط بألوان الأعمدة الثابتة (قياس الفرد/أعلى ٣/الأشرطة)
+    return `<tr>${td(k+1,bg+`color:#${C.num};font-weight:800;font-size:14px`)}${td(esc(x.code),bg+`color:#${C.navy};font-weight:800`)}
+      ${td(`<span dir="ltr">${esc(x.desc)}</span>`,`color:#${C.ink};white-space:nowrap`)}${td(x.pcs,`color:#${C.ink}`)}
+      ${td(x.plies+clrBreak(x.plies),`color:#${C.ink};font-weight:700`)}
+      ${td(I(x.run),`background-color:#fff;background-image:linear-gradient(to ${LANG==='ar'?'left':'right'},#${C.bar} ${pct}%,transparent ${pct}%);font-weight:700`)}
+      ${td(x.len.toFixed(2),`color:#${C.ink}`)}${td(x.meas.toFixed(2),`background:#${C.grn}`)}
+      ${td(N(x.fabf),top?`background:#${C.pinkF};color:#${C.pinkT};font-weight:800`:'font-weight:800')}</tr>`;}).join('')
     +Array.from({length:d.blanks},()=>`<tr>${td('&nbsp;')}${td('')}${td('')}${td('')}${td('')}${td('')}${td('')}${td('',`background:#${C.grn}`)}${td('')}</tr>`).join('');
   const box=(cells,bg,fg,fs)=>`<tr>${cells.map(c=>`<td colspan="${c[1]||1}" style="${bd};background:#${bg};color:#${fg};font-weight:800;font-size:${fs}px;padding:6px 5px;text-align:center">${c[0]}</td>`).join('')}</tr>`;
   const sigBox=lbl=>`<div style="flex:1;text-align:center"><div style="border-bottom:1.5px solid #7c8894;margin:0 14px 6px;height:34px"></div><div style="font-size:11.5px;color:#44515e;font-weight:700">${lbl}</div></div>`;
@@ -3709,7 +3710,7 @@ function rsSpreadForm(){const r=rsResult();if(!r)return {err:'mkNeed'};
   const w=rsFabW();
   return {u,uf,spD,title:$('rs-title')?$('rs-title').value.trim():'',model:r.product||'',fabric:w?tf('rsFormWidth',{w}):'',date:fmtDate(today()),
     rows,plies,run,fabf,avg:run>0?Math.round(fabf/run*1000)/1000:0,top,blanks:Math.max(3,RS_FORM_MINROWS-rows.length)};}
-const RS_FORM_C={navy:'1F3864',blue:'2E75B6',sub:'DDEBF7',kpi:'D9E2F3',yel:'FFF2CC',grn:'E2EFDA',red:'C00000',ink:'1F4E79',pinkF:'FFC7CE',pinkT:'9C0006',bar:'9DC3E6'};
+const RS_FORM_C={num:'595959',navy:'1F3864',blue:'2E75B6',sub:'DDEBF7',kpi:'D9E2F3',yel:'FFF2CC',grn:'E2EFDA',ink:'1F4E79',pinkF:'FFC7CE',pinkT:'9C0006',bar:'9DC3E6'};
 // Excel لأمر الفرد بتصميم «نموذج الفرد والقص والإنتاج» — بمعادلات حيّة (تُعدَّل الأرقام في Excel فتتحدّث المجاميع)
 function exportRsSpreadExcel(){const d=rsSpreadForm();if(d.err)return toast(t(d.err));
   const C=RS_FORM_C,u=d.u,W='FFFFFF';
@@ -3733,15 +3734,15 @@ function exportRsSpreadExcel(){const d=rsSpreadForm();if(d.err)return toast(t(d.
   for(let k=0;k<n+d.blanks;k++){const x=d.rows[k],rr=first+k,f=x&&x.color?x.color.replace('#','').toUpperCase():'';
     const inp={color:C.ink,bd:1},calc={bd:1};
     rows[rr-1]={h:19,c:[
-      {v:x?k+1:'',s:cell({b:1,color:C.red,bd:1},f)},
+      {v:x?k+1:'',s:cell({b:1,color:C.num,bd:1},f)},
       {v:x?x.code:'',s:cell({b:1,color:C.navy,bd:1},f)},
-      {v:x?x.desc:'',s:cell(inp,f)},
-      {v:x?x.pcs:'',s:cell({...inp,nf:'0'},f)},
-      {v:x?x.plies:'',s:cell({...inp,nf:'0'},f)},
-      {f:`IF(OR(D${rr}="",E${rr}=""),"",D${rr}*E${rr})`,v:x?x.run:'',s:cell({...calc,nf:'#,##0'},f)},
-      {v:x?x.len:'',s:cell({...inp,nf:'0.00'},f)},
+      {v:x?x.desc:'',s:inp},
+      {v:x?x.pcs:'',s:{...inp,nf:'0'}},
+      {v:x?x.plies:'',s:{...inp,nf:'0'}},
+      {f:`IF(OR(D${rr}="",E${rr}=""),"",D${rr}*E${rr})`,v:x?x.run:'',s:{...calc,nf:'#,##0'}},
+      {v:x?x.len:'',s:{...inp,nf:'0.00'}},
       {f:`IF(G${rr}="","",G${rr}+$H$5)`,v:x?x.meas:'',s:{...calc,fill:C.grn,nf:'0.00'}},
-      {f:`IF(OR(H${rr}="",E${rr}=""),"",H${rr}*E${rr})`,v:x?x.fabf:'',s:cell({b:1,bd:1,nf:'#,##0.00'},f)}]};}
+      {f:`IF(OR(H${rr}="",E${rr}=""),"",H${rr}*E${rr})`,v:x?x.fabf:'',s:{b:1,bd:1,nf:'#,##0.00'}}]};}// لون الصف من النظام: خانتا الرقم والكود فقط
   merges.push(`A${T}:D${T}`);
   rows[T-1]={h:24,c:[{v:t('total'),s:S.tot},null,null,null,{f:`SUM(E${first}:E${last})`,v:d.plies,s:S.totn},{f:`SUM(F${first}:F${last})`,v:d.run,s:S.totn},{v:'',s:S.tot},{v:'',s:S.tot},{f:`SUM(I${first}:I${last})`,v:d.fabf,s:S.totd}]};
   const cf=[`<conditionalFormatting sqref="F${first}:F${last}"><cfRule type="dataBar" priority="1"><dataBar><cfvo type="min"/><cfvo type="max"/><color rgb="FF5B9BD5"/></dataBar></cfRule></conditionalFormatting>`,
