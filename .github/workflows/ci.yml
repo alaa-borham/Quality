@@ -27,6 +27,21 @@ jobs:
       - name: tests/solver.test.mjs
         run: node tests/solver.test.mjs
 
+  ui:
+    name: اختبار الواجهة في متصفح حقيقي
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: تثبيت الاعتمادات
+        run: npm install
+      - name: تثبيت Chromium
+        run: npx playwright install --with-deps chromium
+      - name: tests/ui.test.mjs
+        run: npm run test:ui
+
   rules:
     name: اختبارات قواعد Firestore
     runs-on: ubuntu-latest
