@@ -163,6 +163,13 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 .rsq-bar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
 .rsq-bar>.rsq-sum{justify-self:end}
 @media (max-width:1100px){.rsq-bar{display:flex;flex-wrap:wrap;justify-content:center}.rsq-bar>span:first-child:empty{display:none}}
+/* الجوال: أشرطة الأزرار داخل الجداول العريضة تبقى بعرض الشاشة الظاهر (لا تُسحب مع تمرير الجدول أفقياً) */
+@media (max-width:700px){
+  .xtbl th.ttl{padding:6px 0}
+  .xtbl th.ttl>div{position:sticky;inset-inline-start:0;width:calc(100vw - 72px);max-width:calc(100vw - 72px);flex-wrap:wrap;justify-content:center;gap:8px}
+  .xtbl th.ttl>div button{white-space:normal}
+  #rs-fab-save{padding:9px 14px!important;font-size:13px!important;bottom:12px!important;left:12px!important}
+}
 /* الريشو — تصميم مطابق للإكسيل */
 .xtbl{width:100%;border-collapse:collapse;font-size:13px}
 .xtbl th,.xtbl td{border:1px solid var(--grid);padding:6px;text-align:center;vertical-align:middle}
