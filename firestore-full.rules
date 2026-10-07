@@ -108,6 +108,16 @@ service cloud.firestore {
       allow update: if qcIsMember() && wsId == qcWs() && qcLvl('marker') >= 2
                     && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['comboLib']);
     }
+    // مكتبة التوليفات: مستند لكل منتج (حدّ 1 ميجابايت لكل منتج). القراءة لأعضاء المساحة، والكتابة لمحرّر الريشو (≥ 2) بحقول محدّدة
+    match /qc_workspaces/{wsId}/combolib/{pid} {
+      allow read, write: if qcIsAdmin();
+      allow read:   if qcIsMember() && wsId == qcWs();
+      allow create, update: if qcIsMember() && wsId == qcWs() && qcLvl('marker') >= 2
+                    && request.resource.data.keys().hasOnly(['prod', 'recs', 'by', 'updatedAt'])
+                    && request.resource.data.prod is string && request.resource.data.recs is list
+                    && request.resource.data.by == request.auth.uid;
+      allow delete: if qcIsMember() && wsId == qcWs() && qcLvl('marker') >= 3;
+    }
     // نسخ احتياطية سحابية لمكتبة التوليفات والمقاسات والمسودة (نسخة لكل موعد: ٥ مساءً/١ صباحاً أو يدوية)
     // القراءة لأعضاء المساحة · الإنشاء لمحرّر الريشو (≥ 2) بحقول محدّدة فقط · لا تعديل · الحذف (تنظيف القديم) لمستوى ≥ 3
     match /qc_workspaces/{wsId}/backups/{bid} {

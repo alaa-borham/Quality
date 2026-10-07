@@ -151,6 +151,27 @@ const bak = await page.evaluate(async () => {
 chk('cloud backup created once per slot', bak.first === 1 && bak.second === 1, bak);
 chk('cloud backups pruned to 30', bak.pruned === 30, bak);
 
+// ٤ب) مكتبة التوليفات لكل منتج: ترحيل من الحقل القديم، حفظ المنتج المتغيّر فقط، والمسح لا يعيد بيانات قديمة
+const lib = await page.evaluate(async () => {
+  const W = ms => new Promise(r => setTimeout(r, ms)), docs = () => [...__store.keys()].filter(k => k.includes('/combolib/'));
+  const r = (s, L) => ({ sig: s, w: '148', actLenM: L, sizes: [] });
+  LIB_MIGRATED.clear(); LIB_DENIED = false; LIB_SPLIT = {}; LIB_SPLIT_N = 0; LIB_SPLIT_READY = true; LIB_WS_READY = true;
+  LIB_LEGACY = { P: [r('A×1', 2)], Q: [r('B×1', 3)] }; libAssemble(); await W(100);
+  const migrated = docs().length;
+  // تحاكي لقطة الخادم بعد الترحيل
+  LIB_SPLIT = {}; docs().forEach(k => { const d = __store.get(k); LIB_SPLIT[d.prod] = d.recs; }); LIB_SPLIT_N = docs().length; libAssemble();
+  const before = JSON.stringify(__store.get(docs().find(k => __store.get(k).prod === 'Q')));
+  const nl = JSON.parse(JSON.stringify(COMBOLIB)); nl.P.push(r('C×1', 4)); await libSave(nl);
+  const pDoc = __store.get(docs().find(k => __store.get(k).prod === 'P')), qSame = JSON.stringify(__store.get(docs().find(k => __store.get(k).prod === 'Q'))) === before;
+  LIB_SPLIT = {}; docs().forEach(k => { const d = __store.get(k); LIB_SPLIT[d.prod] = d.recs; }); libAssemble();
+  const nl2 = JSON.parse(JSON.stringify(COMBOLIB)); nl2.P = []; await libSave(nl2);
+  LIB_SPLIT = {}; docs().forEach(k => { const d = __store.get(k); LIB_SPLIT[d.prod] = d.recs; }); libAssemble();
+  return { migrated, pAfterSave: pDoc.recs.length, qUntouched: qSame, pAfterClear: (COMBOLIB.P || []).length, docsAfterClear: docs().length };
+});
+chk('library migrates per product', lib.migrated === 2, lib);
+chk('library save writes only the changed product', lib.pAfterSave === 2 && lib.qUntouched, lib);
+chk('cleared product stays empty (no legacy resurrection)', lib.pAfterClear === 0 && lib.docsAfterClear === 2, lib);
+
 // ٥) مقياس حجم المستند = مثال Firestore الرسمي (147 بايت)
 const size = await page.evaluate(() => fsBytes('users') + fsBytes('jeff') + fsBytes('tasks') + fsBytes('my_task_id') + 16
   + fsBytes({ type: 'Personal', done: false, priority: 1, description: 'Learn Cloud Firestore' }) + 32);
