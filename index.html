@@ -3464,14 +3464,22 @@ function rsResetPlan(saved){if(!$('rs-qty-rows'))return;
   window.scrollTo({top:0,behavior:'smooth'});if($('rs-title'))setTimeout(()=>$('rs-title').focus(),300);
   toast(t(saved?'rsNewPlanReady':'rsNewPlanEmpty'));}
 // قائمة الخطط المحفوظة (سجل الريشو) — اختر خطة لفتحها في الحاسبة مباشرةً
+// ألوان مجموعات الخطط (RGB) — واضحة على الفاتح والداكن عبر شفافية الخلفية
+const RS_PLAN_TINTS=['31,110,110','46,117,182','180,83,9','124,58,237','190,24,93','22,128,61','161,98,7','71,85,105'];
 function rsOpenSaved(){const plans=TOOLCHK.filter(c=>c.type==='rs');
   if(!plans.length)return toast(t('rsNoSavedPlans'));rsBackfillVers();const vm=rsPlanVers();
-  const rows=plans.map(c=>{const r=c.result||{};const vb=`<span style="display:inline-block;margin-inline-start:8px;background:var(--teal);color:#fff;font-size:12px;font-weight:800;border-radius:999px;padding:1px 9px;vertical-align:middle">${esc(tf('rsPlanVer',{v:vm[c.id]||1}))}</span>`;return `<div style="display:flex;align-items:stretch;gap:8px;margin-bottom:8px">
-    <button type="button" style="flex:1;min-width:0;text-align:start;cursor:pointer;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--card)" onclick="closeModal();rsOpenInCalc('${c.id}')">
+  // تجميع نسخ كل خطة متتالية بلون مميّز لها: المجموعات بالأحدث نشاطاً أولاً، والنسخ داخلها من الأحدث رقماً (٣، ٢، ١)؛
+  // لون المجموعة ثابت حسب أقدم حفظ لها (لا يتغيّر لونها عند إضافة خطط جديدة)
+  const groups={};plans.forEach(c=>(groups[rsPlanKey(c)]=groups[rsPlanKey(c)]||[]).push(c));
+  const G=Object.values(groups).map(arr=>({arr:arr.sort((a,b)=>(vm[b.id]||0)-(vm[a.id]||0)),first:Math.min(...arr.map(rsPlanMs)),last:Math.max(...arr.map(rsPlanMs))}));
+  G.slice().sort((a,b)=>a.first-b.first).forEach((g,i)=>g.col=RS_PLAN_TINTS[i%RS_PLAN_TINTS.length]);
+  const ordered=[];G.sort((a,b)=>b.last-a.last).forEach(g=>g.arr.forEach(c=>{c._tint=g.col;ordered.push(c);}));
+  const rows=ordered.map(c=>{const r=c.result||{},tc=c._tint;const vb=`<span style="display:inline-block;margin-inline-start:8px;background:rgb(${tc});color:#fff;font-size:12px;font-weight:800;border-radius:999px;padding:1px 9px;vertical-align:middle">${esc(tf('rsPlanVer',{v:vm[c.id]||1}))}</span>`;return `<div style="display:flex;align-items:stretch;gap:8px;margin-bottom:8px">
+    <button type="button" style="flex:1;min-width:0;text-align:start;cursor:pointer;border:1px solid rgba(${tc},.45);border-inline-start:6px solid rgb(${tc});border-radius:10px;padding:10px;background:linear-gradient(rgba(${tc},.13),rgba(${tc},.13)),var(--card);color:inherit" onclick="closeModal();rsOpenInCalc('${c.id}')">
       <div style="font-weight:800">${c.title?esc(c.title):esc(toolTypeLabel('rs'))}${vb}</div>
       <div style="font-size:12.5px;color:var(--mut);margin-top:2px">${r.product?'📦 '+esc(r.product)+' · ':''}${fmtDate(c.date)} · ${r.decision==='PASS'?t('rsReady'):t('rsReview')} · ${t('rsTotalProd')} ${r.totalMade||0}/${r.totalReq||0} · ${t('mkTotalFabric')} ${r.totFab||0} ${r.unit||'م'}</div></button>
     <button type="button" class="btn red" style="width:auto;flex:0 0 auto;padding:0 15px;border-radius:10px;font-size:16px" title="${esc(t('del'))}" onclick="rsDelSaved('${c.id}')">🗑</button></div>`;}).join('');
-  modal(`<h3>📂 ${t('rsSavedPlans')}</h3><div class="note" style="margin-bottom:10px">${t('rsSavedPlansHint')}</div>${rows}
+  modal(`<h3>${t('rsSavedPlans')}</h3><div class="note" style="margin-bottom:10px">${t('rsSavedPlansHint')}</div>${rows}
     <div class="row-btns" style="margin-top:12px"><button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);}
 // حذف خطة محفوظة من القائمة (إزالة تفاؤلية فورية + حذف من القاعدة، واللقطة تُصالح النتيجة)
 function rsDelSaved(id){if(!confirm(t('rsDelPlanQ')))return;
