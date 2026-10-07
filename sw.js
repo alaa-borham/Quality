@@ -1,5 +1,5 @@
 // Service worker — network-first for app HTML so updates always appear
-const CACHE = 'qc-root-v4';
+const CACHE = 'qc-root-v5';
 const SHELL = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -10,6 +10,14 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   const url = req.url;
+  // مكتبة Firebase (عنوان بإصدار ثابت) تُخزَّن كي يفتح التطبيق دون اتصال؛ اتصالات قاعدة البيانات نفسها لا تُخزَّن أبداً
+  if (url.includes('gstatic.com/firebasejs/')) {
+    e.respondWith(caches.match(req).then(r => r || fetch(req).then(resp => {
+      if (resp.ok) { const cp = resp.clone(); caches.open(CACHE).then(c => c.put(req, cp)); }
+      return resp;
+    })));
+    return;
+  }
   if (url.includes('googleapis.com') || url.includes('gstatic.com') || url.includes('firebaseio') || url.includes('firebase')) return;
   const isHTML = req.mode === 'navigate' || url.endsWith('index.html');
   if (isHTML) {
