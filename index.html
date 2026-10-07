@@ -3,18 +3,40 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#14504f">
+<meta name="theme-color" content="#0a4a4a">
 <title>نظام متابعة الجودة</title>
 <link rel="manifest" href="manifest.json">
 <script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('qcTheme')||'light')}catch(e){}</script>
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" type="image/png" href="icon-192.png">
 <style>
-:root{--teal:#1f6e6e;--dteal:#14504f;--blue:#2e75b6;--dblue:#1f4e78;--green:#2e9e5b;--red:#d9534f;
---amber:#e0a800;--bg:#f4f6f8;--card:#fff;--line:#e2e7ec;--txt:#1f2a37;--mut:#6b7683;--inp:#fff;}
-:root[data-theme="grey"]{--bg:#dfe3e8;--card:#eef1f4;--line:#c3cad2;--txt:#242a31;--mut:#57606a;--inp:#f7f9fb;}
-:root[data-theme="dark"]{--teal:#2b8e8e;--dteal:#1f6e6e;--green:#43b56b;--red:#e8706c;--amber:#e6b53a;
---bg:#0f1720;--card:#1b2530;--line:#31404e;--txt:#e6edf3;--mut:#9aa7b4;--inp:#243040;}
+:root{--teal:#0b6e6e;--dteal:#0a4a4a;--blue:#1d6fd1;--dblue:#14457f;--green:#15803d;--red:#dc2626;--amber:#d97706;
+--bg:#eef2f6;--card:#ffffff;--line:#c9d3dd;--txt:#0b1220;--mut:#475467;--inp:#ffffff;--lbl:#1f2937;
+--ok:#15803d;--ok-bg:#dcfce7;--ok-bd:#86efac;--bad:#c81e1e;--bad-bg:#fee2e2;--bad-bd:#fca5a5;
+--warn:#92400e;--warn-bg:#fef3c7;--warn-bd:#f2c94c;--info:#1d4ed8;--info-bg:#dbeafe;
+--soft:#e3e9ef;--soft-txt:#0b1220;--chip-bg:#e3e9ef;--chip-txt:#334155;
+--hdr:#ffc000;--hdr-txt:#111111;--hdr2:#f59e0b;--hdr2-txt:#111111;--tot:#0b5f5f;--tot-txt:#ffffff;--grid:#86a6a6;
+--toast:#0b1220;--toast-txt:#ffffff;--topbar:#0a4a4a;--shadow:rgba(15,23,42,.08);}
+/* الرمادي: أسطح رمادية متوسطة بتباين عالٍ للنص (نفس ألوان الحالة والعلامة) */
+:root[data-theme="grey"]{--bg:#c7ced6;--card:#e1e6eb;--line:#9faab6;--txt:#0b1220;--mut:#374151;--inp:#f3f5f8;--lbl:#111827;
+--ok-bg:#c9ecd6;--bad-bg:#f5d0d0;--warn-bg:#f1e3b4;--info-bg:#cbd9f0;
+--soft:#cfd6de;--soft-txt:#0b1220;--chip-bg:#cfd6de;--chip-txt:#1f2937;--grid:#7f9696;--topbar:#2d3a46;--shadow:rgba(15,23,42,.12);}
+/* الداكن: خلفية شبه سوداء ونصوص وألوان حالة ساطعة */
+:root[data-theme="dark"]{--teal:#0fa39d;--dteal:#0b3b3b;--blue:#4c9aff;--dblue:#9cc3ff;--green:#22c55e;--red:#f87171;--amber:#fbbf24;
+--bg:#090e13;--card:#121a22;--line:#2a3846;--txt:#f1f5f9;--mut:#a5b3c1;--inp:#1a2530;--lbl:#d5dee7;
+--ok:#4ade80;--ok-bg:#0e2e1b;--ok-bd:#1f7a43;--bad:#f87171;--bad-bg:#3b1313;--bad-bd:#8a2a2a;
+--warn:#fbbf24;--warn-bg:#332507;--warn-bd:#8a6410;--info:#60a5fa;--info-bg:#10284a;
+--soft:#213041;--soft-txt:#f1f5f9;--chip-bg:#213041;--chip-txt:#cbd5e1;
+--hdr:#e5ac00;--hdr-txt:#0a0a0a;--hdr2:#e08a00;--hdr2-txt:#0a0a0a;--tot:#0d7a74;--tot-txt:#ffffff;--grid:#3d5555;
+--toast:#f1f5f9;--toast-txt:#0b1220;--topbar:#0b2a2a;--shadow:rgba(0,0,0,.4);color-scheme:dark}
+/* الطباعة دائماً بألوان الوضع الفاتح مهما كان الوضع الحالي */
+@media print{:root,:root[data-theme="grey"],:root[data-theme="dark"]{--teal:#0b6e6e;--dteal:#0a4a4a;--blue:#1d6fd1;--dblue:#14457f;--green:#15803d;--red:#dc2626;--amber:#d97706;
+--bg:#eef2f6;--card:#ffffff;--line:#c9d3dd;--txt:#0b1220;--mut:#475467;--inp:#ffffff;--lbl:#1f2937;
+--ok:#15803d;--ok-bg:#dcfce7;--ok-bd:#86efac;--bad:#c81e1e;--bad-bg:#fee2e2;--bad-bd:#fca5a5;
+--warn:#92400e;--warn-bg:#fef3c7;--warn-bd:#f2c94c;--info:#1d4ed8;--info-bg:#dbeafe;
+--soft:#e3e9ef;--soft-txt:#0b1220;--chip-bg:#e3e9ef;--chip-txt:#334155;
+--hdr:#ffc000;--hdr-txt:#111111;--hdr2:#f59e0b;--hdr2-txt:#111111;--tot:#0b5f5f;--tot-txt:#ffffff;--grid:#86a6a6;
+--toast:#0b1220;--toast-txt:#ffffff;--topbar:#0a4a4a;--shadow:rgba(15,23,42,.08);}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
 body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--txt);font-size:15px}
@@ -25,28 +47,28 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--teal);border-col
 .hide{display:none!important}
 .screen{min-height:100vh}
 .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
-background:linear-gradient(135deg,#14504f,#1f6e6e)}
+background:linear-gradient(135deg,var(--dteal),var(--teal))}
 .auth-card{position:relative;background:var(--card);border-radius:18px;padding:28px 24px;width:100%;max-width:400px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
-.langbtn{position:absolute;top:12px;inset-inline-start:12px;background:#eef2f5;color:var(--teal);
+.langbtn{position:absolute;top:12px;inset-inline-start:12px;background:var(--soft);color:var(--teal);
 border-radius:20px;padding:5px 12px;font-size:13px;font-weight:700}
 .brand{text-align:center;margin-bottom:18px}
 .brand .logo{width:60px;height:60px;border-radius:16px;background:var(--dteal);color:#fff;display:inline-flex;
 align-items:center;justify-content:center;font-size:30px}
 .brand h1{font-size:19px;margin:12px 0 2px}
 .brand p{margin:0;color:var(--mut);font-size:13px}
-.tabs{display:flex;background:#eef2f5;border-radius:12px;padding:4px;margin-bottom:16px}
+.tabs{display:flex;background:var(--soft);border-radius:12px;padding:4px;margin-bottom:16px}
 .tabs button{flex:1;padding:9px;background:none;color:var(--mut);font-weight:600;border-radius:9px}
 .tabs button.on{background:var(--card);color:var(--teal);box-shadow:0 1px 4px rgba(0,0,0,.1)}
 .field{margin-bottom:12px}
-.field label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#3a4551}
+.field label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:var(--lbl)}
 .btn{width:100%;padding:12px;background:var(--teal);color:#fff;font-weight:700;font-size:16px;border-radius:11px}
 .btn:active{transform:scale(.99)}
-.btn.sec{background:#eef2f5;color:var(--txt)}
+.btn.sec{background:var(--soft);color:var(--soft-txt);border:1px solid var(--line)}
 .btn.red{background:var(--red)}
 .msg{font-size:13px;padding:9px 11px;border-radius:9px;margin-bottom:10px;text-align:center}
-.msg.err{background:#fdecea;color:#b02a26}
-.msg.ok{background:#e7f6ec;color:#1e7e40}
-.topbar{position:sticky;top:0;z-index:20;background:var(--dteal);color:#fff;display:flex;align-items:center;
+.msg.err{background:var(--bad-bg);color:var(--bad)}
+.msg.ok{background:var(--ok-bg);color:var(--ok)}
+.topbar{position:sticky;top:0;z-index:20;background:var(--topbar);color:#fff;display:flex;align-items:center;
 justify-content:space-between;padding:11px 16px}
 .topbar .tt{font-weight:700;font-size:17px;display:flex;align-items:center;gap:8px}
 .topbar .ws{font-size:12px;opacity:.85;font-weight:400}
@@ -67,12 +89,12 @@ border-bottom:3px solid transparent;border-radius:0;white-space:nowrap}
 .dash-cols .card{margin-bottom:0}
 }
 .sec-h{font-size:18px;font-weight:700;margin:4px 0 14px;display:flex;align-items:center;gap:8px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 1px 3px var(--shadow)}
 .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}
 .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
-.kpi .v{font-size:26px;font-weight:800;color:var(--dteal)}
+.kpi .v{font-size:26px;font-weight:800;color:var(--teal)}
 .kpi .l{font-size:12px;color:var(--mut);margin-top:3px}
-.kpi.good .v{color:var(--green)} .kpi.bad .v{color:var(--red)}
+.kpi.good .v{color:var(--ok)} .kpi.bad .v{color:var(--bad)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 @media(max-width:560px){.grid3{grid-template-columns:1fr 1fr}}
@@ -84,18 +106,18 @@ border-bottom:3px solid transparent;border-radius:0;white-space:nowrap}
 @media(max-width:560px){.grid5{grid-template-columns:1fr 1fr}}
 .row-btns{display:flex;gap:8px;margin-top:6px}
 .mini{padding:8px 12px;font-size:13px;border-radius:9px;background:var(--teal);color:#fff;font-weight:600}
-.mini.g{background:#eef2f5;color:var(--txt)} .mini.r{background:#fdecea;color:#b02a26}
+.mini.g{background:var(--soft);color:var(--soft-txt)} .mini.r{background:var(--bad-bg);color:var(--bad)}
 .item{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:var(--card)}
 .item .h{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .item .t{font-weight:700}
 .item .s{font-size:13px;color:var(--mut);margin-top:3px;line-height:1.7}
 .badge{font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
-.b-pass{background:#e7f6ec;color:#1e7e40}.b-fail{background:#fdecea;color:#b02a26}.b-hold{background:#fff4d6;color:#8a6d00}
-.chip{display:inline-block;font-size:11px;background:#eef2f5;color:#48545f;padding:2px 8px;border-radius:20px;margin-inline-start:4px}
+.b-pass{background:var(--ok-bg);color:var(--ok)}.b-fail{background:var(--bad-bg);color:var(--bad)}.b-hold{background:var(--warn-bg);color:var(--warn)}
+.chip{display:inline-block;font-size:11px;background:var(--chip-bg);color:var(--chip-txt);padding:2px 8px;border-radius:20px;margin-inline-start:4px}
 .empty{text-align:center;color:var(--mut);padding:30px 10px;font-size:14px}
 .bars{display:flex;align-items:flex-end;gap:8px;height:150px;padding-top:10px}
 .bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;height:100%}
-.bar .fill{width:100%;border-radius:6px 6px 0 0;background:linear-gradient(var(--teal),#2b8a8a);min-height:2px;transition:height .3s}
+.bar .fill{width:100%;border-radius:6px 6px 0 0;background:linear-gradient(var(--teal),var(--dteal));min-height:2px;transition:height .3s}
 .bar .cap{font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;max-width:60px;text-overflow:ellipsis}
 .bar .num{font-size:11px;font-weight:700}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:50}
@@ -104,12 +126,12 @@ border-bottom:3px solid transparent;border-radius:0;white-space:nowrap}
 .sheet h3{margin:0 0 14px;font-size:17px}
 .res-box{background:var(--bg);border:1px dashed var(--line);border-radius:12px;padding:12px;margin-top:10px;text-align:center}
 .res-box .big{font-size:24px;font-weight:800}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1f2a37;color:#fff;
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--toast);color:var(--toast-txt);
 padding:11px 18px;border-radius:24px;font-size:14px;z-index:99;opacity:0;transition:.3s;pointer-events:none}
 .toast.show{opacity:1}
 .fab{position:fixed;bottom:20px;inset-inline-start:20px;width:56px;height:56px;border-radius:50%;
 background:var(--teal);color:#fff;font-size:28px;box-shadow:0 6px 18px rgba(31,110,110,.5);z-index:15}
-label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 0 4px}
+label.inl{font-size:13px;font-weight:600;color:var(--lbl);display:block;margin:8px 0 4px}
 .note{font-size:12px;color:var(--mut);line-height:1.7}
 .subnav{display:flex;overflow-x:auto;gap:6px;margin-bottom:14px}
 .subnav button{flex:0 0 auto;padding:8px 14px;background:var(--inp);border:1px solid var(--line);border-radius:20px;font-weight:600;font-size:13px;color:var(--mut);white-space:nowrap}
@@ -120,7 +142,7 @@ label.inl{font-size:13px;font-weight:600;color:#3a4551;display:block;margin:8px 
 .rtbl tr:nth-child(even) td{background:rgba(127,127,127,.08)}
 .rtbl .en{color:var(--mut);font-size:11px}
 .tg{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap}
-.tg-crit{background:#fdecea;color:#b02a26}.tg-maj{background:#fff1e6;color:#b5580a}.tg-min{background:#e7f6ec;color:#1e7e40}
+.tg-crit{background:var(--bad-bg);color:var(--bad)}.tg-maj{background:var(--warn-bg);color:var(--warn)}.tg-min{background:var(--ok-bg);color:var(--ok)}
 .thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .thumbs .tw{position:relative}
 .thumbs img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
@@ -143,17 +165,17 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 @media (max-width:1100px){.rsq-bar{display:flex;flex-wrap:wrap;justify-content:center}.rsq-bar>span:first-child:empty{display:none}}
 /* الريشو — تصميم مطابق للإكسيل */
 .xtbl{width:100%;border-collapse:collapse;font-size:13px}
-.xtbl th,.xtbl td{border:1px solid #9db8b8;padding:6px;text-align:center;vertical-align:middle}
-.xtbl th{background:#ffc000;color:#1c1c1c;font-weight:800;white-space:normal;line-height:1.35;overflow-wrap:break-word;max-width:104px}
+.xtbl th,.xtbl td{border:1px solid var(--grid);padding:6px;text-align:center;vertical-align:middle}
+.xtbl th{background:var(--hdr);color:var(--hdr-txt);font-weight:800;white-space:normal;line-height:1.35;overflow-wrap:break-word;max-width:104px}
 .xtbl th.ttl,.xtbl th.wide{max-width:none;white-space:normal}
-.mini-toggle{background:#fff;border:1px solid #b98;border-radius:7px;padding:2px 12px;cursor:pointer;font-weight:900;font-size:15px;color:#14504f;line-height:1.2}
-.mini-toggle:hover{background:#f4f4f4}
+.mini-toggle{background:var(--card);border:1px solid var(--line);border-radius:7px;padding:2px 12px;cursor:pointer;font-weight:900;font-size:15px;color:var(--teal);line-height:1.2}
+.mini-toggle:hover{background:var(--soft)}
 .xtbl.fit{width:auto;min-width:0}
 .xtbl .szc{width:82px;max-width:82px}
 .xtbl .szc select,.xtbl .szc input{font-size:12px}
 .xtbl .szc select,.xtbl .szc input{min-width:0!important;width:100%}
-.xtbl th.or{background:#f0a13c}
-.xtbl tr.tot td{background:#17696b;color:#fff;font-weight:800}
+.xtbl th.or{background:var(--hdr2);color:var(--hdr2-txt)}
+.xtbl tr.tot td{background:var(--tot);color:var(--tot-txt);font-weight:800}
 #rs-qty-rows{counter-reset:rsqn}
 .rs-size-opt:hover{background:var(--inp)!important}
 #rs-qty-rows .rsq-row{counter-increment:rsqn}
@@ -171,25 +193,15 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 #rs-combo-rows tr{counter-increment:rscn}
 #rs-combo-rows .rscb-seq{width:34px;max-width:34px;font-weight:800;color:var(--mut)}
 #rs-combo-rows .rscb-seq::before{content:counter(rscn)}
-.xtbl .red{color:#c00000;font-weight:800}
+.xtbl .red{color:var(--bad);font-weight:800}
 .xtbl input,.xtbl select{font-family:inherit;font-size:13px}
 .xtbl select{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:none;cursor:pointer}
-.xtbl select:hover,.xtbl select:focus{outline:2px solid #7aa7c7;background:#fff;border-radius:4px}
+.xtbl select:hover,.xtbl select:focus{outline:2px solid var(--blue);background:var(--inp);border-radius:4px}
 .xtbl input[type=number]::-webkit-inner-spin-button{display:none}
 .xtbl input[type=number]{-moz-appearance:textfield;appearance:textfield}
-.xtbl th.ttl{background:#f0a13c;font-size:14px;padding:8px}
+.xtbl th.ttl{background:var(--hdr2);color:var(--hdr2-txt);font-size:14px;padding:8px}
 
-/* توافق الوضع الداكن مع بعض العناصر الملوّنة الفاتحة */
-:root[data-theme="dark"] .chip{background:#2a3947;color:#c9d4de}
-:root[data-theme="dark"] .mini.g{background:#2a3947;color:#e6edf3}
-:root[data-theme="dark"] .mini-toggle{background:#e9edf1;color:#14504f}
-:root[data-theme="dark"] .tabs{background:#243040}
-:root[data-theme="dark"] .msg.err{background:#3a2422;color:#f0b3b0}
-:root[data-theme="dark"] .msg.ok{background:#20362a;color:#a7e0bd}
-:root[data-theme="dark"] .b-pass{background:#1e3a2a;color:#7fdca0}
-:root[data-theme="dark"] .b-fail{background:#3a2422;color:#f0a09c}
-.xtbl td.cmpk{background:#f2f6f6;color:#1c2530}
-:root[data-theme="dark"] .xtbl td.cmpk{background:#243040;color:var(--txt)}
+.xtbl td.cmpk{background:var(--soft);color:var(--txt)}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -338,7 +350,7 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
           <div><label class="inl" data-i18n="productLbl">المنتج</label><select id="rs-product" onchange="rsProductChanged()"></select></div>
           <div><label class="inl" data-i18n="rsDispUnit">وحدة العرض</label><select id="rs-unit" onchange="rsUnitChanged()"><option value="متر">متر</option><option value="ياردة">ياردة</option></select></div>
           <div style="display:flex;align-items:flex-end"><button type="button" class="mini g" onclick="modelsManager()" data-i18n="rsEditList">⚙️ إضافة / تعديل قائمة المقاسات</button></div></div>
-        <div id="rs-nosizes" class="hide" style="margin:8px 0;padding:10px;border:1px dashed #d8a03c;background:#fff8e6;border-radius:10px">
+        <div id="rs-nosizes" class="hide" style="margin:8px 0;padding:10px;border:1px dashed var(--warn-bd);background:var(--warn-bg);border-radius:10px">
           <span data-i18n="rsNoSizes">المنتج المختار بلا مقاسات محفوظة — افتح إدارة الموديلات والمقاسات وأضف المقاسات مع الاستهلاك والنسبة</span>
           <button type="button" class="mini g" style="margin-inline-start:8px" onclick="modelsManager()" data-i18n="mkManage">⚙️ إدارة الموديلات والمقاسات</button></div>
         <div id="rs-summary" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"></div>
@@ -420,7 +432,7 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
           <tbody id="rs-sug-rows" class="rss-hide"></tbody></table></div>
         <button type="button" class="btn g rss-hide" style="margin-top:6px" onclick="rsApplySugs()" data-i18n="rsApplyAll">✔ اعتماد كل الاقتراحات كماركر</button>
         <div style="overflow-x:auto;margin-top:16px">
-          <div style="background:#f0a13c;color:#1c1c1c;font-weight:800;font-size:14px;padding:8px;border-radius:8px 8px 0 0;text-align:center">
+          <div style="background:var(--hdr2);color:var(--hdr2-txt);font-weight:800;font-size:14px;padding:8px;border-radius:8px 8px 0 0;text-align:center">
             <span style="display:inline-flex;align-items:center;gap:10px"><button type="button" class="mini-toggle rso-cv" onclick="rsCollapse('rso')" title="تصغير/تكبير">–</button><span data-i18n="rsRollTbl">📦 خطة الرولات</span></span></div>
           <div class="rso-hide" style="border:1px solid var(--line);border-top:none;padding:12px;border-radius:0 0 8px 8px;background:var(--card)">
             <label class="inl rsu-h" data-b="طول الرول" style="display:inline;font-size:13px">طول الرول (متر)</label>
@@ -794,7 +806,7 @@ const THEMES=['light','grey','dark'],THEME_ICON={light:'☀️',grey:'🌫️',d
 function applyTheme(th){if(!THEMES.includes(th))th='light';
   document.documentElement.setAttribute('data-theme',th);
   localStorage.setItem('qcTheme',th);
-  const mc=document.querySelector('meta[name=theme-color]');if(mc)mc.setAttribute('content',th==='dark'?'#0f1720':th==='grey'?'#dfe3e8':'#14504f');
+  const mc=document.querySelector('meta[name=theme-color]');if(mc)mc.setAttribute('content',th==='dark'?'#0b2a2a':th==='grey'?'#2d3a46':'#0a4a4a');
   const b=$('theme-btn');if(b)b.textContent=THEME_ICON[th];
   // إعادة رسم جداول الريشو الملوّنة كي تلتقط ألوان الثيم الجديدة (الألوان تُطبَّق سطرياً وقت الرسم)
   // ملفوف بـ try لأن applyTheme يُستدعى مبكراً قبل تعريف RS_LOADED (منطقة موتها الزمنية)
@@ -1102,7 +1114,7 @@ function aqlForm(){if(!isOwner())return;const tab=WSAQL||AQLTAB;
     <td><input class="aq-s" type="number" value="${r[1]}" style="min-width:64px;padding:6px"></td>
     <td><input class="aq-m" type="number" value="${r[2]}" style="min-width:64px;padding:6px"></td>
     <td><input class="aq-n" type="number" value="${r[4]}" style="min-width:64px;padding:6px"></td></tr>`).join('')}</table></div>
-  <div id="aql-info" style="display:none;margin-top:8px;padding:10px;background:#eef6f6;border-radius:8px;font-size:13px;line-height:1.7;color:#3a4551"></div>
+  <div id="aql-info" style="display:none;margin-top:8px;padding:10px;background:var(--soft);border-radius:8px;font-size:13px;line-height:1.7;color:#3a4551"></div>
   <label class="inl">${t('critMaxLbl')} ${inf('crit')}</label><input id="aq-crit" type="number" value="${WSCRIT||0}">
   <div class="note" style="margin-top:6px">${t('aqlCfgHint')}</div>
   <div class="row-btns"><button class="btn" onclick="saveAqlCfg()">${t('save')}</button>
@@ -1206,9 +1218,9 @@ function factStats(f){const oids=ORDERS.filter(o=>o.factoryId===f.id).map(o=>o.i
 function factReport(fid){const f=FACT.find(x=>x.id===fid);if(!f)return;
   const {insp,checks,n,pass,avgDhu,tn,tpass,rate}=factStats(f);
   const rating=rate==null?'—':(rate>=90?t('ratingExc'):(rate>=75?t('ratingGood'):(rate>=50?t('ratingOk'):t('ratingPoor'))));
-  const rcol=rate==null?'#666':(rate>=90?'#1e7e40':(rate>=75?'#2e75b6':(rate>=50?'#b58900':'#b02a26')));
+  const rcol=rate==null?'#666':(rate>=90?'var(--ok)':(rate>=75?'#2e75b6':(rate>=50?'var(--amber)':'var(--bad)')));
   const row=(l,v)=>`<tr><td style="font-weight:700;background:#f2f6f6;width:38%">${l}</td><td>${v}</td></tr>`;
-  const dcell=d=>`<span style="font-weight:700;color:${d==='PASS'?'#1e7e40':'#b02a26'}">${d==='PASS'?t('pass'):t('fail')}</span>`;
+  const dcell=d=>`<span style="font-weight:700;color:${d==='PASS'?'var(--ok)':'var(--bad)'}">${d==='PASS'?t('pass'):t('fail')}</span>`;
   const th=`style="background:#e6efee;font-weight:800;color:#14504f"`;
   const inspRows=insp.map(i=>{
     const sum=(i.checklist&&i.checklist.length)?`${i.checklist.filter(x=>x.status==='pass').length}/${i.checklist.length} ${t('statusPass')}`:`DHU ${i.dhu}`;
@@ -1332,9 +1344,9 @@ function renderInspChkItems(type){const cl=curChk().find(c=>c.title===type);if(!
     const p=prev[it.name]||{};
     const critOf=txt=>(p.crits&&p.crits.find(c=>c.text===txt))||{};
     const stOf=txt=>critOf(txt).status||p.status||'pass';
-    return `<div class="chk-itemblock" data-name="${esc(it.name)}" data-tool="${esc(it.tool||'')}" style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;background:#fff">
+    return `<div class="chk-itemblock" data-name="${esc(it.name)}" data-tool="${esc(it.tool||'')}" style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;background:var(--card)">
       <b>${esc(it.name)}</b>${it.tool?` <span class="note">· ${esc(it.tool)}</span>`:''}${it.desc?` <span style="cursor:pointer" onclick="this.parentNode.querySelector('.chk-desc').classList.toggle('hide')">ℹ️</span>
-      <div class="chk-desc note hide" style="margin-top:6px;background:#eef6f6;padding:8px;border-radius:8px;line-height:1.7">${esc(it.desc)}</div>`:''}
+      <div class="chk-desc note hide" style="margin-top:6px;background:var(--soft);padding:8px;border-radius:8px;line-height:1.7">${esc(it.desc)}</div>`:''}
       ${crits.map(c=>`<div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)">
         <div class="note" style="margin-bottom:5px">📏 ${esc(c||'—')}</div>
         <div class="grid2" style="align-items:center">
@@ -1548,7 +1560,7 @@ function exportToolChk(){const src=TOOLCHK.filter(c=>c.type!=='mk');if(!src.leng
 function printInsp(id){const i=INSP.find(x=>x.id===id);if(!i)return;const a=aqlFor(i.sampleSize||0);
   const isChk=!!(i.checklist&&i.checklist.length);
   const row=(l,v)=>`<tr><td style="font-weight:700;background:#f2f6f6;width:38%">${l}</td><td>${esc(v)}</td></tr>`;
-  const dec=i.decision==='PASS'?t('passMark'):t('failMark');const dcol=i.decision==='PASS'?'#1e7e40':'#b02a26';
+  const dec=i.decision==='PASS'?t('passMark'):t('failMark');const dcol=i.decision==='PASS'?'var(--ok)':'var(--bad)';
   const photos=(i.photos||[]).map(p=>`<img src="${p}" style="width:31%;margin:1%;border:1px solid #ccc;border-radius:6px">`).join('');
   $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:720px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
@@ -1563,7 +1575,7 @@ function printInsp(id){const i=INSP.find(x=>x.id===id);if(!i)return;const a=aqlF
       +row(t('criticalLbl'),i.critical)+row('DHU',i.dhu)}
       ${row(t('repNotes'),i.notes||'—')}</table>
     ${isChk?(()=>{const st=s=>s==='fail'?t('statusFail'):(s==='na'?t('statusNA'):t('statusPass'));
-      const cc=s=>s==='fail'?'#b02a26':(s==='na'?'#666':'#1e7e40');
+      const cc=s=>s==='fail'?'var(--bad)':(s==='na'?'#666':'var(--ok)');
       return `<table style="width:100%;border-collapse:collapse;margin-top:14px;font-size:14px" border="1" cellpadding="8">
       <tr style="background:#e6efee;font-weight:800;color:#14504f"><td>م</td><td>${t('colItem')}</td><td>${t('critsCol')}</td><td>${t('foundCol')}</td><td>${t('colTool')}</td><td>${t('colCheck')}</td></tr>
       ${i.checklist.map((x,n)=>{const crits=(x.crits&&x.crits.length)?x.crits:[{text:x.std||'',status:x.status}];
@@ -1599,7 +1611,7 @@ function renderDash(){if(!$('kpis'))return;
     $('factcmp').innerHTML=cmp.length?cmp.map(({f,s})=>{const col=s.rate>=90?'var(--green)':(s.rate>=70?'var(--amber)':'var(--red)');
       return `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;gap:8px;flex-wrap:wrap">
         <b>🏭 ${esc(f.name)}</b><span>${s.tot} ${t('cmpChecks')}${s.avgDhu!=null?' · DHU '+s.avgDhu:''} · <b>${s.rate}%</b></span></div>
-        <div style="height:10px;background:#eef2f5;border-radius:6px;overflow:hidden"><div style="width:${s.rate}%;height:100%;background:${col}"></div></div></div>`;}).join(''):empty(t('noData'));}}
+        <div style="height:10px;background:var(--soft);border-radius:6px;overflow:hidden"><div style="width:${s.rate}%;height:100%;background:${col}"></div></div></div>`;}).join(''):empty(t('noData'));}}
 
 /* ============ TOOLS ============ */
 function goTool(id,btn){const all=id==='all';
@@ -1632,8 +1644,8 @@ function modelsManager(){modal(`<h3>${t('mkManage')}</h3>
   <div id="sizes-import" class="hide" style="margin-top:8px;padding:10px;border:1px dashed var(--line,#cdd8d7);border-radius:10px">
     <div class="note" style="margin-bottom:6px">${t('sizesImportHint')}</div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
-      <span style="font-weight:800;font-size:13px;color:#c00000">${t('sizesImportW')} *</span>
-      <select id="sizes-import-w" style="padding:6px 8px;font-size:13px;border:1px solid #e6a5a2;border-radius:8px">
+      <span style="font-weight:800;font-size:13px;color:var(--bad)">${t('sizesImportW')} *</span>
+      <select id="sizes-import-w" style="padding:6px 8px;font-size:13px;border:1px solid var(--bad-bd);border-radius:8px">
         <option value="">${t('sizesImportPick')}</option>
         ${['96','98','100','142','144','146','148'].map(w=>`<option value="${w}">${w}</option>`).join('')}
       </select></div>
@@ -1702,7 +1714,7 @@ function renderSizesManager(){const el=$('sizes-list');if(!el)return;
   if(!list.length){el.innerHTML=`<span class="note">${t('noSizes')}</span>`;return;}
   const WOPTS=['96','98','100','142','144','146','148'];
   const wsel=`<div style="margin:0 0 10px 0;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-    <span style="font-weight:800;font-size:13px;color:#14504f">${t('smWByW')}</span>
+    <span style="font-weight:800;font-size:13px;color:var(--teal)">${t('smWByW')}</span>
     <select onchange="SM_W=this.value;renderSizesManager()" style="padding:6px 8px;font-size:13px;border:1px solid #cfe0df;border-radius:8px">
       <option value="" ${SM_W===''?'selected':''}>${t('smWBase')}</option>
       ${WOPTS.map(w=>`<option value="${w}" ${SM_W===w?'selected':''}>${w}</option>`).join('')}
@@ -1715,12 +1727,12 @@ function renderSizesManager(){const el=$('sizes-list');if(!el)return;
     const ph=SM_W?(s.cons||'—'):(t('sizeConsPh'));
     return `<span class="chip" style="font-size:13px;padding:4px 8px;margin:0 0 6px 6px;display:inline-flex;align-items:center;gap:5px${SM_W&&hasW?';outline:2px solid var(--green)':''}">${esc(s.size)}
     <input type="number" step="0.01" value="${val}" placeholder="${ph}" title="${t('sizeConsPh')}" onchange="editSizeCons('${nm}',this.value)" style="width:58px;padding:3px 5px;font-size:13px;border:1px solid #cfe0df;border-radius:6px;text-align:center">
-    ${SM_W?'':`<input type="number" step="0.25" value="${s.ratio||''}" title="${t('ratioPh')}" placeholder="${t('ratioShort')}" onchange="editSizeRatio('${nm}',this.value)" style="width:48px;padding:3px 5px;font-size:13px;border:1px solid #e8d9a8;background:#fffbe8;border-radius:6px;text-align:center">`}
+    ${SM_W?'':`<input type="number" step="0.25" value="${s.ratio||''}" title="${t('ratioPh')}" placeholder="${t('ratioShort')}" onchange="editSizeRatio('${nm}',this.value)" style="width:48px;padding:3px 5px;font-size:13px;border:1px solid var(--warn-bd);background:var(--warn-bg);border-radius:6px;text-align:center">`}
     <b style="cursor:pointer;color:var(--red)" onclick="delSize('${nm}')">✕</b></span>`;};
   const groups=sizeGroups(list);
   el.innerHTML=wsel+(groups.length>1
     ?groups.map(g=>`<div style="margin-bottom:8px;padding:6px 8px;border:1px solid #e2eaea;border-radius:10px">
-      <div style="font-weight:800;font-size:13px;color:#14504f;margin-bottom:4px">${esc(g.label)} <span class="note" style="font-weight:400">(${g.items.length})</span></div>
+      <div style="font-weight:800;font-size:13px;color:var(--teal);margin-bottom:4px">${esc(g.label)} <span class="note" style="font-weight:400">(${g.items.length})</span></div>
       ${g.items.map(chip).join('')}</div>`).join('')
     :groups.map(g=>g.items.map(chip).join('')).join(''));}
 function addProduct(){const name=$('new-prod').value.trim();if(!name)return;
@@ -1817,7 +1829,7 @@ function mdRow(s,prod){s=s||{};const list=sizeList(prod!==undefined?prod:mdProdu
     :`<input class="md-size" value="${esc(s.size||'')}" placeholder="L" style="min-width:90px;padding:6px">`;
   return `<tr>
   <td>${sizeCell}</td>
-  <td><input class="md-cons" type="number" step="0.01" value="${s.cons!=null?s.cons:''}" placeholder="3.20" style="min-width:80px;padding:6px${list.length?';background:#f4f6f8;color:#6b7683':''}" ${list.length?'readonly':''}></td>
+  <td><input class="md-cons" type="number" step="0.01" value="${s.cons!=null?s.cons:''}" placeholder="3.20" style="min-width:80px;padding:6px${list.length?';background:var(--soft);color:var(--mut)':''}" ${list.length?'readonly':''}></td>
   <td><button type="button" class="mini r" onclick="this.closest('tr').remove()">✕</button></td></tr>`;}
 function mdPickSize(sel){const opt=sel.selectedOptions[0],cons=opt?opt.dataset.cons:'';
   const c=sel.closest('tr').querySelector('.md-cons');if(cons!=null&&cons!=='')c.value=cons;}
@@ -1896,7 +1908,7 @@ function printToolChk(id){const c=TOOLCHK.find(x=>x.id===id);if(!c)return;
     const nm=i>=0?s.slice(0,i):s,q=i>=0?s.slice(i+1):'';
     return `<span style="display:inline-block;border:1px solid #cfe0df;background:#eef5f4;border-radius:6px;padding:1px 8px;margin:2px 3px 2px 0;white-space:nowrap"><b>${esc(nm)}</b>${q?` <span style="color:#14504f">×${esc(q)}</span>`:''}</span>`;
   }).join('');
-  const dec=c.result.decision==='PASS'?t('passMark'):t('failMark');const dcol=c.result.decision==='PASS'?'#1e7e40':'#b02a26';
+  const dec=c.result.decision==='PASS'?t('passMark'):t('failMark');const dcol=c.result.decision==='PASS'?'var(--ok)':'var(--bad)';
   let rows='';const r=c.result;
   const fpRows=x=>row(t('fpLen'),x.len)+row(t('fpWid'),x.wid)+row(t('fpTotal')+' / '+t('fpUnit'),x.points)+row(t('limit'),x.lim);
   const shRows=x=>row(t('shrLen'),x.shrLen+'%')+row(t('shrWid'),x.shrWid+'%')+row(t('limit'),x.lim+'%');
@@ -2086,9 +2098,9 @@ function rsAddQtyRow(r){r=r||{};const src=rsSizeSrc();const locked=src.length>0;
    <td class="rsq-seq"></td>
    <td><div style="display:flex;align-items:center;gap:6px">${cell}<button type="button" class="mini r" title="حذف المقاس" onclick="this.closest('tr').remove();rsCalc()" style="flex:0 0 auto;padding:2px 8px">✕</button></div></td>
    <td><input class="rsq-qty" type="number" min="0" value="${r.qty!=null?r.qty:''}" style="min-width:70px;padding:6px;text-align:center;font-weight:700" oninput="rsCalc()" onkeydown="rsEnter(event,this)"></td>
-   <td><input class="rsq-ratio" type="number" step="0.25" min="0" value="${r.ratio!=null&&r.ratio!==0?r.ratio:''}" style="min-width:56px;padding:6px;text-align:center;font-weight:700${locked?';background:#fffbe8;border:none':''}" oninput="rsCalc()" onchange="rsEditVal(this,'ratio')" onkeydown="rsEnter(event,this)"></td>
+   <td><input class="rsq-ratio" type="number" step="0.25" min="0" value="${r.ratio!=null&&r.ratio!==0?r.ratio:''}" style="min-width:56px;padding:6px;text-align:center;font-weight:700${locked?';background:var(--warn-bg);border:none':''}" oninput="rsCalc()" onchange="rsEditVal(this,'ratio')" onkeydown="rsEnter(event,this)"></td>
    <td class="rsq-tot red">\u2014</td>
-   <td><input class="rsq-cons" type="number" step="0.01" value="${r.cons!=null?r.cons:''}" style="min-width:70px;padding:6px;text-align:center;color:#c00000;font-weight:800${locked?';background:#fbf3f3;border:none':''}" oninput="rsCalc()" onchange="rsEditVal(this,'cons')" onkeydown="rsEnter(event,this)"></td>
+   <td><input class="rsq-cons" type="number" step="0.01" value="${r.cons!=null?r.cons:''}" style="min-width:70px;padding:6px;text-align:center;color:var(--bad);font-weight:800${locked?';background:var(--bad-bg);border:none':''}" oninput="rsCalc()" onchange="rsEditVal(this,'cons')" onkeydown="rsEnter(event,this)"></td>
    <td class="rsq-totf" style="color:#b45309;font-weight:800">—</td></tr>`);}
 // \u0628\u062d\u062b/\u062a\u0635\u0641\u064a\u0629 \u0641\u064a \u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0642\u064a\u0627\u0633\u0627\u062a \u0627\u0644\u062d\u0627\u0644\u064a\u0629 \u0628\u062c\u062f\u0648\u0644 \u0627\u0644\u0643\u0645\u064a\u0627\u062a \u2014 \u064a\u064f\u0638\u0647\u0631 \u0627\u0644\u0635\u0641\u0648\u0641 \u0627\u0644\u0645\u0637\u0627\u0628\u0642\u0629 \u0641\u0642\u0637 (\u0627\u0644\u0625\u062c\u0645\u0627\u0644\u064a\u0627\u062a \u062a\u0628\u0642\u0649 \u0643\u0627\u0645\u0644\u0629)
 function rsQtyFilter(q){q=String(q||'').trim().toLowerCase();
@@ -2121,7 +2133,7 @@ function rsSizeFilter(inp){RS_SIZE_INP=inp;const src=rsSizeSrc();const q=inp.val
   const list=src.filter(s=>!used.has(s.size)&&(!q||s.size.toLowerCase().includes(q)));
   const p=rsSizePop();
   if(!list.length){p.style.display='none';return;}
-  p.innerHTML=list.slice(0,80).map((s,i)=>`<div class="rs-size-opt" data-sz="${esc(s.size)}" data-cons="${s.cons||''}" data-ratio="${s.ratio||''}"${i===0?' data-active="1"':''} onmousedown="rsSizePick(event,this)" style="padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between;gap:16px;align-items:center${i===0?';background:var(--inp)':''}"><b>${esc(s.size)}</b><span style="color:#c00000;font-weight:700">${s.cons||'—'}</span></div>`).join('');
+  p.innerHTML=list.slice(0,80).map((s,i)=>`<div class="rs-size-opt" data-sz="${esc(s.size)}" data-cons="${s.cons||''}" data-ratio="${s.ratio||''}"${i===0?' data-active="1"':''} onmousedown="rsSizePick(event,this)" style="padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between;gap:16px;align-items:center${i===0?';background:var(--inp)':''}"><b>${esc(s.size)}</b><span style="color:var(--bad);font-weight:700">${s.cons||'—'}</span></div>`).join('');
   const r=inp.getBoundingClientRect();p.style.left=Math.max(4,Math.min(r.left,innerWidth-p.offsetWidth-4))+'px';p.style.top=(r.bottom+2)+'px';p.style.minWidth=Math.max(150,r.width)+'px';p.style.display='';}
 function rsSizePick(e,el){if(e&&e.preventDefault)e.preventDefault();const inp=RS_SIZE_INP;if(!inp||!el)return;
   inp.value=el.dataset.sz;const tr=inp.closest('tr');
@@ -2383,8 +2395,8 @@ function rsRenderSugs(){const tb=$('rs-sug-rows');if(!tb)return;const uf=rsUF();
     s.combo.forEach(p=>rem[p.size]=(rem[p.size]||0)-p.cnt*plies);
     const left=Object.keys(rem).reduce((a,k)=>a+Math.max(0,rem[k]),0);const over=Object.keys(rem).some(k=>rem[k]<0);
     const bg=rsRowBg(i);
-    const yBg=dk?'#3a3420':'#fffbe8',yBd=dk?'#6b5a2a':'#d8c27a';
-    const leftTx=over?(dk?'#f0a09c':'#c00000'):left===0?(dk?'#7fdca0':'#1e7e40'):'var(--txt)';
+    const yBg='var(--warn-bg)',yBd='var(--warn-bd)';
+    const leftTx=over?('var(--bad)'):left===0?('var(--ok)'):'var(--txt)';
     const sz=[0,1,2,3,4,5].map(j=>`<td class="szc" style="background:${bg};font-weight:700">${s.combo[j]?esc(s.combo[j].size):''}</td>`).join('');
     const ct=[0,1,2,3,4,5].map(j=>`<td class="szc" style="background:${bg};font-weight:700">${s.combo[j]?s.combo[j].cnt:''}</td>`).join('');
     html+=`<tr>
@@ -2569,7 +2581,7 @@ function rsBakDraft(){try{return RS_LOADED&&$('rs-qty-rows')?rsBuildDraft():(RS_
 function rsBakCol(){return db.collection('qc_workspaces').doc(MEMBER.wsId).collection('backups');}
 // يكتب نسخة سحابية بالمعرّف المعطى إن لم تكن موجودة؛ يُرجع وعداً بـ true عند الإنشاء
 function rsCloudBackup(id,snap){if(!MEMBER||!MEMBER.wsId||!canEdit('marker')||typeof db==='undefined')return Promise.resolve(false);
-  const ref=rsBakCol().doc(id);
+  let ref;try{ref=rsBakCol().doc(id);}catch(e){return Promise.reject(e);}// خطأ متزامن لا يوقف تحميل الصفحة
   return ref.get().then(d=>{if(d.exists)return false;
     return ref.set({at:firebase.firestore.FieldValue.serverTimestamp(),slot:id,by:(auth.currentUser&&auth.currentUser.uid)||'',byName:MEMBER.name||'',
       nC:rsBakCount(snap.comboLib),nP:(snap.sizeLists||[]).length,data:JSON.stringify(snap)}).then(()=>{rsCloudPrune();return true;});});}
@@ -2628,7 +2640,7 @@ function rsLibSusOpen(){const list=rsLibSuspects();if(!list.length)return toast(
   const rows=list.map(o=>{const sg=esc(o.x.sig).replace(/'/g,"&#39;");
     const pills=(o.x.sizes||[]).map(p=>`<span dir="ltr" style="display:inline-block;font-weight:800;font-size:12px;margin:1px 3px;padding:1px 7px;border:1px solid var(--line);border-radius:999px;background:var(--inp)">${esc(p.size)}×${p.cnt}</span>`).join('');
     return `<div class="item" style="margin-bottom:5px"><div class="h" style="display:flex;align-items:center;gap:8px"><div style="flex:1;line-height:2">${pills}</div>
-      <div style="white-space:nowrap;font-size:13px;text-align:center"><b style="color:#c00000">${Math.round(o.x.actLenM*uf*100)/100}</b> ${esc(u)} <span class="note">/ ${Math.round(o.comp*uf*100)/100}</span><div style="color:#c00000;font-weight:800">+${o.pct}٪</div></div>
+      <div style="white-space:nowrap;font-size:13px;text-align:center"><b style="color:var(--bad)">${Math.round(o.x.actLenM*uf*100)/100}</b> ${esc(u)} <span class="note">/ ${Math.round(o.comp*uf*100)/100}</span><div style="color:var(--bad);font-weight:800">+${o.pct}٪</div></div>
       ${ce?`<button class="mini r" onclick="rsLibSusDel('${sg}')">🗑</button>`:''}</div></div>`;}).join('');
   modal(`<h3>🚩 ${t('rsLibSusTitle')}</h3><div class="note" style="margin-bottom:8px">${esc(tf('rsLibSusHint',{t:Math.round(RS_LIB_TOL*100),w:rsFabW()||'—'}))}</div><div id="rs-libsus-body">${rows}</div>
     <div class="row-btns">${ce?`<button class="btn red" onclick="rsLibSusDel(null)">🗑 ${t('rsLibSusDelAll')} (${list.length})</button>`:''}<button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);}
@@ -2751,7 +2763,7 @@ function rsComboPrintSheet(list,title){const L0=Array.isArray(list)?list:RS_COMB
     return `<tr>
       <td style="padding:6px 8px;text-align:center;color:#6b7683;font-weight:700;${bd}">${i+1}</td>
       <td style="padding:6px 10px;font-weight:800;font-size:14px;${bd}" dir="ltr">${combo}</td>
-      <td style="padding:6px 8px;text-align:center;color:#b02a26;font-weight:800;${bd}">${calc}</td>
+      <td style="padding:6px 8px;text-align:center;color:var(--bad);font-weight:800;${bd}">${calc}</td>
       <td style="padding:6px 8px;${bd}"><div style="border-bottom:1.4px solid #7c8894;height:22px;min-width:110px"></div></td></tr>`;}).join('');
   $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#1c2530;max-width:840px;margin:auto;padding-top:8px" dir="${LANG==='ar'?'rtl':'ltr'}">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #14504f;padding-bottom:10px">
@@ -2780,9 +2792,9 @@ function rsComboRender(){const tb=$('rs-combo-rows');if(!tb)return;const uf=rsUF
     const pcs1=c.combo.reduce((a,p)=>a+p.cnt,0)===1;// قطعة واحدة: الطول = الاستهلاك، لا يحتاج قياساً
     const compDisp=Math.round(c.addLen*uf*100)/100;
     const meas=pcs1||c.actual>0;
-    const badge=pcs1?`<span title="${esc(t('rsCbSingle'))}" style="color:#1e7e40;font-weight:900;margin-inline-end:6px">✓</span>`
-      :(c.actual>0?`<span title="${esc(t('rsCbMeasuredHint'))}" style="color:#1e7e40;font-weight:900;margin-inline-end:6px">✓</span>`:`<span title="${esc(t('rsCbNeedHint'))}" style="color:#cf9a2a;font-weight:900;margin-inline-end:6px">•</span>`);
-    const inpStyle=meas?'width:82px;padding:4px;text-align:center;font-weight:800;border:1px solid #4baf6e;border-radius:6px;background:#eafaf0;color:#14532d':'width:82px;padding:4px;text-align:center;font-weight:800;border:1px solid #cfa53a;border-radius:6px;background:#fffbe8;color:#3a2f00';
+    const badge=pcs1?`<span title="${esc(t('rsCbSingle'))}" style="color:var(--ok);font-weight:900;margin-inline-end:6px">✓</span>`
+      :(c.actual>0?`<span title="${esc(t('rsCbMeasuredHint'))}" style="color:var(--ok);font-weight:900;margin-inline-end:6px">✓</span>`:`<span title="${esc(t('rsCbNeedHint'))}" style="color:#cf9a2a;font-weight:900;margin-inline-end:6px">•</span>`);
+    const inpStyle=meas?'width:82px;padding:4px;text-align:center;font-weight:800;border:1px solid var(--ok-bd);border-radius:6px;background:var(--ok-bg);color:var(--ok)':'width:82px;padding:4px;text-align:center;font-weight:800;border:1px solid var(--warn-bd);border-radius:6px;background:var(--warn-bg);color:var(--warn)';
     const pin=RS_CB_PIN.has(rsComboSig(c.combo));
     return `<tr data-sig="${esc(rsComboSig(c.combo))}" oncontextmenu="return rsComboMenu(event,this)"${pin?' style="outline:2px solid #2e75b6;outline-offset:-2px"':''}>
       <td class="rscb-seq"></td>
@@ -2816,7 +2828,7 @@ function rsComboCalc(){const uf=rsUF(),dk=rsDark();
     if(!effEl)return;
     if(r.eff!=null){const diff=r.addD-r.act,same=Math.abs(diff)<0.005;
       effEl.innerHTML=rsEffLabel(r.eff,diff);effEl.title=tf('rsCbEffRatio',{e:Math.round(r.eff*1000)/1000});
-      effEl.style.color=same?(dk?'#9fb0c0':'#667'):(diff>0?(dk?'#7fdca0':'#1e7e40'):(dk?'#f28b86':'#c00000'));
+      effEl.style.color=same?('var(--mut)'):(diff>0?('var(--ok)'):('var(--bad)'));
       rkEl.textContent=rankMap[r.i]===1?('🏆 '+rankMap[r.i]):rankMap[r.i];}
     else{effEl.textContent='—';effEl.style.color='inherit';rkEl.textContent='—';}});
   const bEl=$('rs-combo-best');if(!bEl)return;
@@ -2824,7 +2836,7 @@ function rsComboCalc(){const uf=rsUF(),dk=rsDark();
   const statusH=`<span style="color:var(--mut);font-weight:700;font-size:13px">${esc(tf('rsCbStatus',{m:measN,n:needN}))}</span>`;
   const best=measured[0];
   if(best){const c=RS_COMBOS[best.i];const addD=Math.round(c.addLen*uf*100)/100;const bl=rsEffLabel(best.eff,addD-c.actual);
-    bEl.innerHTML=statusH+' &nbsp;&nbsp; <span style="color:'+(dk?'#7fdca0':'#1e7e40')+'">'+tf('rsCbBest',{c:esc(c.combo.map(p=>p.size+'×'+p.cnt).join(' + ')),e:bl})+'</span>';}
+    bEl.innerHTML=statusH+' &nbsp;&nbsp; <span style="color:'+('var(--ok)')+'">'+tf('rsCbBest',{c:esc(c.combo.map(p=>p.size+'×'+p.cnt).join(' + ')),e:bl})+'</span>';}
   else bEl.innerHTML=statusH+' &nbsp;&nbsp; <span>'+esc(t('rsCbMeasure'))+'</span>';}
 // تغيير هدف التحسين: يعيد بناء كل الماركرات فوراً بالهدف الجديد.
 // الطلب يُؤخذ من جدول الكميات إن كانت مُدخَلة، وإلا يُشتقّ من إنتاج الماركرات الحالية (خطة يدوية بلا كميات).
@@ -2902,7 +2914,7 @@ function rsColorsCalc(){const el=$('rs-colors-sum');if(!el)return;
   const ct=rsColorTotals();if(!ct){el.innerHTML='';return;}
   const uf=rsUF(),u=rsUL();const R=v=>Math.round(v*uf*100)/100;const roll=(+($('rs-rolllen')&&$('rs-rolllen').value)||0)/uf;
   const totalReq=[...document.querySelectorAll('.rsq-row')].reduce((s,tr)=>s+(+tr.querySelector('.rsq-qty').value||0),0);
-  const dk=rsDark();const wTx=dk?'#e6b53a':'#8a6d00',wBg=dk?'#3a3420':'#fff8e6',wBd=dk?'#6b5a2a':'#f0dca0';
+  const dk=rsDark();const wTx='var(--warn)',wBg='var(--warn-bg)',wBd='var(--warn-bd)';
   const warn=(totalReq>0&&ct.totalQty!==totalReq)?`<div style="flex:1 1 100%;font-size:12px;color:${wTx};background:${wBg};border:1px solid ${wBd};border-radius:8px;padding:6px 10px">🟡 ${tf('rsColMismatch',{c:ct.totalQty,o:totalReq})}</div>`:'';
   el.innerHTML=warn+ct.colors.map((c,i)=>{const p=ct.per[c.name];const rolls=roll>0?Math.ceil(Math.round(p.fab*100)/100/roll):0;
     const bg=rsRowBg(i);
@@ -3187,19 +3199,19 @@ function rsCalibrateOpen(){const r=rsCalibrate();
   const u=rsUL();
   const rows=r.result.map(x=>{const d=Math.round((x.suggested-x.current)*10000)/10000;const big=Math.abs(d)>0.05;
     return `<tr><td style="font-weight:800">${esc(x.size)}</td><td>${x.current}</td>
-      <td style="font-weight:800;color:${big?'#c00000':'#1e7e40'}">${x.suggested}</td>
-      <td style="font-weight:700;color:${big?'#c00000':'#1e7e40'}">${d>=0?'+':''}${d}</td>
+      <td style="font-weight:800;color:${big?'var(--bad)':'var(--ok)'}">${x.suggested}</td>
+      <td style="font-weight:700;color:${big?'var(--bad)':'var(--ok)'}">${d>=0?'+':''}${d}</td>
       <td style="color:var(--mut)">${x.coverage}</td></tr>`;}).join('');
   const improved=r.rmseBefore>0?Math.round((1-r.rmseAfter/r.rmseBefore)*100):0;
   modal(`<h3>🧮 ${t('rsCalibTitle')}</h3>
     <div class="note" style="margin-bottom:10px">${tf('rsCalibInfo',{n:r.rows,s:r.sizes})}</div>
     <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
       <div style="flex:1;min-width:120px;border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center">
-        <div style="font-size:11px;color:var(--mut)">${t('rsCalibRmseBefore')}</div><div style="font-weight:800;color:#c00000">${r.rmseBefore} ${u}</div></div>
+        <div style="font-size:11px;color:var(--mut)">${t('rsCalibRmseBefore')}</div><div style="font-weight:800;color:var(--bad)">${r.rmseBefore} ${u}</div></div>
       <div style="flex:1;min-width:120px;border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center">
-        <div style="font-size:11px;color:var(--mut)">${t('rsCalibRmseAfter')}</div><div style="font-weight:800;color:#1e7e40">${r.rmseAfter} ${u}</div></div>
+        <div style="font-size:11px;color:var(--mut)">${t('rsCalibRmseAfter')}</div><div style="font-weight:800;color:var(--ok)">${r.rmseAfter} ${u}</div></div>
       <div style="flex:1;min-width:120px;border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center">
-        <div style="font-size:11px;color:var(--mut)">${t('rsCalibImprove')}</div><div style="font-weight:800;color:#1e7e40">${improved}%</div></div></div>
+        <div style="font-size:11px;color:var(--mut)">${t('rsCalibImprove')}</div><div style="font-weight:800;color:var(--ok)">${improved}%</div></div></div>
     <div style="overflow-x:auto"><table class="xtbl" style="min-width:420px">
       <tr><th data-i18n="sizeName">المقاس</th><th>${t('rsCalibCurrent')}</th><th>${t('rsCalibSuggested')}</th><th>${t('rsCalibDelta')}</th><th title="${esc(t('rsCalibCovTip'))}">${t('rsCalibCoverage')}</th></tr>
       ${rows}</table></div>
@@ -3267,13 +3279,13 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();const spM=r
     tr1.querySelector('.rsm-run').textContent=run;
     const lenCell=tr1.querySelector('.rsm-len');const calcDisp=Math.round(len*uf*100)/100;
     if(libM>0){const measDisp=Math.round(libM*uf*100)/100;const delta=Math.round((measDisp-calcDisp)*100)/100;
-      const dcol=delta<=-0.005?(dk?'#7fdca0':'#1e7e40'):(delta>=0.005?(dk?'#f28b86':'#c00000'):(dk?'#9fb0c0':'#667'));
-      lenCell.innerHTML=`<span title="${esc(t('rsMkLibLen'))}" style="color:${dk?'#7fdca0':'#1e7e40'};font-weight:800">${measDisp} <span style="font-size:11px">✓📐</span></span><div style="font-size:10px;font-weight:700;color:${dcol};margin-top:2px">${delta>=0?'+':''}${delta} ${esc(t('rsMkVsCalc'))}</div>`;}
-    else if(m.actlen>0){const delta=Math.round((m.actlen-calcDisp)*100)/100;const dcol=Math.abs(delta)<=0.05?(dk?'#7fdca0':'#1e7e40'):(dk?'#f28b86':'#c00000');
+      const dcol=delta<=-0.005?('var(--ok)'):(delta>=0.005?('var(--bad)'):('var(--mut)'));
+      lenCell.innerHTML=`<span title="${esc(t('rsMkLibLen'))}" style="color:${'var(--ok)'};font-weight:800">${measDisp} <span style="font-size:11px">✓📐</span></span><div style="font-size:10px;font-weight:700;color:${dcol};margin-top:2px">${delta>=0?'+':''}${delta} ${esc(t('rsMkVsCalc'))}</div>`;}
+    else if(m.actlen>0){const delta=Math.round((m.actlen-calcDisp)*100)/100;const dcol=Math.abs(delta)<=0.05?('var(--ok)'):('var(--bad)');
       lenCell.innerHTML=`${calcDisp}<div style="font-size:10px;font-weight:700;color:${dcol};margin-top:2px">${delta>=0?'+':''}${delta}</div>`;}
     else{const wf=(st==='st_ok'&&_wfOn)?_wf:0;
-      if(wf>0){const adj=Math.round(len*wf*uf*100)/100;const delta=Math.round((adj-calcDisp)*100)/100;const bcol=dk?'#7fb0dc':'#2e75b6';
-        lenCell.innerHTML=`<span title="${esc(t('rsMkEffAdj'))}" style="color:${bcol};font-weight:800">${adj} <span style="font-size:11px">≈🧲</span></span><div style="font-size:10px;font-weight:700;color:${dk?'#9fb0c0':'#667'};margin-top:2px">${esc(t('rsMkVsCalc'))} ${delta>=0?'+':''}${delta}</div>`;}
+      if(wf>0){const adj=Math.round(len*wf*uf*100)/100;const delta=Math.round((adj-calcDisp)*100)/100;const bcol='var(--info)';
+        lenCell.innerHTML=`<span title="${esc(t('rsMkEffAdj'))}" style="color:${bcol};font-weight:800">${adj} <span style="font-size:11px">≈🧲</span></span><div style="font-size:10px;font-weight:700;color:${'var(--mut)'};margin-top:2px">${esc(t('rsMkVsCalc'))} ${delta>=0?'+':''}${delta}</div>`;}
       else lenCell.textContent=calcDisp;}
     tr1.querySelector('.rsm-fab').textContent=Math.round(fab*uf*100)/100;
     const fabfCell=tr1.querySelector('.rsm-fabf');if(fabfCell)fabfCell.textContent=Math.round(fabf*uf*100)/100;
@@ -3281,8 +3293,8 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();const spM=r
     const pcCell=tr1.querySelector('.rsm-pcons');if(pcCell)pcCell.textContent=(st==='st_ok'&&pcs>0)?Math.round(effLen*uf/pcs*100)/100:'—';
     const stc=tr1.querySelector('.rsm-st');
     const tip=(st==='st_len')?rsLenFix(vp,cons,len,maxlen):'';
-    stc.innerHTML=esc(t(st))+(tip?`<div class="rsm-tip" style="font-weight:700;font-size:11.5px;margin-top:3px;color:${dk?'#e6b53a':'#8a4b00'}">\ud83d\udca1 ${esc(tip)}</div>`:'');
-    const okBg=dk?'#1e3a2a':'#e2f2e2',okTx=dk?'#7fdca0':'#1e7e40',erBg=dk?'#3a2422':'#fbe3e3',erTx=dk?'#f0a09c':'#c00000',emTx=dk?'#9fb0c0':'#667';
+    stc.innerHTML=esc(t(st))+(tip?`<div class="rsm-tip" style="font-weight:700;font-size:11.5px;margin-top:3px;color:${'var(--warn)'}">\ud83d\udca1 ${esc(tip)}</div>`:'');
+    const okBg='var(--ok-bg)',okTx='var(--ok)',erBg='var(--bad-bg)',erTx='var(--bad)',emTx='var(--mut)';
     stc.style.cssText='max-width:180px;font-weight:800;background:'+(ok?okBg:(st==='st_empty'?bg:erBg))+';color:'+(ok?okTx:(st==='st_empty'?emTx:erTx));
     MR.push({stc,st,vp,len,pcs,plies,idx:i});});
   // \u0627\u0633\u062a\u0628\u062f\u0627\u0644 \u062a\u0644\u0642\u0627\u0626\u064a: \u0623\u064a \u0645\u0627\u0631\u0643\u0631 \u062a\u062c\u0627\u0648\u0632 \u0627\u0644\u0637\u0648\u0644 \u0648\u0644\u0647 \u0628\u062f\u064a\u0644 \u0623\u0642\u0635\u0631 \u2014 \u064a\u064f\u0637\u0628\u064e\u0651\u0642 \u0627\u0644\u0627\u0633\u062a\u0628\u062f\u0627\u0644 \u062b\u0645 \u064a\u064f\u0639\u0627\u062f \u0627\u0644\u062d\u0633\u0627\u0628 \u0645\u0631\u0629 \u0648\u0627\u062d\u062f\u0629.
@@ -3298,7 +3310,7 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();const spM=r
   // \u0627\u0642\u062a\u0631\u0627\u062d \u0625\u0636\u0627\u0641\u0629 \u0645\u0642\u0627\u0633 \u0644\u0644\u0645\u0627\u0631\u0643\u0631\u0627\u062a \u0627\u0644\u0635\u0627\u0644\u062d\u0629 \u0627\u0644\u062a\u064a \u0628\u0647\u0627 \u0645\u062a\u0633\u0651\u0639 (\u0642\u0627\u0628\u0644 \u0644\u0644\u0636\u063a\u0637 \u0644\u0644\u062a\u0637\u0628\u064a\u0642)
   const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]-(produced[s]||0));
   MR.forEach(r=>{if(r.st!=='st_ok')return;const add=rsAddFit(r.vp,cons,r.len,r.pcs,maxlen,maxpcs,maxsizes,rem,r.plies);
-    if(add)r.stc.insertAdjacentHTML('beforeend',`<div class="rsm-tip rsm-addtip" role="button" title="${esc(t('rsAddApply'))}" data-sz="${esc(add.size)}" onclick="rsApplyAdd(${r.idx},this.dataset.sz)" style="font-weight:700;font-size:11.5px;margin-top:3px;color:${rsDark()?'#57d99a':'#0a5'};cursor:pointer;text-decoration:underline dotted">\u2795 ${esc(add.msg)}</div>`);});
+    if(add)r.stc.insertAdjacentHTML('beforeend',`<div class="rsm-tip rsm-addtip" role="button" title="${esc(t('rsAddApply'))}" data-sz="${esc(add.size)}" onclick="rsApplyAdd(${r.idx},this.dataset.sz)" style="font-weight:700;font-size:11.5px;margin-top:3px;color:${'var(--ok)'};cursor:pointer;text-decoration:underline dotted">\u2795 ${esc(add.msg)}</div>`);});
   // \u062c\u062f\u0648\u0644 \u0645\u0631\u0627\u062c\u0639\u0629 \u0627\u0644\u0646\u0627\u062a\u062c \u062d\u0633\u0628 \u0627\u0644\u0645\u0642\u0627\u0633
   if($('rs-review')){const srows=[...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),c:+tr.querySelector('.rsq-cons').value||0})).filter(x=>x.size);
     let tReq=0,tProd=0,tRem=0,tCons=0;
@@ -3306,7 +3318,7 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();const spM=r
       tReq+=req;tProd+=prod;tRem+=r;tCons+=req*x.c;
       const stW=r===0?t('rsRvMatch'):r>0?t('rsRvShort'):t('rsRvSurplus');
       return `<tr><td class="rsr-seq"></td><td style="font-weight:800">${esc(x.size)}</td><td style="font-weight:800;font-size:15px">${req}</td><td style="font-weight:800;font-size:15px">${prod}</td><td style="font-weight:800">${r}</td>
-        <td style="font-weight:800;color:${r===0?(rsDark()?'#7fdca0':'#1e7e40'):(rsDark()?'#f0a09c':'#c00000')};background:${r===0?(rsDark()?'#1e3a2a':'#e2f2e2'):(rsDark()?'#3a2422':'#fbe3e3')}">${stW}</td>
+        <td style="font-weight:800;color:${r===0?('var(--ok)'):('var(--bad)')};background:${r===0?('var(--ok-bg)'):('var(--bad-bg)')}">${stW}</td>
         <td class="red">${x.c}</td><td class="red">${oc}</td></tr>`;}).join('');
     $('rs-rv-req').textContent=tReq||'\u2014';$('rs-rv-prod').textContent=tProd||'\u2014';$('rs-rv-rem').textContent=srows.length?tRem:'\u2014';
     $('rs-rv-cons').textContent=tCons?Math.round(tCons*uf*100)/100:'\u2014';
@@ -3326,7 +3338,7 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();const spM=r
   rsRenderSummary({totalReq,prod:prodAll,rem:totalReq-prodAll,valid:RS_VALIDN,fab:fabDisp,pcons:pconsAll,ready:totalReq>0&&prodAll===totalReq,price,cost,pieceCost});
   rsRollPlan();rsColorsCalc();
   const fw=$('rs-fabwarn');if(fw){const dkw=rsDark();const _prod=$('rs-product')?$('rs-product').value:'';const cwv=String(_cw||'').trim();
-    const warnStyle=()=>{fw.style.display='';fw.style.background=dkw?'#40331f':'#fff8e6';fw.style.color=dkw?'#e6b53a':'#8a6d00';fw.style.border='2px solid '+(dkw?'#6a5620':'#f0dca0');};
+    const warnStyle=()=>{fw.style.display='';fw.style.background='var(--warn-bg)';fw.style.color='var(--warn)';fw.style.border='2px solid '+('var(--warn-bd)');};
     if(!cwv){warnStyle();fw.innerHTML=`⚠️ ${esc(t('rsFabWReq'))}`;}
     else if(_prod&&!rsWidthHasData(_prod,cwv)&&!rsProdHasBase(_prod)&&rsProdWidths(_prod).length){
       // عرض مختار لكن لا استهلاك له لهذا المنتج، والبيانات موجودة لأعراض أخرى — دلّ المستخدم وأتِح التبديل بضغطة
@@ -3346,14 +3358,14 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();const spM=r
     else cc.style.display='none';}
   // مؤشّر الهدر: يقارن استهلاك المراكر المقاسة بتقدير الكاد (جمع القطع) — يكشف المراكر الأقل كفاءة
   const ls=$('rs-libsus');if(ls){const dk5=rsDark();
-    if(_nSus>0){ls.style.display='';ls.style.background=dk5?'#3a2422':'#fbe3e3';ls.style.color=dk5?'#f0a09c':'#a01818';ls.style.border='2px solid '+(dk5?'#7a3b38':'#e6a5a2');
+    if(_nSus>0){ls.style.display='';ls.style.background='var(--bad-bg)';ls.style.color='var(--bad)';ls.style.border='2px solid '+('var(--bad-bd)');
       ls.innerHTML=`🚩 ${esc(tf('rsLibSusBanner',{n:_nSus,t:Math.round(RS_LIB_TOL*100),w:_cw||'—'}))} <button type="button" class="mini r" style="margin-inline-start:8px" onclick="rsLibSusOpen()">${esc(t('rsLibSusBtn'))}</button>`;}
     else ls.style.display='none';}
   const mw=$('rs-mkwaste');if(mw){const dk4=rsDark();const net=tFab-tFabAdd;const wasteDisp=Math.round(net*uf*100)/100;
     const pctW=tFabAdd>0?Math.round(net/tFabAdd*1000)/10:0;
-    if(net>0.05&&nWaste>0){mw.style.display='';mw.style.background=dk4?'#40331f':'#fff8e6';mw.style.color=dk4?'#e6b53a':'#8a6d00';mw.style.border='2px solid '+(dk4?'#6a5620':'#f0dca0');
+    if(net>0.05&&nWaste>0){mw.style.display='';mw.style.background='var(--warn-bg)';mw.style.color='var(--warn)';mw.style.border='2px solid '+('var(--warn-bd)');
       mw.innerHTML=`⚠️ ${esc(tf('rsMkWaste',{m:wasteDisp,p:pctW,n:nWaste,u:rsUL()}))}`;}
-    else if(RS_VALIDN>0&&tFabMeas>0){mw.style.display='';mw.style.background=dk4?'#1e3a2a':'#e2f2e2';mw.style.color=dk4?'#7fdca0':'#1e7e40';mw.style.border='2px solid '+(dk4?'#2f5a41':'#b7e0c4');
+    else if(RS_VALIDN>0&&tFabMeas>0){mw.style.display='';mw.style.background='var(--ok-bg)';mw.style.color='var(--ok)';mw.style.border='2px solid '+('var(--ok-bd)');
       mw.innerHTML=`✅ ${esc(t('rsMkWasteOk'))}`;}
     else mw.style.display='none';}
   // حارس التغطية: فحص تلقائي في كل إعادة حساب — يُظهر تحذيراً بارزاً إن كانت الخطة لا تغطّي الأوردر (نقص أو زيادة لأي مقاس)
@@ -3361,32 +3373,32 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();const spM=r
     let short=[],shortN=0,over=[],overN=0,anyOrder=false;
     Object.keys(reqMap).forEach(s=>{const need=reqMap[s]||0;if(need>0)anyOrder=true;const made=produced[s]||0;const d=need-made;
       if(d>0){short.push(s+' (−'+d+')');shortN+=d;}else if(d<0){over.push(s+' (+'+(-d)+')');overN+=(-d);}});
-    if(anyOrder&&shortN>0){cw2.style.display='';cw2.style.background=dk3?'#3a2422':'#fbe3e3';cw2.style.color=dk3?'#f0a09c':'#c00000';cw2.style.border='2px solid '+(dk3?'#7a3b38':'#e6a5a2');
+    if(anyOrder&&shortN>0){cw2.style.display='';cw2.style.background='var(--bad-bg)';cw2.style.color='var(--bad)';cw2.style.border='2px solid '+('var(--bad-bd)');
       cw2.innerHTML=`⚠️ ${esc(tf('rsCoverShort',{n:shortN,m:short.length}))}<div style="font-weight:700;font-size:12.5px;margin-top:4px" dir="ltr">${esc(short.slice(0,12).join('  ·  '))}${short.length>12?' …':''}</div>`;}
-    else if(anyOrder&&overN>0){cw2.style.display='';cw2.style.background=dk3?'#40331f':'#fff8e6';cw2.style.color=dk3?'#e6b53a':'#8a6d00';cw2.style.border='2px solid '+(dk3?'#6a5620':'#f0dca0');
+    else if(anyOrder&&overN>0){cw2.style.display='';cw2.style.background='var(--warn-bg)';cw2.style.color='var(--warn)';cw2.style.border='2px solid '+('var(--warn-bd)');
       cw2.innerHTML=`🟡 ${esc(tf('rsCoverOver',{n:overN,m:over.length}))}<div style="font-weight:700;font-size:12.5px;margin-top:4px" dir="ltr">${esc(over.slice(0,12).join('  ·  '))}${over.length>12?' …':''}</div>`;}
-    else if(anyOrder&&RS_VALIDN>0){cw2.style.display='';cw2.style.background=dk3?'#1e3a2a':'#e2f2e2';cw2.style.color=dk3?'#7fdca0':'#1e7e40';cw2.style.border='2px solid '+(dk3?'#2f5a41':'#b7e0c4');
+    else if(anyOrder&&RS_VALIDN>0){cw2.style.display='';cw2.style.background='var(--ok-bg)';cw2.style.color='var(--ok)';cw2.style.border='2px solid '+('var(--ok-bd)');
       cw2.innerHTML=`✅ ${esc(t('rsCoverOk'))}`;}
     else cw2.style.display='none';}
   RS_LIBC=null;// إنهاء المسار السريع
   rsMkApplyColors();rsSaveDraft();}
 function rsRenderSummary(d){const el=$('rs-summary');if(!el)return;
-  const c=(l,v,col)=>`<div style="flex:1 1 150px;display:flex;border:1px solid #d8c27a;border-radius:8px;overflow:hidden;min-width:140px">
-    <div style="background:#ffc000;padding:8px 10px;font-weight:800;flex:1;font-size:12.5px">${l}</div>
-    <div style="background:#fdf6e3;padding:8px 10px;font-weight:800;min-width:56px;text-align:center;color:${col||'#1c1c1c'}">${v}</div></div>`;
+  const c=(l,v,col)=>`<div style="flex:1 1 150px;display:flex;border:1px solid var(--hdr2);border-radius:8px;overflow:hidden;min-width:140px">
+    <div style="background:var(--hdr);color:var(--hdr-txt);padding:8px 10px;font-weight:800;flex:1;font-size:12.5px">${l}</div>
+    <div style="background:var(--card);padding:8px 10px;font-weight:800;min-width:56px;text-align:center;color:${col||'var(--txt)'}">${v}</div></div>`;
   const surplus=d.prod-d.totalReq,shortage=d.totalReq-d.prod;
   let banner='';
-  if(surplus>0)banner=`<div style="flex:1 1 100%;background:#fbe3e3;border:1.5px solid #e6a5a2;border-radius:10px;padding:9px 13px;font-weight:800;color:#b02a26;display:flex;align-items:center;gap:8px">\u26a0\ufe0f ${tf('rsOverProd',{n:surplus})}</div>`;
-  else if(shortage>0)banner=`<div style="flex:1 1 100%;background:#fff8e6;border:1.5px solid #f0dca0;border-radius:10px;padding:9px 13px;font-weight:800;color:#8a6d00;display:flex;align-items:center;gap:8px">\ud83d\udfe1 ${tf('rsUnderProd',{n:shortage})}</div>`;
+  if(surplus>0)banner=`<div style="flex:1 1 100%;background:var(--bad-bg);border:1.5px solid var(--bad-bd);border-radius:10px;padding:9px 13px;font-weight:800;color:var(--bad);display:flex;align-items:center;gap:8px">\u26a0\ufe0f ${tf('rsOverProd',{n:surplus})}</div>`;
+  else if(shortage>0)banner=`<div style="flex:1 1 100%;background:var(--warn-bg);border:1.5px solid var(--warn-bd);border-radius:10px;padding:9px 13px;font-weight:800;color:var(--warn);display:flex;align-items:center;gap:8px">\ud83d\udfe1 ${tf('rsUnderProd',{n:shortage})}</div>`;
   el.innerHTML=banner
     +c(t('rsSumReq'),d.totalReq||'\u2014')
     +c(t('rsSumProd'),d.prod||'\u2014')
-    +c(surplus>0?t('rsSumSurplus'):t('rsSumRem'),surplus>0?('+'+surplus):d.rem,d.rem===0?'#1e7e40':'#c00000')
+    +c(surplus>0?t('rsSumSurplus'):t('rsSumRem'),surplus>0?('+'+surplus):d.rem,d.rem===0?'var(--ok)':'var(--bad)')
     +c(t('rsSumValid'),d.valid||'\u2014')
     +c(t('rsSumFabT'),(d.fab||0)+' '+rsUL())
-    +c(t('rsSumPcons'),d.pcons?(d.pcons+' '+rsUL()):'—','#1e7e40')
-    +(d.price>0?c(t('rsCostFab'),d.cost,'#1e7e40')+c(t('rsCostPiece'),d.pieceCost,'#1e7e40'):'')
-    +c(t('rsPlanState'),d.ready?t('rsReady'):t('rsReview'),d.ready?'#1e7e40':'#c00000');}
+    +c(t('rsSumPcons'),d.pcons?(d.pcons+' '+rsUL()):'—','var(--ok)')
+    +(d.price>0?c(t('rsCostFab'),d.cost,'var(--ok)')+c(t('rsCostPiece'),d.pieceCost,'var(--ok)'):'')
+    +c(t('rsPlanState'),d.ready?t('rsReady'):t('rsReview'),d.ready?'var(--ok)':'var(--bad)');}
 /* ---- \u062d\u0641\u0638 / \u0637\u0628\u0627\u0639\u0629 / \u0641\u062a\u062d \u062e\u0637\u0629 \u0627\u0644\u0631\u064a\u0634\u0648 ---- */
 function rsResult(){const qty=rsReadQty();if(!qty.length)return null;
   const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
@@ -3517,25 +3529,25 @@ function rsPlanTablesHtml(r){const uf=r.uf||1,u=r.unit||'\u0645\u062a\u0631';con
   const badge=code=>`<span style="display:inline-block;background:#14504f;color:#fff;font-weight:800;padding:3px 9px;border-radius:7px">${esc(code)}</span>`;
   const spM=(r.spread||0)/100;
   const qt=sec(t('rsQtyTbl2'))+open+hd([[t('sizeName'),'s'],[t('mkQtyOrder')],[t('rsRatio')],[t('rsPieceConsM')],[uL('rsQtyConsM')],[uL('rsQtyConsF')]])
-    +(r.qty||[]).map((x,i)=>`<tr style="background:${zb(i)}"><td style="padding:7px 8px;font-weight:700;text-align:${st('s')}">${esc(x.size)}</td><td style="padding:7px;text-align:center;font-weight:700">${x.qty}</td><td style="padding:7px;text-align:center">${x.ratio||'\u2014'}</td><td style="padding:7px;text-align:center;color:#c00000;font-weight:700">${x.cons}</td><td style="padding:7px;text-align:center">${R(x.qty*x.cons)}</td><td style="padding:7px;text-align:center;color:#b45309;font-weight:700">${R(x.qty*(x.cons+spM))}</td></tr>`).join('')
+    +(r.qty||[]).map((x,i)=>`<tr style="background:${zb(i)}"><td style="padding:7px 8px;font-weight:700;text-align:${st('s')}">${esc(x.size)}</td><td style="padding:7px;text-align:center;font-weight:700">${x.qty}</td><td style="padding:7px;text-align:center">${x.ratio||'\u2014'}</td><td style="padding:7px;text-align:center;color:var(--bad);font-weight:700">${x.cons}</td><td style="padding:7px;text-align:center">${R(x.qty*x.cons)}</td><td style="padding:7px;text-align:center;color:#b45309;font-weight:700">${R(x.qty*(x.cons+spM))}</td></tr>`).join('')
     +totr([[t('total'),'s'],[r.totalReq],[(r.qty||[]).reduce((s,x)=>s+(x.ratio||0),0)||'\u2014'],['\u2014'],[R((r.qty||[]).reduce((s,x)=>s+x.qty*x.cons,0))],[R((r.qty||[]).reduce((s,x)=>s+x.qty*(x.cons+spM),0))]])+`</table>`;
   const mk=sec(t('rsMkTbl'))+open+hd([[t('rsCode')],[t('rsMkTbl'),'s'],[t('rsPcsLbl')],[t('rsPlies')],[t('rsPcsRun')],[t('rsMkStatus')],[uL('rsMkPerPly')],[uL('rsSumFab')],[uL('rsQtyConsF')]])
-    +(r.markers||[]).map((m,i)=>`<tr style="background:${rsMkColor(m.pairs)||zb(i)}"><td style="padding:7px;text-align:center">${badge(m.code)}</td><td style="padding:7px 8px;text-align:${st('s')}">${chips(m.pairs)}</td><td style="padding:7px;text-align:center;font-weight:700">${m.pcs}</td><td style="padding:7px;text-align:center;font-weight:800">${m.plies}</td><td style="padding:7px;text-align:center;font-weight:700">${m.run}</td><td style="padding:7px;text-align:center;color:${m.ok?'#1e7e40':'#c00000'};font-weight:700">${esc(m.status)}</td><td style="padding:7px;text-align:center">${R(m.len)}</td><td style="padding:7px;text-align:center;font-weight:700">${R(m.fab)}</td><td style="padding:7px;text-align:center;color:#b45309;font-weight:700">${m.ok?R(m.fab+spM*m.plies):'—'}</td></tr>`).join('')
+    +(r.markers||[]).map((m,i)=>`<tr style="background:${rsMkColor(m.pairs)||zb(i)}"><td style="padding:7px;text-align:center">${badge(m.code)}</td><td style="padding:7px 8px;text-align:${st('s')}">${chips(m.pairs)}</td><td style="padding:7px;text-align:center;font-weight:700">${m.pcs}</td><td style="padding:7px;text-align:center;font-weight:800">${m.plies}</td><td style="padding:7px;text-align:center;font-weight:700">${m.run}</td><td style="padding:7px;text-align:center;color:${m.ok?'var(--ok)':'var(--bad)'};font-weight:700">${esc(m.status)}</td><td style="padding:7px;text-align:center">${R(m.len)}</td><td style="padding:7px;text-align:center;font-weight:700">${R(m.fab)}</td><td style="padding:7px;text-align:center;color:#b45309;font-weight:700">${m.ok?R(m.fab+spM*m.plies):'—'}</td></tr>`).join('')
     +totr([[t('total'),'s',4],[r.totalMade],[''],[''],[R(r.totFab)],[R((r.markers||[]).filter(m=>m.ok).reduce((s,m)=>s+m.fab+spM*m.plies,0))]])+`</table>`;
   const cv=sec(t('rsReviewTbl'))+open+hd([[t('sizeName'),'s'],[t('mkQtyOrder')],[t('rsPcsRun')],[t('rsRemaining')]])
-    +(r.cover||[]).map((c,i)=>`<tr style="background:${zb(i)}"><td style="padding:7px 8px;font-weight:700;text-align:${st('s')}">${esc(c.size)}</td><td style="padding:7px;text-align:center;font-weight:700">${c.req}</td><td style="padding:7px;text-align:center;font-weight:700">${c.made}</td><td style="padding:7px;text-align:center;color:${c.rem===0?'#1e7e40':'#c00000'};font-weight:800">${c.rem}</td></tr>`).join('')
+    +(r.cover||[]).map((c,i)=>`<tr style="background:${zb(i)}"><td style="padding:7px 8px;font-weight:700;text-align:${st('s')}">${esc(c.size)}</td><td style="padding:7px;text-align:center;font-weight:700">${c.req}</td><td style="padding:7px;text-align:center;font-weight:700">${c.made}</td><td style="padding:7px;text-align:center;color:${c.rem===0?'var(--ok)':'var(--bad)'};font-weight:800">${c.rem}</td></tr>`).join('')
     +totr([[t('total'),'s'],[r.totalReq],[r.totalMade],[r.totRem]])+`</table>`;
   return qt+mk+cv;}
 function printRsPlan(){const r=rsResult();if(!r)return toast(t('mkNeed'));
   const uf=r.uf||1,u=r.unit||'\u0645\u062a\u0631';const R=v=>Math.round(v*uf*100)/100;
-  const title=$('rs-title')?$('rs-title').value.trim():'';const dcol=r.decision==='PASS'?'#1e7e40':'#b02a26';
+  const title=$('rs-title')?$('rs-title').value.trim():'';const dcol=r.decision==='PASS'?'var(--ok)':'var(--bad)';
   const surplus=r.totalMade-r.totalReq;
   const card=(label,val,sub)=>`<div style="flex:1;min-width:96px;border:1px solid #dbe5e4;border-radius:11px;padding:9px 8px;text-align:center;background:#f7faf9">
     <div style="font-size:10.5px;color:#6b7683;font-weight:700">${label}</div>
     <div style="font-size:19px;color:#14504f;font-weight:800;line-height:1.2;margin-top:2px">${val}${sub?`<span style="font-size:11px;color:#93a0ab;font-weight:700"> ${sub}</span>`:''}</div></div>`;
   const sigBox=lbl=>`<div style="flex:1;text-align:center"><div style="border-bottom:1.5px solid #7c8894;margin:0 14px 6px;height:40px"></div><div style="font-size:12px;color:#44515e;font-weight:700">${lbl}</div></div>`;
-  const banner=surplus>0?`<div style="margin-top:10px;background:#fbe3e3;border:1.5px solid #e6a5a2;border-radius:9px;padding:8px 12px;font-weight:800;color:#b02a26">\u26a0\ufe0f ${tf('rsOverProd',{n:surplus})}</div>`
-    :surplus<0?`<div style="margin-top:10px;background:#fff8e6;border:1.5px solid #f0dca0;border-radius:9px;padding:8px 12px;font-weight:800;color:#8a6d00">\ud83d\udfe1 ${tf('rsUnderProd',{n:-surplus})}</div>`:'';
+  const banner=surplus>0?`<div style="margin-top:10px;background:var(--bad-bg);border:1.5px solid var(--bad-bd);border-radius:9px;padding:8px 12px;font-weight:800;color:var(--bad)">\u26a0\ufe0f ${tf('rsOverProd',{n:surplus})}</div>`
+    :surplus<0?`<div style="margin-top:10px;background:var(--warn-bg);border:1.5px solid var(--warn-bd);border-radius:9px;padding:8px 12px;font-weight:800;color:var(--warn)">\ud83d\udfe1 ${tf('rsUnderProd',{n:-surplus})}</div>`:'';
   $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#1c2530;max-width:840px;margin:auto;padding-top:8px" dir="${LANG==='ar'?'rtl':'ltr'}">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #14504f;padding-bottom:10px">
       <div><div style="font-size:23px;font-weight:800;color:#14504f;line-height:1.15">\ud83e\uddf5 ${esc(MEMBER.wsName||'')}</div>
@@ -3662,29 +3674,29 @@ function rsRollPlan(){const host=$('rs-rolls');if(!host)return;const uf=rsUF(),u
   const card=(l,v,col)=>`<div style="flex:1 1 120px;min-width:120px;border:1px solid #dbe5e4;border-radius:10px;padding:8px 10px;text-align:center;background:var(--card)">
     <div style="font-size:11px;color:var(--mut);font-weight:700">${l}</div><div style="font-size:18px;font-weight:800;color:${col||'#14504f'};margin-top:2px">${v}</div></div>`;
   const cards=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-    ${card(t('rsRollCount'),d.nRolls)}${card(t('rsRollTotalLen'),R(d.totRoll)+' '+u)}${card(t('rsRollWaste'),R(d.loss)+' '+u,d.loss>0.5?'#c00000':'#1e7e40')}${card(t('rsRollEff'),d.eff+'%',d.eff>=90?'#1e7e40':d.eff>=80?'#b5580a':'#c00000')}${d.mode==='continuous'?card(t('rsRollSplices'),d.splices,d.splices>0?'#b5580a':'#1e7e40'):''}</div>`;
+    ${card(t('rsRollCount'),d.nRolls)}${card(t('rsRollTotalLen'),R(d.totRoll)+' '+u)}${card(t('rsRollWaste'),R(d.loss)+' '+u,d.loss>0.5?'var(--bad)':'var(--ok)')}${card(t('rsRollEff'),d.eff+'%',d.eff>=90?'var(--ok)':d.eff>=80?'var(--warn)':'var(--bad)')}${d.mode==='continuous'?card(t('rsRollSplices'),d.splices,d.splices>0?'var(--warn)':'var(--ok)'):''}</div>`;
   // تلميح: إن كان الهدر مرتفعاً في وضع «بلا وصل»، اعرض بديل الفرد المتصل
   let hint='';
   if(d.mode!=='continuous'&&d.eff<90){const alt=rsRollAlt('continuous');
-    if(alt&&!alt.err&&alt.nRolls<d.nRolls)hint=`<div style="margin-bottom:10px;font-size:12px;color:#8a6d00;background:#fff8e6;border:1px solid #f0dca0;border-radius:8px;padding:8px 11px">💡 ${tf('rsRollTip',{n:alt.nRolls,l:R(alt.loss)+' '+u,e:alt.eff})}</div>`;}
+    if(alt&&!alt.err&&alt.nRolls<d.nRolls)hint=`<div style="margin-bottom:10px;font-size:12px;color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn-bd);border-radius:8px;padding:8px 11px">💡 ${tf('rsRollTip',{n:alt.nRolls,l:R(alt.loss)+' '+u,e:alt.eff})}</div>`;}
   // اقتراح طول الرول المثالي — أساس الحساب طول الماركر (لا يتغيّر)؛ نقترح رولاً = مضاعف لطول الماركر السائد
   let rollHint='';
   if(d.mode!=='continuous'){const id=rsRollIdeal(d);
     if(id&&Math.abs(id.ideal-d.roll)>0.05){
-      rollHint=`<div style="margin-bottom:10px;font-size:12px;color:#0e3f3e;background:#eef5f4;border:1px solid #cfe0df;border-radius:8px;padding:8px 11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      rollHint=`<div style="margin-bottom:10px;font-size:12px;color:var(--teal);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:8px 11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <span>🎯 ${tf('rsRollIdeal',{L:R(id.Ldom)+' '+u,k:id.k,y:R(id.ideal)+' '+u})}</span>
         <button type="button" class="mini g" onclick="rsSetRoll(${R(id.ideal)})">${t('rsRollApplyIdeal')}</button></div>`;}}
   // قطع إضافية مستخرَجة من بواقي الأثواب
   let extraBox='';
-  if(d.mode==='salvage'&&d.extraTotal>0){extraBox=`<div style="margin-bottom:10px;background:#e7f6ec;border:1px solid #b7e0c4;border-radius:8px;padding:8px 11px">
-    <b style="color:#1e7e40">🎁 ${tf('rsRollExtra',{n:d.extraTotal,l:R(d.salvLen)+' '+u})}</b>
-    <div style="margin-top:4px">${Object.entries(d.extra).sort((a,b)=>b[1]-a[1]).map(([s,n])=>`<span class="chip" style="margin:2px;background:#d5efdd">${esc(s)} +${n}</span>`).join(' ')}</div></div>`;}
+  if(d.mode==='salvage'&&d.extraTotal>0){extraBox=`<div style="margin-bottom:10px;background:var(--ok-bg);border:1px solid var(--ok-bd);border-radius:8px;padding:8px 11px">
+    <b style="color:var(--ok)">🎁 ${tf('rsRollExtra',{n:d.extraTotal,l:R(d.salvLen)+' '+u})}</b>
+    <div style="margin-top:4px">${Object.entries(d.extra).sort((a,b)=>b[1]-a[1]).map(([s,n])=>`<span class="chip" style="margin:2px;background:var(--ok-bg)">${esc(s)} +${n}</span>`).join(' ')}</div></div>`;}
   const rows=d.rolls.map((r,i)=>`<tr>
     <td style="font-weight:800">${t('rsRollNo')} ${i+1}</td>
-    <td style="text-align:start">${Object.entries(r.by).map(([c,n])=>`<span class="chip" style="margin:2px">${esc(c)} ×${n}</span>`).join(' ')}${r.spl?` <span style="color:#b5580a;font-weight:700">✂${r.spl}</span>`:''}${r.salv&&Object.keys(r.salv).length?' '+Object.entries(r.salv).map(([s,n])=>`<span class="chip" style="margin:2px;background:#d5efdd;color:#1e7e40">🎁${esc(s)}×${n}</span>`).join(' '):''}</td>
+    <td style="text-align:start">${Object.entries(r.by).map(([c,n])=>`<span class="chip" style="margin:2px">${esc(c)} ×${n}</span>`).join(' ')}${r.spl?` <span style="color:var(--warn);font-weight:700">✂${r.spl}</span>`:''}${r.salv&&Object.keys(r.salv).length?' '+Object.entries(r.salv).map(([s,n])=>`<span class="chip" style="margin:2px;background:var(--ok-bg);color:var(--ok)">🎁${esc(s)}×${n}</span>`).join(' '):''}</td>
     <td style="font-weight:700">${r.plies}</td>
     <td>${R(r.used)} ${u}</td>
-    <td style="font-weight:800;color:${r.rem>0.5?'#c00000':'#1e7e40'}">${R(r.rem)} ${u}</td></tr>`).join('');
+    <td style="font-weight:800;color:${r.rem>0.5?'var(--bad)':'var(--ok)'}">${R(r.rem)} ${u}</td></tr>`).join('');
   host.innerHTML=rollHint+hint+extraBox+cards+`<div style="overflow-x:auto"><table class="xtbl" style="min-width:560px">
     <tr><th data-i18n="rsRollNo2">${t('rsRollNo2')}</th><th>${t('rsRollPlies')}</th><th>${t('rsPlies')}</th><th>${t('rsRollUsed')} (${u})</th><th>${t('rsRollRem')} (${u})</th></tr>
     ${rows}</table></div>`;}
@@ -3707,10 +3719,10 @@ function printRsRolls(){const d=rsRollCompute();
   const card=(l,v)=>`<div style="flex:1;min-width:96px;border:1px solid #dbe5e4;border-radius:11px;padding:9px 8px;text-align:center;background:#f7faf9"><div style="font-size:10.5px;color:#6b7683;font-weight:700">${l}</div><div style="font-size:19px;color:#14504f;font-weight:800;margin-top:2px">${v}</div></div>`;
   const rows=d.rolls.map((r,i)=>`<tr style="background:${i%2?'#f6faf9':'#fff'}">
     <td style="text-align:center;padding:8px"><span style="display:inline-block;background:#14504f;color:#fff;font-weight:800;padding:3px 10px;border-radius:7px">${t('rsRollNo')} ${i+1}</span></td>
-    <td style="padding:8px;text-align:${LANG==='ar'?'right':'left'}">${Object.entries(r.by).map(([c,n])=>`<span style="display:inline-block;background:#fff;border:1.5px solid #cfe0df;border-radius:999px;padding:2px 9px;margin:2px;font-weight:800">${esc(c)} <span style="color:#1f6e6e">×${n}</span></span>`).join('')}${r.spl?` <b style="color:#b5580a">✂${r.spl}</b>`:''}${r.salv&&Object.keys(r.salv).length?' '+Object.entries(r.salv).map(([s,n])=>`<span style="display:inline-block;background:#e7f6ec;border:1.5px solid #b7e0c4;border-radius:999px;padding:2px 9px;margin:2px;font-weight:800;color:#1e7e40">🎁 ${esc(s)} ×${n}</span>`).join(''):''}</td>
+    <td style="padding:8px;text-align:${LANG==='ar'?'right':'left'}">${Object.entries(r.by).map(([c,n])=>`<span style="display:inline-block;background:#fff;border:1.5px solid #cfe0df;border-radius:999px;padding:2px 9px;margin:2px;font-weight:800">${esc(c)} <span style="color:#1f6e6e">×${n}</span></span>`).join('')}${r.spl?` <b style="color:var(--warn)">✂${r.spl}</b>`:''}${r.salv&&Object.keys(r.salv).length?' '+Object.entries(r.salv).map(([s,n])=>`<span style="display:inline-block;background:var(--ok-bg);border:1.5px solid var(--ok-bd);border-radius:999px;padding:2px 9px;margin:2px;font-weight:800;color:var(--ok)">🎁 ${esc(s)} ×${n}</span>`).join(''):''}</td>
     <td style="text-align:center;padding:8px;font-weight:800">${r.plies}</td>
     <td style="text-align:center;padding:8px">${R(r.used)} ${u}</td>
-    <td style="text-align:center;padding:8px;font-weight:800;color:${r.rem>0.5?'#b02a26':'#1e7e40'}">${R(r.rem)} ${u}</td>
+    <td style="text-align:center;padding:8px;font-weight:800;color:${r.rem>0.5?'var(--bad)':'var(--ok)'}">${R(r.rem)} ${u}</td>
     <td style="padding:8px;min-width:90px"></td></tr>`).join('');
   $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#1c2530;max-width:840px;margin:auto;padding-top:8px" dir="${LANG==='ar'?'rtl':'ltr'}">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #14504f;padding-bottom:10px">
@@ -3718,7 +3730,7 @@ function printRsRolls(){const d=rsRollCompute();
       <div style="display:inline-block;margin-top:6px;background:#14504f;color:#fff;font-size:13px;font-weight:800;padding:3px 12px;border-radius:7px">${t('rsRollTitle')}</div></div>
       <div style="text-align:${LANG==='ar'?'left':'right'};font-size:12px;color:#6b7683;line-height:1.9"><div>📅 ${fmtDate(today())}</div>${title?`<div>📝 ${esc(title)}</div>`:''}<div>📏 ${t('rsRollLenLbl')}: ${R(d.roll)} ${u}</div></div></div>
     <div style="display:flex;gap:8px;margin-top:12px">${card(t('rsRollCount'),d.nRolls)}${card(t('rsRollTotalLen'),R(d.totRoll)+' '+u)}${card(t('rsRollWaste'),R(d.loss)+' '+u)}${card(t('rsRollEff'),d.eff+'%')}</div>
-    ${d.mode==='salvage'&&d.extraTotal>0?`<div style="margin-top:10px;background:#e7f6ec;border:1px solid #b7e0c4;border-radius:9px;padding:8px 12px;font-weight:800;color:#1e7e40">🎁 ${tf('rsRollExtra',{n:d.extraTotal,l:R(d.salvLen)+' '+u})} — ${Object.entries(d.extra).sort((a,b)=>b[1]-a[1]).map(([s,n])=>esc(s)+' +'+n).join(' · ')}</div>`:''}
+    ${d.mode==='salvage'&&d.extraTotal>0?`<div style="margin-top:10px;background:var(--ok-bg);border:1px solid var(--ok-bd);border-radius:9px;padding:8px 12px;font-weight:800;color:var(--ok)">🎁 ${tf('rsRollExtra',{n:d.extraTotal,l:R(d.salvLen)+' '+u})} — ${Object.entries(d.extra).sort((a,b)=>b[1]-a[1]).map(([s,n])=>esc(s)+' +'+n).join(' · ')}</div>`:''}
     <table class="prt-grid" style="width:100%;border-collapse:collapse;margin-top:14px;border:1px solid #d5dee2;border-radius:10px;overflow:hidden;font-size:13px">
       <thead><tr style="background:#e6efee"><th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${t('rsRollNo2')}</th><th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${t('rsRollPlies')}</th><th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${t('rsPlies')}</th><th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${t('rsRollUsed')} (${u})</th><th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${t('rsRollRem')} (${u})</th><th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${t('signature')}</th></tr></thead>
       <tbody>${rows}</tbody></table>
@@ -3891,13 +3903,13 @@ function rsCompareShow(){const ids=[...document.querySelectorAll('.rs-cmp-ck:che
    +rowM(t('productLbl'),c=>`<td>${esc(c.result.product||'—')}</td>`)
    +rowM(t('rsSumReq'),c=>`<td>${c.result.totalReq}</td>`)
    +rowM(t('rsSumProd'),c=>`<td>${c.result.totalMade}</td>`)
-   +rowM(t('rsSumRem'),c=>`<td style="color:${c.result.totRem===0?'#1e7e40':'#c00000'};font-weight:800">${c.result.totRem}</td>`)
+   +rowM(t('rsSumRem'),c=>`<td style="color:${c.result.totRem===0?'var(--ok)':'var(--bad)'};font-weight:800">${c.result.totRem}</td>`)
    +rowM(t('rsCmpMarkers'),c=>`<td>${c.result.valid}</td>`)
    +rowM(t('rsSumFabT'),c=>{const isBest=passed.includes(c)&&Math.abs(fabM(c)-bestM)<1e-6;
-        return `<td style="font-weight:800${isBest?';background:#e7f6ec;color:#1e7e40':''}">${c.result.totFab} ${c.result.unit||'م'}${isBest?' ★':''}</td>`;})
+        return `<td style="font-weight:800${isBest?';background:var(--ok-bg);color:var(--ok)':''}">${c.result.totFab} ${c.result.unit||'م'}${isBest?' ★':''}</td>`;})
    +rowM(t('rsCmpWaste'),c=>{if(bestM==null||c.result.decision!=='PASS')return`<td>—</td>`;
-        const d=Math.round((fabM(c)-bestM)*100)/100;return `<td style="font-weight:700;color:${d<1e-6?'#1e7e40':'#b5580a'}">${d<1e-6?'0':'+'+d+' م'}</td>`;})
-   +rowM(t('rsPlanState'),c=>`<td style="font-weight:800;color:${c.result.decision==='PASS'?'#1e7e40':'#c00000'}">${c.result.decision==='PASS'?t('rsReady'):t('rsReview')}</td>`);
+        const d=Math.round((fabM(c)-bestM)*100)/100;return `<td style="font-weight:700;color:${d<1e-6?'var(--ok)':'var(--warn)'}">${d<1e-6?'0':'+'+d+' م'}</td>`;})
+   +rowM(t('rsPlanState'),c=>`<td style="font-weight:800;color:${c.result.decision==='PASS'?'var(--ok)':'var(--bad)'}">${c.result.decision==='PASS'?t('rsReady'):t('rsReview')}</td>`);
   window._rsCmpIds=ids;
   modal(`<h3>⚖️ ${t('rsCompareTitle')}</h3>
     <div style="overflow-x:auto"><table class="xtbl" style="min-width:${120+sel.length*120}px">
@@ -3916,11 +3928,11 @@ function rsComparePrint(){const ids=window._rsCmpIds||[];const sel=ids.map(id=>T
    +rowM(t('productLbl'),c=>`<td style="text-align:center">${esc(c.result.product||'—')}</td>`)
    +rowM(t('rsSumReq'),c=>`<td style="text-align:center">${c.result.totalReq}</td>`)
    +rowM(t('rsSumProd'),c=>`<td style="text-align:center">${c.result.totalMade}</td>`)
-   +rowM(t('rsSumRem'),c=>`<td style="text-align:center;color:${c.result.totRem===0?'#1e7e40':'#c00000'};font-weight:800">${c.result.totRem}</td>`)
+   +rowM(t('rsSumRem'),c=>`<td style="text-align:center;color:${c.result.totRem===0?'var(--ok)':'var(--bad)'};font-weight:800">${c.result.totRem}</td>`)
    +rowM(t('rsCmpMarkers'),c=>`<td style="text-align:center">${c.result.valid}</td>`)
-   +rowM(t('rsSumFabT'),c=>{const isBest=passed.includes(c)&&Math.abs(fabM(c)-bestM)<1e-6;return `<td style="text-align:center;font-weight:800${isBest?';color:#1e7e40':''}">${c.result.totFab} ${c.result.unit||'م'}${isBest?' ★':''}</td>`;})
-   +rowM(t('rsCmpWaste'),c=>{if(bestM==null||c.result.decision!=='PASS')return`<td style="text-align:center">—</td>`;const d=Math.round((fabM(c)-bestM)*100)/100;return `<td style="text-align:center;font-weight:700;color:${d<1e-6?'#1e7e40':'#b5580a'}">${d<1e-6?'0':'+'+d+' م'}</td>`;})
-   +rowM(t('rsPlanState'),c=>`<td style="text-align:center;font-weight:800;color:${c.result.decision==='PASS'?'#1e7e40':'#c00000'}">${c.result.decision==='PASS'?t('rsReady'):t('rsReview')}</td>`);
+   +rowM(t('rsSumFabT'),c=>{const isBest=passed.includes(c)&&Math.abs(fabM(c)-bestM)<1e-6;return `<td style="text-align:center;font-weight:800${isBest?';color:var(--ok)':''}">${c.result.totFab} ${c.result.unit||'م'}${isBest?' ★':''}</td>`;})
+   +rowM(t('rsCmpWaste'),c=>{if(bestM==null||c.result.decision!=='PASS')return`<td style="text-align:center">—</td>`;const d=Math.round((fabM(c)-bestM)*100)/100;return `<td style="text-align:center;font-weight:700;color:${d<1e-6?'var(--ok)':'var(--warn)'}">${d<1e-6?'0':'+'+d+' م'}</td>`;})
+   +rowM(t('rsPlanState'),c=>`<td style="text-align:center;font-weight:800;color:${c.result.decision==='PASS'?'var(--ok)':'var(--bad)'}">${c.result.decision==='PASS'?t('rsReady'):t('rsReview')}</td>`);
   $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#111;max-width:900px;margin:auto;padding-top:10px" dir="${LANG==='ar'?'rtl':'ltr'}">
     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #14504f;padding-bottom:8px">
       <div><div style="font-size:22px;font-weight:800;color:#14504f">🧵 ${esc(MEMBER.wsName||'')}</div>
