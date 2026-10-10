@@ -2954,9 +2954,10 @@ function rsComboPrintSheet(list,title){const L0=Array.isArray(list)?list:RS_COMB
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 function rsComboRender(){const tb=$('rs-combo-rows');if(!tb)return;const uf=rsUF();
   if(!RS_COMBOS.length){tb.innerHTML=`<tr><td colspan="6" style="padding:10px;color:var(--mut)">${t('rsCbEmpty')}</td></tr>`;if($('rs-combo-best'))$('rs-combo-best').textContent='';return;}
-  // التوليفات التي تحتاج قياساً (ليست قطعة واحدة ولم تُقَس بعد) تتصدّر القائمة لتسهيل قياسها، مع حفظ الترتيب داخل كل مجموعة
-  const _needM=c=>c.combo.reduce((a,p)=>a+p.cnt,0)!==1&&!(c.actual>0);
-  const _pn=[],_nd=[],_rs=[];RS_COMBOS.forEach(c=>(RS_CB_PIN.has(rsComboSig(c.combo))?_pn:_needM(c)?_nd:_rs).push(c));RS_COMBOS=_pn.concat(_nd,_rs);
+  // التوليفات التي تحتاج قياساً (ليست قطعة واحدة ولم تُقَس بعد) تتصدّر القائمة دائماً — المثبّتة (بديل/أولوية) أولاً داخلها؛
+  // وبعد قياس المثبّتة تنزل تحت ما يحتاج قياساً. الترتيب داخل كل مجموعة محفوظ.
+  const _needM=c=>c.combo.reduce((a,p)=>a+p.cnt,0)!==1&&!(c.actual>0),_pin=c=>RS_CB_PIN.has(rsComboSig(c.combo));
+  const _g=[[],[],[],[]];RS_COMBOS.forEach(c=>_g[(_needM(c)?0:2)+(_pin(c)?0:1)].push(c));RS_COMBOS=[].concat(..._g);
   tb.innerHTML=RS_COMBOS.map((c,i)=>{
     const sizesHtml=c.combo.map((p,k)=>{const nm=esc(p.size);
       const cnt=` <span style="color:var(--teal);font-weight:900;font-size:12px">×${p.cnt}</span>`;
