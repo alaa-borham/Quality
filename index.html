@@ -220,6 +220,8 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
  /* صف لوّنه المستخدم (ألوان فاتحة): نص داكن ليُقرأ في كل الأوضاع — الخلايا والحقول ذات اللون الدلالي (أحمر/برتقالي) تحتفظ بلونها */
 :where(.xtbl tr.rs-tinted)>td,:where(.xtbl tr.rs-tinted) input,:where(.xtbl tr.rs-tinted) select{color:#0b1220}
 .xtbl tr.rs-tinted{--txt:#0b1220;--mut:#475467;--bad:#c81e1e;--warn:#92400e;--ok:#15803d;--amber:#b45309;--teal:#0b6e6e;--inp:transparent}
+ /* حقول الأرقام في إدارة المقاسات: بلا أسهم الزيادة/النقصان كي تظهر القيمة كاملة */
+.sm-num{-moz-appearance:textfield;appearance:textfield}.sm-num::placeholder{font-weight:400;color:var(--mut);opacity:.75;font-size:12px}.sm-num::-webkit-inner-spin-button,.sm-num::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 .xtbl input.rs-miss{outline:3px solid var(--bad)!important;background:var(--bad-bg)!important}
 @media print{.xtbl tr>td,.rtbl tr>td{box-shadow:none!important}.xtbl tr,.rtbl tr{outline:none!important}}
 </style>
@@ -1765,12 +1767,12 @@ function renderSizesManager(){const el=$('sizes-list');if(!el)return;
     const val=SM_W?(hasW?s.consW[SM_W]:''):(s.cons||'');
     const ph=SM_W?(s.cons||'—'):(t('sizeConsPh'));
     return `<span class="chip" style="font-size:13px;padding:4px 8px;margin:0 0 6px 6px;display:inline-flex;align-items:center;gap:5px${SM_W&&hasW?';outline:2px solid var(--green)':''}">${esc(s.size)}
-    <input type="number" step="0.01" value="${val}" placeholder="${ph}" title="${t('sizeConsPh')}" onchange="editSizeCons('${nm}',this.value)" style="width:58px;padding:3px 5px;font-size:13px;border:1px solid #cfe0df;border-radius:6px;text-align:center">
-    ${SM_W?'':`<input type="number" step="0.25" value="${s.ratio||''}" title="${t('ratioPh')}" placeholder="${t('ratioShort')}" onchange="editSizeRatio('${nm}',this.value)" style="width:48px;padding:3px 5px;font-size:13px;border:1px solid var(--warn-bd);background:var(--warn-bg);border-radius:6px;text-align:center">`}
+    <input type="number" class="sm-num" dir="ltr" step="0.01" value="${val}" placeholder="${ph}" title="${t('sizeConsPh')}" onchange="editSizeCons('${nm}',this.value)" style="width:74px;padding:4px 4px;font-size:13.5px;font-weight:700;border:1px solid var(--line);border-radius:6px;text-align:center">
+    ${SM_W?'':`<input type="number" step="0.25" value="${s.ratio||''}" title="${t('ratioPh')}" placeholder="${t('ratioShort')}" onchange="editSizeRatio('${nm}',this.value)" class="sm-num" dir="ltr" style="width:54px;padding:4px 4px;font-size:13.5px;font-weight:700;border:1px solid var(--warn-bd);background:var(--warn-bg);color:var(--txt);border-radius:6px;text-align:center">`}
     <b style="cursor:pointer;color:var(--red)" onclick="delSize('${nm}')">✕</b></span>`;};
   const groups=sizeGroups(list);
   el.innerHTML=wsel+(groups.length>1
-    ?groups.map(g=>`<div style="margin-bottom:8px;padding:6px 8px;border:1px solid #e2eaea;border-radius:10px">
+    ?groups.map(g=>`<div style="margin-bottom:8px;padding:6px 8px;border:1px solid var(--line);border-radius:10px">
       <div style="font-weight:800;font-size:13px;color:var(--teal);margin-bottom:4px">${esc(g.label)} <span class="note" style="font-weight:400">(${g.items.length})</span></div>
       ${g.items.map(chip).join('')}</div>`).join('')
     :groups.map(g=>g.items.map(chip).join('')).join(''));}
