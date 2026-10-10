@@ -217,6 +217,9 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 #rs-markers .rs-mrow1:focus-within+.rs-mrow2>td,#rs-markers .rs-mrow1:has(+.rs-mrow2:focus-within)>td{box-shadow:inset 0 0 0 999px var(--row-focus)}
 .xtbl tr:not(.tot):not(.rs-mrow1):not(.rs-mrow2):focus-within,.rtbl tr:focus-within{outline:2px solid var(--row-focus-bd);outline-offset:-2px}
 .xtbl td input:focus,.xtbl td select:focus{outline:2px solid var(--row-focus-bd)}
+ /* صف لوّنه المستخدم (ألوان فاتحة): نص داكن ليُقرأ في كل الأوضاع — الخلايا والحقول ذات اللون الدلالي (أحمر/برتقالي) تحتفظ بلونها */
+:where(.xtbl tr.rs-tinted)>td,:where(.xtbl tr.rs-tinted) input,:where(.xtbl tr.rs-tinted) select{color:#0b1220}
+.xtbl tr.rs-tinted{--txt:#0b1220;--mut:#475467;--bad:#c81e1e;--warn:#92400e;--ok:#15803d;--amber:#b45309;--teal:#0b6e6e;--inp:transparent}
 .xtbl input.rs-miss{outline:3px solid var(--bad)!important;background:var(--bad-bg)!important}
 @media print{.xtbl tr>td,.rtbl tr>td{box-shadow:none!important}.xtbl tr,.rtbl tr{outline:none!important}}
 </style>
@@ -1999,8 +2002,8 @@ function rsRowMenu(e,tr){const se=tr.querySelector('.rsq-size');const size=se?se
 function rsComboMenu(e,tr){return rsBuildColorMenu(e,'rsSetComboColor',tr.getAttribute('data-sig')||'');}
 function rsSetRowColor(size,color){if(color)RS_ROWCOL[size]=color;else delete RS_ROWCOL[size];rsCloseRowMenu();rsApplyRowColors();rsSaveDraft();}
 function rsSetComboColor(sig,color){if(color)RS_COMBOCOL[sig]=color;else delete RS_COMBOCOL[sig];rsCloseRowMenu();rsComboApplyColors();rsMkApplyColors();rsSaveDraft();}
-function rsTintRow(tr,col){tr.querySelectorAll('td').forEach(td=>{td.style.background=col;td.style.color=col?'#0b1220':'';});
-  tr.querySelectorAll('input,select,span[dir="ltr"]').forEach(el=>{if(el.dataset.bg0===undefined)el.dataset.bg0=el.style.backgroundColor||'';el.style.backgroundColor=col?'transparent':el.dataset.bg0;el.style.color=col?'#0b1220':'';});}
+function rsTintRow(tr,col){tr.classList.toggle('rs-tinted',!!col);tr.querySelectorAll('td').forEach(td=>{td.style.background=col;});
+  tr.querySelectorAll('input,select,span[dir="ltr"]').forEach(el=>{if(el.dataset.bg0===undefined)el.dataset.bg0=el.style.backgroundColor||'';el.style.backgroundColor=col?'transparent':el.dataset.bg0;});}
 function rsComboApplyColors(){document.querySelectorAll('#rs-combo-rows tr[data-sig]').forEach(tr=>{const sig=tr.getAttribute('data-sig');rsTintRow(tr,(sig&&RS_COMBOCOL[sig])||'');});}
 // ألوان صفوف الماركرات: مرتبطة بالتوليفة (نفس لون «مطور المراكر») وتظهر في الطباعة وملف Excel
 function rsMkPairsSig(pairs){const vp=(pairs||[]).filter(p=>p&&p.size&&p.cnt>0);return vp.length?rsComboSig(vp):'';}
@@ -2014,10 +2017,10 @@ function rsMkRowMenu(e){const tg=e.target;if(tg&&tg.closest&&tg.closest('input,s
   if(!tr1||!tr1.classList.contains('rs-mrow1'))return true;const sg=rsMkRowSig(tr1);if(!sg){e.preventDefault();toast(t('rsMkClrNeed'));return false;}
   return rsBuildColorMenu(e,'rsSetComboColor',sg);}
 function rsApplyRowColors(){document.querySelectorAll('.rsq-row').forEach(tr=>{const se=tr.querySelector('.rsq-size');const sz=se?se.value.trim():'';const col=(sz&&RS_ROWCOL[sz])||'';
-  tr.querySelectorAll('td').forEach(td=>{td.style.background=col;td.style.color=col?'#0b1220':'';});
+  tr.classList.toggle('rs-tinted',!!col);tr.querySelectorAll('td').forEach(td=>{td.style.background=col;});
   // اجعل حقول الإدخال شفافة ليظهر لون الصف خلفها، مع حفظ خلفيتها الأصلية لاستعادتها عند الإلغاء
   tr.querySelectorAll('input,select').forEach(inp=>{if(inp.dataset.bg0===undefined)inp.dataset.bg0=inp.style.backgroundColor||'';
-    inp.style.backgroundColor=col?'transparent':inp.dataset.bg0;inp.style.color=col?'#0b1220':'';});});}
+    inp.style.backgroundColor=col?'transparent':inp.dataset.bg0;});});}
 // طيّ كل الأقسام افتراضياً (المستخدم يفتح ما يحتاجه) — يُطبَّق مرة عند أول دخول لصفحة الريشو في الجلسة
 function rsCollapseAll(){['rsc','rsq','rsm','rsr','rss','rscb','rso'].forEach(k=>{if(!RS_COL[k]&&document.querySelector('.'+k+'-cv'))rsCollapse(k);});}
 // طيّ/فتح جدول
