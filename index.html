@@ -2426,12 +2426,17 @@ function rsSolve(rem0,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
   const SUR=opt.sur!=null?opt.sur:Math.max(0,Math.round(+($('rs-surplus')&&$('rs-surplus').value)||0)); // فائض مسموح لكل قياس (0=تغطية تامة، افتراضي)
   const work={};Object.keys(rem0).forEach(s=>work[s]=rem0[s]);
   const BUDGET=opt.budget||3500;// ميزانية زمنية (مللي ثانية) — تُصغَّر للاقتراحات الحيّة كي لا تُجمّد الواجهة
-  const out=[];let guard=0;const t0=Date.now();const deadline=t0+BUDGET;
-  while(guard++<2000&&Date.now()-t0<BUDGET){
+  const out=[];let guard=0;const t0=Date.now();
+  // لا نتوقف قبل تغطية الأوردر: الميزانية تُوزَّع على الجولات (لكل جولة شريحة وقت، بحد أدنى ٤٠ مللي ثانية)
+  while(guard++<2000){
     const active=Object.keys(work).filter(s=>work[s]>0&&cons[s]>0);if(!active.length)break;
+    const deadline=Date.now()+Math.max(40,(BUDGET-(Date.now()-t0))/Math.max(2,Math.ceil(active.length/2)));
     let best=null;
-    // يُعاد توليد التوليفات للقياسات المتبقية فقط كل جولة — يضمن تغطية كل القياسات حتى عند بلوغ سقف التوليد
-    const src=opt.cands?opt.cands.filter(c=>c.every(p=>work[p.size]>0&&cons[p.size]>0)):rsCombos(active,maxsizes,maxpcs,cons,maxlen,deadline);
+    if(!opt.cands){best=rsBestCombo(active,work,cons,maxlen,maxsizes,maxpcs,SUR,better,deadline);
+      if(!best)break;out.push({combo:best.combo,plies:best.plies,len:best.len});
+      best.combo.forEach(p=>work[p.size]-=p.cnt*best.plies);Object.keys(work).forEach(s=>{if(work[s]<0)work[s]=0;});continue;}
+    // مسار المرشّحين الجاهزين (توليفات المكتبة/البدائل): نقيّم المتاح منها للقياسات المتبقية فقط
+    const src=opt.cands.filter(c=>c.every(p=>work[p.size]>0&&cons[p.size]>0));
     for(const combo of src){
       const len=combo.reduce((a,p)=>a+p.cnt*cons[p.size],0);if(maxlen>0&&len>maxlen+1e-9)continue;
       const flo=Math.min(...combo.map(p=>Math.floor(work[p.size]/p.cnt)));
@@ -2450,6 +2455,27 @@ function rsSolve(rem0,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
     best.combo.forEach(p=>work[p.size]-=p.cnt*best.plies);
     Object.keys(work).forEach(s=>{if(work[s]<0)work[s]=0;});} // تصفير الفائض كي لا يُحسب سالباً
   return out;}
+// أفضل توليفة لجولة واحدة: يمرّ على كل التوليفات الصالحة (بلا سقف عددي ولا تخزين) ويقيّم كلاً منها أثناء المرور.
+// المقاسات مرتّبة بالكمية المتبقية تنازلياً — فإن انتهى وقت الجولة قبل المرور على الكل، يكون المتروك هو الأقل أثراً.
+function rsBestCombo(active,work,cons,maxlen,maxsizes,maxpcs,SUR,better,deadline){
+  const sz=active.slice().sort((a,b)=>work[b]-work[a]),n=sz.length,W=sz.map(s=>work[s]),C=sz.map(s=>cons[s]);
+  const idx=[],cnt=[],cur={plies:0,covered:0,surplus:0,len:0,pcs:0,spread:0};let best=null,nodes=0,stop=false;
+  const evalCur=(pcs,len)=>{const k=idx.length;let flo=Infinity,fin=0,mx=-Infinity,mn=Infinity;
+    for(let j=0;j<k;j++){const w=W[idx[j]],q=cnt[j],f=Math.floor(w/q),g=Math.ceil(w/q),cv=C[idx[j]];
+      if(f<flo)flo=f;if(g>fin)fin=g;if(cv>mx)mx=cv;if(cv<mn)mn=cv;}
+    let finOk=fin>=1;if(finOk)for(let j=0;j<k;j++)if(fin*cnt[j]-W[idx[j]]>SUR){finOk=false;break;}
+    const plies=finOk?fin:flo;if(plies<1)return;
+    let covered=0,surplus=0;for(let j=0;j<k;j++){const m=plies*cnt[j],w=W[idx[j]];covered+=m<w?m:w;if(m>w)surplus+=m-w;}
+    cur.plies=plies;cur.covered=covered;cur.surplus=surplus;cur.len=len;cur.pcs=pcs;cur.spread=mx-mn;
+    if(!best||better(cur,best)>0)best={...cur,combo:idx.map((i,j)=>({size:sz[i],cnt:cnt[j]}))};};
+  const rec=(start,pcs,len)=>{
+    if(((++nodes)&1023)===0&&Date.now()>deadline&&best){stop=true;return;}
+    if(idx.length)evalCur(pcs,len);
+    if(idx.length>=maxsizes)return;
+    for(let i=start;i<n;i++){const c0=C[i];
+      for(let c=1;pcs+c<=maxpcs;c++){const nl=len+c*c0;if(maxlen>0&&nl>maxlen+1e-9)break;
+        idx.push(i);cnt.push(c);rec(i+1,pcs+c,nl);idx.pop();cnt.pop();if(stop)return;}}};
+  rec(0,0,0);return best;}
 // أفضل خطة تلقائياً للكميات المتبقية بأقل استهلاك (تغطية تامة بلا زيادة)
 function rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,rawPairs){
   if(!vp.length)return false;const pcs=vp.reduce((a,p)=>a+p.cnt,0);const len=vp.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);
