@@ -3,7 +3,7 @@
  * التشغيل:  npm run test:solver
  * تُستخرج الدوال كما هي من index.html (نفس الكود الذي يعمل في التطبيق) وتُشغَّل في سياق node:vm.
  * يفحص: تغطية الأوردر بلا نقص ولا زيادة، احترام القيود، عدد الماركرات (منع رجوع «٢٦ مقاس ← ٢٩ ماركر»)،
- *        اختيار المكتبة/الحرّ، حارس المكتبة، توقيع التوليفة، مواعيد النسخ الاحتياطي، و CRC لملفات Excel.
+ *        اختيار المكتبة/الحرّ، حارس المكتبة، توقيع التوليفة، مواعيد النسخ الاحتياطي، CRC لملفات Excel، وفحص منطق الاستهلاك.
  */
 import fs from 'fs';
 import vm from 'vm';
@@ -34,13 +34,13 @@ function grabConst(name) {
 }
 
 const code = [
-  grabConst('RS_LIB_TOL'), grabConst('XL_CRC'), grabConst('rsP2'),
-  ...['rsCombos', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc'].map(grabFn),
+  grabConst('RS_LIB_TOL'), grabConst('XL_CRC'), grabConst('rsP2'), grabConst('SIZE_ORDER'), grabConst('CV_HI'),
+  ...['rsCombos', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck'].map(grabFn),
 ].join('\n');
 // rsSolve يقرأ الهدف/الفائض من الواجهة عند غياب الخيارات — نعيد قيمة فارغة فيُستعمل الافتراضي («أقل ماركرات»، فائض 0)
 const ctx = { $: () => ({ value: '' }), Date, Math, Object, Set, Array, String, Number, Uint32Array, TextEncoder, console };
 vm.createContext(ctx);
-vm.runInContext(code + '\n;globalThis.__x={rsCombos,rsSolve,rsPlanSolve,rsComboSig,rsLibComp,rsLibOk,rsBakSlot,rsBakSlotId,xlCrc};', ctx);
+vm.runInContext(code + '\n;globalThis.__x={rsCombos,rsSolve,rsPlanSolve,rsComboSig,rsLibComp,rsLibOk,rsBakSlot,rsBakSlotId,xlCrc,consCheck};', ctx);
 const X = ctx.__x;
 
 let pass = 0, fail = 0;
@@ -115,6 +115,28 @@ chk('rsComboSig distinguishes counts', X.rsComboSig([{ size: 'S', cnt: 1 }]) !==
 
 // ── CRC32 لكاتب ملفات Excel (القيمة المرجعية القياسية) ──
 chk('xlCrc("123456789") = CBF43926', X.xlCrc(new TextEncoder().encode('123456789')) === 0xCBF43926);
+
+// ── فحص منطق الاستهلاك ──
+{ const base = [['S-53', 2.1], ['S-54', 2.15], ['S-55', 2.18], ['S-56', 2.21], ['S-57', 2.31], ['M-56', 2.3], ['L-56', 2.4]];
+  const mk = over => base.map(([size, cons]) => ({ size, cons: over && over[size] != null ? over[size] : cons }));
+  const lv = (R, s) => R[s] ? R[s][0].lvl + ':' + R[s][0].code : '';
+  chk('cv: clean list has no issues', Object.keys(X.consCheck(mk())).length === 0, X.consCheck(mk()));
+  { const R = X.consCheck(mk({ 'S-56': 41.0526 }));
+    chk('cv: 41.05 among ~2.2 is bad outlier', lv(R, 'S-56') === 'bad:cvOut', R);
+    chk('cv: outlier not used as neighbour reference', !R['S-55'] && !R['S-57'] && !R['M-56'], R); }
+  chk('cv: 0.221 typo is bad outlier', lv(X.consCheck(mk({ 'S-56': 0.221 })), 'S-56') === 'bad:cvOut');
+  { const R = X.consCheck(mk({ 'S-56': 2.0 }));
+    chk('cv: longer size lower → warn both sides', lv(R, 'S-56') === 'warn:cvLtPrev' && lv(R, 'S-55') === 'warn:cvGtNext', R); }
+  chk('cv: small dip within 3% tolerated', !X.consCheck(mk({ 'S-56': 2.16 }))['S-56']);
+  { const R = X.consCheck(mk({ 'S-57': 2.6 }));
+    chk('cv: +18% for one step → jump warn', lv(R, 'S-57') === 'warn:cvJump', R); }
+  { const R = X.consCheck(mk({ 'L-56': 2.1 }));
+    chk('cv: wider letter lower → warn', lv(R, 'L-56') === 'warn:cvLtLetter' && lv(R, 'M-56') === 'warn:cvGtLetter', R); }
+  { const R = X.consCheck(mk({ 'S-56': 41 }), new Set(['S-53']));
+    chk('cv: "only" limits reported sizes', Object.keys(R).length === 0, R); }
+  chk('cv: XXL ranks like 2XL (no false letter warn)', !Object.keys(X.consCheck([{ size: 'XL-59', cons: 2.5 }, { size: 'XXL-59', cons: 2.6 }, { size: '3XL-59', cons: 2.7 }])).length);
+  { const R = X.consCheck(mk({ 'S-56': 2.0 })); chk('cv: no jump warn right after a dip', !R['S-57'], R); }
+  chk('cv: < 4 values → no outlier judgement', !X.consCheck([{ size: 'A', cons: 1 }, { size: 'B', cons: 9 }]).A); }
 
 console.log(`\nSolver tests: ${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
