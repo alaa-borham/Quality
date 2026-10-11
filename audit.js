@@ -2,7 +2,7 @@
 /*
  * audit.js — تدقيق ثابت لنظام متابعة الجودة (index.html) بلا أي اعتمادات خارجية.
  * الاستخدام:  node audit.js
- * يفحص: صياغة JavaScript، مفاتيح الترجمة (مفقودة/مكرّرة/تطابق ع-إ)، والمعالِجات غير المعرّفة.
+ * يفحص: صياغة JavaScript، مفاتيح الترجمة (مفقودة/مكرّرة/تطابق ع-إ)، المعالِجات غير المعرّفة، ومتغيّرات CSS غير المعرّفة في الثيمات.
  * يعيد رمز خروج 1 عند وجود أي خطأ (صالح لبوابة ما قبل الدفع)، و0 إن كان نظيفاً.
  */
 'use strict';
@@ -83,6 +83,11 @@ const defined = new Set();
 [...html.matchAll(/\bwindow\.([a-zA-Z_$][\w$]*)\s*=/g)].forEach(m => defined.add(m[1]));
 const undef = handlers.filter(h => !defined.has(h));
 if (undef.length) problems.push('معالِجات أحداث غير معرّفة: ' + undef.join(', '));
+
+/* 5) متغيّرات CSS المستعملة var(--x) يجب أن تكون معرّفة (--x:) في الثيمات — وإلا يسقط اللون للقيمة الاحتياطية فيختفي النص في وضع الدارك */
+const cssDefined = new Set([...html.matchAll(/--([a-z0-9-]+)\s*:/g)].map(m => m[1]));
+const cssUndef = [...new Set([...html.matchAll(/var\(--([a-z0-9-]+)/g)].map(m => m[1]))].filter(v => !cssDefined.has(v));
+if (cssUndef.length) problems.push('متغيّرات CSS غير معرّفة في الثيمات: ' + cssUndef.map(v => '--' + v).join(', '));
 
 /* التقرير */
 console.log(`تدقيق ${path.basename(FILE)} — كتل script: ${scripts.length} · مفاتيح L.ar: ${arKeys.length} · L.en: ${enKeys.length} · معالِجات: ${handlers.length}`);

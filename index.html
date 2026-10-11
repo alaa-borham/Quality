@@ -4031,8 +4031,8 @@ function rsExpOutside(e){const m=$('rs-expmenu');if(m&&!m.contains(e.target))rsE
 function rsExpKey(e){if(e.key==='Escape')rsExpClose();}
 function rsExpMenu(ev,kind){if(ev){ev.preventDefault();ev.stopPropagation();}rsExpClose();
   const m=document.createElement('div');m.id='rs-expmenu';m.setAttribute('role','menu');
-  m.style.cssText='position:fixed;z-index:9999;background:var(--card,#fff);color:var(--ink,#1c2530);border:1px solid var(--line,#d5dee2);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:6px;min-width:180px';
-  const it=(ic,lbl,fn)=>`<button type="button" role="menuitem" onclick="rsExpClose();${fn}" style="display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;border:none;background:transparent;color:inherit;font:inherit;font-weight:800;cursor:pointer;border-radius:7px;text-align:start" onmouseover="this.style.background='rgba(20,80,79,.1)'" onmouseout="this.style.background='transparent'">${ic} ${esc(lbl)}</button>`;
+  m.style.cssText='position:fixed;z-index:9999;background:var(--card,#fff);color:var(--txt,#1c2530);border:1px solid var(--line,#d5dee2);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:6px;min-width:180px';
+  const it=(ic,lbl,fn)=>`<button type="button" role="menuitem" onclick="rsExpClose();${fn}" style="display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;border:none;background:transparent;color:inherit;font:inherit;font-weight:800;cursor:pointer;border-radius:7px;text-align:start" onmouseover="this.style.background='var(--row-hover)'" onmouseout="this.style.background='transparent'">${ic} ${esc(lbl)}</button>`;
   m.innerHTML=it('📄',t('rsExpPdf'),`rsExpPdf('${kind}')`)+it('📊',t('rsExpXls'),`${RS_EXP[kind].xls}()`);
   document.body.appendChild(m);
   const b=ev&&ev.currentTarget&&ev.currentTarget.getBoundingClientRect?ev.currentTarget.getBoundingClientRect():null;
