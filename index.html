@@ -149,10 +149,11 @@ label.inl{font-size:13px;font-weight:600;color:var(--lbl);display:block;margin:8
 .thumbs .rm{position:absolute;top:-7px;inset-inline-end:-7px;background:var(--red);color:#fff;border-radius:50%;width:20px;height:20px;font-size:12px;line-height:20px;text-align:center;cursor:pointer}
 #print-area{display:none}
 @media print{
-  html,body{background:#fff;height:auto;margin:0;padding:0}
+  /* الصفحة نفسها LTR عند الطباعة (التقرير يحمل اتجاهه dir=rtl بنفسه) — يمنع خللاً في Chrome يُزيح الورقة جانبياً مع الصفحات RTL عند تغيير الهوامش */
+  html,body{background:#fff;height:auto;margin:0;padding:0;direction:ltr!important;width:auto!important;min-width:0!important;overflow:visible!important}
   /* إخفاء التطبيق كليًّا من التدفّق (display لا يترك ارتفاعًا شبحيًّا يسبب صفحة ثانية فارغة) */
   body>*{display:none!important}
-  #print-area{display:block!important;position:static;inset:auto;padding:0 6mm}
+  #print-area{display:block!important;position:static;inset:auto;padding:0;margin:0 auto;width:auto;box-sizing:border-box}
   #print-area,#print-area *{visibility:visible}
 }
 /* جداول الطباعة: فواصل واضحة بين الأعمدة والصفوف */
