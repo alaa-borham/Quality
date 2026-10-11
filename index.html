@@ -4127,8 +4127,20 @@ function rsAnalysisSheet(a){const C=RS_FORM_C,u=a.u,W='FFFFFF',n=a.rows.length;
   const cf=[`<conditionalFormatting sqref="C${first}:C${last}"><cfRule type="dataBar" priority="1"><dataBar><cfvo type="min"/><cfvo type="max"/><color rgb="FF5B9BD5"/></dataBar></cfRule></conditionalFormatting>`,
     `<conditionalFormatting sqref="H${first}:H${last}"><cfRule type="top10" dxfId="0" priority="2" rank="3"/></conditionalFormatting>`];
   return {sheet:t('rsAnaSheet'),cols:[5,12,12,11,11,13,15,16],rows,merges,cf};}
-function exportRsAnalysisExcel(){const a=rsAnalysisData();if(a.err)return toast(t(a.err));const d=rsSpreadForm();
-  xlsxBuild(rsExpFileBase('analysis')+'.xlsx',{sheets:[rsAnalysisSheet(a)].concat(d.err?[]:[rsSpreadSheet(d)]),dxfs:rsFormDxfs()});toast(t('saved'));}
+function exportRsAnalysisExcel(){const a=rsAnalysisData();if(a.err)return toast(t(a.err));const d=rsSpreadForm(),A=rsAnalysisSheet(a);
+  // الاثنان في ورقة واحدة جنباً إلى جنب (نفس ترتيب الصفوف: العنوان، البيانات، الملخّص، رأس الجدول، الصفوف)
+  const sh=d.err?A:{...xlSideBySide(A,rsSpreadSheet(d)),sheet:t('rsAnaSheet'),landscape:true};
+  xlsxBuild(rsExpFileBase('analysis')+'.xlsx',{...sh,dxfs:rsFormDxfs()});toast(t('saved'));}
+// إزاحة مراجع الخلايا (A1، $B$5، A1:C3) عدداً من الأعمدة
+function xlShift(ref,off){return String(ref).replace(/(\$?)([A-Z]{1,3})(\$?)(\d+)/g,(m,a,c,b,r)=>{let n=0;for(const ch of c)n=n*26+ch.charCodeAt(0)-64;return a+xlCol(n-1+off)+b+r;});}
+// دمج ورقتين (مواصفتا xlsxBuild) أفقياً في ورقة واحدة: B على يسار/بعد A بعمود فاصل — تُزاح معادلات B ودمجها وتنسيقها الشرطي
+function xlSideBySide(A,B,gap){gap=gap==null?2:gap;const off=A.cols.length+1,n=Math.max(A.rows.length,B.rows.length),rows=[];
+  for(let i=0;i<n;i++){const ra=A.rows[i],rb=B.rows[i];if(!ra&&!rb)continue;const c=((ra&&ra.c)||[]).slice();c.length=Math.max(c.length,off);
+    ((rb&&rb.c)||[]).forEach((cl,j)=>{c[off+j]=cl&&cl.f!=null?{...cl,f:xlShift(cl.f,off)}:cl;});
+    rows[i]={h:Math.max((ra&&ra.h)||0,(rb&&rb.h)||0)||undefined,c};}
+  const pr=(A.cf||[]).length;
+  return {cols:[...A.cols,gap,...B.cols],rows,merges:[...(A.merges||[]),...(B.merges||[]).map(m=>xlShift(m,off))],
+    cf:[...(A.cf||[]),...(B.cf||[]).map(x=>x.replace(/sqref="([^"]+)"/,(m,r)=>`sqref="${xlShift(r,off)}"`).replace(/priority="(\d+)"/g,(m,k)=>`priority="${+k+pr}"`))]};}
 // Excel لأمر الرولات
 function exportRsRollsExcel(){const d=rsRollCompute();
   if(d.err==='empty'||d.err==='short')return toast(t('rsNoValidMk'));if(d.err==='nolen')return toast(t('rsRollNeedLen'));
