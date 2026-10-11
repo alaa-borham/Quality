@@ -2426,25 +2426,32 @@ function rsSolve(rem0,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
   // ولا يُطبَّق عبثاً لملء ماركر طويل بينما ماركر أقصر يغطّي بالضبط (كان يرفع الفائض بلا داعٍ مع الأطوال الكبيرة).
   // spread = تنوّع الحجم داخل التوليفة — يُستعمل كسرّ ترجيح أخير فقط (بعد كل معايير الاستهلاك)،
   // فلا يرفع الاستهلاك أبداً؛ يحسّن خلط الكبير مع الصغير فقط بين الخيارات المتكافئة تماماً في الاستهلاك
+  // مع أطوال مقيسة: نحلّ مرتين (بترجيح نسبة التداخل وبدونه) ونأخذ الأفضل — الأقل ماركرات (أو طبقات) ثم الأقل قماشاً فعلياً
+  if(opt.meas&&opt.meas.length&&!opt._one){const bh=(opt.budget||3500)/2,A=rsSolve(rem0,cons,maxlen,maxsizes,maxpcs,{...opt,mode,_one:1,budget:bh}),B=rsSolve(rem0,cons,maxlen,maxsizes,maxpcs,{...opt,mode,_one:1,noRatio:true,budget:bh});
+    const sc=o=>[mode==='markers'?o.length:o.reduce((x,m)=>x+m.plies,0),o.reduce((x,m)=>x+m.len*m.plies,0)];const a=sc(A),b=sc(B);
+    return (b[0]<a[0]||(b[0]===a[0]&&b[1]<a[1]-1e-9))?B:A;}
+  const RW=opt.noRatio?0:1;// RW=0: بلا ترجيح نسبة التداخل (للمقارنة بين بديلين)
   const better=mode==='markers'
-    ? (a,b)=>(a.covered-b.covered)||(b.surplus-a.surplus)||(a.pcs-b.pcs)||(b.len-a.len)||(a.spread-b.spread)   // أقل ماركرات: تغطية ← أقل فائض ← أكثر قطع ← أقصر ← (تعادل) أكثر تنوّعاً
-    : (a,b)=>(a.pcs-b.pcs)||(a.covered-b.covered)||(b.surplus-a.surplus)||(a.len-b.len)||(a.spread-b.spread);  // أقل طبقات: قطع/طبقة ← تغطية ← أقل فائض ← أقرب للطول ← (تعادل) أكثر تنوّعاً
+    ? (a,b)=>(a.covered-b.covered)||(b.surplus-a.surplus)||(a.pcs-b.pcs)||RW*(b.ratio-a.ratio)||(b.len-a.len)||(a.spread-b.spread)   // أقل ماركرات: تغطية ← أقل فائض ← أكثر قطع ← أقصر ← (تعادل) أكثر تنوّعاً
+    : (a,b)=>(a.pcs-b.pcs)||(a.covered-b.covered)||(b.surplus-a.surplus)||RW*(b.ratio-a.ratio)||(a.len-b.len)||(a.spread-b.spread);  // أقل طبقات: قطع/طبقة ← تغطية ← أقل فائض ← أقرب للطول ← (تعادل) أكثر تنوّعاً
   const SUR=opt.sur!=null?opt.sur:Math.max(0,Math.round(+($('rs-surplus')&&$('rs-surplus').value)||0)); // فائض مسموح لكل قياس (0=تغطية تامة، افتراضي)
   const work={};Object.keys(rem0).forEach(s=>work[s]=rem0[s]);
   const BUDGET=opt.budget||3500;// ميزانية زمنية (مللي ثانية) — تُصغَّر للاقتراحات الحيّة كي لا تُجمّد الواجهة
   const out=[];let guard=0;const t0=Date.now();
+  // نسبة التداخل المقيسة (مقيس÷محسوب) سرّ ترجيح بعد عدد القطع: بين توليفتين متكافئتين نفضّل الأوفر قماشاً فعلياً
+  const MM=new Map((opt.meas||[]).map(x=>[rsComboSig(x.pairs),x.len]));
   // لا نتوقف قبل تغطية الأوردر: الميزانية تُوزَّع على الجولات (لكل جولة شريحة وقت، بحد أدنى ٤٠ مللي ثانية)
   while(guard++<2000){
     const active=Object.keys(work).filter(s=>work[s]>0&&cons[s]>0);if(!active.length)break;
     const deadline=Date.now()+Math.max(40,(BUDGET-(Date.now()-t0))/Math.max(2,Math.ceil(active.length/2)));
     let best=null;
-    if(!opt.cands){best=rsBestCombo(active,work,cons,maxlen,maxsizes,maxpcs,SUR,better,deadline);
+    if(!opt.cands){best=rsBestCombo(active,work,cons,maxlen,maxsizes,maxpcs,SUR,better,deadline,opt.meas);
       if(!best)break;out.push({combo:best.combo,plies:best.plies,len:best.len});
       best.combo.forEach(p=>work[p.size]-=p.cnt*best.plies);Object.keys(work).forEach(s=>{if(work[s]<0)work[s]=0;});continue;}
     // مسار المرشّحين الجاهزين (توليفات المكتبة/البدائل): نقيّم المتاح منها للقياسات المتبقية فقط
     const src=opt.cands.filter(c=>c.every(p=>work[p.size]>0&&cons[p.size]>0));
     for(const combo of src){
-      const len=combo.reduce((a,p)=>a+p.cnt*cons[p.size],0);if(maxlen>0&&len>maxlen+1e-9)continue;
+      const lenC=combo.reduce((a,p)=>a+p.cnt*cons[p.size],0),ml=MM.size?MM.get(rsComboSig(combo)):0,len=ml>0?ml:lenC,ratio=lenC>0?len/lenC:1;if(maxlen>0&&len>maxlen+1e-9)continue;
       const flo=Math.min(...combo.map(p=>Math.floor(work[p.size]/p.cnt)));
       // «الإنهاء»: أقل عدد طبقات يُغطّي كل قياسات التوليفة؛ نستعمله إن كان فائضه ≤ SUR لكل قياس فيُنهيها بلا ذيل
       const fin=Math.max(...combo.map(p=>Math.ceil(work[p.size]/p.cnt)));
@@ -2455,34 +2462,49 @@ function rsSolve(rem0,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
       const covered=combo.reduce((a,p)=>a+Math.min(plies*p.cnt,work[p.size]),0);
       const surplus=combo.reduce((a,p)=>a+Math.max(0,plies*p.cnt-work[p.size]),0);
       const cvals=combo.map(p=>cons[p.size]);const spread=Math.max(...cvals)-Math.min(...cvals);// تنوّع الحجم (سرّ ترجيح أخير فقط)
-      const cand={plies,covered,surplus,len,pcs,spread};
-      if(!best||better(cand,best)>0)best={combo:combo.map(p=>({size:p.size,cnt:p.cnt})),plies,covered,surplus,len,pcs,spread};}
+      const cand={plies,covered,surplus,len,pcs,spread,ratio};
+      if(!best||better(cand,best)>0)best={combo:combo.map(p=>({size:p.size,cnt:p.cnt})),plies,covered,surplus,len,pcs,spread,ratio};}
     if(!best)break;out.push({combo:best.combo,plies:best.plies,len:best.len});
     best.combo.forEach(p=>work[p.size]-=p.cnt*best.plies);
     Object.keys(work).forEach(s=>{if(work[s]<0)work[s]=0;});} // تصفير الفائض كي لا يُحسب سالباً
   return out;}
 // أفضل توليفة لجولة واحدة: يمرّ على كل التوليفات الصالحة (بلا سقف عددي ولا تخزين) ويقيّم كلاً منها أثناء المرور.
 // المقاسات مرتّبة بالكمية المتبقية تنازلياً — فإن انتهى وقت الجولة قبل المرور على الكل، يكون المتروك هو الأقل أثراً.
-function rsBestCombo(active,work,cons,maxlen,maxsizes,maxpcs,SUR,better,deadline){
+// meas=[{pairs,len}]: أطوال مقيسة (مكتبة المنتج لهذا العرض / مطور المراكر) — تُستعمل بدل المحسوب في حد الطول وفي الاستهلاك،
+// ويُوسَّع حد البحث بأفضل نسبة تداخل مقيسة كي تُرى التوليفات التي محسوبها فوق الحد ومقيسها ضمنه (غير المقيسة تبقى بالمحسوب)
+function rsBestCombo(active,work,cons,maxlen,maxsizes,maxpcs,SUR,better,deadline,meas){
   const sz=active.slice().sort((a,b)=>work[b]-work[a]),n=sz.length,W=sz.map(s=>work[s]),C=sz.map(s=>cons[s]);
-  const idx=[],cnt=[],cur={plies:0,covered:0,surplus:0,len:0,pcs:0,spread:0};let best=null,nodes=0,stop=false;
-  const evalCur=(pcs,len)=>{const k=idx.length;let flo=Infinity,fin=0,mx=-Infinity,mn=Infinity;
+  let MK=null,lim=maxlen;
+  if(meas&&meas.length){const ix={};sz.forEach((s,i)=>ix[s]=i);MK=new Map();let rmin=1;
+    meas.forEach(x=>{if(!x.pairs.length||!x.pairs.every(p=>ix[p.size]!=null))return;const comp=x.pairs.reduce((a,p)=>a+p.cnt*cons[p.size],0);if(!(comp>0&&x.len>0))return;
+      MK.set(x.pairs.map(p=>[ix[p.size],p.cnt]).sort((a,b)=>a[0]-b[0]).map(([i,c])=>i+':'+c).join(','),x.len);rmin=Math.min(rmin,x.len/comp);});
+    if(!MK.size)MK=null;else if(maxlen>0)lim=maxlen/Math.max(0.8,rmin);}
+  const idx=[],cnt=[],cur={plies:0,covered:0,surplus:0,len:0,pcs:0,spread:0,ratio:1};let best=null,nodes=0,stop=false;
+  const evalCur=(pcs,len,key)=>{const ml=MK?MK.get(key):undefined,eff=ml>0?ml:len;if(maxlen>0&&eff>maxlen+1e-9)return;const k=idx.length;let flo=Infinity,fin=0,mx=-Infinity,mn=Infinity;
     for(let j=0;j<k;j++){const w=W[idx[j]],q=cnt[j],f=Math.floor(w/q),g=Math.ceil(w/q),cv=C[idx[j]];
       if(f<flo)flo=f;if(g>fin)fin=g;if(cv>mx)mx=cv;if(cv<mn)mn=cv;}
     let finOk=fin>=1;if(finOk)for(let j=0;j<k;j++)if(fin*cnt[j]-W[idx[j]]>SUR){finOk=false;break;}
     const plies=finOk?fin:flo;if(plies<1)return;
     let covered=0,surplus=0;for(let j=0;j<k;j++){const m=plies*cnt[j],w=W[idx[j]];covered+=m<w?m:w;if(m>w)surplus+=m-w;}
-    cur.plies=plies;cur.covered=covered;cur.surplus=surplus;cur.len=len;cur.pcs=pcs;cur.spread=mx-mn;
+    cur.plies=plies;cur.covered=covered;cur.surplus=surplus;cur.len=eff;cur.pcs=pcs;cur.spread=mx-mn;cur.ratio=len>0?eff/len:1;
     if(!best||better(cur,best)>0)best={...cur,combo:idx.map((i,j)=>({size:sz[i],cnt:cnt[j]}))};};
-  const rec=(start,pcs,len)=>{
+  const rec=(start,pcs,len,key)=>{
     if(((++nodes)&1023)===0&&Date.now()>deadline&&best){stop=true;return;}
-    if(idx.length)evalCur(pcs,len);
+    if(idx.length)evalCur(pcs,len,key);
     if(idx.length>=maxsizes)return;
     for(let i=start;i<n;i++){const c0=C[i];
-      for(let c=1;pcs+c<=maxpcs;c++){const nl=len+c*c0;if(maxlen>0&&nl>maxlen+1e-9)break;
-        idx.push(i);cnt.push(c);rec(i+1,pcs+c,nl);idx.pop();cnt.pop();if(stop)return;}}};
-  rec(0,0,0);return best;}
+      for(let c=1;pcs+c<=maxpcs;c++){const nl=len+c*c0;if(lim>0&&nl>lim+1e-9)break;
+        idx.push(i);cnt.push(c);rec(i+1,pcs+c,nl,MK?(key?key+',':'')+i+':'+c:'');idx.pop();cnt.pop();if(stop)return;}}};
+  rec(0,0,0,'');return best;}
 // أفضل خطة تلقائياً للكميات المتبقية بأقل استهلاك (تغطية تامة بلا زيادة)
+// كل الأطوال المقيسة الصالحة لعرض القماش الحالي (متر): مكتبة المنتج (بحارسها) + قياسات «مطور المراكر» غير المحفوظة — للحلّال
+function rsMeasList(cons){const cw=rsFabW(),pc=rsProdConsMap(),seen=new Set(),out=[];
+  prodComboLib(rsComboProd()).forEach(x=>{if(String(x.w||'')!==String(cw||'')||!(x.actLenM>0)||!x.sizes||!x.sizes.length||seen.has(x.sig)||!rsLibOk(x,pc))return;
+    seen.add(x.sig);out.push({pairs:x.sizes.map(p=>({size:p.size,cnt:p.cnt})),len:x.actLenM});});
+  Object.keys(RS_CBACT||{}).forEach(sg=>{const v=RS_CBACT[sg];if(!(v>0)||seen.has(sg))return;
+    const pairs=sg.split('|').map(t=>{const i=t.lastIndexOf('×');return {size:t.slice(0,i),cnt:+t.slice(i+1)};});
+    const comp=pairs.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);if(comp>0&&v<=comp*(1+RS_LIB_TOL)){seen.add(sg);out.push({pairs,len:v});}});
+  return out;}
 // الطول المقيس للماركر (متر) إن وُجد: من مكتبة المنتج لهذا العرض، أو قياس «مطور المراكر» غير المحفوظ (بنفس حارس المكتبة)، أو الطول الفعلي المُدخَل — وإلا 0
 function rsMeasLenM(vp,calcLen,actlenDisp,uf){vp=(vp||[]).filter(p=>p&&p.size&&p.cnt>0);if(!vp.length)return 0;const lib=rsMarkerLibLen(vp);if(lib>0)return lib;
   const sg=rsComboSig(vp);if(RS_CBACT[sg]>0&&calcLen>0&&RS_CBACT[sg]<=calcLen*(1+RS_LIB_TOL))return RS_CBACT[sg];
@@ -2558,15 +2580,16 @@ function rsAutoPlan(){if(!$('rs-markers'))return;
   if(!Object.values(rem).some(v=>v>0)){if(trimMsg)rsMkCalc();return toast(trimMsg?trimMsg+' — '+t('rsAutoDone'):t('rsAutoDone'));}
   // أولاً: اتّبع نمط توليفات مكتبتك — هيكل التوليفات مشترك عبر كل الأعراض (تُدخل مرة واحدة على العرض الأساسي)؛
   // نأخذ تراكيب توليفات كل الأعراض بلا تكرار، والطول المقيس يبقى خاصاً بعرض القماش الحالي (يُطبَّق لاحقاً في الحساب).
+  const _meas=rsMeasList(cons),_measM=new Map(_meas.map(x=>[rsComboSig(x.pairs),x.len]));// الأطوال المقيسة لهذا العرض
   const _seenSig=new Set();
   const libRecs=prodComboLib(rsComboProd()).filter(x=>{const sg=x.sig||'';if(!sg||_seenSig.has(sg))return false;_seenSig.add(sg);return true;});
   const libCands=libRecs.map(x=>x.sizes).filter(c=>c&&c.length&&new Set(c.map(p=>p.size)).size===c.length
     &&c.length<=maxsizes&&c.reduce((a,p)=>a+p.cnt,0)<=maxpcs
     &&c.every(p=>reqMap[p.size]!=null&&cons[p.size]>0)
-    &&c.reduce((a,p)=>a+p.cnt*cons[p.size],0)<=maxlen+1e-9);
+    &&(c.reduce((a,p)=>a+p.cnt*cons[p.size],0)<=maxlen+1e-9||(_measM.get(rsComboSig(c))||Infinity)<=maxlen+1e-9));
   // مقاسات باقية لا يمكن وضعها في أي ماركر: بلا استهلاك، أو قطعتها وحدها أطول من حد الماركر — نسمّيها ونميّز خاناتها
   const noCons=Object.keys(rem).filter(s=>rem[s]>0&&!(cons[s]>0)),tooLong=Object.keys(rem).filter(s=>rem[s]>0&&cons[s]>0&&maxlen>0&&cons[s]>maxlen+1e-9);
-  let {added,libN}=rsPlanSolve(rem,cons,maxlen,maxsizes,maxpcs,libCands);
+  let {added,libN}=rsPlanSolve(rem,cons,maxlen,maxsizes,maxpcs,libCands,{meas:_meas});
   if(noCons.length||tooLong.length){rsFlagSizes(noCons.concat(tooLong));
     const msg=[noCons.length?tf('rsNoConsSizes',{s:noCons.join('، ')}):'',tooLong.length?tf('rsTooLongSizes',{s:tooLong.join('، ')}):''].filter(Boolean).join(' · ');
     if(!added.length)return toast(msg);setTimeout(()=>toast(msg),1800);}

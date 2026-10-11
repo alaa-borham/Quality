@@ -116,6 +116,23 @@ chk('rsComboSig distinguishes counts', X.rsComboSig([{ size: 'S', cnt: 1 }]) !==
 // ── CRC32 لكاتب ملفات Excel (القيمة المرجعية القياسية) ──
 chk('xlCrc("123456789") = CBF43926', X.xlCrc(new TextEncoder().encode('123456789')) === 0xCBF43926);
 
+// ── الأطوال المقيسة في الحلّال ──
+{ const cons = { A: 5, B: 5, C: 4.6 }, q = { A: 10, B: 10, C: 0 };
+  const free = X.rsSolve({ ...q }, cons, 9.5, 6, 5, { mode: 'markers', sur: 0 });
+  chk('meas: without measurement A+B (10 > 9.5) cannot pair', free.length === 2 && free.every(m => m.combo.length === 1), free);
+  const withM = X.rsSolve({ ...q }, cons, 9.5, 6, 5, { mode: 'markers', sur: 0, meas: [{ pairs: [{ size: 'A', cnt: 1 }, { size: 'B', cnt: 1 }], len: 9.4 }] });
+  chk('meas: measured 9.4 ≤ 9.5 → one marker A+B ×10', withM.length === 1 && withM[0].combo.length === 2 && withM[0].plies === 10, withM);
+  chk('meas: marker length = measured length', withM.length && Math.abs(withM[0].len - 9.4) < 1e-9, withM);
+  const tooLong = X.rsSolve({ ...q }, cons, 9.5, 6, 5, { mode: 'markers', sur: 0, meas: [{ pairs: [{ size: 'A', cnt: 1 }, { size: 'B', cnt: 1 }], len: 9.8 }] });
+  chk('meas: measured 9.8 > 9.5 still rejected', tooLong.every(m => m.combo.length === 1), tooLong);
+  // سرّ الترجيح: بين توليفتين متكافئتين يُفضَّل الأوفر بالقياس
+  const c2 = { A: 3, B: 3, C: 3 }, q2 = { A: 6, B: 6, C: 6 };
+  const pick = X.rsSolve({ ...q2 }, c2, 6.5, 2, 2, { mode: 'markers', sur: 0, meas: [{ pairs: [{ size: 'B', cnt: 1 }, { size: 'C', cnt: 1 }], len: 5.6 }] });
+  chk('meas: equal options → prefers better measured nesting', pick.some(m => m.combo.map(p => p.size).sort().join('') === 'BC'), pick);
+  // مسار المرشّحين (مكتبة): يقبل المقيس ضمن الحد
+  const lib = X.rsSolve({ ...q }, cons, 9.5, 6, 5, { mode: 'markers', sur: 0, cands: [[{ size: 'A', cnt: 1 }, { size: 'B', cnt: 1 }]], meas: [{ pairs: [{ size: 'A', cnt: 1 }, { size: 'B', cnt: 1 }], len: 9.4 }] });
+  chk('meas: library candidate accepted by measured length', lib.length === 1 && lib[0].plies === 10, lib); }
+
 // ── إزالة الإنتاج الزائد ──
 { const mk = (pairs, plies) => ({ pairs: pairs.map(([size, cnt]) => ({ size, cnt })), plies });
   const prod = (ms, pl) => { const o = {}; ms.forEach((m, i) => m.pairs.forEach(p => o[p.size] = (o[p.size] || 0) + p.cnt * pl[i])); return o; };
