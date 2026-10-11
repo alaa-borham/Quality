@@ -3796,31 +3796,31 @@ function printRsSpread(){const d=rsSpreadForm();if(d.err)return toast(t(d.err));
       ${td(`<span dir="ltr">${rsFormDescHtml(x.parts)}</span>`,`color:#${C.ink};white-space:nowrap`)}${td(x.pcs,`color:#${C.ink}`)}
       ${td(x.plies+clrBreak(x.plies),`color:#${C.ink};font-weight:700`)}
       ${td(I(x.run),`background-color:#fff;background-image:linear-gradient(to ${LANG==='ar'?'left':'right'},#${C.bar} ${pct}%,transparent ${pct}%);font-weight:700`)}
-      ${td(x.len.toFixed(2),`color:#${C.ink}`)}${td(x.meas.toFixed(2),`background:#${C.grn}`)}
+      ${td(x.meas.toFixed(2),`background:#${C.grn}`)}
       ${td(N(x.fabf),top?`background:#${C.pinkF};color:#${C.pinkT};font-weight:800`:'font-weight:800')}</tr>`;}).join('')
-    +Array.from({length:Math.max(0,Math.min(d.blanks,RS_FORM_PRINTROWS-n))},()=>`<tr>${td('&nbsp;')}${td('')}${td('')}${td('')}${td('')}${td('')}${td('')}${td('',`background:#${C.grn}`)}${td('')}</tr>`).join('');
+    +Array.from({length:Math.max(0,Math.min(d.blanks,RS_FORM_PRINTROWS-n))},()=>`<tr>${td('&nbsp;')}${td('')}${td('')}${td('')}${td('')}${td('')}${td('',`background:#${C.grn}`)}${td('')}</tr>`).join('');
   const box=(cells,bg,fg,fs)=>`<tr>${cells.map(c=>`<td colspan="${c[1]||1}" style="${bd};background:#${bg};color:#${fg};font-weight:800;font-size:${fs}px;padding:6px 5px;text-align:center">${c[0]}</td>`).join('')}</tr>`;
-  const cg='<colgroup><col style="width:4%"><col style="width:7%"><col style="width:29%"><col style="width:9%"><col style="width:8%"><col style="width:11%"><col style="width:10%"><col style="width:9%"><col style="width:13%"></colgroup>';
+  const cg='<colgroup><col style="width:4%"><col style="width:7%"><col style="width:34%"><col style="width:9%"><col style="width:8%"><col style="width:11%"><col style="width:12%"><col style="width:15%"></colgroup>';
   const sigBox=lbl=>`<div style="flex:1;text-align:center"><div style="border-bottom:1.5px solid #7c8894;margin:0 14px 6px;height:34px"></div><div style="font-size:11.5px;color:#44515e;font-weight:700">${lbl}</div></div>`;
   $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#1c2530;max-width:860px;margin:auto;padding-top:6px;-webkit-print-color-adjust:exact;print-color-adjust:exact" dir="${LANG==='ar'?'rtl':'ltr'}">
     <style>@page{size:A4 portrait;margin:8mm}</style>
     <table style="width:100%;border-collapse:collapse;table-layout:fixed">
       ${cg}
-      <tr><td colspan="9" style="${bd};background:#${C.navy};color:#fff;font-weight:800;font-size:20px;padding:9px;text-align:center">${esc(t('rsFormTitle'))}${MEMBER&&MEMBER.wsName?` <span style="font-size:13px;opacity:.85">— ${esc(MEMBER.wsName)}</span>`:''}</td></tr>
-      <tr><td colspan="9" style="${bd};background:#${C.sub};color:#${C.ink};font-style:italic;font-size:11.5px;padding:4px;text-align:center">${esc(t('rsFormSub'))}</td></tr>
-      <tr><td colspan="9" style="height:6px"></td></tr>
-      ${box([[esc(t('rsFormOrderNo')),3],[esc(t('rsFormModel')),2],[esc(t('rsFormFabric'))],[esc(t('dateLbl'))],[esc(tf('rsFormSpread',{u})),2]],C.blue,'ffffff',11)}
-      ${box([[esc(d.title)||'&nbsp;',3],[esc(d.model)||'&nbsp;',2],[esc(d.fabric)],[esc(d.date)],[d.spD.toFixed(2),2]],C.yel,C.ink,12.5)}
-      <tr><td colspan="9" style="height:6px"></td></tr>
-      ${box([[esc(t('rsFormNMk')),3],[esc(t('rsFormPlies')),2],[esc(t('rsFormPcs'))],[esc(tf('rsFormFab',{u}))],[esc(tf('rsFormAvg',{u})),2]],C.navy,'ffffff',11)}
-      ${box([[n,3],[I(d.plies),2],[I(d.run)],[N(d.fabf)],[d.avg.toFixed(3),2]],C.kpi,C.navy,19)}
+      <tr><td colspan="8" style="${bd};background:#${C.navy};color:#fff;font-weight:800;font-size:20px;padding:9px;text-align:center">${esc(t('rsFormTitle'))}${MEMBER&&MEMBER.wsName?` <span style="font-size:13px;opacity:.85">— ${esc(MEMBER.wsName)}</span>`:''}</td></tr>
+      <tr><td colspan="8" style="${bd};background:#${C.sub};color:#${C.ink};font-style:italic;font-size:11.5px;padding:4px;text-align:center">${esc(t('rsFormSub'))}</td></tr>
+      <tr><td colspan="8" style="height:6px"></td></tr>
+      ${box([[esc(t('rsFormOrderNo')),3],[esc(t('rsFormModel')),2],[esc(t('rsFormFabric'))],[esc(t('dateLbl'))],[esc(tf('rsFormSpread',{u}))]],C.blue,'ffffff',11)}
+      ${box([[esc(d.title)||'&nbsp;',3],[esc(d.model)||'&nbsp;',2],[esc(d.fabric)],[esc(d.date)],[d.spD.toFixed(2)]],C.yel,C.ink,12.5)}
+      <tr><td colspan="8" style="height:6px"></td></tr>
+      ${box([[esc(t('rsFormNMk')),3],[esc(t('rsFormPlies')),2],[esc(t('rsFormPcs'))],[esc(tf('rsFormFab',{u}))],[esc(tf('rsFormAvg',{u}))]],C.navy,'ffffff',11)}
+      ${box([[n,3],[I(d.plies),2],[I(d.run)],[N(d.fabf)],[d.avg.toFixed(3)]],C.kpi,C.navy,19)}
     </table>
     <table style="width:100%;border-collapse:collapse;table-layout:fixed;margin-top:8px">
       ${cg}
-      <thead><tr>${hd(esc(t('rsCbNo')),C.blue)}${hd(esc(t('rsCode')),C.blue)}${hd(esc(t('rsDesc')),C.blue)}${hd(esc(t('rsPcsLbl')),C.blue)}${hd(esc(t('rsPlies')),C.blue)}${hd(esc(t('rsPcsRun')),C.blue)}${hd(esc(tf('rsFormLen',{u})),C.blue)}${hd(esc(tf('rsFormMeas',{u})),C.blue)}${hd(esc(tf('rsFormFabf',{u})),C.blue)}</tr></thead>
+      <thead><tr>${hd(esc(t('rsCbNo')),C.blue)}${hd(esc(t('rsCode')),C.blue)}${hd(esc(t('rsDesc')),C.blue)}${hd(esc(t('rsPcsLbl')),C.blue)}${hd(esc(t('rsPlies')),C.blue)}${hd(esc(t('rsPcsRun')),C.blue)}${hd(esc(tf('rsFormMeas',{u})),C.blue)}${hd(esc(tf('rsFormFabf',{u})),C.blue)}</tr></thead>
       <tbody>${rows}
       <tr><td colspan="4" style="${bd};background:#${C.navy};color:#fff;font-weight:800;padding:7px;text-align:center">${esc(t('total'))}</td>
-        ${[I(d.plies),I(d.run),'','',N(d.fabf)].map(v=>`<td style="${bd};background:#${C.navy};color:#fff;font-weight:800;padding:7px;text-align:center">${v}</td>`).join('')}</tr></tbody>
+        ${[I(d.plies),I(d.run),'',N(d.fabf)].map(v=>`<td style="${bd};background:#${C.navy};color:#fff;font-weight:800;padding:7px;text-align:center">${v}</td>`).join('')}</tr></tbody>
     </table>
     <div style="margin-top:18px;display:flex;gap:16px;break-inside:avoid;page-break-inside:avoid">${sigBox(t('rsFarradSig'))}${sigBox(t('rsCutSupSig'))}${sigBox(t('repInspector')+(MEMBER.name?' — '+esc(MEMBER.name):''))}</div></div>`;
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
@@ -4010,7 +4010,7 @@ function exportRsSpreadExcel(){const d=rsSpreadForm();if(d.err)return toast(t(d.
     kh:{b:1,sz:10,color:W,fill:C.navy,bd:1,wrap:1},kv:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'#,##0'},kvd:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'#,##0.00'},kva:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'0.000'},
     th:{b:1,sz:10,color:W,fill:C.blue,bd:1,wrap:1},tot:{b:1,color:W,fill:C.navy,bd:1},totn:{b:1,color:W,fill:C.navy,bd:1,nf:'#,##0'},totd:{b:1,color:W,fill:C.navy,bd:1,nf:'#,##0.00'}};
   const cell=(base,fill)=>fill?{...base,fill}:base;
-  const rows=[],merges=['A1:I1','A2:I2','A4:C4','D4:E4','H4:I4','A5:C5','D5:E5','H5:I5','A7:C7','D7:E7','H7:I7','A8:C8','D8:E8','H8:I8'];
+  const rows=[],merges=['A1:H1','A2:H2','A4:C4','D4:E4','A5:C5','D5:E5','A7:C7','D7:E7','A8:C8','D8:E8'];
   rows[0]={h:34,c:[{v:t('rsFormTitle'),s:S.title}]};
   rows[1]={h:20,c:[{v:t('rsFormSub'),s:S.sub}]};
   rows[2]={h:6,c:[]};
@@ -4019,9 +4019,9 @@ function exportRsSpreadExcel(){const d=rsSpreadForm();if(d.err)return toast(t(d.
   rows[5]={h:6,c:[]};
   const first=11,n=d.rows.length,last=first+n+d.blanks-1,T=last+1;
   rows[6]={h:30,c:[{v:t('rsFormNMk'),s:S.kh},null,null,{v:t('rsFormPlies'),s:S.kh},null,{v:t('rsFormPcs'),s:S.kh},{v:tf('rsFormFab',{u}),s:S.kh},{v:tf('rsFormAvg',{u}),s:S.kh}]};
-  rows[7]={h:34,c:[{f:`COUNTA(B${first}:B${last})`,v:n,s:S.kv},null,null,{f:`E${T}`,v:d.plies,s:S.kv},null,{f:`F${T}`,v:d.run,s:S.kv},{f:`I${T}`,v:d.fabf,s:S.kvd},{f:`IF(F${T}>0,I${T}/F${T},0)`,v:d.avg,s:S.kva}]};
+  rows[7]={h:34,c:[{f:`COUNTA(B${first}:B${last})`,v:n,s:S.kv},null,null,{f:`E${T}`,v:d.plies,s:S.kv},null,{f:`F${T}`,v:d.run,s:S.kv},{f:`H${T}`,v:d.fabf,s:S.kvd},{f:`IF(F${T}>0,H${T}/F${T},0)`,v:d.avg,s:S.kva}]};
   rows[8]={h:6,c:[]};
-  rows[9]={h:40,c:[t('rsCbNo'),t('rsCode'),t('rsDesc'),t('rsPcsLbl'),t('rsPlies'),t('rsPcsRun'),tf('rsFormLen',{u}),tf('rsFormMeas',{u}),tf('rsFormFabf',{u})].map(v=>({v,s:S.th}))};
+  rows[9]={h:40,c:[t('rsCbNo'),t('rsCode'),t('rsDesc'),t('rsPcsLbl'),t('rsPlies'),t('rsPcsRun'),tf('rsFormMeas',{u}),tf('rsFormFabf',{u})].map(v=>({v,s:S.th}))};
   for(let k=0;k<n+d.blanks;k++){const x=d.rows[k],rr=first+k,f=x&&x.color?x.color.replace('#','').toUpperCase():'';
     const inp={color:C.ink,bd:1},calc={bd:1};
     rows[rr-1]={h:19,c:[
@@ -4031,14 +4031,13 @@ function exportRsSpreadExcel(){const d=rsSpreadForm();if(d.err)return toast(t(d.
       {v:x?x.pcs:'',s:{...inp,nf:'0'}},
       {v:x?x.plies:'',s:{...inp,nf:'0'}},
       {f:`IF(OR(D${rr}="",E${rr}=""),"",D${rr}*E${rr})`,v:x?x.run:'',s:{...calc,nf:'#,##0'}},
-      {v:x?x.len:'',s:{...inp,nf:'0.00'}},
-      {f:`IF(G${rr}="","",G${rr}+$H$5)`,v:x?x.meas:'',s:{...calc,fill:C.grn,nf:'0.00'}},
-      {f:`IF(OR(H${rr}="",E${rr}=""),"",H${rr}*E${rr})`,v:x?x.fabf:'',s:{b:1,bd:1,nf:'#,##0.00'}}]};}// لون الصف من النظام: خانتا الرقم والكود فقط
+      {v:x?x.meas:'',s:{...inp,fill:C.grn,nf:'0.00'}},
+      {f:`IF(OR(G${rr}="",E${rr}=""),"",G${rr}*E${rr})`,v:x?x.fabf:'',s:{b:1,bd:1,nf:'#,##0.00'}}]};}// لون الصف من النظام: خانتا الرقم والكود فقط
   merges.push(`A${T}:D${T}`);
-  rows[T-1]={h:24,c:[{v:t('total'),s:S.tot},null,null,null,{f:`SUM(E${first}:E${last})`,v:d.plies,s:S.totn},{f:`SUM(F${first}:F${last})`,v:d.run,s:S.totn},{v:'',s:S.tot},{v:'',s:S.tot},{f:`SUM(I${first}:I${last})`,v:d.fabf,s:S.totd}]};
+  rows[T-1]={h:24,c:[{v:t('total'),s:S.tot},null,null,null,{f:`SUM(E${first}:E${last})`,v:d.plies,s:S.totn},{f:`SUM(F${first}:F${last})`,v:d.run,s:S.totn},{v:'',s:S.tot},{f:`SUM(H${first}:H${last})`,v:d.fabf,s:S.totd}]};
   const cf=[`<conditionalFormatting sqref="F${first}:F${last}"><cfRule type="dataBar" priority="1"><dataBar><cfvo type="min"/><cfvo type="max"/><color rgb="FF5B9BD5"/></dataBar></cfRule></conditionalFormatting>`,
-    `<conditionalFormatting sqref="I${first}:I${last}"><cfRule type="top10" dxfId="0" priority="2" rank="3"/></conditionalFormatting>`];
-  xlsxBuild(rsExpFileBase('spread')+'.xlsx',{sheet:t('rsFormTitle'),cols:[5,9,Math.min(80,Math.max(34,...d.rows.map(x=>Math.ceil(x.parts.reduce((a,[sz,c])=>a+(sz+'×'+c).length,0)*1.15+(x.parts.length-1)*5+4)))),11,10,12,12,11,14],rows,merges,cf,
+    `<conditionalFormatting sqref="H${first}:H${last}"><cfRule type="top10" dxfId="0" priority="2" rank="3"/></conditionalFormatting>`];
+  xlsxBuild(rsExpFileBase('spread')+'.xlsx',{sheet:t('rsFormTitle'),cols:[5,9,Math.min(80,Math.max(34,...d.rows.map(x=>Math.ceil(x.parts.reduce((a,[sz,c])=>a+(sz+'×'+c).length,0)*1.15+(x.parts.length-1)*5+4)))),11,10,12,12,16],rows,merges,cf,
     dxfs:[`<dxf><font><b/><color rgb="FF${C.pinkT}"/></font><fill><patternFill><bgColor rgb="FF${C.pinkF}"/></patternFill></fill></dxf>`]});
   toast(t('saved'));}
 // Excel لأمر الرولات
