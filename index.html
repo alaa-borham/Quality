@@ -1525,6 +1525,8 @@ function xlsxBuild(filename,spec){const X=v=>String(v).replace(/&/g,'&amp;').rep
       const v=cl.v;
       if(cl.f!=null){const cached=v==null||v===''?'':(typeof v==='number'&&isFinite(v)?`<v>${v}</v>`:'');
         const tAttr=typeof v==='string'&&v!==''?' t="str"':'';return `<c r="${ref}" s="${si}"${tAttr}><f>${X(cl.f)}</f>${cached||(tAttr?`<v>${X(v)}</v>`:'')}</c>`;}
+      // نص منسّق داخل خلية واحدة (أجزاء بألوان/سماكة مختلفة): rich=[{t,b,color,sz}]
+      if(cl.rich&&cl.rich.length)return `<c r="${ref}" s="${si}" t="inlineStr"><is>${cl.rich.map(x=>`<r><rPr>${x.b?'<b/>':''}<sz val="${x.sz||(cl.s&&cl.s.sz)||11}"/><color rgb="FF${x.color||(cl.s&&cl.s.color)||'000000'}"/><rFont val="Calibri"/></rPr><t xml:space="preserve">${X(x.t)}</t></r>`).join('')}</is></c>`;
       if(v==null||v==='')return `<c r="${ref}" s="${si}"/>`;
       return typeof v==='number'&&isFinite(v)?`<c r="${ref}" s="${si}"><v>${v}</v></c>`:`<c r="${ref}" s="${si}" t="inlineStr"><is><t xml:space="preserve">${X(v)}</t></is></c>`;}).join('');
     return `<row r="${ri+1}"${r.h?` ht="${r.h}" customHeight="1"`:''}>${cells}</row>`;}).join('');
@@ -3791,7 +3793,7 @@ function printRsSpread(){const d=rsSpreadForm();if(d.err)return toast(t(d.err));
   const rows=d.rows.map((x,k)=>{const bg=x.color?`background:${x.color};`:'',pct=Math.round(x.run/maxRun*100),top=d.top.has(k);
     // لون الصف من النظام يظهر شريطاً في خانتي الرقم والكود فقط — كي لا يختلط بألوان الأعمدة الثابتة (قياس الفرد/أعلى ٣/الأشرطة)
     return `<tr>${td(k+1,bg+`color:#${C.num};font-weight:800;font-size:14px`)}${td(esc(x.code),bg+`color:#${C.navy};font-weight:800`)}
-      ${td(`<span dir="ltr">${esc(x.desc)}</span>`,`color:#${C.ink};white-space:nowrap`)}${td(x.pcs,`color:#${C.ink}`)}
+      ${td(`<span dir="ltr">${rsFormDescHtml(x.parts)}</span>`,`color:#${C.ink};white-space:nowrap`)}${td(x.pcs,`color:#${C.ink}`)}
       ${td(x.plies+clrBreak(x.plies),`color:#${C.ink};font-weight:700`)}
       ${td(I(x.run),`background-color:#fff;background-image:linear-gradient(to ${LANG==='ar'?'left':'right'},#${C.bar} ${pct}%,transparent ${pct}%);font-weight:700`)}
       ${td(x.len.toFixed(2),`color:#${C.ink}`)}${td(x.meas.toFixed(2),`background:#${C.grn}`)}
@@ -3983,11 +3985,17 @@ function rsExpPdf(kind){const old=document.title;document.title=rsExpFileBase(ki
 // ── «نموذج الفرد والقص والإنتاج»: بيانات مشتركة بين ملف Excel والطباعة/PDF ──
 // الأطوال بوحدة العرض: طول الماركر الفعّال (المقيس من الكاد إن وُجد)، قياس الفرد = الطول + سماحية الفرد، استهلاك مع الفرد = قياس الفرد × الطبقات
 const RS_FORM_MINROWS=25,RS_FORM_PRINTROWS=23;// الطباعة: صفوف فارغة حتى ٢٣ صفاً فقط كي تبقى الصفحة واحدة مع التوقيعات// صفوف فارغة لإكمال الجدول يدوياً حتى هذا العدد (و٣ على الأقل)
+// «البيان»: فاصل بارز ┃ بلون مميّز بين القياسات، والقياس عريض والعدد ×n بلون هادئ — في PDF وExcel بنفس الشكل
+const RS_FORM_SEP='ED7D31';
+function rsFormDescHtml(parts){return (parts||[]).map(([s,c])=>`<b>${esc(s)}</b><span style="color:#2E75B6;font-weight:700">×${c}</span>`)
+  .join(`<span style="color:#${RS_FORM_SEP};font-weight:900;font-size:15px;padding:0 6px;vertical-align:-1px">┃</span>`);}
+function rsFormDescRich(parts){const out=[];(parts||[]).forEach(([s,c],i)=>{if(i)out.push({t:'  ┃  ',b:1,color:RS_FORM_SEP,sz:13});
+  out.push({t:s,b:1,color:'1F2937'},{t:'×'+c,b:1,color:'2E75B6'});});return out;}
 function rsSpreadForm(){const r=rsResult();if(!r)return {err:'mkNeed'};
   const mk=(r.markers||[]).filter(m=>m.ok);if(!mk.length)return {err:'rsNoValidMk'};
   const uf=r.uf||1,u=rsUnitTxt(r.unit),R2=v=>Math.round(v*100)/100,spD=R2((r.spread||0)/100*uf);
   const rows=mk.map(m=>{const len=R2((m.effLen||m.fab/m.plies)*uf),meas=R2(len+spD);
-    return {code:m.code,desc:m.pairs.map(p=>p.size+'×'+p.cnt).join(' · '),pcs:m.pcs,plies:m.plies,run:m.pcs*m.plies,len,meas,fabf:R2(meas*m.plies),color:rsMkColor(m.pairs)};});
+    return {code:m.code,desc:m.pairs.map(p=>p.size+'×'+p.cnt).join(' ┃ '),parts:m.pairs.map(p=>[p.size,p.cnt]),pcs:m.pcs,plies:m.plies,run:m.pcs*m.plies,len,meas,fabf:R2(meas*m.plies),color:rsMkColor(m.pairs)};});
   const plies=rows.reduce((a,x)=>a+x.plies,0),run=rows.reduce((a,x)=>a+x.run,0),fabf=R2(rows.reduce((a,x)=>a+x.fabf,0));
   const top=new Set(rows.map((x,k)=>[x.fabf,k]).sort((a,b)=>b[0]-a[0]).slice(0,3).map(x=>x[1]));
   const w=rsFabW();
@@ -4019,7 +4027,7 @@ function exportRsSpreadExcel(){const d=rsSpreadForm();if(d.err)return toast(t(d.
     rows[rr-1]={h:19,c:[
       {v:x?k+1:'',s:cell({b:1,color:C.num,bd:1},f)},
       {v:x?x.code:'',s:cell({b:1,color:C.navy,bd:1},f)},
-      {v:x?x.desc:'',s:inp},
+      {v:x?x.desc:'',s:inp,rich:x&&x.parts?rsFormDescRich(x.parts):null},
       {v:x?x.pcs:'',s:{...inp,nf:'0'}},
       {v:x?x.plies:'',s:{...inp,nf:'0'}},
       {f:`IF(OR(D${rr}="",E${rr}=""),"",D${rr}*E${rr})`,v:x?x.run:'',s:{...calc,nf:'#,##0'}},
@@ -4030,7 +4038,7 @@ function exportRsSpreadExcel(){const d=rsSpreadForm();if(d.err)return toast(t(d.
   rows[T-1]={h:24,c:[{v:t('total'),s:S.tot},null,null,null,{f:`SUM(E${first}:E${last})`,v:d.plies,s:S.totn},{f:`SUM(F${first}:F${last})`,v:d.run,s:S.totn},{v:'',s:S.tot},{v:'',s:S.tot},{f:`SUM(I${first}:I${last})`,v:d.fabf,s:S.totd}]};
   const cf=[`<conditionalFormatting sqref="F${first}:F${last}"><cfRule type="dataBar" priority="1"><dataBar><cfvo type="min"/><cfvo type="max"/><color rgb="FF5B9BD5"/></dataBar></cfRule></conditionalFormatting>`,
     `<conditionalFormatting sqref="I${first}:I${last}"><cfRule type="top10" dxfId="0" priority="2" rank="3"/></conditionalFormatting>`];
-  xlsxBuild(rsExpFileBase('spread')+'.xlsx',{sheet:t('rsFormTitle'),cols:[5,9,34,11,10,12,12,11,14],rows,merges,cf,
+  xlsxBuild(rsExpFileBase('spread')+'.xlsx',{sheet:t('rsFormTitle'),cols:[5,9,Math.min(80,Math.max(34,...d.rows.map(x=>Math.ceil(x.parts.reduce((a,[sz,c])=>a+(sz+'×'+c).length,0)*1.15+(x.parts.length-1)*5+4)))),11,10,12,12,11,14],rows,merges,cf,
     dxfs:[`<dxf><font><b/><color rgb="FF${C.pinkT}"/></font><fill><patternFill><bgColor rgb="FF${C.pinkF}"/></patternFill></fill></dxf>`]});
   toast(t('saved'));}
 // Excel لأمر الرولات
