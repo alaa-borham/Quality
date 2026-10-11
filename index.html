@@ -3801,7 +3801,7 @@ function rsSpreadHtml(d){
   const clrBreak=pl=>colors.length?`<div style="font-size:9.5px;color:#44515e;font-weight:600;line-height:1.5">${rsDistribute(pl,colors).map(c=>`${esc(c.name)} <b>${c.plies}</b>`).join(' · ')}</div>`:'';
   const rows=d.rows.map((x,k)=>{const bg=x.color?`background:${x.color};`:'',pct=Math.round(x.run/maxRun*100),top=d.top.has(k);
     // لون الصف من النظام يظهر شريطاً في خانتي الرقم والكود فقط — كي لا يختلط بألوان الأعمدة الثابتة (قياس الفرد/أعلى ٣/الأشرطة)
-    return `<tr>${td(k+1,bg+`color:#${C.num};font-weight:800;font-size:14px`)}${td(esc(x.code),bg+`color:#${C.navy};font-weight:800`)}
+    return `<tr>${td(k+1,bg+`color:#${C.num};font-weight:800;font-size:14px`)}${td(esc(x.code)+(x.bad?' ⚠':''),bg+`color:#${x.bad?'C00000':C.navy};font-weight:800`)}
       ${Array.from({length:K},(_,j)=>td(x.parts[j]?rsFormPartHtml(x.parts[j]):'',`white-space:nowrap;padding:3px 2px;${sepR}`)).join('')}${td(x.pcs,`color:#${C.ink}`)}
       ${td(x.plies+clrBreak(x.plies),`color:#${C.ink};font-weight:700`)}
       ${td(I(x.run),`background-color:#fff;background-image:linear-gradient(to ${LANG==='ar'?'left':'right'},#${C.bar} ${pct}%,transparent ${pct}%);font-weight:700`)}
@@ -3831,6 +3831,7 @@ function rsSpreadHtml(d){
       <tr><td colspan="${K+3}" style="${bd};background:#${C.navy};color:#fff;font-weight:800;padding:7px;text-align:center">${esc(t('total'))}</td>
         ${[I(d.plies),I(d.run),'',N(d.fabf)].map(v=>`<td style="${bd};background:#${C.navy};color:#fff;font-weight:800;padding:7px;text-align:center">${v}</td>`).join('')}</tr></tbody>
     </table>
+    ${d.rows.some(x=>x.bad)?`<div style="margin-top:6px;font-size:11px;color:#C00000;font-weight:700;line-height:1.6">${d.rows.filter(x=>x.bad).map(x=>`⚠ ${esc(x.code)}: ${esc(x.status)}`).join(' · ')}</div>`:''}
     <div style="margin-top:18px;display:flex;gap:16px;break-inside:avoid;page-break-inside:avoid">${sigBox(t('rsFarradSig'))}${sigBox(t('rsCutSupSig'))}${sigBox(t('repInspector')+(MEMBER.name?' — '+esc(MEMBER.name):''))}</div></div>`;}
 /* ---- خطة الأثواب: توزيع طبقات الماركرات على أثواب بطول محدّد (First-Fit Decreasing) ---- */
 // يُرجع {mk,roll,rolls,totalFab,nRolls,totRoll,loss,eff} بوحدات داخلية (متر) أو رسالة خطأ عبر err
@@ -3999,10 +4000,11 @@ function rsFormPartHtml([s,c]){return `<span dir="ltr"><b style="color:#1F2937">
 function rsFormDescRich(parts){const out=[];(parts||[]).forEach(([s,c],i)=>{if(i)out.push({t:'  ┃  ',b:1,color:RS_FORM_SEP,sz:13});
   out.push({t:s,b:1,color:'1F2937'},{t:'×'+c,b:1,color:'2E75B6'});});return out;}
 function rsSpreadForm(){const r=rsResult();if(!r)return {err:'mkNeed'};
-  const mk=(r.markers||[]).filter(m=>m.ok);if(!mk.length)return {err:'rsNoValidMk'};
+  // الخطة كاملة: كل ماركر له قياسات وطبقات يظهر — غير الصالح يُعلَّم ⚠ مع سببه (لا يُحذف من التقرير)
+  const mk=(r.markers||[]).filter(m=>m.pairs.length&&m.plies>0);if(!mk.length)return {err:'rsNoValidMk'};
   const uf=r.uf||1,u=rsUnitTxt(r.unit),R2=v=>Math.round(v*100)/100,spD=R2((r.spread||0)/100*uf);
-  const rows=mk.map(m=>{const len=R2((m.effLen||m.fab/m.plies)*uf),meas=R2(len+spD);
-    return {code:m.code,desc:m.pairs.map(p=>p.size+'×'+p.cnt).join(' ┃ '),parts:m.pairs.map(p=>[p.size,p.cnt]),pcs:m.pcs,plies:m.plies,run:m.pcs*m.plies,len,meas,fabf:R2(meas*m.plies),color:rsMkColor(m.pairs)};});
+  const rows=mk.map(m=>{const len=R2((m.effLen||m.len||0)*uf),meas=R2(len+spD);
+    return {code:m.code,bad:!m.ok,status:m.ok?'':m.status,desc:m.pairs.map(p=>p.size+'×'+p.cnt).join(' ┃ '),parts:m.pairs.map(p=>[p.size,p.cnt]),pcs:m.pcs,plies:m.plies,run:m.pcs*m.plies,len,meas,fabf:R2(meas*m.plies),color:rsMkColor(m.pairs)};});
   const plies=rows.reduce((a,x)=>a+x.plies,0),run=rows.reduce((a,x)=>a+x.run,0),fabf=R2(rows.reduce((a,x)=>a+x.fabf,0));
   const top=new Set(rows.map((x,k)=>[x.fabf,k]).sort((a,b)=>b[0]-a[0]).slice(0,3).map(x=>x[1]));
   const w=rsFabW();
@@ -4041,7 +4043,7 @@ function rsSpreadSheet(d){
     const inp={color:C.ink,bd:1},calc={bd:1},part={color:C.ink,bd:1,bdv:RS_FORM_SEP};
     rows[rr-1]={h:19,c:[
       {v:x?k+1:'',s:cell({b:1,color:C.num,bd:1},f)},
-      {v:x?x.code:'',s:cell({b:1,color:C.navy,bd:1},f)},
+      {v:x?x.code+(x.bad?' ⚠':''):'',s:cell({b:1,color:x&&x.bad?'C00000':C.navy,bd:1},f)},
       ...Array.from({length:K},(_,j)=>{const pt=x&&x.parts[j];return {v:pt?pt[0]+'×'+pt[1]:'',s:part,rich:pt?rsFormDescRich([pt]):null};}),
       {v:x?x.pcs:'',s:{...inp,nf:'0'}},
       {v:x?x.plies:'',s:{...inp,nf:'0'}},
@@ -4049,6 +4051,8 @@ function rsSpreadSheet(d){
       {v:x?x.meas:'',s:{...inp,fill:C.grn,nf:'0.00'}},
       {f:`IF(OR(${Ms}${rr}="",${Pl}${rr}=""),"",${Ms}${rr}*${Pl}${rr})`,v:x?x.fabf:'',s:{b:1,bd:1,nf:'#,##0.00'}}]};}// لون الصف من النظام: خانتا الرقم والكود فقط
   merges.push(`A${T}:${P}${T}`);
+  const badN=d.rows.filter(x=>x.bad);
+  if(badN.length){merges.push(`A${T+1}:${Fb}${T+1}`);rows[T]={h:20,c:[{v:badN.map(x=>`⚠ ${x.code}: ${x.status}`).join('   ·   '),s:{b:1,sz:10,color:'C00000',h:LANG==='ar'?'right':'left'}}]};}
   rows[T-1]={h:24,c:pad([[0,{v:t('total'),s:S.tot}],[iL,{f:`SUM(${Pl}${first}:${Pl}${last})`,v:d.plies,s:S.totn}],[iR,{f:`SUM(${Rn}${first}:${Rn}${last})`,v:d.run,s:S.totn}],[iM,{v:'',s:S.tot}],[iF,{f:`SUM(${Fb}${first}:${Fb}${last})`,v:d.fabf,s:S.totd}]])};
   const cf=[`<conditionalFormatting sqref="${Rn}${first}:${Rn}${last}"><cfRule type="dataBar" priority="1"><dataBar><cfvo type="min"/><cfvo type="max"/><color rgb="FF5B9BD5"/></dataBar></cfRule></conditionalFormatting>`,
     `<conditionalFormatting sqref="${Fb}${first}:${Fb}${last}"><cfRule type="top10" dxfId="0" priority="2" rank="3"/></conditionalFormatting>`];
