@@ -35,12 +35,12 @@ function grabConst(name) {
 
 const code = [
   grabConst('RS_LIB_TOL'), grabConst('XL_CRC'), grabConst('rsP2'), grabConst('SIZE_ORDER'), grabConst('CV_HI'),
-  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck'].map(grabFn),
+  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus'].map(grabFn),
 ].join('\n');
 // rsSolve يقرأ الهدف/الفائض من الواجهة عند غياب الخيارات — نعيد قيمة فارغة فيُستعمل الافتراضي («أقل ماركرات»، فائض 0)
 const ctx = { $: () => ({ value: '' }), Date, Math, Object, Set, Array, String, Number, Uint32Array, TextEncoder, console };
 vm.createContext(ctx);
-vm.runInContext(code + '\n;globalThis.__x={rsCombos,rsSolve,rsPlanSolve,rsComboSig,rsLibComp,rsLibOk,rsBakSlot,rsBakSlotId,xlCrc,consCheck};', ctx);
+vm.runInContext(code + '\n;globalThis.__x={rsCombos,rsSolve,rsPlanSolve,rsComboSig,rsLibComp,rsLibOk,rsBakSlot,rsBakSlotId,xlCrc,consCheck,rsTrimSurplus};', ctx);
 const X = ctx.__x;
 
 let pass = 0, fail = 0;
@@ -115,6 +115,25 @@ chk('rsComboSig distinguishes counts', X.rsComboSig([{ size: 'S', cnt: 1 }]) !==
 
 // ── CRC32 لكاتب ملفات Excel (القيمة المرجعية القياسية) ──
 chk('xlCrc("123456789") = CBF43926', X.xlCrc(new TextEncoder().encode('123456789')) === 0xCBF43926);
+
+// ── إزالة الإنتاج الزائد ──
+{ const mk = (pairs, plies) => ({ pairs: pairs.map(([size, cnt]) => ({ size, cnt })), plies });
+  const prod = (ms, pl) => { const o = {}; ms.forEach((m, i) => m.pairs.forEach(p => o[p.size] = (o[p.size] || 0) + p.cnt * pl[i])); return o; };
+  // حالة المستخدم: ماركر صار صالحاً (٤ قياسات × ٣ طبقات) فزاد كل قياس ٣ — يُحذف كاملاً
+  { const ms = [mk([['M-54', 1], ['S-56', 1], ['S-57', 1], ['S-53', 1]], 3), mk([['M-54', 1], ['M-53', 2]], 21), mk([['S-56', 1], ['S-57', 1], ['S-53', 1]], 3)];
+    const r = X.rsTrimSurplus(ms, { 'M-54': 3, 'S-56': 3, 'S-57': 3, 'S-53': 3 });
+    chk('trim: whole surplus marker removed', r.plies[0] === 0 && r.plies[1] === 21 && r.plies[2] === 3, r.plies);
+    chk('trim: no surplus left', Object.values(r.over).every(v => v <= 0), r.over); }
+  // زيادة جزئية: يُخفَّض أولاً دون نقص (٤ طبقات)، ثم يُزال باقي زائد B فينتج نقص A=2 يكمله الحلّال
+  { const ms = [mk([['A', 1], ['B', 1]], 10)]; const r = X.rsTrimSurplus(ms, { A: 4, B: 6 });
+    chk('trim: partial reduction, then remaining surplus removed (shortage filled later)', r.plies[0] === 4 && r.over.A === -2 && r.over.B === 0, r); }
+  // الزائد في قياس واحد فقط: يُزال كله (أي نقص ناتج يكمله الحلّال) ويُختار الماركر الأقل ضرراً
+  { const ms = [mk([['A', 1], ['B', 1], ['C', 1]], 5), mk([['A', 1], ['D', 1]], 5)]; const r = X.rsTrimSurplus(ms, { A: 2, D: 2 });
+    chk('trim: picks least-harm marker', r.plies[1] === 3 && r.plies[0] === 5 && r.over.A === 0 && r.over.D === 0, r); }
+  { const ms = [mk([['A', 2]], 4)]; const r = X.rsTrimSurplus(ms, { A: 3 });
+    chk('trim: odd surplus with cnt 2 → no surplus left (1 short, filled later)', r.plies[0] === 2 && r.over.A === -1, r); }
+  { const ms = [mk([['A', 1]], 5)]; const before = JSON.stringify(ms); X.rsTrimSurplus(ms, { A: 2 });
+    chk('trim: does not mutate input', JSON.stringify(ms) === before); } }
 
 // ── فحص منطق الاستهلاك ──
 { const base = [['S-53', 2.1], ['S-54', 2.15], ['S-55', 2.18], ['S-56', 2.21], ['S-57', 2.31], ['M-56', 2.3], ['L-56', 2.4]];

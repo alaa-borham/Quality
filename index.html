@@ -600,7 +600,7 @@ rsSumReq:'إجمالي كمية الطلب',rsSumProd:'إجمالي إنتاج �
 rsPriceLbl:'سعر {u} القماش (اختياري)',rsCostFab:'تكلفة القماش',rsCostPiece:'تكلفة القطعة',
 rsOverProd:'زيادة إنتاج: {n} قطعة فوق المطلوب — قلّل الطبقات أو احذف قياساً من الماركرات ذات «زيادة» في جدول المراجعة',rsUnderProd:'نقص إنتاج: {n} قطعة أقل من المطلوب — أكمل الخطة تلقائياً أو أضف ماركرات',
 rsReviewTbl:'مطابقة الخطة',rsProdFromMk:'إجمالي القطع من الماركر',rsRemFromOrder:'المتبقي من الأوردر',rsRvShort:'نقص',rsRvMatch:'مطابق',rsRvSurplus:'زيادة',
-rsAutoBtn:'أكمل الخطة تلقائياً (أقل استهلاك)',rsAutoDone:'الخطة مكتملة — لا كميات متبقية',rsAutoAdded:'أُضيف {n} ماركر تلقائياً',rsAutoAddedLib:'أُضيف {n} ماركر تلقائياً — منها {l} من مكتبتك المقيسة (مطابقة للكاد)',rsNoSug:'تعذّر توليد خطة — تأكّد من إدخال الكميات والاستهلاك، وأن حدّ طول الماركر يتّسع للقياسات',rsScNoData:'لا توجد كميات في الأوردر — أدخِل الكميات في جدول الكميات أولاً',
+rsAutoBtn:'أكمل الخطة تلقائياً (أقل استهلاك)',rsAutoDone:'الخطة مكتملة — لا كميات متبقية',rsTrimQ:'يوجد إنتاج زائد عن الأوردر ({n} قطعة). إزالة الزائد بتقليل طبقات الماركرات المسبّبة (وحذف ما يصبح بلا طبقات) ثم إكمال أي نقص تلقائياً؟',rsTrimmed:'✂️ أُزيل الإنتاج الزائد: {x}',rsTrimDel:'حُذف {n} ماركر',rsTrimRed:'خُفّضت طبقات {n} ماركر',rsAutoAdded:'أُضيف {n} ماركر تلقائياً',rsAutoAddedLib:'أُضيف {n} ماركر تلقائياً — منها {l} من مكتبتك المقيسة (مطابقة للكاد)',rsNoSug:'تعذّر توليد خطة — تأكّد من إدخال الكميات والاستهلاك، وأن حدّ طول الماركر يتّسع للقياسات',rsScNoData:'لا توجد كميات في الأوردر — أدخِل الكميات في جدول الكميات أولاً',
 rsReducePliesBtn:'قلّل الطبقات',rsReduceDone:'قُلّلت الطبقات في {n} ماركر: {a} ← {b} طبقة (القماش والكمية دون تغيير)',rsReduceNone:'لا يمكن تقليل الطبقات أكثر — الماركرات مضبوطة على حدّ الطول أو أقصى قطع',
 rsClearMkBtn:'امسح الماركرات',rsClearMkQ:'حذف كل الماركرات؟ يمكنك بعدها الضغط على «أكمل الخطة تلقائياً» لبناء خطة بلا زيادة إنتاج.',rsSortBtn:'ترتيب حسب الطول',rsSortPcBtn:'الأفضل حسب استهلاك القطعة',
 rsColTitle:'🎨 توزيع الألوان (اختياري)',rsColAdd:'إضافة لون',rsColName:'اسم اللون',rsColQty:'الكمية',rsColUnnamed:'لون',rsColPcs:'القطع',rsColMismatch:'مجموع كميات الألوان ({c}) لا يساوي كمية الطلب ({o})',
@@ -755,7 +755,7 @@ rsSumReq:'Total order qty',rsSumProd:'Plan production',rsSumRem:'Total remaining
 rsPriceLbl:'Fabric price / {u} (optional)',rsCostFab:'Fabric cost',rsCostPiece:'Cost / piece',
 rsOverProd:'Overproduction: {n} pcs above required — reduce plies or remove a size from the markers marked “surplus” in the review table',rsUnderProd:'Underproduction: {n} pcs below required — auto-complete the plan or add markers',
 rsReviewTbl:'Plan match',rsProdFromMk:'Pieces from markers',rsRemFromOrder:'Remaining of order',rsRvShort:'short',rsRvMatch:'matched',rsRvSurplus:'surplus',
-rsAutoBtn:'Auto-complete plan (least consumption)',rsAutoDone:'Plan complete — nothing remaining',rsAutoAdded:'{n} markers added automatically',rsAutoAddedLib:'{n} markers added automatically — {l} from your measured library (CAD-matched)',rsNoSug:'Could not generate a plan — check quantities, consumption, and that the marker length limit fits the sizes',rsScNoData:'No order quantities — enter quantities in the quantities table first',
+rsAutoBtn:'Auto-complete plan (least consumption)',rsAutoDone:'Plan complete — nothing remaining',rsTrimQ:'The plan overproduces the order ({n} pieces). Remove the surplus by reducing plies of the markers causing it (deleting any left with no plies), then auto-complete any shortage?',rsTrimmed:'✂️ Surplus removed: {x}',rsTrimDel:'{n} marker(s) deleted',rsTrimRed:'{n} marker(s) reduced',rsAutoAdded:'{n} markers added automatically',rsAutoAddedLib:'{n} markers added automatically — {l} from your measured library (CAD-matched)',rsNoSug:'Could not generate a plan — check quantities, consumption, and that the marker length limit fits the sizes',rsScNoData:'No order quantities — enter quantities in the quantities table first',
 rsReducePliesBtn:'Reduce plies',rsReduceDone:'Plies reduced in {n} marker(s): {a} → {b} plies (fabric & quantity unchanged)',rsReduceNone:'Cannot reduce plies further — markers are capped by length limit or max pieces',
 rsClearMkBtn:'Clear markers',rsClearMkQ:'Delete all markers? You can then press “Auto-complete plan” to build a plan with no overproduction.',rsSortBtn:'Sort by length',rsSortPcBtn:'Best by consumption/piece',
 rsColTitle:'🎨 Color split (optional)',rsColAdd:'Add color',rsColName:'Color name',rsColQty:'Quantity',rsColUnnamed:'Color',rsColPcs:'Pieces',rsColMismatch:'Colors total ({c}) ≠ order quantity ({o})',
@@ -2511,6 +2511,22 @@ function rsPlanSolve(rem0,cons,maxlen,maxsizes,maxpcs,libCands,opt){opt=opt||{};
   if(libN){const addedFree=rsSolve(remOrig,cons,maxlen,maxsizes,maxpcs,opt);
     if(addedFree.length&&addedFree.length<added.length){added=addedFree;libN=0;}}
   return {added,libN};}
+// إزالة الإنتاج الزائد بإنقاص الطبقات (دالة نقية — تُختبر في tests/solver.test.mjs): ms=[{pairs:[{size,cnt}],plies}]، over={قياس:زائد}
+// ١) ماركرات كل قياساتها زائدة: يُنقَص منها أكبر عدد طبقات لا يُحدث نقصاً — الأولوية لحذف ماركر كامل ثم لأكبر إزالة
+// ٢) ما بقي زائداً: يُنقَص من الماركر الأقل ضرراً على باقي القياسات (أي نقص ينتج يغطّيه الحلّال بعدها) — النتيجة تغطية تامة
+function rsTrimSurplus(ms,over){const ov={...over},pl=ms.map(m=>m.plies);
+  const cut=(i,k)=>{pl[i]-=k;ms[i].pairs.forEach(p=>ov[p.size]=(ov[p.size]||0)-p.cnt*k);};
+  for(let g=0;g<5000;g++){let best=null;
+    ms.forEach((m,i)=>{if(pl[i]<1)return;const k=Math.min(pl[i],...m.pairs.map(p=>Math.floor(Math.max(0,ov[p.size]||0)/p.cnt)));if(k<1)return;
+      const full=k===pl[i]?1:0,gain=k*m.pairs.reduce((a,p)=>a+p.cnt,0);
+      if(!best||full>best.full||(full===best.full&&gain>best.gain))best={i,k,full,gain};});
+    if(!best)break;cut(best.i,best.k);}
+  for(let g=0;g<5000;g++){const sz=Object.keys(ov).find(x=>ov[x]>0);if(!sz)break;let best=null;
+    ms.forEach((m,i)=>{if(pl[i]<1)return;const p=m.pairs.find(q=>q.size===sz);if(!p)return;const k=Math.min(pl[i],Math.ceil(ov[sz]/p.cnt));
+      const harm=m.pairs.reduce((a,q)=>a+Math.max(0,q.cnt*k-Math.max(0,ov[q.size]||0)),0);
+      if(!best||harm<best.harm)best={i,k,harm};});
+    if(!best)break;cut(best.i,best.k);}
+  return {plies:pl,over:ov};}
 // تمييز خانة الاستهلاك لمقاسات معيّنة في جدول الكميات (أحمر حتى تُعدَّل) والانتقال لأولها
 function rsFlagSizes(list){const set=new Set(list);let first=null;if(RS_COL&&RS_COL['rsq'])rsCollapse('rsq');
   document.querySelectorAll('.rsq-row').forEach(tr=>{const sz=tr.querySelector('.rsq-size').value.trim(),ce=tr.querySelector('.rsq-cons');if(!ce)return;
@@ -2524,10 +2540,22 @@ function rsAutoPlan(){if(!$('rs-markers'))return;
   // قيمة استهلاك غير منطقية (مثل 41 بدل 2.1) تُفسد الخطة كلها — نوقف ونميّزها بدل توليد خطة خاطئة
   const cvR=rsConsValList(),cvBad=Object.keys(cvR).filter(s=>cvR[s][0].lvl==='bad'&&reqMap[s]>0);
   if(cvBad.length){rsFlagSizes(cvBad);return toast(tf('cvBlockAuto',{s:cvBad.map(s=>s+' = '+cons[s]).join('، ')}));}
-  const produced={};rsReadMarkers().forEach(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
-    if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs,m.actlen))vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);});
+  const readProd=()=>{const pr={},vm=[],rows=[...document.querySelectorAll('.rs-mrow1')];
+    rsReadMarkers().forEach((m,i)=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
+      if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs,m.actlen)){vp.forEach(p=>pr[p.size]=(pr[p.size]||0)+p.cnt*plies);vm.push({mid:rows[i].dataset.mid,pairs:vp,plies});}});
+    return {pr,vm};};
+  let {pr:produced,vm}=readProd(),trimMsg='';
+  // إنتاج زائد عن الأوردر (فوق الفائض المسموح): نُنقص طبقات الماركرات المسبّبة أولاً (بعد التأكيد) ثم يُكمل الحلّال أي نقص ينتج
+  const SUR=Math.max(0,Math.round(+($('rs-surplus')&&$('rs-surplus').value)||0)),over={};
+  Object.keys(produced).forEach(s=>{const o=produced[s]-(reqMap[s]||0)-SUR;if(o>0)over[s]=o;});
+  const overN=Object.values(over).reduce((a,v)=>a+v,0);
+  if(overN>0&&confirm(tf('rsTrimQ',{n:overN}))){const r=rsTrimSurplus(vm,over);let del=0,red=0;
+    vm.forEach((m,i)=>{if(r.plies[i]===m.plies)return;
+      if(r.plies[i]<1){document.querySelectorAll('tr[data-mid="'+m.mid+'"]').forEach(tr=>tr.remove());del++;}
+      else{const inp=document.querySelector('tr.rs-mrow1[data-mid="'+m.mid+'"] .rsm-plies');if(inp)inp.value=r.plies[i];red++;}});
+    trimMsg=tf('rsTrimmed',{x:[del?tf('rsTrimDel',{n:del}):'',red?tf('rsTrimRed',{n:red}):''].filter(Boolean).join(LANG==='ar'?' و':' & ')});({pr:produced,vm}=readProd());}
   const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]-(produced[s]||0));
-  if(!Object.values(rem).some(v=>v>0))return toast(t('rsAutoDone'));
+  if(!Object.values(rem).some(v=>v>0)){if(trimMsg)rsMkCalc();return toast(trimMsg?trimMsg+' — '+t('rsAutoDone'):t('rsAutoDone'));}
   // أولاً: اتّبع نمط توليفات مكتبتك — هيكل التوليفات مشترك عبر كل الأعراض (تُدخل مرة واحدة على العرض الأساسي)؛
   // نأخذ تراكيب توليفات كل الأعراض بلا تكرار، والطول المقيس يبقى خاصاً بعرض القماش الحالي (يُطبَّق لاحقاً في الحساب).
   const _seenSig=new Set();
@@ -2545,7 +2573,7 @@ function rsAutoPlan(){if(!$('rs-markers'))return;
   if(!added.length)return toast(t('rsNoSug'));
   added.sort((a,b)=>b.len-a.len);// ترتيب تنازلي حسب طول الماركر (استهلاك الماركر/طبقة)
   added.forEach(a=>rsAddMarker({pairs:a.combo,plies:a.plies}));rsMkCalc();
-  toast(libN?tf('rsAutoAddedLib',{n:added.length,l:libN}):tf('rsAutoAdded',{n:added.length}));}
+  toast((trimMsg?trimMsg+' · ':'')+(libN?tf('rsAutoAddedLib',{n:added.length,l:libN}):tf('rsAutoAdded',{n:added.length})));}
 /* ---- جدول الاقتراحات التلقائي لباقي الكمية ---- */
 let RS_SUGS=[],RS_SUG_REM0={},RS_SUG_BT=null;
 function rsScheduleSugs(){clearTimeout(RS_SUG_BT);RS_SUG_BT=setTimeout(rsBuildSugs,500);}
