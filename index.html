@@ -473,7 +473,8 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
             <div id="rs-rolls" style="margin-top:12px"></div></div></div>
         <div class="row-btns" style="margin-top:14px"><button class="btn sec rs-exp" data-exp="plan" onclick="printRsPlan()" oncontextmenu="return rsExpMenu(event,'plan')" title="كليك يمين (أو ضغطة مطوّلة): تصدير PDF أو Excel" data-i18n-title="rsExpTip" data-i18n="rsPrint">🖨 طباعة الخطة</button>
         <button class="btn sec rs-exp" data-exp="spread" onclick="printRsSpread()" oncontextmenu="return rsExpMenu(event,'spread')" title="كليك يمين (أو ضغطة مطوّلة): تصدير PDF أو Excel" data-i18n-title="rsExpTip" data-i18n="rsSpreadBtn">🧵 أمر الفرد</button>
-        <button class="btn sec rs-exp" data-exp="rolls" onclick="printRsRolls()" oncontextmenu="return rsExpMenu(event,'rolls')" title="كليك يمين (أو ضغطة مطوّلة): تصدير PDF أو Excel" data-i18n-title="rsExpTip" data-i18n="rsRollBtn">📦 أمر الرولات</button></div>
+        <button class="btn sec rs-exp" data-exp="rolls" onclick="printRsRolls()" oncontextmenu="return rsExpMenu(event,'rolls')" title="كليك يمين (أو ضغطة مطوّلة): تصدير PDF أو Excel" data-i18n-title="rsExpTip" data-i18n="rsRollBtn">📦 أمر الرولات</button>
+        <button class="btn sec rs-exp" data-exp="analysis" onclick="printRsAnalysis()" oncontextmenu="return rsExpMenu(event,'analysis')" title="كليك يمين (أو ضغطة مطوّلة): تصدير PDF أو Excel" data-i18n-title="rsExpTip" data-i18n="rsAnaBtn">📊 تحليل</button></div>
       </div>
     </div>
     <div id="p-ref" class="hide">
@@ -604,7 +605,7 @@ rsReducePliesBtn:'قلّل الطبقات',rsReduceDone:'قُلّلت الطبق
 rsClearMkBtn:'امسح الماركرات',rsClearMkQ:'حذف كل الماركرات؟ يمكنك بعدها الضغط على «أكمل الخطة تلقائياً» لبناء خطة بلا زيادة إنتاج.',rsSortBtn:'ترتيب حسب الطول',rsSortPcBtn:'الأفضل حسب استهلاك القطعة',
 rsColTitle:'🎨 توزيع الألوان (اختياري)',rsColAdd:'إضافة لون',rsColName:'اسم اللون',rsColQty:'الكمية',rsColUnnamed:'لون',rsColPcs:'القطع',rsColMismatch:'مجموع كميات الألوان ({c}) لا يساوي كمية الطلب ({o})',
 rsSugTbl:'إكمال الخطة',rsSugPliesC:'الطبقات المقترحة',rsEditPliesC:'تعديل الطبقات يدويًا (اختياري)',rsRemWithRun:'إجمالي المتبقي مع التشغيل',rsApplyAll:'✔ اعتماد كل الاقتراحات كماركر',rsSugEmpty:'لا كميات متبقية — الاقتراحات فارغة',
-rsSpreadBtn:'🧵 أمر الفرد',rsNoValidMk:'لا ماركرات صالحة للفرد',
+rsSpreadBtn:'🧵 أمر الفرد',rsAnaBtn:'📊 تحليل',rsAnaTitle:'تحليل الأوردر',rsAnaSheet:'تحليل',rsAnaSub:'كميات المقاسات · النِّسب · استهلاك القماش لكل مقاس',rsAnaSizes:'عدد المقاسات',rsAnaQty:'إجمالي الكمية',rsAnaShare:'النسبة من الكمية',rsAnaCp:'استهلاك القطعة ({u})',rsAnaCq:'استهلاك الكمية ({u})',rsAnaCf:'استهلاك مع الفرد ({u})',rsNoValidMk:'لا ماركرات صالحة للفرد',
 rsFarradSig:'توقيع الفرّاد',rsCutSupSig:'مشرف القص',
 rsRollTbl:'📦 خطة الرولات',rsRollTitle:'أمر الرولات',rsRollBtn:'📦 أمر الرولات',rsRollNo:'رول',rsRollNo2:'رقم الرول',rsRollLenLbl:'طول الرول',rsStoreKeeper:'أمين المخزن',rsRollNeedLen:'أدخل طول الرول لحساب التوزيع',rsRollNoMk:'لا ماركرات صالحة بعد — أكمل الخطة أولاً',rsRollTooShort:'طول الرول أقصر من أطول ماركر ({n}) — زِد طول الرول',rsRollCount:'عدد الرولات المطلوبة',rsRollTotalLen:'إجمالي طول الرولات',rsRollWaste:'الهدر (بواقي الرولات)',rsRollEff:'كفاءة الاستخدام',rsRollPlies:'الطبقات المفرودة (ماركر×عدد)',rsRollUsed:'الطول المستخدم',rsRollRem:'الباقي',
 rsRollMode:'طريقة الفرد',rsRollNoSplice:'بلا وصل — كل طبقة من رول واحد',rsRollCont:'متصل بوصل الرولات — أقل هدر',rsRollSalvage:'بلا وصل + استغلال البواقي بقياسات صغيرة',rsRollSplices:'عدد الوصلات',rsRollTip:'الفرد المتصل يوفّر: {n} رول فقط · هدر {l} · كفاءة {e}% (تحدث وصلة عند نهاية الرول)',
@@ -759,7 +760,7 @@ rsReducePliesBtn:'Reduce plies',rsReduceDone:'Plies reduced in {n} marker(s): {a
 rsClearMkBtn:'Clear markers',rsClearMkQ:'Delete all markers? You can then press “Auto-complete plan” to build a plan with no overproduction.',rsSortBtn:'Sort by length',rsSortPcBtn:'Best by consumption/piece',
 rsColTitle:'🎨 Color split (optional)',rsColAdd:'Add color',rsColName:'Color name',rsColQty:'Quantity',rsColUnnamed:'Color',rsColPcs:'Pieces',rsColMismatch:'Colors total ({c}) ≠ order quantity ({o})',
 rsSugTbl:'Plan completion',rsSugPliesC:'Suggested plies',rsEditPliesC:'Adjust plies (optional)',rsRemWithRun:'Remaining after run',rsApplyAll:'✔ Apply all suggestions as markers',rsSugEmpty:'Nothing remaining — no suggestions',
-rsSpreadBtn:'🧵 Spreading order',rsNoValidMk:'No valid markers to spread',
+rsSpreadBtn:'🧵 Spreading order',rsAnaBtn:'📊 Analysis',rsAnaTitle:'Order analysis',rsAnaSheet:'Analysis',rsAnaSub:'Size quantities · ratios · fabric consumption per size',rsAnaSizes:'Sizes',rsAnaQty:'Total quantity',rsAnaShare:'Share of quantity',rsAnaCp:'Per-piece consumption ({u})',rsAnaCq:'Quantity consumption ({u})',rsAnaCf:'Consumption incl. spread ({u})',rsNoValidMk:'No valid markers to spread',
 rsFarradSig:'Spreader signature',rsCutSupSig:'Cutting supervisor',
 rsRollTbl:'📦 Fabric roll plan',rsRollTitle:'Roll pull order',rsRollBtn:'📦 Roll order',rsRollNo:'Roll',rsRollNo2:'Roll #',rsRollLenLbl:'Roll length',rsStoreKeeper:'Store keeper',rsRollNeedLen:'Enter roll length to compute allocation',rsRollNoMk:'No valid markers yet — complete the plan first',rsRollTooShort:'Roll shorter than the longest marker ({n}) — increase roll length',rsRollCount:'Rolls needed',rsRollTotalLen:'Total roll length',rsRollWaste:'End-loss (remnants)',rsRollEff:'Utilization',rsRollPlies:'Plies laid (marker×count)',rsRollUsed:'Used length',rsRollRem:'Remnant',
 rsRollMode:'Spreading method',rsRollNoSplice:'No splice — each ply from one roll',rsRollCont:'Continuous (spliced) — least waste',rsRollSalvage:'No splice + salvage remnants with small sizes',rsRollSplices:'Splices',rsRollTip:'Continuous spreading saves: only {n} rolls · {l} loss · {e}% utilization (a splice occurs at each roll end)',
@@ -1517,11 +1518,13 @@ function xlsxBuild(filename,spec){const X=v=>String(v).replace(/&/g,'&amp;').rep
     const al=`<alignment horizontal="${o.h||'center'}" vertical="${o.v||'center'}"${o.wrap?' wrapText="1"':''}${o.rtl?' readingOrder="2"':''}/>`;
     const xf=`<xf numFmtId="${nf}" fontId="${idx(fonts,fo)}" fillId="${idx(fills,fi)}" borderId="${idx(borders,bo)}" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1">${al}</xf>`;
     return memo[key]=idx(xfs,xf);};
+  // ورقة واحدة أو عدة أوراق (spec.sheets) — سجل الأنماط مشترك بين الأوراق
+  const sheetXml=sp=>{
   // الخلايا داخل نطاق مدموج تأخذ نمط خليته الأولى كي تُرسم الحدود والتعبئة كاملة
-  (spec.merges||[]).forEach(m=>{const [a,b]=m.split(':');const p=r=>{const mm=/([A-Z]+)(\d+)/.exec(r);let c=0;for(const ch of mm[1])c=c*26+ch.charCodeAt(0)-64;return [c-1,+mm[2]-1];};
-    const [c1,r1]=p(a),[c2,r2]=p(b);const top=spec.rows[r1]&&spec.rows[r1].c[c1];if(!top)return;
-    for(let r=r1;r<=r2;r++){const row=spec.rows[r]||(spec.rows[r]={c:[]});for(let c=c1;c<=c2;c++)if(!(r===r1&&c===c1)&&!row.c[c])row.c[c]={s:top.s};}});
-  const sheetRows=spec.rows.map((r,ri)=>{if(!r)return '';const cells=(r.c||[]).map((cl,ci)=>{if(!cl)return '';const ref=xlCol(ci)+(ri+1),si=st(cl.s);
+  (sp.merges||[]).forEach(m=>{const [a,b]=m.split(':');const p=r=>{const mm=/([A-Z]+)(\d+)/.exec(r);let c=0;for(const ch of mm[1])c=c*26+ch.charCodeAt(0)-64;return [c-1,+mm[2]-1];};
+    const [c1,r1]=p(a),[c2,r2]=p(b);const top=sp.rows[r1]&&sp.rows[r1].c[c1];if(!top)return;
+    for(let r=r1;r<=r2;r++){const row=sp.rows[r]||(sp.rows[r]={c:[]});for(let c=c1;c<=c2;c++)if(!(r===r1&&c===c1)&&!row.c[c])row.c[c]={s:top.s};}});
+  const sheetRows=sp.rows.map((r,ri)=>{if(!r)return '';const cells=(r.c||[]).map((cl,ci)=>{if(!cl)return '';const ref=xlCol(ci)+(ri+1),si=st(cl.s);
       const v=cl.v;
       if(cl.f!=null){const cached=v==null||v===''?'':(typeof v==='number'&&isFinite(v)?`<v>${v}</v>`:'');
         const tAttr=typeof v==='string'&&v!==''?' t="str"':'';return `<c r="${ref}" s="${si}"${tAttr}><f>${X(cl.f)}</f>${cached||(tAttr?`<v>${X(v)}</v>`:'')}</c>`;}
@@ -1530,16 +1533,16 @@ function xlsxBuild(filename,spec){const X=v=>String(v).replace(/&/g,'&amp;').rep
       if(v==null||v==='')return `<c r="${ref}" s="${si}"/>`;
       return typeof v==='number'&&isFinite(v)?`<c r="${ref}" s="${si}"><v>${v}</v></c>`:`<c r="${ref}" s="${si}" t="inlineStr"><is><t xml:space="preserve">${X(v)}</t></is></c>`;}).join('');
     return `<row r="${ri+1}"${r.h?` ht="${r.h}" customHeight="1"`:''}>${cells}</row>`;}).join('');
-  const rtl=spec.rtl!=null?spec.rtl:LANG==='ar';
-  const sheet=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><sheetViews><sheetView workbookViewId="0" showGridLines="0"${rtl?' rightToLeft="1"':''}/></sheetViews><cols>${(spec.cols||[]).map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('')}</cols><sheetData>${sheetRows}</sheetData>${(spec.merges||[]).length?`<mergeCells count="${spec.merges.length}">${spec.merges.map(m=>`<mergeCell ref="${m}"/>`).join('')}</mergeCells>`:''}${(spec.cf||[]).join('')}<pageMargins left="0.3" right="0.3" top="0.4" bottom="0.4" header="0.2" footer="0.2"/><pageSetup paperSize="9" orientation="${spec.landscape?'landscape':'portrait'}" fitToWidth="1" fitToHeight="0"/></worksheet>`;
+  const rtl=sp.rtl!=null?sp.rtl:(spec.rtl!=null?spec.rtl:LANG==='ar');
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><sheetViews><sheetView workbookViewId="0" showGridLines="0"${rtl?' rightToLeft="1"':''}/></sheetViews><cols>${(sp.cols||[]).map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join('')}</cols><sheetData>${sheetRows}</sheetData>${(sp.merges||[]).length?`<mergeCells count="${sp.merges.length}">${sp.merges.map(m=>`<mergeCell ref="${m}"/>`).join('')}</mergeCells>`:''}${(sp.cf||[]).join('')}<pageMargins left="0.3" right="0.3" top="0.4" bottom="0.4" header="0.2" footer="0.2"/><pageSetup paperSize="9" orientation="${sp.landscape?'landscape':'portrait'}" fitToWidth="1" fitToHeight="0"/></worksheet>`;};
+  const SH=(spec.sheets||[spec]).map(sp=>({name:X(String(sp.sheet||'Sheet1').replace(/[\[\]:*?\/\\]/g,' ').slice(0,31)||'Sheet1'),xml:sheetXml(sp)}));
   const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">${nfs.length?`<numFmts count="${nfs.length}">${nfs.map((f,k)=>`<numFmt numFmtId="${164+k}" formatCode="${X(f)}"/>`).join('')}</numFmts>`:''}<fonts count="${fonts.length}">${fonts.join('')}</fonts><fills count="${fills.length}">${fills.join('')}</fills><borders count="${borders.length}">${borders.join('')}</borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="${xfs.length}">${xfs.join('')}</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>${(spec.dxfs||[]).length?`<dxfs count="${spec.dxfs.length}">${spec.dxfs.join('')}</dxfs>`:''}</styleSheet>`;
-  const sname=X(String(spec.sheet||'Sheet1').replace(/[\[\]:*?\/\\]/g,' ').slice(0,31)||'Sheet1');
   const blob=xlZip([
-    {name:'[Content_Types].xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'},
+    {name:'[Content_Types].xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'+SH.map((x,k)=>`<Override PartName="/xl/worksheets/sheet${k+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')+'<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'},
     {name:'_rels/.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'},
-    {name:'xl/workbook.xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="${sname}" sheetId="1" r:id="rId1"/></sheets><calcPr calcId="191029" fullCalcOnLoad="1"/></workbook>`},
-    {name:'xl/_rels/workbook.xml.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'},
-    {name:'xl/worksheets/sheet1.xml',data:sheet},{name:'xl/styles.xml',data:styles}]);
+    {name:'xl/workbook.xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${SH.map((x,k)=>`<sheet name="${x.name}" sheetId="${k+1}" r:id="rId${k+1}"/>`).join('')}</sheets><calcPr calcId="191029" fullCalcOnLoad="1"/></workbook>`},
+    {name:'xl/_rels/workbook.xml.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+SH.map((x,k)=>`<Relationship Id="rId${k+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${k+1}.xml"/>`).join('')+`<Relationship Id="rId${SH.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`},
+    ...SH.map((x,k)=>({name:`xl/worksheets/sheet${k+1}.xml`,data:x.xml})),{name:'xl/styles.xml',data:styles}]);
   const el=document.createElement('a');el.href=URL.createObjectURL(blob);el.download=filename;document.body.appendChild(el);el.click();
   setTimeout(()=>{URL.revokeObjectURL(el.href);el.remove();},2000);}
 function xlsxDownload(filename,rows,opt){opt=opt||{};const rtl=opt.rtl!=null?opt.rtl:LANG==='ar';
@@ -3784,6 +3787,9 @@ function printRsPlan(){const r=rsResult();if(!r)return toast(t('mkNeed'));
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 // أمر الفرد: ورقة تشغيل لعامل الفرشة — ماركر لكل صف مع الطبقات وطول الماركر وخانة توقيع
 function printRsSpread(){const d=rsSpreadForm();if(d.err)return toast(t(d.err));
+  $('print-area').innerHTML=rsSpreadHtml(d);window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
+// صفحة «نموذج الفرد والقص والإنتاج» (HTML للطباعة) — تُستعمل وحدها في «أمر الفرد» وكصفحة ثانية في «تحليل»
+function rsSpreadHtml(d){
   const C=RS_FORM_C,u=d.u,colors=rsColors(),n=d.rows.length,maxRun=Math.max(1,...d.rows.map(x=>x.run));
   const N=v=>Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),I=v=>Number(v).toLocaleString('en-US');
   const bd='border:1px solid #bfbfbf';
@@ -3802,7 +3808,7 @@ function printRsSpread(){const d=rsSpreadForm();if(d.err)return toast(t(d.err));
   const box=(cells,bg,fg,fs)=>`<tr>${cells.map(c=>`<td colspan="${c[1]||1}" style="${bd};background:#${bg};color:#${fg};font-weight:800;font-size:${fs}px;padding:6px 5px;text-align:center">${c[0]}</td>`).join('')}</tr>`;
   const cg='<colgroup><col style="width:4%"><col style="width:7%"><col style="width:34%"><col style="width:9%"><col style="width:8%"><col style="width:11%"><col style="width:12%"><col style="width:15%"></colgroup>';
   const sigBox=lbl=>`<div style="flex:1;text-align:center"><div style="border-bottom:1.5px solid #7c8894;margin:0 14px 6px;height:34px"></div><div style="font-size:11.5px;color:#44515e;font-weight:700">${lbl}</div></div>`;
-  $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#1c2530;max-width:860px;margin:auto;padding-top:6px;-webkit-print-color-adjust:exact;print-color-adjust:exact" dir="${LANG==='ar'?'rtl':'ltr'}">
+  return `<div style="font-family:'Segoe UI',Tahoma,Arial;color:#1c2530;max-width:860px;margin:auto;padding-top:6px;-webkit-print-color-adjust:exact;print-color-adjust:exact" dir="${LANG==='ar'?'rtl':'ltr'}">
     <style>@page{size:A4 portrait;margin:8mm}</style>
     <table style="width:100%;border-collapse:collapse;table-layout:fixed">
       ${cg}
@@ -3822,8 +3828,7 @@ function printRsSpread(){const d=rsSpreadForm();if(d.err)return toast(t(d.err));
       <tr><td colspan="4" style="${bd};background:#${C.navy};color:#fff;font-weight:800;padding:7px;text-align:center">${esc(t('total'))}</td>
         ${[I(d.plies),I(d.run),'',N(d.fabf)].map(v=>`<td style="${bd};background:#${C.navy};color:#fff;font-weight:800;padding:7px;text-align:center">${v}</td>`).join('')}</tr></tbody>
     </table>
-    <div style="margin-top:18px;display:flex;gap:16px;break-inside:avoid;page-break-inside:avoid">${sigBox(t('rsFarradSig'))}${sigBox(t('rsCutSupSig'))}${sigBox(t('repInspector')+(MEMBER.name?' — '+esc(MEMBER.name):''))}</div></div>`;
-  window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
+    <div style="margin-top:18px;display:flex;gap:16px;break-inside:avoid;page-break-inside:avoid">${sigBox(t('rsFarradSig'))}${sigBox(t('rsCutSupSig'))}${sigBox(t('repInspector')+(MEMBER.name?' — '+esc(MEMBER.name):''))}</div></div>`;}
 /* ---- خطة الأثواب: توزيع طبقات الماركرات على أثواب بطول محدّد (First-Fit Decreasing) ---- */
 // يُرجع {mk,roll,rolls,totalFab,nRolls,totRoll,loss,eff} بوحدات داخلية (متر) أو رسالة خطأ عبر err
 function rsRollCompute(){
@@ -3957,7 +3962,7 @@ function printRsRolls(){const d=rsRollCompute();
     <div style="margin-top:28px;display:flex;gap:16px"><div style="flex:1;text-align:center"><div style="border-bottom:1.5px solid #7c8894;margin:0 14px 6px;height:38px"></div><div style="font-size:12px;color:#44515e;font-weight:700">${t('rsFarradSig')}</div></div><div style="flex:1;text-align:center"><div style="border-bottom:1.5px solid #7c8894;margin:0 14px 6px;height:38px"></div><div style="font-size:12px;color:#44515e;font-weight:700">${t('rsStoreKeeper')}</div></div></div></div>`;
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 /* ---- قائمة التصدير (كليك يمين / ضغطة مطوّلة على زر التقرير): PDF أو Excel ---- */
-const RS_EXP={plan:{print:'printRsPlan',xls:'exportRsExcel',name:'risho'},spread:{print:'printRsSpread',xls:'exportRsSpreadExcel',name:'spread'},rolls:{print:'printRsRolls',xls:'exportRsRollsExcel',name:'rolls'}};
+const RS_EXP={plan:{print:'printRsPlan',xls:'exportRsExcel',name:'risho'},spread:{print:'printRsSpread',xls:'exportRsSpreadExcel',name:'spread'},rolls:{print:'printRsRolls',xls:'exportRsRollsExcel',name:'rolls'},analysis:{print:'printRsAnalysis',xls:'exportRsAnalysisExcel',name:'analysis'}};
 function rsExpFileBase(kind){const title=$('rs-title')?$('rs-title').value.trim():'';
   return RS_EXP[kind].name+'_'+(title?title.replace(/[^\w؀-ۿ]+/g,'_').slice(0,30)+'_':'')+today();}
 function rsExpClose(){const m=$('rs-expmenu');if(m)m.remove();document.removeEventListener('mousedown',rsExpOutside,true);document.removeEventListener('keydown',rsExpKey,true);window.removeEventListener('scroll',rsExpClose,true);}
@@ -4004,6 +4009,10 @@ function rsSpreadForm(){const r=rsResult();if(!r)return {err:'mkNeed'};
 const RS_FORM_C={num:'595959',navy:'1F3864',blue:'2E75B6',sub:'DDEBF7',kpi:'D9E2F3',yel:'FFF2CC',grn:'E2EFDA',ink:'1F4E79',pinkF:'FFC7CE',pinkT:'9C0006',bar:'9DC3E6'};
 // Excel لأمر الفرد بتصميم «نموذج الفرد والقص والإنتاج» — بمعادلات حيّة (تُعدَّل الأرقام في Excel فتتحدّث المجاميع)
 function exportRsSpreadExcel(){const d=rsSpreadForm();if(d.err)return toast(t(d.err));
+  xlsxBuild(rsExpFileBase('spread')+'.xlsx',{...rsSpreadSheet(d),dxfs:rsFormDxfs()});toast(t('saved'));}
+function rsFormDxfs(){return [`<dxf><font><b/><color rgb="FF${RS_FORM_C.pinkT}"/></font><fill><patternFill><bgColor rgb="FF${RS_FORM_C.pinkF}"/></patternFill></fill></dxf>`];}
+// ورقة Excel «نموذج الفرد والقص والإنتاج» (مواصفة لـ xlsxBuild) — تُصدَّر وحدها أو كورقة ثانية في «تحليل»
+function rsSpreadSheet(d){
   const C=RS_FORM_C,u=d.u,W='FFFFFF';
   const S={title:{b:1,sz:16,color:W,fill:C.navy,bd:1},sub:{i:1,sz:10,color:C.ink,fill:C.sub,bd:1},
     ih:{b:1,sz:10,color:W,fill:C.blue,bd:1,wrap:1},iv:{b:1,color:C.ink,fill:C.yel,bd:1},ivn:{b:1,color:C.ink,fill:C.yel,bd:1,nf:'0.00'},
@@ -4037,9 +4046,82 @@ function exportRsSpreadExcel(){const d=rsSpreadForm();if(d.err)return toast(t(d.
   rows[T-1]={h:24,c:[{v:t('total'),s:S.tot},null,null,null,{f:`SUM(E${first}:E${last})`,v:d.plies,s:S.totn},{f:`SUM(F${first}:F${last})`,v:d.run,s:S.totn},{v:'',s:S.tot},{f:`SUM(H${first}:H${last})`,v:d.fabf,s:S.totd}]};
   const cf=[`<conditionalFormatting sqref="F${first}:F${last}"><cfRule type="dataBar" priority="1"><dataBar><cfvo type="min"/><cfvo type="max"/><color rgb="FF5B9BD5"/></dataBar></cfRule></conditionalFormatting>`,
     `<conditionalFormatting sqref="H${first}:H${last}"><cfRule type="top10" dxfId="0" priority="2" rank="3"/></conditionalFormatting>`];
-  xlsxBuild(rsExpFileBase('spread')+'.xlsx',{sheet:t('rsFormTitle'),cols:[5,9,Math.min(80,Math.max(34,...d.rows.map(x=>Math.ceil(x.parts.reduce((a,[sz,c])=>a+(sz+'×'+c).length,0)*1.15+(x.parts.length-1)*5+4)))),11,10,12,12,16],rows,merges,cf,
-    dxfs:[`<dxf><font><b/><color rgb="FF${C.pinkT}"/></font><fill><patternFill><bgColor rgb="FF${C.pinkF}"/></patternFill></fill></dxf>`]});
-  toast(t('saved'));}
+  return {sheet:t('rsFormTitle'),cols:[5,9,Math.min(80,Math.max(34,...d.rows.map(x=>Math.ceil(x.parts.reduce((a,[sz,c])=>a+(sz+'×'+c).length,0)*1.15+(x.parts.length-1)*5+4)))),11,10,12,12,16],rows,merges,cf};}
+/* ---- «تحليل»: صفحة تحليل كميات الأوردر (المقاسات · النِّسب · الاستهلاك) + نموذج الفرد والقص في نفس التقرير ---- */
+function rsAnalysisData(){const uf=rsUF(),u=rsUL(),sp=rsSpreadM(),R2=v=>Math.round(v*100)/100;
+  const rows=[...document.querySelectorAll('.rsq-row')].map(tr=>{const size=tr.querySelector('.rsq-size').value.trim(),qty=+tr.querySelector('.rsq-qty').value||0,
+      cons=+tr.querySelector('.rsq-cons').value||0,ratio=+tr.querySelector('.rsq-ratio').value||0;
+    return {size,qty,ratio,cons:Math.round(cons*uf*10000)/10000,cq:cons>0?R2(qty*cons*uf):0,cf:cons>0?R2(qty*(cons+sp)*uf):0,color:RS_ROWCOL[size]||''};}).filter(x=>x.size&&x.qty>0);
+  if(!rows.length)return {err:'mkNeed'};
+  const qty=rows.reduce((a,x)=>a+x.qty,0),ratio=R2(rows.reduce((a,x)=>a+x.ratio,0)),cq=R2(rows.reduce((a,x)=>a+x.cq,0)),cf=R2(rows.reduce((a,x)=>a+x.cf,0));
+  rows.forEach(x=>x.share=qty>0?x.qty/qty:0);
+  const top=new Set(rows.map((x,k)=>[x.cf,k]).sort((a,b)=>b[0]-a[0]).slice(0,3).map(x=>x[1])),w=rsFabW();
+  return {u,uf,spD:R2(sp*uf),title:$('rs-title')?$('rs-title').value.trim():'',model:$('rs-product')?$('rs-product').value:'',fabric:w?tf('rsFormWidth',{w}):'',date:fmtDate(today()),
+    rows,qty,ratio,cq,cf,avg:qty>0?Math.round(cf/qty*1000)/1000:0,top};}
+function rsAnalysisHtml(a){const C=RS_FORM_C,u=a.u,n=a.rows.length,maxQ=Math.max(1,...a.rows.map(x=>x.qty)),dense=n>28;
+  const N=v=>Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),I=v=>Number(v).toLocaleString('en-US');
+  const bd='border:1px solid #bfbfbf',pad=dense?'2px 5px':'3px 5px',fs=dense?11.5:12;
+  const hd=txt=>`<th style="${bd};background:#${C.blue};color:#fff;font-weight:800;font-size:11.5px;padding:6px 5px;text-align:center;vertical-align:middle;line-height:1.3">${txt}</th>`;
+  const td=(v,x)=>`<td style="${bd};padding:${pad};text-align:center;vertical-align:middle;font-size:${fs}px;${x||''}">${v}</td>`;
+  const box=(cells,bg,fg,f)=>`<tr>${cells.map(c=>`<td colspan="${c[1]||1}" style="${bd};background:#${bg};color:#${fg};font-weight:800;font-size:${f}px;padding:6px 5px;text-align:center">${c[0]}</td>`).join('')}</tr>`;
+  const cg='<colgroup><col style="width:5%"><col style="width:15%"><col style="width:13%"><col style="width:11%"><col style="width:11%"><col style="width:13%"><col style="width:15%"><col style="width:17%"></colgroup>';
+  const rows=a.rows.map((x,k)=>{const bg=x.color?`background:${x.color};`:'',pct=Math.round(x.qty/maxQ*100);
+    return `<tr>${td(k+1,bg+`color:#${C.num};font-weight:800`)}${td(`<span dir="ltr">${esc(x.size)}</span>`,bg+`color:#${C.navy};font-weight:800`)}
+      ${td(I(x.qty),`background-color:#fff;background-image:linear-gradient(to ${LANG==='ar'?'left':'right'},#${C.bar} ${pct}%,transparent ${pct}%);font-weight:700`)}
+      ${td(x.ratio||'',`color:#${C.ink}`)}${td((x.share*100).toFixed(1)+'%',`color:#${C.ink}`)}
+      ${td(x.cons?x.cons.toFixed(3):'—',`background:#${C.grn}`)}${td(N(x.cq),`color:#${C.ink}`)}
+      ${td(N(x.cf),a.top.has(k)?`background:#${C.pinkF};color:#${C.pinkT};font-weight:800`:'font-weight:800')}</tr>`;}).join('');
+  return `<div style="font-family:'Segoe UI',Tahoma,Arial;color:#1c2530;max-width:860px;margin:auto;padding-top:6px;-webkit-print-color-adjust:exact;print-color-adjust:exact" dir="${LANG==='ar'?'rtl':'ltr'}">
+    <style>@page{size:A4 portrait;margin:8mm}</style>
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed">${cg}
+      <tr><td colspan="8" style="${bd};background:#${C.navy};color:#fff;font-weight:800;font-size:20px;padding:9px;text-align:center">${esc(t('rsAnaTitle'))}${MEMBER&&MEMBER.wsName?` <span style="font-size:13px;opacity:.85">— ${esc(MEMBER.wsName)}</span>`:''}</td></tr>
+      <tr><td colspan="8" style="${bd};background:#${C.sub};color:#${C.ink};font-style:italic;font-size:11.5px;padding:4px;text-align:center">${esc(t('rsAnaSub'))}</td></tr>
+      <tr><td colspan="8" style="height:6px"></td></tr>
+      ${box([[esc(t('rsFormOrderNo')),3],[esc(t('rsFormModel')),2],[esc(t('rsFormFabric'))],[esc(t('dateLbl'))],[esc(tf('rsFormSpread',{u}))]],C.blue,'ffffff',11)}
+      ${box([[esc(a.title)||'&nbsp;',3],[esc(a.model)||'&nbsp;',2],[esc(a.fabric)||'&nbsp;'],[esc(a.date)],[a.spD.toFixed(2)]],C.yel,C.ink,12.5)}
+      <tr><td colspan="8" style="height:6px"></td></tr>
+      ${box([[esc(t('rsAnaSizes')),2],[esc(t('rsAnaQty')),2],[esc(tf('rsAnaCq',{u})),2],[esc(tf('rsAnaCf',{u}))],[esc(tf('rsFormAvg',{u}))]],C.navy,'ffffff',11)}
+      ${box([[n,2],[I(a.qty),2],[N(a.cq),2],[N(a.cf)],[a.avg.toFixed(3)]],C.kpi,C.navy,19)}
+    </table>
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed;margin-top:8px">${cg}
+      <thead><tr>${hd(esc(t('rsCbNo')))}${hd(esc(t('sizeName')))}${hd(esc(t('mkQtyOrder')))}${hd(esc(t('rsRatio')))}${hd(esc(t('rsAnaShare')))}${hd(esc(tf('rsAnaCp',{u})))}${hd(esc(tf('rsAnaCq',{u})))}${hd(esc(tf('rsAnaCf',{u})))}</tr></thead>
+      <tbody>${rows}
+      <tr><td colspan="2" style="${bd};background:#${C.navy};color:#fff;font-weight:800;padding:7px;text-align:center">${esc(t('total'))}</td>
+        ${[I(a.qty),a.ratio||'','100%','',N(a.cq),N(a.cf)].map(v=>`<td style="${bd};background:#${C.navy};color:#fff;font-weight:800;padding:7px;text-align:center">${v}</td>`).join('')}</tr></tbody>
+    </table></div>`;}
+function printRsAnalysis(){const a=rsAnalysisData();if(a.err)return toast(t(a.err));const d=rsSpreadForm();
+  $('print-area').innerHTML=rsAnalysisHtml(a)+(d.err?'':`<div style="break-before:page;page-break-before:always"></div>`+rsSpreadHtml(d));
+  window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
+// ورقة Excel «تحليل» بمعادلات حيّة (النسبة من الكمية، الاستهلاك، المجاميع) + ورقة «نموذج الفرد والقص» في نفس الملف
+function rsAnalysisSheet(a){const C=RS_FORM_C,u=a.u,W='FFFFFF',n=a.rows.length;
+  const S={title:{b:1,sz:16,color:W,fill:C.navy,bd:1},sub:{i:1,sz:10,color:C.ink,fill:C.sub,bd:1},
+    ih:{b:1,sz:10,color:W,fill:C.blue,bd:1,wrap:1},iv:{b:1,color:C.ink,fill:C.yel,bd:1},ivn:{b:1,color:C.ink,fill:C.yel,bd:1,nf:'0.00'},
+    kh:{b:1,sz:10,color:W,fill:C.navy,bd:1,wrap:1},kv:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'#,##0'},kvd:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'#,##0.00'},kva:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'0.000'},
+    th:{b:1,sz:10,color:W,fill:C.blue,bd:1,wrap:1},tot:{b:1,color:W,fill:C.navy,bd:1},totn:{b:1,color:W,fill:C.navy,bd:1,nf:'#,##0'},totd:{b:1,color:W,fill:C.navy,bd:1,nf:'#,##0.00'},totp:{b:1,color:W,fill:C.navy,bd:1,nf:'0%'}};
+  const first=11,last=first+n-1,T=last+1;
+  const rows=[],merges=['A1:H1','A2:H2','A4:C4','D4:E4','A5:C5','D5:E5','A7:B7','C7:D7','E7:F7','A8:B8','C8:D8','E8:F8',`A${T}:B${T}`];
+  rows[0]={h:34,c:[{v:t('rsAnaTitle'),s:S.title}]};rows[1]={h:20,c:[{v:t('rsAnaSub'),s:S.sub}]};rows[2]={h:6,c:[]};
+  rows[3]={h:22,c:[{v:t('rsFormOrderNo'),s:S.ih},null,null,{v:t('rsFormModel'),s:S.ih},null,{v:t('rsFormFabric'),s:S.ih},{v:t('dateLbl'),s:S.ih},{v:tf('rsFormSpread',{u}),s:S.ih}]};
+  rows[4]={h:24,c:[{v:a.title,s:S.iv},null,null,{v:a.model,s:S.iv},null,{v:a.fabric,s:S.iv},{v:a.date,s:S.iv},{v:a.spD,s:S.ivn}]};
+  rows[5]={h:6,c:[]};
+  rows[6]={h:30,c:[{v:t('rsAnaSizes'),s:S.kh},null,{v:t('rsAnaQty'),s:S.kh},null,{v:tf('rsAnaCq',{u}),s:S.kh},null,{v:tf('rsAnaCf',{u}),s:S.kh},{v:tf('rsFormAvg',{u}),s:S.kh}]};
+  rows[7]={h:34,c:[{f:`COUNTA(B${first}:B${last})`,v:n,s:S.kv},null,{f:`C${T}`,v:a.qty,s:S.kv},null,{f:`G${T}`,v:a.cq,s:S.kvd},null,{f:`H${T}`,v:a.cf,s:S.kvd},{f:`IF(C${T}>0,H${T}/C${T},0)`,v:a.avg,s:S.kva}]};
+  rows[8]={h:6,c:[]};
+  rows[9]={h:40,c:[t('rsCbNo'),t('sizeName'),t('mkQtyOrder'),t('rsRatio'),t('rsAnaShare'),tf('rsAnaCp',{u}),tf('rsAnaCq',{u}),tf('rsAnaCf',{u})].map(v=>({v,s:S.th}))};
+  a.rows.forEach((x,k)=>{const rr=first+k,f=x.color?x.color.replace('#','').toUpperCase():'',inp={color:C.ink,bd:1};
+    rows[rr-1]={h:19,c:[{v:k+1,s:{b:1,color:C.num,bd:1,...(f?{fill:f}:{})}},{v:x.size,s:{b:1,color:C.navy,bd:1,...(f?{fill:f}:{})}},
+      {v:x.qty,s:{...inp,b:1,nf:'#,##0'}},{v:x.ratio||'',s:inp},
+      {f:`IF($C$${T}>0,C${rr}/$C$${T},"")`,v:x.share,s:{...inp,nf:'0.0%'}},
+      {v:x.cons||'',s:{...inp,fill:C.grn,nf:'0.000'}},
+      {f:`IF(F${rr}="","",C${rr}*F${rr})`,v:x.cq,s:{...inp,nf:'#,##0.00'}},
+      {f:`IF(F${rr}="","",C${rr}*(F${rr}+$H$5))`,v:x.cf,s:{b:1,bd:1,nf:'#,##0.00'}}]};});
+  rows[T-1]={h:24,c:[{v:t('total'),s:S.tot},null,{f:`SUM(C${first}:C${last})`,v:a.qty,s:S.totn},{f:`SUM(D${first}:D${last})`,v:a.ratio,s:S.totd},{f:`SUM(E${first}:E${last})`,v:1,s:S.totp},{v:'',s:S.tot},
+    {f:`SUM(G${first}:G${last})`,v:a.cq,s:S.totd},{f:`SUM(H${first}:H${last})`,v:a.cf,s:S.totd}]};
+  const cf=[`<conditionalFormatting sqref="C${first}:C${last}"><cfRule type="dataBar" priority="1"><dataBar><cfvo type="min"/><cfvo type="max"/><color rgb="FF5B9BD5"/></dataBar></cfRule></conditionalFormatting>`,
+    `<conditionalFormatting sqref="H${first}:H${last}"><cfRule type="top10" dxfId="0" priority="2" rank="3"/></conditionalFormatting>`];
+  return {sheet:t('rsAnaSheet'),cols:[5,12,12,11,11,13,15,16],rows,merges,cf};}
+function exportRsAnalysisExcel(){const a=rsAnalysisData();if(a.err)return toast(t(a.err));const d=rsSpreadForm();
+  xlsxBuild(rsExpFileBase('analysis')+'.xlsx',{sheets:[rsAnalysisSheet(a)].concat(d.err?[]:[rsSpreadSheet(d)]),dxfs:rsFormDxfs()});toast(t('saved'));}
 // Excel لأمر الرولات
 function exportRsRollsExcel(){const d=rsRollCompute();
   if(d.err==='empty'||d.err==='short')return toast(t('rsNoValidMk'));if(d.err==='nolen')return toast(t('rsRollNeedLen'));
