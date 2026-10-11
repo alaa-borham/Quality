@@ -2483,11 +2483,17 @@ function rsBestCombo(active,work,cons,maxlen,maxsizes,maxpcs,SUR,better,deadline
         idx.push(i);cnt.push(c);rec(i+1,pcs+c,nl);idx.pop();cnt.pop();if(stop)return;}}};
   rec(0,0,0);return best;}
 // أفضل خطة تلقائياً للكميات المتبقية بأقل استهلاك (تغطية تامة بلا زيادة)
-function rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,rawPairs){
+// الطول المقيس للماركر (متر) إن وُجد: من مكتبة المنتج لهذا العرض، أو قياس «مطور المراكر» غير المحفوظ (بنفس حارس المكتبة)، أو الطول الفعلي المُدخَل — وإلا 0
+function rsMeasLenM(vp,calcLen,actlenDisp,uf){vp=(vp||[]).filter(p=>p&&p.size&&p.cnt>0);if(!vp.length)return 0;const lib=rsMarkerLibLen(vp);if(lib>0)return lib;
+  const sg=rsComboSig(vp);if(RS_CBACT[sg]>0&&calcLen>0&&RS_CBACT[sg]<=calcLen*(1+RS_LIB_TOL))return RS_CBACT[sg];
+  return actlenDisp>0?actlenDisp/(uf||rsUF()):0;}
+// حد طول الماركر يُقارَن بالطول المقيس إن وُجد (الحقيقي على الطاولة بعد تداخل القطع)، وإلا بالطول المحسوب
+function rsFitLen(vp,calcLen,actlenDisp,uf){const m=rsMeasLenM(vp,calcLen,actlenDisp,uf);return m>0?m:calcLen;}
+function rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,rawPairs,actlen){
   if(!vp.length)return false;const pcs=vp.reduce((a,p)=>a+p.cnt,0);const len=vp.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);
   if(new Set(vp.map(p=>p.size)).size<vp.length)return false;
   if(vp.length>maxsizes||pcs>maxpcs)return false;if(!(plies>0)||plies%1!==0)return false;
-  if(maxlen>0&&len>maxlen+1e-9)return false;
+  if(maxlen>0&&rsFitLen(vp,len,actlen)>maxlen+1e-9)return false;
   if(rawPairs&&rawPairs.some(p=>(!p.size&&p.cnt>0)||(p.size&&(!(p.cnt>0)||p.cnt%1!==0))))return false;
   return true;}
 // حلّ الكميات المتبقية (دالة نقية بلا DOM — تُختبر في tests/solver.test.mjs):
@@ -2519,7 +2525,7 @@ function rsAutoPlan(){if(!$('rs-markers'))return;
   const cvR=rsConsValList(),cvBad=Object.keys(cvR).filter(s=>cvR[s][0].lvl==='bad'&&reqMap[s]>0);
   if(cvBad.length){rsFlagSizes(cvBad);return toast(tf('cvBlockAuto',{s:cvBad.map(s=>s+' = '+cons[s]).join('، ')}));}
   const produced={};rsReadMarkers().forEach(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
-    if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs))vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);});
+    if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs,m.actlen))vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);});
   const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]-(produced[s]||0));
   if(!Object.values(rem).some(v=>v>0))return toast(t('rsAutoDone'));
   // أولاً: اتّبع نمط توليفات مكتبتك — هيكل التوليفات مشترك عبر كل الأعراض (تُدخل مرة واحدة على العرض الأساسي)؛
@@ -2548,7 +2554,7 @@ function rsBuildSugs(){if(!$('rs-sug-rows'))return;
   const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
   const reqMap={};[...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();if(s)reqMap[s]=+tr.querySelector('.rsq-qty').value||0;});
   const produced={};rsReadMarkers().forEach(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
-    if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs))vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);});
+    if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs,m.actlen))vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);});
   RS_SUG_REM0={};Object.keys(reqMap).forEach(s=>RS_SUG_REM0[s]=reqMap[s]-(produced[s]||0));
   RS_SUGS=rsSolve(RS_SUG_REM0,cons,maxlen,maxsizes,maxpcs,{budget:300}).map(s=>({combo:s.combo,sug:s.plies,plies:s.plies,len:s.len})).sort((a,b)=>b.len-a.len);
   rsRenderSugs();}
@@ -3052,7 +3058,7 @@ function rsObjectiveChanged(){rsSaveDraft();
   [...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();const q=+tr.querySelector('.rsq-qty').value||0;if(s&&q>0)reqMap[s]=q;});
   if(!Object.keys(reqMap).length){ // لا كميات مُدخَلة: اشتقّ الطلب من إنتاج الماركرات الصالحة الحالية
     rsReadMarkers().forEach(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
-      if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs))vp.forEach(p=>reqMap[p.size]=(reqMap[p.size]||0)+p.cnt*plies);});}
+      if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs,m.actlen))vp.forEach(p=>reqMap[p.size]=(reqMap[p.size]||0)+p.cnt*plies);});}
   if(!Object.keys(reqMap).length){rsMkCalc();return;} // لا شيء لإعادة بنائه
   const rem={};Object.keys(reqMap).forEach(s=>rem[s]=reqMap[s]);
   const added=rsSolve(rem,cons,maxlen,maxsizes,maxpcs);
@@ -3110,7 +3116,7 @@ function rsColorTotals(){const colors=rsColors();if(!colors.length)return null;
   const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
   const per={};colors.forEach(c=>per[c.name]={plies:0,fab:0,pcs:0});
   rsReadMarkers().forEach(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
-    if(!rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs))return;
+    if(!rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs,m.actlen))return;
     const len=vp.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0),pcs=vp.reduce((a,p)=>a+p.cnt,0);
     rsDistribute(plies,colors).forEach(d=>{if(per[d.name]){per[d.name].plies+=d.plies;per[d.name].fab+=d.plies*len;per[d.name].pcs+=d.plies*pcs;}});});
   const totalQty=colors.reduce((s,c)=>s+c.qty,0);
@@ -3322,7 +3328,7 @@ function rsHeavyApply(){if(!RS_HEAVY||!RS_HEAVY.length)return toast(t('rsHeavyNo
   const effLen=c=>measLen(c)||rsMkEffLen(c,calcL(c),0,uf);
   const reqMap={};[...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();if(s)reqMap[s]=+tr.querySelector('.rsq-qty').value||0;});
   const cur=rsReadMarkers().map(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
-    const ok=rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs);
+    const ok=rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs,m.actlen);
     return {m,vp,plies,ok,fab:ok?rsMkEffLen(m.pairs,calcL(vp),m.actlen,uf)*plies:0};});
   // البدائل المقيسة فقط التي استهلاك قطعتها الفعلي أقل من الماركر الثقيل
   const heavyIdx=new Set(),alts=[],seen=new Set();let unmeasured=0;
@@ -3462,7 +3468,7 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();const spM=r
       else if(pcs>maxpcs)st='st_maxpcs';
       else if(!(plies>0)||plies%1!==0)st='st_plies';
       else{len=vp.reduce((s,p)=>s+p.cnt*(cons[p.size]||0),0);
-        if(maxlen>0&&len>maxlen+1e-9){st='st_len';
+        if(maxlen>0&&rsFitLen(vp,len,m.actlen,uf)>maxlen+1e-9){st='st_len';
           const sw=rsLenSwapPick(vp,cons,len,maxlen);if(sw)swaps.push({idx:i,from:sw.from,to:sw.to});}
         else st='st_ok';}}
     const _sig0=vp.length?rsComboSig(vp):'';
@@ -3617,7 +3623,7 @@ function rsResult(){const qty=rsReadQty();if(!qty.length)return null;
     else if(m.pairs.some(p=>p.size&&(!(p.cnt>0)||p.cnt%1!==0)))st='st_badqty';
     else if(new Set(vp.map(p=>p.size)).size<vp.length)st='st_dup';
     else if(vp.length>maxsizes)st='st_maxsizes';else if(pcs>maxpcs)st='st_maxpcs';
-    else if(!(plies>0)||plies%1!==0)st='st_plies';else if(maxlen>0&&len>maxlen+1e-9)st='st_len';
+    else if(!(plies>0)||plies%1!==0)st='st_plies';else if(maxlen>0&&rsFitLen(vp,len,m.actlen,ufA)>maxlen+1e-9)st='st_len';
     const effLen=rsMkEffLen(m.pairs,len,m.actlen,ufA);
     const ok=st==='st_ok',run=ok?pcs*plies:0,fab=ok?effLen*plies:0;if(ok){tRun+=run;tFab+=fab;}
     markers.push({code:'M'+String(i+1).padStart(2,'0'),pairs:vp,plies,pcs,len:Math.round(len*100)/100,effLen:Math.round(effLen*10000)/10000,actlen:m.actlen||0,status:t(st),ok,run,fab:Math.round(fab*100)/100});});
@@ -3840,7 +3846,7 @@ function rsRollCompute(){
   const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
   const ufA=rsUF();// الطول الفعلي يُدخَل بوحدة العرض الحالية — يُحوَّل لمتر (وحدة الحساب الداخلية) قبل استخدامه
   const mk=[],mprod={};rsReadMarkers().forEach((m,i)=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
-    if(!rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs))return;
+    if(!rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs,m.actlen))return;
     const calcLen=vp.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);
     const len=Math.round(rsMkEffLen(m.pairs,calcLen,m.actlen,ufA)*100)/100;// طول الرول: المقيس من المكتبة إن تطابق وإلا الفعلي وإلا المحسوب
     vp.forEach(p=>mprod[p.size]=(mprod[p.size]||0)+p.cnt*plies);
@@ -4168,7 +4174,7 @@ function exportRsExcel(){
   const objTxt=($('rs-objective')&&$('rs-objective').value==='markers')?t('rsObjMarkers'):t('rsObjPlies');
   const produced={};let tRun=0,tFab=0,tFabf=0,tPlies=0;const markers=[];const spM=rsSpreadM();
   rsReadMarkers().forEach((m,i)=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
-    const ok=rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs);
+    const ok=rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs,m.actlen);
     if(!vp.length&&!plies)return;
     const pcs=vp.reduce((a,p)=>a+p.cnt,0),len=vp.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);
     const effLen=rsMkEffLen(m.pairs,len,m.actlen,uf);
