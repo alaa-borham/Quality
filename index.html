@@ -3897,7 +3897,7 @@ function rsSpreadHtml(d){
       ${box([[esc(d.title)||'&nbsp;',2+K],[esc(d.model)||'&nbsp;',2],[esc(d.fabric)],[esc(d.date)],[d.spD.toFixed(2)]],C.yel,C.ink,12.5)}
       <tr><td colspan="${NC}" style="height:6px"></td></tr>
       ${box([[esc(t('rsFormNMk')),1+K],[esc(t('rsFormPlies')),2],[esc(t('rsFormPcs'))],[esc(tf('rsAnaCq',{u}))],[esc(tf('rsAnaCf',{u}))],[esc(tf('rsFormAvg',{u}))]],C.navy,'ffffff',11)}
-      ${box([[n,1+K],[I(d.plies),2],[I(d.run)],[N(d.cq)],[N(d.fabf)],[d.avg.toFixed(3)]],C.kpi,C.navy,19)}
+      ${box([[n,1+K],[I(d.plies),2],[I(d.run)],[N(d.cq)],[N(d.fabf)],[d.avg.toFixed(2)]],C.kpi,C.navy,19)}
     </table>
     <table style="width:100%;border-collapse:collapse;table-layout:fixed;margin-top:8px">
       ${cg}
@@ -4098,7 +4098,7 @@ function rsSpreadSheet(d){
   const iP=2+K,iL=iP+1,iR=iP+2,iM=iP+3,iF=iP+4,P=L(iP),Pl=L(iL),Rn=L(iR),Ms=L(iM),Fb=L(iF),dEnd=L(1+K);
   const S={title:{b:1,sz:16,color:W,fill:C.navy,bd:1},
     ih:{b:1,sz:10,color:W,fill:C.blue,bd:1,wrap:1},iv:{b:1,color:C.ink,fill:C.yel,bd:1},ivn:{b:1,color:C.ink,fill:C.yel,bd:1,nf:'0.00'},
-    kh:{b:1,sz:10,color:W,fill:C.navy,bd:1,wrap:1},kv:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'#,##0'},kvd:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'#,##0.00'},kva:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'0.000'},
+    kh:{b:1,sz:10,color:W,fill:C.navy,bd:1,wrap:1},kv:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'#,##0'},kvd:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'#,##0.00'},kva:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'0.00'},
     th:{b:1,sz:10,color:W,fill:C.blue,bd:1,wrap:1},tot:{b:1,color:W,fill:C.navy,bd:1},totn:{b:1,color:W,fill:C.navy,bd:1,nf:'#,##0'},totd:{b:1,color:W,fill:C.navy,bd:1,nf:'#,##0.00'}};
   const cell=(base,fill)=>fill?{...base,fill}:base,pad=(arr)=>{const o=[];arr.forEach(([i,v])=>o[i]=v);return o;};
   const rows=[],merges=[`A1:${Fb}1`,`A4:${dEnd}4`,`${P}4:${Pl}4`,`A5:${dEnd}5`,`${P}5:${Pl}5`,`A7:${L(K)}7`,`${L(K+1)}7:${P}7`,`A8:${L(K)}8`,`${L(K+1)}8:${P}8`];
@@ -4168,7 +4168,7 @@ function rsAnalysisHtml(a){const C=RS_FORM_C,u=a.u,n=a.rows.length,maxQ=Math.max
       ${box([[esc(a.title)||'&nbsp;',3],[esc(a.model)||'&nbsp;',2],[esc(a.fabric)||'&nbsp;'],[esc(a.date)],[a.spD.toFixed(2)]],C.yel,C.ink,12.5)}
       <tr><td colspan="8" style="height:6px"></td></tr>
       ${box([[esc(t('rsAnaSizes')),2],[esc(t('rsAnaQty')),2],[esc(tf('rsAnaCq',{u})),2],[esc(tf('rsAnaCf',{u}))],[esc(tf('rsFormAvg',{u}))]],C.navy,'ffffff',11)}
-      ${box([[n,2],[I(a.qty),2],[N(a.cq),2],[N(a.cf)],[a.avg.toFixed(3)]],C.kpi,C.navy,19)}
+      ${box([[n,2],[I(a.qty),2],[N(a.cq),2],[N(a.cf)],[a.avg.toFixed(2)]],C.kpi,C.navy,19)}
     </table>
     <table style="width:100%;border-collapse:collapse;table-layout:fixed;margin-top:8px">${cg}
       <thead><tr>${hd(esc(t('rsCbNo')))}${hd(esc(t('sizeName')))}${hd(esc(t('mkQtyOrder')))}${hd(esc(t('rsRatio')))}${hd(esc(t('rsAnaShare')))}${hd(esc(tf('rsAnaCp',{u})))}${hd(esc(tf('rsAnaCq',{u})))}${hd(esc(tf('rsAnaCf',{u})))}</tr></thead>
@@ -4183,7 +4183,7 @@ function printRsAnalysis(){const a=rsAnalysisData();if(a.err)return toast(t(a.er
 function rsAnalysisSheet(a){const C=RS_FORM_C,u=a.u,W='FFFFFF',n=a.rows.length;
   const S={title:{b:1,sz:16,color:W,fill:C.navy,bd:1},
     ih:{b:1,sz:10,color:W,fill:C.blue,bd:1,wrap:1},iv:{b:1,color:C.ink,fill:C.yel,bd:1},ivn:{b:1,color:C.ink,fill:C.yel,bd:1,nf:'0.00'},
-    kh:{b:1,sz:10,color:W,fill:C.navy,bd:1,wrap:1},kv:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'#,##0'},kvd:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'#,##0.00'},kva:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'0.000'},
+    kh:{b:1,sz:10,color:W,fill:C.navy,bd:1,wrap:1},kv:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'#,##0'},kvd:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'#,##0.00'},kva:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'0.00'},
     th:{b:1,sz:10,color:W,fill:C.blue,bd:1,wrap:1},tot:{b:1,color:W,fill:C.navy,bd:1},totn:{b:1,color:W,fill:C.navy,bd:1,nf:'#,##0'},totd:{b:1,color:W,fill:C.navy,bd:1,nf:'#,##0.00'},totp:{b:1,color:W,fill:C.navy,bd:1,nf:'0%'}};
   const first=11,last=first+n-1,T=last+1;
   const rows=[],merges=['A1:H1','A4:C4','D4:E4','A5:C5','D5:E5','A7:B7','C7:D7','E7:F7','A8:B8','C8:D8','E8:F8',`A${T}:B${T}`];
