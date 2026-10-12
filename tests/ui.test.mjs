@@ -101,7 +101,7 @@ const rs = await page.evaluate(async () => {
   const spreadRows = $('print-area').querySelectorAll('tbody tr').length;
   step('printRsAnalysis', () => printRsAnalysis());
   const anaPages = $('print-area').querySelectorAll('thead').length; // صفحة التحليل + نموذج الفرد
-  const anaCmp = $('print-area').textContent.includes(t('rsCmpTitle')); // جدول «الفرق بين الخطتين»
+  const anaCmp = $('print-area').textContent.includes(t('rsSaveTitle')); // جدول «الفرق بين الخطتين»
   step('exportRsAnalysisExcel', () => exportRsAnalysisExcel());
   step('exportRsExcel', () => exportRsExcel()); step('exportRsSpreadExcel', () => exportRsSpreadExcel()); step('exportRsRollsExcel', () => exportRsRollsExcel());
   step('rsMeasQ', () => { rsMkCalc(); if (RS_MEASQ.length) { rsMeasQToCombos(); rsMeasQPrint(); } });
@@ -113,7 +113,7 @@ chk('risho functions run without errors', rs.log.length === 0, rs.log);
 chk('auto plan creates markers', rs.nMk > 0, rs.nMk);
 chk('spread form prints a row per marker (+ blank rows + total)', rs.spreadRows >= rs.nMk + 1, rs);
 chk('analysis report = analysis page + spread form', rs.anaPages === 2, rs.anaPages);
-chk('analysis report includes the plans comparison', rs.anaCmp === true);
+chk('analysis report includes the saving rate', rs.anaCmp === true);
 chk('new plan clears markers', rs.after === 0, rs.after);
 await page.waitForTimeout(300);
 chk('Excel exports download 4 .xlsx files', downloads.filter(f => f.endsWith('.xlsx')).length >= 4, downloads);
