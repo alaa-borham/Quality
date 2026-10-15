@@ -396,7 +396,6 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
             <span style="display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;margin-inline-start:24px"><label style="font-size:13px;font-weight:700;white-space:nowrap"><span data-i18n="rsCbCap">عدد التوليفات</span> <input id="rs-combo-cap" type="number" min="20" max="500" value="50" style="width:70px;padding:4px;text-align:center;background:var(--inp)"></label><span class="note" style="margin:0" data-i18n="rsCbBtnHint">كلما زاد العدد والتنوّع، اقتربت النتيجة من CAD (مقابل قياس توليفات أكثر)</span></span></div>
           <div class="rsc-hide" style="margin-top:8px">
             <div id="rs-colors" style="display:flex;flex-direction:column;gap:6px;max-width:520px"></div>
-            <div id="rs-cmatrix" style="margin-top:10px"></div>
             <div id="rs-colors-sum" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div></div></div>
         <div id="rs-consval" style="display:none;margin-top:10px;border-radius:9px;padding:9px 12px;font-size:13px;color:var(--txt)"></div>
         <div id="rs-consdiff" style="display:none;margin-top:10px;border-radius:9px;padding:9px 12px;font-size:13px;font-weight:800;background:var(--warn-bg);color:var(--warn);border:2px solid var(--warn-bd)"></div>
@@ -611,7 +610,7 @@ rsReviewTbl:'مطابقة الخطة',rsProdFromMk:'إجمالي القطع من
 rsAutoBtn:'أكمل الخطة تلقائياً (أقل استهلاك)',rsAutoDone:'الخطة مكتملة — لا كميات متبقية',rsTrimQ:'يوجد إنتاج زائد عن الأوردر ({n} قطعة). إزالة الزائد بتقليل طبقات الماركرات المسبّبة (وحذف ما يصبح بلا طبقات) ثم إكمال أي نقص تلقائياً؟',rsTrimmed:'✂️ أُزيل الإنتاج الزائد: {x}',rsTrimDel:'حُذف {n} ماركر',rsTrimRed:'خُفّضت طبقات {n} ماركر',rsAutoAdded:'أُضيف {n} ماركر تلقائياً',rsAutoAddedLib:'أُضيف {n} ماركر تلقائياً — منها {l} من مكتبتك المقيسة (مطابقة للكاد)',rsNoSug:'تعذّر توليد خطة — تأكّد من إدخال الكميات والاستهلاك، وأن حدّ طول الماركر يتّسع للقياسات',rsScNoData:'لا توجد كميات في الأوردر — أدخِل الكميات في جدول الكميات أولاً',
 rsReducePliesBtn:'قلّل الطبقات',rsReduceDone:'قُلّلت الطبقات في {n} ماركر: {a} ← {b} طبقة (القماش والكمية دون تغيير)',rsReduceNone:'لا يمكن تقليل الطبقات أكثر — الماركرات مضبوطة على حدّ الطول أو أقصى قطع',
 rsClearMkBtn:'امسح الماركرات',rsClearMkQ:'حذف كل الماركرات؟ يمكنك بعدها الضغط على «أكمل الخطة تلقائياً» لبناء خطة بلا زيادة إنتاج.',rsSortBtn:'ترتيب حسب الطول',rsSortPcBtn:'الأفضل حسب استهلاك القطعة',
-rsColTitle:'🎨 توزيع الألوان (اختياري)',rsCMTitle:'كمية كل لون لكل مقاس',rsCMFill:'⚖️ وزّع كمية الأوردر على الألوان',rsCMToOrder:'↩️ اعتمد مجموع الألوان ككمية الأوردر',rsCMClear:'🧹 امسح كميات الألوان',rsCMHint:'اكتب كمية كل لون لكل مقاس (أو اضغط «وزّع» ثم عدّل). «أكمل الخطة تلقائياً» يوزّع طبقات كل ماركر على الألوان بحيث يغطّي كل لون كمياته بالضبط — الماركرات مشتركة بين الألوان.',rsCMBad:'{n} مقاس مجموع ألوانه لا يساوي كمية الأوردر (بالأحمر) — عدّل الأرقام أو اضغط «اعتمد مجموع الألوان ككمية الأوردر»',rsCMFillQ:'توزيع كمية الأوردر لكل مقاس على الألوان حسب حصة كل لون؟ (تُستبدل القيم الحالية)',rsCMToOrderQ:'جعل كمية الأوردر لكل مقاس = مجموع ألوانه؟',rsCMClearQ:'مسح كميات الألوان لكل المقاسات؟',rsCMQtyAuto:'محسوبة من جدول «كمية كل لون لكل مقاس»',rsCMSize:'المقاس',rsCMOrder:'كمية الأوردر',rsCMSum:'مجموع الألوان',rsColDone:'✅ يغطّي كمياته بالضبط',rsColShort:'ناقص {n} قطعة',rsColOver:'زائد {n} قطعة',rsColAutoDone:'✅ وُزّعت الطبقات على الألوان: أُضيف {a} ماركر · عُدّل {e} · حُذف {d}',rsCpApprox:'توزيع تقريبي بالنسبة — اضغط «أكمل الخطة تلقائياً» لتوزيع دقيق لكل لون',rsColAdd:'إضافة لون',rsColName:'اسم اللون',rsColQty:'الكمية',rsColUnnamed:'لون',rsColPcs:'القطع',rsColMismatch:'مجموع كميات الألوان ({c}) لا يساوي كمية الطلب ({o})',
+rsColTitle:'🎨 توزيع الألوان (اختياري)',rsCMQtyAuto:'محسوبة من أعمدة الألوان في جدول كميات الأوردر',rsColDone:'✅ يغطّي كمياته بالضبط',rsColShort:'ناقص {n} قطعة',rsColOver:'زائد {n} قطعة',rsColAutoDone:'✅ وُزّعت الطبقات على الألوان: أُضيف {a} ماركر · عُدّل {e} · حُذف {d}',rsCpApprox:'توزيع تقريبي بالنسبة — اضغط «أكمل الخطة تلقائياً» لتوزيع دقيق لكل لون',rsColAdd:'إضافة لون',rsColName:'اسم اللون',rsColQty:'الكمية',rsColUnnamed:'لون',rsColPcs:'القطع',rsColMismatch:'مجموع كميات الألوان ({c}) لا يساوي كمية الطلب ({o})',
 rsSugTbl:'إكمال الخطة',rsSugPliesC:'الطبقات المقترحة',rsEditPliesC:'تعديل الطبقات يدويًا (اختياري)',rsRemWithRun:'إجمالي المتبقي مع التشغيل',rsApplyAll:'✔ اعتماد كل الاقتراحات كماركر',rsSugEmpty:'لا كميات متبقية — الاقتراحات فارغة',
 rsSpreadBtn:'🧵 أمر الفرد',rsAnaBtn:'📊 تحليل',rsSaveTitle:'نسبة التوفير',rsSaveOrder:'استهلاك تحليل الأوردر — مع الفرد ({u})',rsSavePlan:'استهلاك خطة الفرد والقص — مع الفرد ({u})',rsSaveAmt:'التوفير ({u})',rsSavePct:'نسبة التوفير',rsSaveNote:'التوفير = استهلاك التحليل − استهلاك الخطة (مع الفرد) · النسبة = التوفير ÷ استهلاك التحليل · بالأحمر (−) = زيادة',rsAnaTitle:'تحليل استهلاك الأوردر',rsAnaSheet:'تحليل',rsAnaSizes:'عدد المقاسات',rsAnaQty:'إجمالي الكمية',rsAnaShare:'النسبة من الكمية',rsAnaCp:'استهلاك القطعة ({u})',rsAnaCq:'استهلاك الكمية ({u})',rsAnaCf:'استهلاك مع الفرد ({u})',rsNoValidMk:'لا ماركرات صالحة للفرد',
 rsFarradSig:'توقيع الفرّاد',rsCutSupSig:'مشرف القص',
@@ -766,7 +765,7 @@ rsReviewTbl:'Plan match',rsProdFromMk:'Pieces from markers',rsRemFromOrder:'Rema
 rsAutoBtn:'Auto-complete plan (least consumption)',rsAutoDone:'Plan complete — nothing remaining',rsTrimQ:'The plan overproduces the order ({n} pieces). Remove the surplus by reducing plies of the markers causing it (deleting any left with no plies), then auto-complete any shortage?',rsTrimmed:'✂️ Surplus removed: {x}',rsTrimDel:'{n} marker(s) deleted',rsTrimRed:'{n} marker(s) reduced',rsAutoAdded:'{n} markers added automatically',rsAutoAddedLib:'{n} markers added automatically — {l} from your measured library (CAD-matched)',rsNoSug:'Could not generate a plan — check quantities, consumption, and that the marker length limit fits the sizes',rsScNoData:'No order quantities — enter quantities in the quantities table first',
 rsReducePliesBtn:'Reduce plies',rsReduceDone:'Plies reduced in {n} marker(s): {a} → {b} plies (fabric & quantity unchanged)',rsReduceNone:'Cannot reduce plies further — markers are capped by length limit or max pieces',
 rsClearMkBtn:'Clear markers',rsClearMkQ:'Delete all markers? You can then press “Auto-complete plan” to build a plan with no overproduction.',rsSortBtn:'Sort by length',rsSortPcBtn:'Best by consumption/piece',
-rsColTitle:'🎨 Color split (optional)',rsCMTitle:'Quantity per color per size',rsCMFill:'⚖️ Split the order quantity across colors',rsCMToOrder:'↩️ Use color totals as the order quantity',rsCMClear:'🧹 Clear color quantities',rsCMHint:'Enter each color quantity per size (or press “Split” then adjust). “Auto-complete plan” splits each marker plies across colors so every color covers its quantities exactly — markers are shared between colors.',rsCMBad:'{n} size(s) whose color total differs from the order quantity (in red) — fix the numbers or press “Use color totals as the order quantity”',rsCMFillQ:'Split each size order quantity across colors by each color share? (current values are replaced)',rsCMToOrderQ:'Set each size order quantity = its color total?',rsCMClearQ:'Clear the color quantities for all sizes?',rsCMQtyAuto:'Computed from the “Quantity per color per size” table',rsCMSize:'Size',rsCMOrder:'Order qty',rsCMSum:'Colors total',rsColDone:'✅ Covers its quantities exactly',rsColShort:'short {n} pcs',rsColOver:'over {n} pcs',rsColAutoDone:'✅ Plies split across colors: {a} marker(s) added · {e} adjusted · {d} removed',rsCpApprox:'Approximate proportional split — press “Auto-complete plan” for an exact per-color split',rsColAdd:'Add color',rsColName:'Color name',rsColQty:'Quantity',rsColUnnamed:'Color',rsColPcs:'Pieces',rsColMismatch:'Colors total ({c}) ≠ order quantity ({o})',
+rsColTitle:'🎨 Color split (optional)',rsCMQtyAuto:'Computed from the color columns of the order quantities table',rsColDone:'✅ Covers its quantities exactly',rsColShort:'short {n} pcs',rsColOver:'over {n} pcs',rsColAutoDone:'✅ Plies split across colors: {a} marker(s) added · {e} adjusted · {d} removed',rsCpApprox:'Approximate proportional split — press “Auto-complete plan” for an exact per-color split',rsColAdd:'Add color',rsColName:'Color name',rsColQty:'Quantity',rsColUnnamed:'Color',rsColPcs:'Pieces',rsColMismatch:'Colors total ({c}) ≠ order quantity ({o})',
 rsSugTbl:'Plan completion',rsSugPliesC:'Suggested plies',rsEditPliesC:'Adjust plies (optional)',rsRemWithRun:'Remaining after run',rsApplyAll:'✔ Apply all suggestions as markers',rsSugEmpty:'Nothing remaining — no suggestions',
 rsSpreadBtn:'🧵 Spreading order',rsAnaBtn:'📊 Analysis',rsSaveTitle:'Saving rate',rsSaveOrder:'Order analysis consumption — incl. spread ({u})',rsSavePlan:'Cutting plan consumption — incl. spread ({u})',rsSaveAmt:'Saving ({u})',rsSavePct:'Saving rate',rsSaveNote:'Saving = analysis − plan consumption (incl. spread) · rate = saving ÷ analysis · red (−) = extra',rsAnaTitle:'Order consumption analysis',rsAnaSheet:'Analysis',rsAnaSizes:'Sizes',rsAnaQty:'Total quantity',rsAnaShare:'Share of quantity',rsAnaCp:'Per-piece consumption ({u})',rsAnaCq:'Quantity consumption ({u})',rsAnaCf:'Consumption incl. spread ({u})',rsNoValidMk:'No valid markers to spread',
 rsFarradSig:'Spreader signature',rsCutSupSig:'Cutting supervisor',
@@ -2222,7 +2221,7 @@ function rsEnter(e,el){if(e.key!=='Enter')return;e.preventDefault();
   const tr=el.closest('tr'),next=tr.nextElementSibling;
   if(!next||!next.classList.contains('rsq-row'))return;
   const cls=[...el.classList].find(c=>c.indexOf('rsq-')===0);
-  const tgt=next.querySelector('.'+cls);if(tgt){tgt.focus();if(tgt.select)tgt.select();}}
+  const tgt=next.querySelector('.'+cls+(cls==='rsq-cin'?'[data-c="'+el.dataset.c+'"]':''));if(tgt){tgt.focus();if(tgt.select)tgt.select();}}
 // \u062a\u0639\u062f\u064a\u0644 \u0627\u0644\u0646\u0633\u0628\u0629/\u0627\u0644\u0627\u0633\u062a\u0647\u0644\u0627\u0643 \u0645\u0646 \u0627\u0644\u062c\u062f\u0648\u0644 \u064a\u062d\u0641\u0638 \u0627\u0644\u0642\u064a\u0645\u0629 \u0641\u064a \u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0645\u0646\u062a\u062c
 function rsEditVal(el,field){const prod=$('rs-product')?$('rs-product').value:'';
   const tr=el.closest('tr');const size=tr.querySelector('.rsq-size').value.trim();
@@ -2308,7 +2307,7 @@ function rsConsValCheck(){const R=rsConsValList();
   const el=$('rs-consval');if(!el)return;const html=cvBox(R);if(!html){el.style.display='none';return;}
   const b=cvCount(R).b;el.style.display='';el.style.background=`var(--${b?'bad':'warn'}-bg)`;el.style.border=`2px solid var(--${b?'bad':'warn'}-bd)`;el.innerHTML=html;}
 function rsConsSync(){const n=rsConsDiffList().length;if(!n)return;if(!confirm(tf('rsConsSyncQ',{n})))return;rsWidthChanged();toast(tf('rsConsSynced',{n}));}
-function rsCalc(){if(!$('rs-qty-rows'))return;const uf=rsUF();const sp=rsSpreadM();
+function rsCalc(){if(!$('rs-qty-rows'))return;rsColorMatrixRender();const uf=rsUF();const sp=rsSpreadM();
   let q=0,rsum=0,csum=0,cfsum=0;
   document.querySelectorAll('.rsq-row').forEach(tr=>{
     const qty=+tr.querySelector('.rsq-qty').value||0;
@@ -2324,7 +2323,6 @@ function rsCalc(){if(!$('rs-qty-rows'))return;const uf=rsUF();const sp=rsSpreadM
   const cf=$('rs-qt-cf');if(cf)cf.textContent=cfsum?Math.round(cfsum*uf*100)/100:'\u2014';
   if($('rs-qt-c2'))$('rs-qt-c2').textContent=$('rs-qt-c').textContent;if($('rs-qt-cf2')&&cf)$('rs-qt-cf2').textContent=cf.textContent;
   rsApplyRowColors();rsConsDiffCheck();rsConsValCheck();
-  if(!(document.activeElement&&document.activeElement.classList&&document.activeElement.classList.contains('rscm-in')))rsColorMatrixRender();
   rsMkCalc();rsSaveDraft();}
 /* ---- \u062c\u062f\u0648\u0644 \u0627\u0644\u0645\u0627\u0631\u0643\u0631\u0627\u062a ---- */
 const RS_COLORS=['#d9e8f7','#d9f0d5','#f7d9ec','#f9e0cb','#d5eef4','#eaf4cf','#e6e0f7','#f7f3cf'];
@@ -3229,43 +3227,36 @@ function rsAddColorRow(c){c=c||{};if(!$('rs-colors'))return;
     <button type="button" class="mini r" onclick="this.closest('.rs-color-row').remove();rsColorsChanged()">✕</button>`;
   $('rs-colors').appendChild(row);rsColorMatrixRender();}
 function rsColorsChanged(){rsColorMatrixRender();rsMkCalc();rsSaveDraft();}
-// جدول «كمية كل لون لكل مقاس» مفعَّل إذا أُدخلت فيه أي قيمة — عندها كمية اللون = مجموع عموده
-function rsCMOn(){return [...document.querySelectorAll('.rs-color-row')].some(r=>Object.values(r._sq||{}).some(v=>+v>0));}
+// وضع الألوان: بمجرد إضافة لون تظهر أعمدة الألوان داخل جدول «كميات الأوردر» بدل «الكمية المطلوبة»،
+// وكمية كل مقاس = مجموع ألوانه تلقائياً (المصدر الوحيد للكمية في هذا الوضع)
+function rsCMOn(){return document.querySelectorAll('.rs-color-row').length>0;}
 function rsColors(){const on=rsCMOn();return [...document.querySelectorAll('.rs-color-row')].map(r=>{const sq={};Object.keys(r._sq||{}).forEach(k=>{if(+r._sq[k]>0)sq[k]=+r._sq[k];});
   return {name:r.querySelector('.rsc-name').value.trim()||t('rsColUnnamed'),qty:on?Object.values(sq).reduce((a,v)=>a+v,0):(+r.querySelector('.rsc-qty').value||0),sq};}).filter(c=>c.qty>0);}
-function rsCMSizes(){return [...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0})).filter(x=>x.size);}
-function rsColorMatrixRender(){const el=$('rs-cmatrix');if(!el)return;const rows=[...document.querySelectorAll('.rs-color-row')],sizes=rsCMSizes();
-  if(!rows.length||!sizes.length){el.innerHTML='';return;}
-  const on=rsCMOn(),names=rows.map((r,i)=>r.querySelector('.rsc-name').value.trim()||(t('rsColUnnamed')+' '+(i+1))),g=(r,s)=>+((r._sq||{})[s])||0;
-  const colTot=rows.map(r=>sizes.reduce((a,x)=>a+g(r,x.size),0));let bad=0;
-  rows.forEach((r,i)=>{const q=r.querySelector('.rsc-qty');if(on){q.value=colTot[i];q.readOnly=true;q.title=t('rsCMQtyAuto');}else{q.readOnly=false;q.title='';}});
-  const body=sizes.map(x=>{const tot=rows.reduce((a,r)=>a+g(r,x.size),0),d=tot-x.qty;if(on&&d)bad++;
-    return `<tr><td style="font-weight:800" dir="ltr">${esc(x.size)}</td><td>${x.qty}</td>${rows.map((r,ci)=>`<td><input class="rscm-in" type="number" min="0" data-c="${ci}" data-s="${esc(x.size)}" value="${g(r,x.size)||''}" oninput="rsCMInput(this)" onchange="rsColorsChanged()" style="width:72px;padding:4px;text-align:center;font-weight:700"></td>`).join('')}
-      <td class="rscm-rt" data-s="${esc(x.size)}" style="font-weight:800;${on&&d?'color:var(--bad)':''}">${tot}${on&&d?` <span style="font-size:11px" dir="ltr">(${d>0?'+':''}${d})</span>`:''}</td></tr>`;}).join('');
-  el.innerHTML=`<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px"><b>📋 ${esc(t('rsCMTitle'))}</b>
-      <button type="button" class="mini g" onclick="rsCMFill()">${esc(t('rsCMFill'))}</button>
-      ${on?`<button type="button" class="mini" onclick="rsCMToOrder()">${esc(t('rsCMToOrder'))}</button><button type="button" class="mini r" onclick="rsCMClear()">${esc(t('rsCMClear'))}</button>`:''}</div>
-    <div class="note" style="font-size:12px;margin-bottom:6px">${esc(t('rsCMHint'))}</div>
-    ${on&&bad?`<div style="font-size:12.5px;font-weight:800;color:var(--bad);background:var(--bad-bg);border:1px solid var(--bad-bd);border-radius:8px;padding:6px 10px;margin-bottom:6px">⚠️ ${esc(tf('rsCMBad',{n:bad}))}</div>`:''}
-    <div style="overflow-x:auto"><table class="xtbl" style="min-width:auto;width:auto"><tr><th>${esc(t('rsCMSize'))}</th><th>${esc(t('rsCMOrder'))}</th>${names.map(n=>`<th>🎨 ${esc(n)}</th>`).join('')}<th>${esc(t('rsCMSum'))}</th></tr>${body}
-      <tr class="tot"><td>${esc(t('total'))}</td><td>${sizes.reduce((a,x)=>a+x.qty,0)}</td>${colTot.map((v,ci)=>`<td class="rscm-ct" data-c="${ci}">${v}</td>`).join('')}<td class="rscm-gt">${colTot.reduce((a,v)=>a+v,0)}</td></tr></table></div>`;}
-// كتابة خانة: تحديث الأرقام فقط (بلا إعادة رسم كي لا يضيع المؤشر) — وإعادة الرسم الكاملة عند الخروج من الخانة
-function rsCMInput(inp){const rows=[...document.querySelectorAll('.rs-color-row')],r=rows[+inp.dataset.c],s=inp.dataset.s;if(!r)return;
-  r._sq=r._sq||{};const v=Math.max(0,Math.round(+inp.value||0));if(v>0)r._sq[s]=v;else delete r._sq[s];
-  const g=(rr,ss)=>+((rr._sq||{})[ss])||0,rt=document.querySelector(`#rs-cmatrix .rscm-rt[data-s="${CSS.escape(s)}"]`);if(rt)rt.textContent=rows.reduce((a,rr)=>a+g(rr,s),0);
-  const ct=document.querySelector(`#rs-cmatrix .rscm-ct[data-c="${inp.dataset.c}"]`),sizes=rsCMSizes();if(ct)ct.textContent=sizes.reduce((a,x)=>a+g(r,x.size),0);
-  const gt=document.querySelector('#rs-cmatrix .rscm-gt');if(gt)gt.textContent=rows.reduce((a,rr)=>a+sizes.reduce((b,x)=>b+g(rr,x.size),0),0);}
-// توزيع كمية الأوردر لكل مقاس على الألوان حسب حصة كل لون (أكبر باقٍ) — نقطة بداية تُعدَّل يدوياً
-function rsCMFill(){const rows=[...document.querySelectorAll('.rs-color-row')],sizes=rsCMSizes();if(!rows.length||!sizes.length)return;
-  if(rsCMOn()&&!confirm(t('rsCMFillQ')))return;
-  let sh=rows.map(r=>+r.querySelector('.rsc-qty').value||0);if(!sh.some(v=>v>0))sh=rows.map(()=>1);
-  const cols=rows.map((r,i)=>({name:String(i),qty:sh[i]}));
-  rows.forEach(r=>r._sq={});sizes.forEach(x=>{rsDistribute(x.qty,cols).forEach((d,i)=>{if(d.plies>0)rows[i]._sq[x.size]=d.plies;});});
-  rsColorsChanged();}
-function rsCMToOrder(){if(!confirm(t('rsCMToOrderQ')))return;const rows=[...document.querySelectorAll('.rs-color-row')];
-  document.querySelectorAll('.rsq-row').forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();if(!s)return;tr.querySelector('.rsq-qty').value=rows.reduce((a,r)=>a+(+((r._sq||{})[s])||0),0);});
-  rsCalc();rsColorsChanged();}
-function rsCMClear(){if(!confirm(t('rsCMClearQ')))return;document.querySelectorAll('.rs-color-row').forEach(r=>r._sq={});rsColorsChanged();}
+let RS_QCC_SIG='';
+function rsColorMatrixRender(){const tbl=$('rs-qty-tbl');if(!tbl)return;const crow=[...document.querySelectorAll('.rs-color-row')],on=crow.length>0;
+  const trs=[...document.querySelectorAll('.rsq-row')],sizeOf=tr=>tr.querySelector('.rsq-size').value.trim(),g=(r,sz)=>+((r._sq||{})[sz])||0;
+  const names=crow.map((r,i)=>r.querySelector('.rsc-name').value.trim()||(t('rsColUnnamed')+' '+(i+1)));
+  // أول تفعيل: الكميات الحالية تذهب للون الأول كي لا يضيع شيء
+  if(on&&!crow.some(r=>Object.values(r._sq||{}).some(v=>+v>0))){crow[0]._sq={};trs.forEach(tr=>{const sz=sizeOf(tr),q=+tr.querySelector('.rsq-qty').value||0;if(sz&&q>0)crow[0]._sq[sz]=q;});}
+  const sig=(on?names.join('|'):'-')+'#'+trs.map(sizeOf).join('|');
+  const focused=document.activeElement&&document.activeElement.classList&&document.activeElement.classList.contains('rsq-cin');
+  if(sig!==RS_QCC_SIG&&!focused){RS_QCC_SIG=sig;
+    const hr=tbl.querySelector('th[data-i18n="mkQtyOrder"]'),hrow=hr.parentElement;hrow.querySelectorAll('.rsq-cth').forEach(e=>e.remove());hr.style.display=on?'none':'';
+    if(on)hr.after(...names.map((n,i)=>{const th=document.createElement('th');th.className='rsq-cth or';th.style.cssText='font-size:15px;font-weight:900;background:'+rsRowBg(i)+';color:var(--txt)';th.textContent='🎨 '+n;return th;}));
+    trs.forEach(tr=>{const qi=tr.querySelector('.rsq-qty'),qtd=qi.closest('td');tr.querySelectorAll('.rsq-ctd').forEach(e=>e.remove());qtd.style.display=on?'none':'';
+      if(on){const sz=sizeOf(tr);qtd.after(...crow.map((r,ci)=>{const td=document.createElement('td');td.className='rsq-ctd';
+        td.innerHTML=`<input class="rsq-cin" type="number" min="0" data-c="${ci}" value="${g(r,sz)||''}" oninput="rsQtyCInput(this)" onkeydown="rsEnter(event,this)" style="min-width:64px;padding:6px;text-align:center;font-weight:800">`;return td;}));}});
+    const qt=$('rs-qt-q'),trow=qt.parentElement;trow.querySelectorAll('.rsq-ctot').forEach(e=>e.remove());qt.style.display=on?'none':'';
+    if(on)qt.after(...crow.map((r,ci)=>{const td=document.createElement('td');td.className='rsq-ctot';td.dataset.c=ci;return td;}));
+    const ttl=tbl.querySelector('th.ttl');if(ttl)ttl.colSpan=7+(on?names.length-1:0);}
+  if(on){trs.forEach(tr=>{const sz=sizeOf(tr);if(sz)tr.querySelector('.rsq-qty').value=crow.reduce((a,r)=>a+g(r,sz),0)||'';});
+    tbl.querySelectorAll('.rsq-ctot').forEach(td=>{const r=crow[+td.dataset.c];td.textContent=r?trs.reduce((a,tr)=>a+g(r,sizeOf(tr)),0):'';});
+    crow.forEach(r=>{const q=r.querySelector('.rsc-qty');q.value=trs.reduce((a,tr)=>a+g(r,sizeOf(tr)),0);q.readOnly=true;q.title=t('rsCMQtyAuto');});}
+  else document.querySelectorAll('.rsc-qty').forEach(q=>{q.readOnly=false;q.title='';});}
+// كتابة كمية لون لمقاس: تُحدَّث كمية المقاس (= مجموع ألوانه) وكل الحسابات
+function rsQtyCInput(inp){const crow=[...document.querySelectorAll('.rs-color-row')],r=crow[+inp.dataset.c],tr=inp.closest('tr');if(!r||!tr)return;
+  const sz=tr.querySelector('.rsq-size').value.trim();if(!sz)return;r._sq=r._sq||{};const v=Math.max(0,Math.round(+inp.value||0));if(v>0)r._sq[sz]=v;else delete r._sq[sz];
+  rsCalc();}
 // طبقات كل لون في الماركر: المحفوظة صراحةً (من التوزيع التلقائي) إن طابق مجموعها الطبقات، وإلا بالنسبة (تقريبي)
 function rsMkSplit(m,colors){const P=+m.plies||0;if(!colors.length)return [];const cp=m.cp;
   if(cp&&typeof cp==='object'){const names=new Set(colors.map(c=>c.name)),ks=Object.keys(cp).filter(k=>cp[k]>0);

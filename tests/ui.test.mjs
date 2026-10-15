@@ -124,7 +124,12 @@ const col = await page.evaluate(() => {
     $('rs-qty-rows').innerHTML = '';
     [['L-58', 64, 2.72], ['L-60', 79, 2.79], ['L-62', 35, 2.86], ['XL-60', 6, 2.87], ['XL-62', 62, 2.98], ['2XL-60', 20, 3.01]].forEach(([s, q, c]) => rsAddQtyRow({ size: s, qty: q, cons: c })); rsCalc();
     $('rs-maxlen').value = '9'; $('rs-maxpcs').value = '5'; $('rs-surplus').value = '0';
-    rsAddColorRow({ name: 'W', qty: 100 }); rsAddColorRow({ name: 'C', qty: 166 }); rsCMFill(); });
+    rsAddColorRow({ name: 'W' }); rsAddColorRow({ name: 'C' });
+    // أعمدة الألوان داخل جدول الكميات: الكمية الحالية تذهب للون الأول، ثم نكتب في الخانات كما يفعل المستخدم
+    const W = { 'L-58': 27, 'L-60': 33, 'L-62': 15, 'XL-60': 3, 'XL-62': 26, '2XL-60': 8 };
+    document.querySelectorAll('.rsq-row').forEach(tr => { const sz = tr.querySelector('.rsq-size').value.trim(), q = +tr.querySelector('.rsq-qty').value;
+      const [w, c] = tr.querySelectorAll('.rsq-cin'); w.value = W[sz]; rsQtyCInput(w); c.value = q - W[sz]; rsQtyCInput(c); }); });
+  const qtyKept = [...document.querySelectorAll('.rsq-row')].reduce((a, tr) => a + (+tr.querySelector('.rsq-qty').value || 0), 0);
   step('auto', () => rsAutoPlan());
   const ct = rsColorTotals(); let bad = 0;
   ct.colors.forEach(c => new Set([...Object.keys(c.sq), ...Object.keys(ct.per[c.name].made)]).forEach(s => { if ((ct.per[c.name].made[s] || 0) !== (c.sq[s] || 0)) bad++; }));
@@ -132,9 +137,10 @@ const col = await page.evaluate(() => {
   const dr = rsBuildDraft(); const saved = dr.markers.every(m => m.cp) && dr.colors.every(c => Object.keys(c.sq).length > 0);
   const n = rsReadMarkers().length;
   step('cleanup', () => { rsResetPlan(false); rsColorMatrixRender(); });
-  return { log, bad, exact, saved, n };
+  return { log, bad, exact, saved, n, qtyKept };
 });
 chk('colors: per-color plan runs without errors', col.log.length === 0, col.log);
+chk('colors: order qty = sum of color columns (unchanged total 266)', col.qtyKept === 266, col);
 chk('colors: every color covers its per-size quantities exactly', col.bad === 0 && col.n > 0, col);
 chk('colors: each marker stores an exact per-color ply split (saved in draft)', col.exact && col.saved, col);
 await page.waitForTimeout(300);
