@@ -2346,7 +2346,7 @@ function rsAddMarker(m){m=m||{};if(!$('rs-markers'))return;RS_MSEQ++;const id='r
      <td rowspan="2" class="rsm-code" style="font-weight:800">\u2014</td>
      <td style="font-weight:700">${t('rsSizesRow')}</td>${[0,1,2,3,4,5].map(i=>selCell(pairs[i])).join('')}
      <td rowspan="2" class="rsm-pcs" style="font-weight:800">0</td>
-     <td rowspan="2"><input class="rsm-plies" type="number" min="1" value="${m.plies!=null?m.plies:1}" style="width:62px;padding:4px;text-align:center;font-weight:800;border:1px solid #9db8b8;border-radius:6px" oninput="rsMkCalc()"><div class="rsm-cp" style="font-size:10.5px;font-weight:700;margin-top:3px;line-height:1.5;color:var(--mut)"></div></td>
+     <td rowspan="2"><input class="rsm-plies" type="number" min="1" value="${m.plies!=null?m.plies:1}" style="width:62px;padding:4px;text-align:center;font-weight:800;border:1px solid #9db8b8;border-radius:6px" oninput="rsMkCalc()"><div class="rsm-cp" style="margin-top:4px;line-height:1.6;max-width:150px;margin-inline:auto"></div></td>
      <td rowspan="2" class="rsm-run" style="font-weight:800">0</td>
      <td rowspan="2" class="rsm-st" style="max-width:170px">\u2014</td>
      <td rowspan="2" class="rsm-len red">0</td>
@@ -3651,7 +3651,8 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();const spM=r
     tr1.querySelector('.rsm-code').textContent='M'+String(i+1).padStart(2,'0');
     tr1.querySelector('.rsm-pcs').textContent=pcs;
     const cpEl=tr1.querySelector('.rsm-cp');if(cpEl){const sp=_mkCols.length&&plies>0?rsMkSplit(m,_mkCols):[];
-      cpEl.innerHTML=sp.length?(sp[0].exact?'':'≈ ')+sp.filter(x=>x.plies>0).map(x=>`${esc(x.name)} <b>${x.plies}</b>`).join(' · '):'';cpEl.title=sp.length&&!sp[0].exact?t('rsCpApprox'):'';}
+      // شارة لكل لون بنفس لون عموده في جدول الكميات — واضحة ومقروءة
+      cpEl.innerHTML=sp.length?(sp[0].exact?'':'<span style="font-weight:900">≈</span> ')+sp.map((x,ci)=>x.plies>0?`<span style="display:inline-block;margin:2px;padding:2px 9px;border-radius:999px;background:${rsRowBg(ci)};color:var(--txt);border:1px solid var(--line);font-size:12.5px;font-weight:800;white-space:nowrap">${esc(x.name)} <b style="font-size:14px">${x.plies}</b></span>`:'').join(''):'';cpEl.title=sp.length&&!sp[0].exact?t('rsCpApprox'):'';}
     tr1.querySelector('.rsm-run').textContent=run;
     const lenCell=tr1.querySelector('.rsm-len');const calcDisp=Math.round(len*uf*100)/100;
     if(libM>0){const measDisp=Math.round(libM*uf*100)/100;const delta=Math.round((measDisp-calcDisp)*100)/100;
