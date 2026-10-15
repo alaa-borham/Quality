@@ -115,6 +115,28 @@ chk('spread form prints a row per marker (+ blank rows + total)', rs.spreadRows 
 chk('analysis report = analysis page + spread form', rs.anaPages === 2, rs.anaPages);
 chk('analysis report includes the saving rate', rs.anaCmp === true);
 chk('new plan clears markers', rs.after === 0, rs.after);
+
+// ٢ب) الألوان: كمية كل لون لكل مقاس → «أكمل الخطة» يوزّع طبقات كل ماركر على الألوان فيغطّي كل لون كمياته بالضبط
+const col = await page.evaluate(() => {
+  const log = []; const step = (n, f) => { try { f(); } catch (e) { log.push(n + ': ' + (e && e.message)); } };
+  window.confirm = () => true;
+  step('setup', () => { document.querySelectorAll('.rs-mrow1,.rs-mrow2').forEach(tr => tr.remove()); $('rs-colors').innerHTML = '';
+    $('rs-qty-rows').innerHTML = '';
+    [['L-58', 64, 2.72], ['L-60', 79, 2.79], ['L-62', 35, 2.86], ['XL-60', 6, 2.87], ['XL-62', 62, 2.98], ['2XL-60', 20, 3.01]].forEach(([s, q, c]) => rsAddQtyRow({ size: s, qty: q, cons: c })); rsCalc();
+    $('rs-maxlen').value = '9'; $('rs-maxpcs').value = '5'; $('rs-surplus').value = '0';
+    rsAddColorRow({ name: 'W', qty: 100 }); rsAddColorRow({ name: 'C', qty: 166 }); rsCMFill(); });
+  step('auto', () => rsAutoPlan());
+  const ct = rsColorTotals(); let bad = 0;
+  ct.colors.forEach(c => new Set([...Object.keys(c.sq), ...Object.keys(ct.per[c.name].made)]).forEach(s => { if ((ct.per[c.name].made[s] || 0) !== (c.sq[s] || 0)) bad++; }));
+  const exact = rsReadMarkers().every(m => m.cp && Object.values(m.cp).reduce((a, v) => a + v, 0) === +m.plies);
+  const dr = rsBuildDraft(); const saved = dr.markers.every(m => m.cp) && dr.colors.every(c => Object.keys(c.sq).length > 0);
+  const n = rsReadMarkers().length;
+  step('cleanup', () => { rsResetPlan(false); rsColorMatrixRender(); });
+  return { log, bad, exact, saved, n };
+});
+chk('colors: per-color plan runs without errors', col.log.length === 0, col.log);
+chk('colors: every color covers its per-size quantities exactly', col.bad === 0 && col.n > 0, col);
+chk('colors: each marker stores an exact per-color ply split (saved in draft)', col.exact && col.saved, col);
 await page.waitForTimeout(300);
 chk('Excel exports download 4 .xlsx files', downloads.filter(f => f.endsWith('.xlsx')).length >= 4, downloads);
 

@@ -396,6 +396,7 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
             <span style="display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;margin-inline-start:24px"><label style="font-size:13px;font-weight:700;white-space:nowrap"><span data-i18n="rsCbCap">عدد التوليفات</span> <input id="rs-combo-cap" type="number" min="20" max="500" value="50" style="width:70px;padding:4px;text-align:center;background:var(--inp)"></label><span class="note" style="margin:0" data-i18n="rsCbBtnHint">كلما زاد العدد والتنوّع، اقتربت النتيجة من CAD (مقابل قياس توليفات أكثر)</span></span></div>
           <div class="rsc-hide" style="margin-top:8px">
             <div id="rs-colors" style="display:flex;flex-direction:column;gap:6px;max-width:520px"></div>
+            <div id="rs-cmatrix" style="margin-top:10px"></div>
             <div id="rs-colors-sum" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div></div></div>
         <div id="rs-consval" style="display:none;margin-top:10px;border-radius:9px;padding:9px 12px;font-size:13px;color:var(--txt)"></div>
         <div id="rs-consdiff" style="display:none;margin-top:10px;border-radius:9px;padding:9px 12px;font-size:13px;font-weight:800;background:var(--warn-bg);color:var(--warn);border:2px solid var(--warn-bd)"></div>
@@ -610,7 +611,7 @@ rsReviewTbl:'مطابقة الخطة',rsProdFromMk:'إجمالي القطع من
 rsAutoBtn:'أكمل الخطة تلقائياً (أقل استهلاك)',rsAutoDone:'الخطة مكتملة — لا كميات متبقية',rsTrimQ:'يوجد إنتاج زائد عن الأوردر ({n} قطعة). إزالة الزائد بتقليل طبقات الماركرات المسبّبة (وحذف ما يصبح بلا طبقات) ثم إكمال أي نقص تلقائياً؟',rsTrimmed:'✂️ أُزيل الإنتاج الزائد: {x}',rsTrimDel:'حُذف {n} ماركر',rsTrimRed:'خُفّضت طبقات {n} ماركر',rsAutoAdded:'أُضيف {n} ماركر تلقائياً',rsAutoAddedLib:'أُضيف {n} ماركر تلقائياً — منها {l} من مكتبتك المقيسة (مطابقة للكاد)',rsNoSug:'تعذّر توليد خطة — تأكّد من إدخال الكميات والاستهلاك، وأن حدّ طول الماركر يتّسع للقياسات',rsScNoData:'لا توجد كميات في الأوردر — أدخِل الكميات في جدول الكميات أولاً',
 rsReducePliesBtn:'قلّل الطبقات',rsReduceDone:'قُلّلت الطبقات في {n} ماركر: {a} ← {b} طبقة (القماش والكمية دون تغيير)',rsReduceNone:'لا يمكن تقليل الطبقات أكثر — الماركرات مضبوطة على حدّ الطول أو أقصى قطع',
 rsClearMkBtn:'امسح الماركرات',rsClearMkQ:'حذف كل الماركرات؟ يمكنك بعدها الضغط على «أكمل الخطة تلقائياً» لبناء خطة بلا زيادة إنتاج.',rsSortBtn:'ترتيب حسب الطول',rsSortPcBtn:'الأفضل حسب استهلاك القطعة',
-rsColTitle:'🎨 توزيع الألوان (اختياري)',rsColAdd:'إضافة لون',rsColName:'اسم اللون',rsColQty:'الكمية',rsColUnnamed:'لون',rsColPcs:'القطع',rsColMismatch:'مجموع كميات الألوان ({c}) لا يساوي كمية الطلب ({o})',
+rsColTitle:'🎨 توزيع الألوان (اختياري)',rsCMTitle:'كمية كل لون لكل مقاس',rsCMFill:'⚖️ وزّع كمية الأوردر على الألوان',rsCMToOrder:'↩️ اعتمد مجموع الألوان ككمية الأوردر',rsCMClear:'🧹 امسح كميات الألوان',rsCMHint:'اكتب كمية كل لون لكل مقاس (أو اضغط «وزّع» ثم عدّل). «أكمل الخطة تلقائياً» يوزّع طبقات كل ماركر على الألوان بحيث يغطّي كل لون كمياته بالضبط — الماركرات مشتركة بين الألوان.',rsCMBad:'{n} مقاس مجموع ألوانه لا يساوي كمية الأوردر (بالأحمر) — عدّل الأرقام أو اضغط «اعتمد مجموع الألوان ككمية الأوردر»',rsCMFillQ:'توزيع كمية الأوردر لكل مقاس على الألوان حسب حصة كل لون؟ (تُستبدل القيم الحالية)',rsCMToOrderQ:'جعل كمية الأوردر لكل مقاس = مجموع ألوانه؟',rsCMClearQ:'مسح كميات الألوان لكل المقاسات؟',rsCMQtyAuto:'محسوبة من جدول «كمية كل لون لكل مقاس»',rsCMSize:'المقاس',rsCMOrder:'كمية الأوردر',rsCMSum:'مجموع الألوان',rsColDone:'✅ يغطّي كمياته بالضبط',rsColShort:'ناقص {n} قطعة',rsColOver:'زائد {n} قطعة',rsColAutoDone:'✅ وُزّعت الطبقات على الألوان: أُضيف {a} ماركر · عُدّل {e} · حُذف {d}',rsCpApprox:'توزيع تقريبي بالنسبة — اضغط «أكمل الخطة تلقائياً» لتوزيع دقيق لكل لون',rsColAdd:'إضافة لون',rsColName:'اسم اللون',rsColQty:'الكمية',rsColUnnamed:'لون',rsColPcs:'القطع',rsColMismatch:'مجموع كميات الألوان ({c}) لا يساوي كمية الطلب ({o})',
 rsSugTbl:'إكمال الخطة',rsSugPliesC:'الطبقات المقترحة',rsEditPliesC:'تعديل الطبقات يدويًا (اختياري)',rsRemWithRun:'إجمالي المتبقي مع التشغيل',rsApplyAll:'✔ اعتماد كل الاقتراحات كماركر',rsSugEmpty:'لا كميات متبقية — الاقتراحات فارغة',
 rsSpreadBtn:'🧵 أمر الفرد',rsAnaBtn:'📊 تحليل',rsSaveTitle:'نسبة التوفير',rsSaveOrder:'استهلاك تحليل الأوردر — مع الفرد ({u})',rsSavePlan:'استهلاك خطة الفرد والقص — مع الفرد ({u})',rsSaveAmt:'التوفير ({u})',rsSavePct:'نسبة التوفير',rsSaveNote:'التوفير = استهلاك التحليل − استهلاك الخطة (مع الفرد) · النسبة = التوفير ÷ استهلاك التحليل · بالأحمر (−) = زيادة',rsAnaTitle:'تحليل استهلاك الأوردر',rsAnaSheet:'تحليل',rsAnaSizes:'عدد المقاسات',rsAnaQty:'إجمالي الكمية',rsAnaShare:'النسبة من الكمية',rsAnaCp:'استهلاك القطعة ({u})',rsAnaCq:'استهلاك الكمية ({u})',rsAnaCf:'استهلاك مع الفرد ({u})',rsNoValidMk:'لا ماركرات صالحة للفرد',
 rsFarradSig:'توقيع الفرّاد',rsCutSupSig:'مشرف القص',
@@ -765,7 +766,7 @@ rsReviewTbl:'Plan match',rsProdFromMk:'Pieces from markers',rsRemFromOrder:'Rema
 rsAutoBtn:'Auto-complete plan (least consumption)',rsAutoDone:'Plan complete — nothing remaining',rsTrimQ:'The plan overproduces the order ({n} pieces). Remove the surplus by reducing plies of the markers causing it (deleting any left with no plies), then auto-complete any shortage?',rsTrimmed:'✂️ Surplus removed: {x}',rsTrimDel:'{n} marker(s) deleted',rsTrimRed:'{n} marker(s) reduced',rsAutoAdded:'{n} markers added automatically',rsAutoAddedLib:'{n} markers added automatically — {l} from your measured library (CAD-matched)',rsNoSug:'Could not generate a plan — check quantities, consumption, and that the marker length limit fits the sizes',rsScNoData:'No order quantities — enter quantities in the quantities table first',
 rsReducePliesBtn:'Reduce plies',rsReduceDone:'Plies reduced in {n} marker(s): {a} → {b} plies (fabric & quantity unchanged)',rsReduceNone:'Cannot reduce plies further — markers are capped by length limit or max pieces',
 rsClearMkBtn:'Clear markers',rsClearMkQ:'Delete all markers? You can then press “Auto-complete plan” to build a plan with no overproduction.',rsSortBtn:'Sort by length',rsSortPcBtn:'Best by consumption/piece',
-rsColTitle:'🎨 Color split (optional)',rsColAdd:'Add color',rsColName:'Color name',rsColQty:'Quantity',rsColUnnamed:'Color',rsColPcs:'Pieces',rsColMismatch:'Colors total ({c}) ≠ order quantity ({o})',
+rsColTitle:'🎨 Color split (optional)',rsCMTitle:'Quantity per color per size',rsCMFill:'⚖️ Split the order quantity across colors',rsCMToOrder:'↩️ Use color totals as the order quantity',rsCMClear:'🧹 Clear color quantities',rsCMHint:'Enter each color quantity per size (or press “Split” then adjust). “Auto-complete plan” splits each marker plies across colors so every color covers its quantities exactly — markers are shared between colors.',rsCMBad:'{n} size(s) whose color total differs from the order quantity (in red) — fix the numbers or press “Use color totals as the order quantity”',rsCMFillQ:'Split each size order quantity across colors by each color share? (current values are replaced)',rsCMToOrderQ:'Set each size order quantity = its color total?',rsCMClearQ:'Clear the color quantities for all sizes?',rsCMQtyAuto:'Computed from the “Quantity per color per size” table',rsCMSize:'Size',rsCMOrder:'Order qty',rsCMSum:'Colors total',rsColDone:'✅ Covers its quantities exactly',rsColShort:'short {n} pcs',rsColOver:'over {n} pcs',rsColAutoDone:'✅ Plies split across colors: {a} marker(s) added · {e} adjusted · {d} removed',rsCpApprox:'Approximate proportional split — press “Auto-complete plan” for an exact per-color split',rsColAdd:'Add color',rsColName:'Color name',rsColQty:'Quantity',rsColUnnamed:'Color',rsColPcs:'Pieces',rsColMismatch:'Colors total ({c}) ≠ order quantity ({o})',
 rsSugTbl:'Plan completion',rsSugPliesC:'Suggested plies',rsEditPliesC:'Adjust plies (optional)',rsRemWithRun:'Remaining after run',rsApplyAll:'✔ Apply all suggestions as markers',rsSugEmpty:'Nothing remaining — no suggestions',
 rsSpreadBtn:'🧵 Spreading order',rsAnaBtn:'📊 Analysis',rsSaveTitle:'Saving rate',rsSaveOrder:'Order analysis consumption — incl. spread ({u})',rsSavePlan:'Cutting plan consumption — incl. spread ({u})',rsSaveAmt:'Saving ({u})',rsSavePct:'Saving rate',rsSaveNote:'Saving = analysis − plan consumption (incl. spread) · rate = saving ÷ analysis · red (−) = extra',rsAnaTitle:'Order consumption analysis',rsAnaSheet:'Analysis',rsAnaSizes:'Sizes',rsAnaQty:'Total quantity',rsAnaShare:'Share of quantity',rsAnaCp:'Per-piece consumption ({u})',rsAnaCq:'Quantity consumption ({u})',rsAnaCf:'Consumption incl. spread ({u})',rsNoValidMk:'No valid markers to spread',
 rsFarradSig:'Spreader signature',rsCutSupSig:'Cutting supervisor',
@@ -839,7 +840,7 @@ function applyI18n(){
   // التلميحات المكتوبة بالعربية مباشرةً في الصفحة: تُحفظ الأصلية وتُترجم من قاموس TITLE_EN
   document.querySelectorAll('[title]:not([data-i18n-title])').forEach(el=>{if(el.dataset.tar==null){if(!/[\u0600-\u06FF]/.test(el.title))return;el.dataset.tar=el.title;}
     el.title=LANG==='en'?(TITLE_EN[el.dataset.tar]||el.dataset.tar):el.dataset.tar;});
-  try{rsUpdateUnitLabels();if(RS_LOADED&&$('rs-markers'))rsMkCalc();}catch(e){}
+  try{rsUpdateUnitLabels();if(RS_LOADED&&$('rs-markers')){rsColorMatrixRender();rsMkCalc();}}catch(e){}
   const other=LANG==='ar'?'EN':'ع';
   if($('lang-name'))$('lang-name').textContent=other;
   document.querySelectorAll('.lang-name2').forEach(e=>e.textContent=other);
@@ -2156,7 +2157,7 @@ function rsApplyDraft(d){
   $('rs-qty-rows').innerHTML='';
   const q=(d.qty&&d.qty.length)?d.qty:src.map(s=>({size:s.size}));
   q.forEach(x=>rsAddQtyRow({size:x.size,qty:x.qty,cons:cm[x.size]!=null?cm[x.size]:x.cons,ratio:rm[x.size]!=null?rm[x.size]:x.ratio}));
-  if($('rs-markers'))$('rs-markers').innerHTML='';(d.markers||[]).forEach(m=>rsAddMarker({pairs:m.pairs,plies:m.plies,actlen:m.actlen||0}));
+  if($('rs-markers'))$('rs-markers').innerHTML='';(d.markers||[]).forEach(m=>rsAddMarker({pairs:m.pairs,plies:m.plies,actlen:m.actlen||0,cp:m.cp}));
   rsUpdateUnitLabels();rsCalc();}
 function rsProductChanged(){RS_LOADED=true;$('rs-qty-rows').innerHTML='';if($('rs-markers'))$('rs-markers').innerHTML='';
   rsAutoPickWidth();
@@ -2168,7 +2169,7 @@ function rsBuildDraft(){return {title:($('rs-title')?$('rs-title').value.trim():
   objective:($('rs-objective')?$('rs-objective').value:'markers'),objV:2,rolllen:+($('rs-rolllen')&&$('rs-rolllen').value)||0,rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,spread:+($('rs-spread')&&$('rs-spread').value)||0,colors:rsColors(),
   qty:[...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0})).filter(x=>x.size),
   rowcol:RS_ROWCOL,combocol:RS_COMBOCOL,comboAct:rsComboActMap(),
-  markers:rsReadMarkers().filter(m=>m.pairs.length||m.plies).map(m=>({pairs:m.pairs,plies:+m.plies||0,actlen:m.actlen||0}))};}
+  markers:rsReadMarkers().filter(m=>m.pairs.length||m.plies).map(m=>({pairs:m.pairs,plies:+m.plies||0,actlen:m.actlen||0,...(m.cp?{cp:m.cp}:{})}))};}
 // كتابة فورية للمسودة + تحديث مؤشّر آخر حفظ (تتجاوز الكتابة إن لم يتغيّر شيء)
 let RS_LAST_SAVED='';
 function rsWriteDraft(silent){if(!RS_LOADED||!MEMBER||!$('rs-qty-rows'))return;
@@ -2322,7 +2323,9 @@ function rsCalc(){if(!$('rs-qty-rows'))return;const uf=rsUF();const sp=rsSpreadM
   $('rs-qt-c').textContent=csum?Math.round(csum*uf*100)/100:'\u2014';
   const cf=$('rs-qt-cf');if(cf)cf.textContent=cfsum?Math.round(cfsum*uf*100)/100:'\u2014';
   if($('rs-qt-c2'))$('rs-qt-c2').textContent=$('rs-qt-c').textContent;if($('rs-qt-cf2')&&cf)$('rs-qt-cf2').textContent=cf.textContent;
-  rsApplyRowColors();rsConsDiffCheck();rsConsValCheck();rsMkCalc();rsSaveDraft();}
+  rsApplyRowColors();rsConsDiffCheck();rsConsValCheck();
+  if(!(document.activeElement&&document.activeElement.classList&&document.activeElement.classList.contains('rscm-in')))rsColorMatrixRender();
+  rsMkCalc();rsSaveDraft();}
 /* ---- \u062c\u062f\u0648\u0644 \u0627\u0644\u0645\u0627\u0631\u0643\u0631\u0627\u062a ---- */
 const RS_COLORS=['#d9e8f7','#d9f0d5','#f7d9ec','#f9e0cb','#d5eef4','#eaf4cf','#e6e0f7','#f7f3cf'];
 // نسخ داكنة متناسقة لوضع الدارك — كي يبقى نصّ الثيم الفاتح مقروءاً على خلفية الصفّ
@@ -2345,7 +2348,7 @@ function rsAddMarker(m){m=m||{};if(!$('rs-markers'))return;RS_MSEQ++;const id='r
      <td rowspan="2" class="rsm-code" style="font-weight:800">\u2014</td>
      <td style="font-weight:700">${t('rsSizesRow')}</td>${[0,1,2,3,4,5].map(i=>selCell(pairs[i])).join('')}
      <td rowspan="2" class="rsm-pcs" style="font-weight:800">0</td>
-     <td rowspan="2"><input class="rsm-plies" type="number" min="1" value="${m.plies!=null?m.plies:1}" style="width:62px;padding:4px;text-align:center;font-weight:800;border:1px solid #9db8b8;border-radius:6px" oninput="rsMkCalc()"></td>
+     <td rowspan="2"><input class="rsm-plies" type="number" min="1" value="${m.plies!=null?m.plies:1}" style="width:62px;padding:4px;text-align:center;font-weight:800;border:1px solid #9db8b8;border-radius:6px" oninput="rsMkCalc()"><div class="rsm-cp" style="font-size:10.5px;font-weight:700;margin-top:3px;line-height:1.5;color:var(--mut)"></div></td>
      <td rowspan="2" class="rsm-run" style="font-weight:800">0</td>
      <td rowspan="2" class="rsm-st" style="max-width:170px">\u2014</td>
      <td rowspan="2" class="rsm-len red">0</td>
@@ -2353,6 +2356,7 @@ function rsAddMarker(m){m=m||{};if(!$('rs-markers'))return;RS_MSEQ++;const id='r
      <td rowspan="2" class="rsm-fab red">0</td>
      <td rowspan="2" class="rsm-fabf red" style="color:#b45309">0</td></tr>
     <tr class="rs-mrow2" data-mid="${id}"><td style="font-weight:700">${t('rsQtyRow')}</td>${[0,1,2,3,4,5].map(i=>cntCell(pairs[i])).join('')}</tr>`);
+  if(m.cp&&typeof m.cp==='object'){const r1=$('rs-markers').querySelector('tr.rs-mrow1[data-mid="'+id+'"]');if(r1)r1.dataset.cp=JSON.stringify(m.cp);}
   rsMkCalc();}
 // عند اختيار المقاس: الكمية الافتراضية 1 (قابلة للزيادة)
 function rsPickMkSize(sel){const tr1=sel.closest('tr');const i=[...tr1.querySelectorAll('.rsp-size')].indexOf(sel);
@@ -2549,6 +2553,58 @@ function rsPlanSolve(rem0,cons,maxlen,maxsizes,maxpcs,libCands,opt){opt=opt||{};
   if(libN){const addedFree=rsSolve(remOrig,cons,maxlen,maxsizes,maxpcs,opt);
     if(addedFree.length&&addedFree.length<added.length){added=addedFree;libN=0;}}
   return {added,libN};}
+// توليفات المكتبة المرشّحة (نمط توليفات المنتج) ضمن قيود الأوردر — مشتركة بين الحلّال العادي وحلّال الألوان
+function rsLibCands(cons,maxlen,maxsizes,maxpcs,reqMap,measM){const seen=new Set();
+  return prodComboLib(rsComboProd()).filter(x=>{const sg=x.sig||'';if(!sg||seen.has(sg))return false;seen.add(sg);return true;}).map(x=>x.sizes)
+    .filter(c=>c&&c.length&&new Set(c.map(p=>p.size)).size===c.length&&c.length<=maxsizes&&c.reduce((a,p)=>a+p.cnt,0)<=maxpcs
+      &&c.every(p=>reqMap[p.size]!=null&&cons[p.size]>0)
+      &&(c.reduce((a,p)=>a+p.cnt*cons[p.size],0)<=maxlen+1e-9||(measM.get(rsComboSig(c))||Infinity)<=maxlen+1e-9));}
+// أكمل الخطة بالألوان: الماركرات مشتركة، وطبقات كل لون في كل ماركر تُحسب ليغطّي كل لون كمياته لكل مقاس بالضبط
+// ١) إزالة زيادة كل لون (بعد التأكيد) ٢) توليفات مشتركة من باقي الإجمالي (+المكتبة والماركرات الحالية) ٣) لكل لون: المرشّحة أولاً ثم الحرّ للباقي
+// ٤) دمج طبقات الألوان في نفس التوليفة (ماركر واحد بطبقات لكل لون)
+function rsAutoPlanColors(cons,maxlen,maxsizes,maxpcs){const colors=rsColors();if(!colors.length)return;
+  const SUR=Math.max(0,Math.round(+($('rs-surplus')&&$('rs-surplus').value)||0)),meas=rsMeasList(cons),measM=new Map(meas.map(x=>[rsComboSig(x.pairs),x.len]));
+  const need={};colors.forEach(c=>need[c.name]={...c.sq});
+  const noCons=[...new Set(colors.flatMap(c=>Object.keys(c.sq).filter(s=>!(cons[s]>0))))];if(noCons.length){rsFlagSizes(noCons);return toast(tf('rsNoConsSizes',{s:noCons.join('، ')}));}
+  const rowsEl=[...document.querySelectorAll('.rs-mrow1')],mk=[];
+  rsReadMarkers().forEach((m,i)=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0),pl=+m.plies||0;if(!rsMarkerValid(vp,pl,cons,maxlen,maxsizes,maxpcs,m.pairs,m.actlen))return;
+    const sp={};rsMkSplit(m,colors).forEach(x=>{if(x.plies>0)sp[x.name]=x.plies;});mk.push({tr:rowsEl[i],vp,sig:rsComboSig(vp),sp,p0:pl,sp0:JSON.stringify(sp)});});
+  const madeOf=cn=>{const o={};mk.forEach(m=>{const p=m.sp[cn]||0;if(p>0)m.vp.forEach(q=>o[q.size]=(o[q.size]||0)+q.cnt*p);});return o;};
+  const remOf=cn=>{const md=madeOf(cn),r={};Object.keys(need[cn]).forEach(s=>{const v=need[cn][s]-(md[s]||0);if(v>0)r[s]=v;});return r;};
+  // ١) زيادة كل لون عن كمياته
+  const overs={};let overN=0;colors.forEach(c=>{const md=madeOf(c.name),ov={};Object.keys(md).forEach(s=>{const o=md[s]-(need[c.name][s]||0)-SUR;if(o>0){ov[s]=o;overN+=o;}});overs[c.name]=ov;});
+  if(overN>0&&confirm(tf('rsTrimQ',{n:overN})))colors.forEach(c=>{const ov=overs[c.name];if(!Object.keys(ov).length)return;
+    const idx=mk.map((m,i)=>i).filter(i=>(mk[i].sp[c.name]||0)>0),r=rsTrimSurplus(idx.map(i=>({pairs:mk[i].vp,plies:mk[i].sp[c.name]})),ov);
+    idx.forEach((i,k)=>{mk[i].sp[c.name]=r.plies[k];});});
+  // ٢) التوليفات المرشّحة المشتركة
+  const cands=[],seen=new Set(),addC=c=>{const sg=rsComboSig(c);if(!seen.has(sg)){seen.add(sg);cands.push(c.map(p=>({size:p.size,cnt:p.cnt})));}};
+  mk.forEach(m=>addC(m.vp));const tot={};colors.forEach(c=>{const r=remOf(c.name);Object.keys(r).forEach(s=>tot[s]=(tot[s]||0)+r[s]);});
+  if(Object.keys(tot).length){const reqMap={};colors.forEach(c=>Object.keys(c.sq).forEach(s=>reqMap[s]=1));
+    rsPlanSolve(tot,cons,maxlen,maxsizes,maxpcs,rsLibCands(cons,maxlen,maxsizes,maxpcs,reqMap,measM),{meas}).added.forEach(a=>addC(a.combo));}
+  // ٣) اختيار مشترك: في كل خطوة التوليفة التي تغطّي أكبر عدد قطع من كل الألوان معاً (طبقات لكل لون) — فتقلّ الماركرات الصغيرة
+  //    المرشّحة: الحالية + توليفات حلّ الإجمالي + توليفات حلّ كل لون منفرداً؛ وما يتبقّى لكل لون يكمله الحلّال الحرّ
+  colors.forEach(c=>{const r=remOf(c.name);if(Object.keys(r).length)rsSolve({...r},cons,maxlen,maxsizes,maxpcs,{meas,sur:SUR}).forEach(a=>addC(a.combo));});
+  const remC={};colors.forEach(c=>remC[c.name]=remOf(c.name));
+  const adds={},put=(combo,cn,pl,len)=>{if(pl<1)return;const sg=rsComboSig(combo),ex=mk.find(m=>m.sig===sg);
+    if(ex)ex.sp[cn]=(ex.sp[cn]||0)+pl;else{const ad=adds[sg]=adds[sg]||{combo,sp:{},len:len||combo.reduce((a,p)=>a+p.cnt*cons[p.size],0)};ad.sp[cn]=(ad.sp[cn]||0)+pl;}
+    combo.forEach(p=>{remC[cn][p.size]=(remC[cn][p.size]||0)-p.cnt*pl;});};
+  const okC=cands.filter(c=>{const l=c.reduce((a,p)=>a+p.cnt*cons[p.size],0),ml=measM.get(rsComboSig(c));return c.every(p=>cons[p.size]>0)&&(maxlen<=0||(ml>0?ml:l)<=maxlen+1e-9);});
+  for(let g=0;g<500;g++){let best=null;
+    okC.forEach(cb=>{let cov=0;const k={};colors.forEach(c=>{const r=remC[c.name];if(!cb.every(p=>(r[p.size]||0)>0))return;
+        const flo=Math.min(...cb.map(p=>Math.floor(r[p.size]/p.cnt))),fin=Math.max(...cb.map(p=>Math.ceil(r[p.size]/p.cnt)));
+        const pl=(fin>=1&&cb.every(p=>fin*p.cnt-r[p.size]<=SUR))?fin:flo;if(pl<1)return;k[c.name]=pl;cov+=cb.reduce((a,p)=>a+Math.min(pl*p.cnt,r[p.size]),0);});
+      if(cov>0&&(!best||cov>best.cov||(cov===best.cov&&Object.keys(k).length>Object.keys(best.k).length)))best={cb,k,cov};});
+    if(!best)break;Object.keys(best.k).forEach(cn=>put(best.cb,cn,best.k[cn]));}
+  colors.forEach(c=>{const lp={};Object.keys(remC[c.name]).forEach(s=>{if(remC[c.name][s]>0)lp[s]=remC[c.name][s];});
+    if(Object.keys(lp).length)rsSolve(lp,cons,maxlen,maxsizes,maxpcs,{meas,sur:SUR}).forEach(a=>put(a.combo,c.name,a.plies,a.len));});
+  // ٤) تطبيق على الجدول
+  let del=0,edit=0;mk.forEach(m=>{const sp={};Object.keys(m.sp).forEach(k=>{if(m.sp[k]>0)sp[k]=m.sp[k];});const P=Object.values(sp).reduce((a,v)=>a+v,0);
+    if(P<1){document.querySelectorAll('tr[data-mid="'+m.tr.dataset.mid+'"]').forEach(tr=>tr.remove());del++;return;}
+    if(P!==m.p0||JSON.stringify(sp)!==m.sp0)edit++;m.tr.querySelector('.rsm-plies').value=P;m.tr.dataset.cp=JSON.stringify(sp);});
+  const nw=Object.values(adds).sort((a,b)=>b.len-a.len);nw.forEach(a=>rsAddMarker({pairs:a.combo,plies:Object.values(a.sp).reduce((x,v)=>x+v,0),cp:a.sp}));
+  rsMkCalc();rsSaveDraft();
+  if(!nw.length&&!edit&&!del)return toast(t('rsAutoDone'));
+  toast(tf('rsColAutoDone',{a:nw.length,e:edit,d:del}));}
 // إزالة الإنتاج الزائد بإنقاص الطبقات (دالة نقية — تُختبر في tests/solver.test.mjs): ms=[{pairs:[{size,cnt}],plies}]، over={قياس:زائد}
 // ١) ماركرات كل قياساتها زائدة: يُنقَص منها أكبر عدد طبقات لا يُحدث نقصاً — الأولوية لحذف ماركر كامل ثم لأكبر إزالة
 // ٢) ما بقي زائداً: يُنقَص من الماركر الأقل ضرراً على باقي القياسات (أي نقص ينتج يغطّيه الحلّال بعدها) — النتيجة تغطية تامة
@@ -2578,6 +2634,7 @@ function rsAutoPlan(){if(!$('rs-markers'))return;
   // قيمة استهلاك غير منطقية (مثل 41 بدل 2.1) تُفسد الخطة كلها — نوقف ونميّزها بدل توليد خطة خاطئة
   const cvR=rsConsValList(),cvBad=Object.keys(cvR).filter(s=>cvR[s][0].lvl==='bad'&&reqMap[s]>0);
   if(cvBad.length){rsFlagSizes(cvBad);return toast(tf('cvBlockAuto',{s:cvBad.map(s=>s+' = '+cons[s]).join('، ')}));}
+  if(rsCMOn())return rsAutoPlanColors(cons,maxlen,maxsizes,maxpcs);
   const readProd=()=>{const pr={},vm=[],rows=[...document.querySelectorAll('.rs-mrow1')];
     rsReadMarkers().forEach((m,i)=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
       if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs,m.actlen)){vp.forEach(p=>pr[p.size]=(pr[p.size]||0)+p.cnt*plies);vm.push({mid:rows[i].dataset.mid,pairs:vp,plies});}});
@@ -2689,10 +2746,10 @@ function rsSortMarkers(){if(!$('rs-markers'))return;
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const ms=rsReadMarkers().filter(m=>m.pairs.length||+m.plies).map(m=>{
     const len=m.pairs.filter(p=>p.size&&p.cnt>0).reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);
-    return {pairs:m.pairs,plies:+m.plies||0,actlen:m.actlen||0,len};});
+    return {pairs:m.pairs,plies:+m.plies||0,actlen:m.actlen||0,cp:m.cp,len};});
   if(ms.length<2)return;
   ms.sort((a,b)=>b.len-a.len);
-  $('rs-markers').innerHTML='';ms.forEach(m=>rsAddMarker({pairs:m.pairs,plies:m.plies,actlen:m.actlen}));
+  $('rs-markers').innerHTML='';ms.forEach(m=>rsAddMarker({pairs:m.pairs,plies:m.plies,actlen:m.actlen,cp:m.cp}));
   rsMkCalc();rsSaveDraft();}
 // ترتيب حسب «استهلاك القطعة» (الأقل/الأفضل أولاً) — يعتمد الطول الفعلي المقاس إن وُجد (فيشمل التداخل الحقيقي)
 function rsSortByPerPiece(){if(!$('rs-markers'))return;
@@ -2701,10 +2758,10 @@ function rsSortByPerPiece(){if(!$('rs-markers'))return;
     const vp=m.pairs.filter(p=>p.size&&p.cnt>0);
     const len=vp.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);const pcs=vp.reduce((a,p)=>a+p.cnt,0);
     const eff=(m.actlen&&m.actlen>0)?m.actlen/uf:len; // الطول الفعّال بالمتر: الفعلي المقاس إن وُجد وإلا المحسوب
-    return {pairs:m.pairs,plies:+m.plies||0,actlen:m.actlen||0,pc:pcs>0?eff/pcs:Infinity};});
+    return {pairs:m.pairs,plies:+m.plies||0,actlen:m.actlen||0,cp:m.cp,pc:pcs>0?eff/pcs:Infinity};});
   if(ms.length<2)return;
   ms.sort((a,b)=>a.pc-b.pc); // الأقل استهلاكاً للقطعة أولاً = الأفضل توليفةً
-  $('rs-markers').innerHTML='';ms.forEach(m=>rsAddMarker({pairs:m.pairs,plies:m.plies,actlen:m.actlen}));
+  $('rs-markers').innerHTML='';ms.forEach(m=>rsAddMarker({pairs:m.pairs,plies:m.plies,actlen:m.actlen,cp:m.cp}));
   rsMkCalc();rsSaveDraft();}
 /* ---- معايرة التوليفات: يقترح النظام توليفات الأوردر (تغطّي كل القياسات)، تقيس أطوالها الفعلية،
    فيحسب الكفاءة (فعلي÷محسوب) ويرشّح الأفضل. كفاءة <1 = تداخل يوفّر قماشاً — إن وُجد فعلاً ---- */
@@ -3166,11 +3223,54 @@ function rsMaxLenChanged(){rsLimitsChanged();}
 /* ---- توزيع الألوان (اختياري): يوزّع طبقات كل ماركر على الألوان حسب حصصها ---- */
 function rsAddColorRow(c){c=c||{};if(!$('rs-colors'))return;
   const row=document.createElement('div');row.className='rs-color-row';row.style.cssText='display:flex;gap:6px;align-items:center';
-  row.innerHTML=`<input class="rsc-name" value="${esc(c.name||'')}" placeholder="${esc(t('rsColName'))}" style="flex:2;padding:6px;background:var(--inp)" oninput="rsMkCalc();rsSaveDraft()">
-    <input class="rsc-qty" type="number" min="0" value="${c.qty!=null?c.qty:''}" placeholder="${esc(t('rsColQty'))}" style="flex:1;max-width:120px;padding:6px;text-align:center;font-weight:700;background:var(--inp)" oninput="rsMkCalc();rsSaveDraft()">
-    <button type="button" class="mini r" onclick="this.closest('.rs-color-row').remove();rsMkCalc();rsSaveDraft()">✕</button>`;
-  $('rs-colors').appendChild(row);}
-function rsColors(){return [...document.querySelectorAll('.rs-color-row')].map(r=>({name:r.querySelector('.rsc-name').value.trim()||t('rsColUnnamed'),qty:+r.querySelector('.rsc-qty').value||0})).filter(c=>c.qty>0);}
+  row._sq=(c.sq&&typeof c.sq==='object')?{...c.sq}:{};// كمية هذا اللون لكل مقاس (جدول كميات الألوان)
+  row.innerHTML=`<input class="rsc-name" value="${esc(c.name||'')}" placeholder="${esc(t('rsColName'))}" style="flex:2;padding:6px;background:var(--inp)" oninput="rsColorsChanged()">
+    <input class="rsc-qty" type="number" min="0" value="${c.qty!=null?c.qty:''}" placeholder="${esc(t('rsColQty'))}" style="flex:1;max-width:120px;padding:6px;text-align:center;font-weight:700;background:var(--inp)" oninput="rsColorsChanged()">
+    <button type="button" class="mini r" onclick="this.closest('.rs-color-row').remove();rsColorsChanged()">✕</button>`;
+  $('rs-colors').appendChild(row);rsColorMatrixRender();}
+function rsColorsChanged(){rsColorMatrixRender();rsMkCalc();rsSaveDraft();}
+// جدول «كمية كل لون لكل مقاس» مفعَّل إذا أُدخلت فيه أي قيمة — عندها كمية اللون = مجموع عموده
+function rsCMOn(){return [...document.querySelectorAll('.rs-color-row')].some(r=>Object.values(r._sq||{}).some(v=>+v>0));}
+function rsColors(){const on=rsCMOn();return [...document.querySelectorAll('.rs-color-row')].map(r=>{const sq={};Object.keys(r._sq||{}).forEach(k=>{if(+r._sq[k]>0)sq[k]=+r._sq[k];});
+  return {name:r.querySelector('.rsc-name').value.trim()||t('rsColUnnamed'),qty:on?Object.values(sq).reduce((a,v)=>a+v,0):(+r.querySelector('.rsc-qty').value||0),sq};}).filter(c=>c.qty>0);}
+function rsCMSizes(){return [...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0})).filter(x=>x.size);}
+function rsColorMatrixRender(){const el=$('rs-cmatrix');if(!el)return;const rows=[...document.querySelectorAll('.rs-color-row')],sizes=rsCMSizes();
+  if(!rows.length||!sizes.length){el.innerHTML='';return;}
+  const on=rsCMOn(),names=rows.map((r,i)=>r.querySelector('.rsc-name').value.trim()||(t('rsColUnnamed')+' '+(i+1))),g=(r,s)=>+((r._sq||{})[s])||0;
+  const colTot=rows.map(r=>sizes.reduce((a,x)=>a+g(r,x.size),0));let bad=0;
+  rows.forEach((r,i)=>{const q=r.querySelector('.rsc-qty');if(on){q.value=colTot[i];q.readOnly=true;q.title=t('rsCMQtyAuto');}else{q.readOnly=false;q.title='';}});
+  const body=sizes.map(x=>{const tot=rows.reduce((a,r)=>a+g(r,x.size),0),d=tot-x.qty;if(on&&d)bad++;
+    return `<tr><td style="font-weight:800" dir="ltr">${esc(x.size)}</td><td>${x.qty}</td>${rows.map((r,ci)=>`<td><input class="rscm-in" type="number" min="0" data-c="${ci}" data-s="${esc(x.size)}" value="${g(r,x.size)||''}" oninput="rsCMInput(this)" onchange="rsColorsChanged()" style="width:72px;padding:4px;text-align:center;font-weight:700"></td>`).join('')}
+      <td class="rscm-rt" data-s="${esc(x.size)}" style="font-weight:800;${on&&d?'color:var(--bad)':''}">${tot}${on&&d?` <span style="font-size:11px" dir="ltr">(${d>0?'+':''}${d})</span>`:''}</td></tr>`;}).join('');
+  el.innerHTML=`<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px"><b>📋 ${esc(t('rsCMTitle'))}</b>
+      <button type="button" class="mini g" onclick="rsCMFill()">${esc(t('rsCMFill'))}</button>
+      ${on?`<button type="button" class="mini" onclick="rsCMToOrder()">${esc(t('rsCMToOrder'))}</button><button type="button" class="mini r" onclick="rsCMClear()">${esc(t('rsCMClear'))}</button>`:''}</div>
+    <div class="note" style="font-size:12px;margin-bottom:6px">${esc(t('rsCMHint'))}</div>
+    ${on&&bad?`<div style="font-size:12.5px;font-weight:800;color:var(--bad);background:var(--bad-bg);border:1px solid var(--bad-bd);border-radius:8px;padding:6px 10px;margin-bottom:6px">⚠️ ${esc(tf('rsCMBad',{n:bad}))}</div>`:''}
+    <div style="overflow-x:auto"><table class="xtbl" style="min-width:auto;width:auto"><tr><th>${esc(t('rsCMSize'))}</th><th>${esc(t('rsCMOrder'))}</th>${names.map(n=>`<th>🎨 ${esc(n)}</th>`).join('')}<th>${esc(t('rsCMSum'))}</th></tr>${body}
+      <tr class="tot"><td>${esc(t('total'))}</td><td>${sizes.reduce((a,x)=>a+x.qty,0)}</td>${colTot.map((v,ci)=>`<td class="rscm-ct" data-c="${ci}">${v}</td>`).join('')}<td class="rscm-gt">${colTot.reduce((a,v)=>a+v,0)}</td></tr></table></div>`;}
+// كتابة خانة: تحديث الأرقام فقط (بلا إعادة رسم كي لا يضيع المؤشر) — وإعادة الرسم الكاملة عند الخروج من الخانة
+function rsCMInput(inp){const rows=[...document.querySelectorAll('.rs-color-row')],r=rows[+inp.dataset.c],s=inp.dataset.s;if(!r)return;
+  r._sq=r._sq||{};const v=Math.max(0,Math.round(+inp.value||0));if(v>0)r._sq[s]=v;else delete r._sq[s];
+  const g=(rr,ss)=>+((rr._sq||{})[ss])||0,rt=document.querySelector(`#rs-cmatrix .rscm-rt[data-s="${CSS.escape(s)}"]`);if(rt)rt.textContent=rows.reduce((a,rr)=>a+g(rr,s),0);
+  const ct=document.querySelector(`#rs-cmatrix .rscm-ct[data-c="${inp.dataset.c}"]`),sizes=rsCMSizes();if(ct)ct.textContent=sizes.reduce((a,x)=>a+g(r,x.size),0);
+  const gt=document.querySelector('#rs-cmatrix .rscm-gt');if(gt)gt.textContent=rows.reduce((a,rr)=>a+sizes.reduce((b,x)=>b+g(rr,x.size),0),0);}
+// توزيع كمية الأوردر لكل مقاس على الألوان حسب حصة كل لون (أكبر باقٍ) — نقطة بداية تُعدَّل يدوياً
+function rsCMFill(){const rows=[...document.querySelectorAll('.rs-color-row')],sizes=rsCMSizes();if(!rows.length||!sizes.length)return;
+  if(rsCMOn()&&!confirm(t('rsCMFillQ')))return;
+  let sh=rows.map(r=>+r.querySelector('.rsc-qty').value||0);if(!sh.some(v=>v>0))sh=rows.map(()=>1);
+  const cols=rows.map((r,i)=>({name:String(i),qty:sh[i]}));
+  rows.forEach(r=>r._sq={});sizes.forEach(x=>{rsDistribute(x.qty,cols).forEach((d,i)=>{if(d.plies>0)rows[i]._sq[x.size]=d.plies;});});
+  rsColorsChanged();}
+function rsCMToOrder(){if(!confirm(t('rsCMToOrderQ')))return;const rows=[...document.querySelectorAll('.rs-color-row')];
+  document.querySelectorAll('.rsq-row').forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();if(!s)return;tr.querySelector('.rsq-qty').value=rows.reduce((a,r)=>a+(+((r._sq||{})[s])||0),0);});
+  rsCalc();rsColorsChanged();}
+function rsCMClear(){if(!confirm(t('rsCMClearQ')))return;document.querySelectorAll('.rs-color-row').forEach(r=>r._sq={});rsColorsChanged();}
+// طبقات كل لون في الماركر: المحفوظة صراحةً (من التوزيع التلقائي) إن طابق مجموعها الطبقات، وإلا بالنسبة (تقريبي)
+function rsMkSplit(m,colors){const P=+m.plies||0;if(!colors.length)return [];const cp=m.cp;
+  if(cp&&typeof cp==='object'){const names=new Set(colors.map(c=>c.name)),ks=Object.keys(cp).filter(k=>cp[k]>0);
+    if(ks.length&&ks.every(k=>names.has(k))&&ks.reduce((a,k)=>a+cp[k],0)===P)return colors.map(c=>({name:c.name,plies:cp[c.name]||0,exact:true}));}
+  return rsDistribute(P,colors).map(x=>({...x,exact:false}));}
 // توزيع P طبقة على الألوان حسب حصصها (أعداد صحيحة، مجموعها P — طريقة أكبر باقٍ)
 function rsDistribute(P,colors){const sum=colors.reduce((s,c)=>s+c.qty,0);if(sum<=0||P<=0)return colors.map(c=>({name:c.name,plies:0}));
   const b=colors.map(c=>{const ex=P*c.qty/sum;return {name:c.name,plies:Math.floor(ex),rem:ex-Math.floor(ex)};});
@@ -3181,11 +3281,11 @@ function rsDistribute(P,colors){const sum=colors.reduce((s,c)=>s+c.qty,0);if(sum
 function rsColorTotals(){const colors=rsColors();if(!colors.length)return null;
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
-  const per={};colors.forEach(c=>per[c.name]={plies:0,fab:0,pcs:0});
+  const per={};colors.forEach(c=>per[c.name]={plies:0,fab:0,pcs:0,made:{}});
   rsReadMarkers().forEach(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
     if(!rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs,m.actlen))return;
     const len=vp.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0),pcs=vp.reduce((a,p)=>a+p.cnt,0);
-    rsDistribute(plies,colors).forEach(d=>{if(per[d.name]){per[d.name].plies+=d.plies;per[d.name].fab+=d.plies*len;per[d.name].pcs+=d.plies*pcs;}});});
+    rsMkSplit(m,colors).forEach(d=>{const pc=per[d.name];if(pc){pc.plies+=d.plies;pc.fab+=d.plies*len;pc.pcs+=d.plies*pcs;vp.forEach(p=>pc.made[p.size]=(pc.made[p.size]||0)+p.cnt*d.plies);}});});
   const totalQty=colors.reduce((s,c)=>s+c.qty,0);
   return {colors,per,totalQty};}
 function rsColorsCalc(){const el=$('rs-colors-sum');if(!el)return;
@@ -3200,14 +3300,19 @@ function rsColorsCalc(){const el=$('rs-colors-sum');if(!el)return;
       <div style="background:${bg};padding:6px 10px;font-weight:800;color:var(--txt)">🎨 ${esc(c.name)}</div>
       <div style="padding:8px 10px;font-size:12.5px;line-height:1.9;background:var(--card)">
         <div>${t('rsColPcs')}: <b>${p.pcs}</b> · ${t('rsPlies')}: <b>${p.plies}</b></div>
-        <div>${t('mkTotalFabric')}: <b>${R(p.fab)} ${u}</b>${rolls?` · ${t('rsRollCount')}: <b>${rolls}</b>`:''}</div></div></div>`;}).join('');}
+        <div>${t('mkTotalFabric')}: <b>${R(p.fab)} ${u}</b>${rolls?` · ${t('rsRollCount')}: <b>${rolls}</b>`:''}</div>${rsCMOn()?rsColCover(c,p):''}</div></div>`;}).join('');}
+// تغطية اللون لكمياته لكل مقاس (عند تفعيل جدول كميات الألوان)
+function rsColCover(c,p){let sh=0,ov=0;const ks=new Set([...Object.keys(c.sq||{}),...Object.keys(p.made||{})]);
+  ks.forEach(s=>{const d=(p.made[s]||0)-((c.sq||{})[s]||0);if(d<0)sh-=d;else ov+=d;});
+  return `<div style="font-weight:800;color:var(--${sh||ov?'bad':'ok'})">${sh||ov?'⚠️ '+[sh?tf('rsColShort',{n:sh}):'',ov?tf('rsColOver',{n:ov}):''].filter(Boolean).join(' · '):esc(t('rsColDone'))}</div>`;}
 function rsReadMarkers(){return [...document.querySelectorAll('.rs-mrow1')].map(tr1=>{
   const tr2=tr1.nextElementSibling;
   const ss=[...tr1.querySelectorAll('.rsp-size')].map(e=>e.value.trim());
   const cs=tr2?[...tr2.querySelectorAll('.rsp-cnt')].map(e=>+e.value||0):[];
   const pairs=ss.map((s,i)=>({size:s,cnt:cs[i]||0})).filter(p=>p.size||p.cnt);
   const al=tr1.querySelector('.rsm-actlen');
-  return {pairs,plies:tr1.querySelector('.rsm-plies').value,actlen:al?(+al.value||0):0};});}
+  let cp=null;try{cp=tr1.dataset.cp?JSON.parse(tr1.dataset.cp):null;}catch(e){}
+  return {pairs,plies:tr1.querySelector('.rsm-plies').value,actlen:al?(+al.value||0):0,cp};});}
 // عرض القماش الحالي (نص مُطبَّع) — قياسات المكتبة خاصة بكل عرض
 function rsFabW(){const el=$('rs-fabwidth');if(!el)return '';const v=String(el.value||'').trim();return v==='__other'?'':v;}
 // ضبط قيمة عرض القماش في القائمة؛ يُضيف خياراً للأعراض غير الموجودة (خطط محفوظة/يدوية) قبل خيار «عرض آخر»
@@ -3418,7 +3523,7 @@ function rsHeavyApply(){if(!RS_HEAVY||!RS_HEAVY.length)return toast(t('rsHeavyNo
   if(!covers||!(newFab<oldFab-0.005))return toast(t('rsHeavyApplyNoGain'));
   const nOld=heavyIdx.size,nNew=added.length;
   $('rs-markers').innerHTML='';
-  kept.forEach(x=>rsAddMarker({pairs:x.m.pairs,plies:x.m.plies,actlen:x.m.actlen||0}));
+  kept.forEach(x=>rsAddMarker({pairs:x.m.pairs,plies:x.m.plies,actlen:x.m.actlen||0,cp:x.m.cp}));
   added.sort((a,b)=>b.len-a.len).forEach(a=>rsAddMarker({pairs:a.combo,plies:a.plies}));
   rsMkCalc();rsSaveDraft();rsReviewHeavy();
   toast(tf('rsHeavyApplied',{o:nOld,n:nNew,s:Math.round((oldFab-newFab)*uf*100)/100,u}));}
@@ -3522,7 +3627,7 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();const spM=r
   const _wf=rsWidthEff();const _wfOn=_wf>0&&Math.abs(_wf-1)>1e-6;
   RS_LIBC={map:_libMap,wf:_wf};// تفعيل المسار السريع لكل الاستدعاءات المتداخلة (rsRollPlan…)
   const reqMap={};[...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();if(s)reqMap[s]=+tr.querySelector('.rsq-qty').value||0;});
-  const produced={};const MR=[];const swaps=[];const _measQ=[];
+  const produced={};const MR=[];const swaps=[];const _measQ=[];const _mkCols=rsColors();
   [...document.querySelectorAll('.rs-mrow1')].forEach((tr1,i)=>{const m=raw[i];const tr2=tr1.nextElementSibling;
     const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;let st='',pcs=0,len=0,run=0,fab=0,fabf=0;
     if(!m.pairs.length&&!m.plies)st='st_empty';
@@ -3554,6 +3659,8 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();const spM=r
     if(tr2)tr2.querySelectorAll('td').forEach(td=>td.style.background=bg);
     tr1.querySelector('.rsm-code').textContent='M'+String(i+1).padStart(2,'0');
     tr1.querySelector('.rsm-pcs').textContent=pcs;
+    const cpEl=tr1.querySelector('.rsm-cp');if(cpEl){const sp=_mkCols.length&&plies>0?rsMkSplit(m,_mkCols):[];
+      cpEl.innerHTML=sp.length?(sp[0].exact?'':'≈ ')+sp.filter(x=>x.plies>0).map(x=>`${esc(x.name)} <b>${x.plies}</b>`).join(' · '):'';cpEl.title=sp.length&&!sp[0].exact?t('rsCpApprox'):'';}
     tr1.querySelector('.rsm-run').textContent=run;
     const lenCell=tr1.querySelector('.rsm-len');const calcDisp=Math.round(len*uf*100)/100;
     if(libM>0){const measDisp=Math.round(libM*uf*100)/100;const delta=Math.round((measDisp-calcDisp)*100)/100;
@@ -3685,7 +3792,7 @@ function rsResult(){const qty=rsReadQty();if(!qty.length)return null;
   const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const ufA=rsUF();// الطول الفعلي يُدخَل بوحدة العرض الحالية
-  const markers=[];let tRun=0,tFab=0;
+  const markers=[];let tRun=0,tFab=0;const _cols=rsColors();
   rsReadMarkers().forEach((m,i)=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);if(!vp.length&&!m.plies)return;
     const plies=+m.plies||0,pcs=vp.reduce((s,p)=>s+p.cnt,0),len=vp.reduce((s,p)=>s+p.cnt*(cons[p.size]||0),0);
     let st='st_ok';
@@ -3696,7 +3803,7 @@ function rsResult(){const qty=rsReadQty();if(!qty.length)return null;
     else if(!(plies>0)||plies%1!==0)st='st_plies';else if(maxlen>0&&rsFitLen(vp,len,m.actlen,ufA)>maxlen+1e-9)st='st_len';
     const effLen=rsMkEffLen(m.pairs,len,m.actlen,ufA);
     const ok=st==='st_ok',run=ok?pcs*plies:0,fab=ok?effLen*plies:0;if(ok){tRun+=run;tFab+=fab;}
-    markers.push({code:'M'+String(i+1).padStart(2,'0'),pairs:vp,plies,pcs,len:Math.round(len*100)/100,effLen:Math.round(effLen*10000)/10000,actlen:m.actlen||0,status:t(st),ok,run,fab:Math.round(fab*100)/100});});
+    markers.push({code:'M'+String(i+1).padStart(2,'0'),pairs:vp,plies,pcs,...(m.cp?{cp:m.cp}:{}),csplit:rsMkSplit(m,_cols),len:Math.round(len*100)/100,effLen:Math.round(effLen*10000)/10000,actlen:m.actlen||0,status:t(st),ok,run,fab:Math.round(fab*100)/100});});
   const totalReq=qty.reduce((s,x)=>s+x.qty,0);
   const cover=qty.map(x=>{const made=markers.filter(m=>m.ok).reduce((s,m)=>s+m.pairs.filter(p=>p.size===x.size).reduce((a,p)=>a+p.cnt,0)*m.plies,0);
     return {size:x.size,req:x.qty,made,rem:x.qty-made};});
@@ -3815,7 +3922,7 @@ function rsOpenInCalc(id){const c=TOOLCHK.find(x=>x.id===id);if(!c||c.type!=='rs
   if(r.spread!=null&&$('rs-spread'))$('rs-spread').value=r.spread;
   if($('rs-colors')){$('rs-colors').innerHTML='';(r.colors||[]).forEach(cc=>rsAddColorRow(cc));}
   $('rs-qty-rows').innerHTML='';(r.qty||[]).forEach(x=>rsAddQtyRow(x));
-  $('rs-markers').innerHTML='';(r.markers||[]).forEach(m=>rsAddMarker({pairs:m.pairs,plies:m.plies,actlen:m.actlen||0}));
+  $('rs-markers').innerHTML='';(r.markers||[]).forEach(m=>rsAddMarker({pairs:m.pairs,plies:m.plies,actlen:m.actlen||0,cp:m.cp}));
   rsUpdateUnitLabels();rsCalc();toast(t('restored'));}
 function rsPlanTablesHtml(r){const uf=r.uf||1,u=rsUnitTxt(r.unit);const R=v=>Math.round(v*uf*100)/100;
   const uL=s=>t(s).replace('\u0645\u062a\u0631',u).replace('(m)','('+u+')');
@@ -3874,12 +3981,12 @@ function rsSpreadHtml(d,opt){opt=opt||{};
   const bd='border:1px solid #bfbfbf';
   const hd=(txt,bg,x)=>`<th style="${bd};background:#${bg};color:#fff;font-weight:800;font-size:11.5px;padding:6px 5px;text-align:center;vertical-align:middle;line-height:1.3;${x||''}">${txt}</th>`;
   const td=(v,x)=>`<td style="${bd};padding:3px 5px;text-align:center;vertical-align:middle;font-size:12px;${x||''}">${v}</td>`;
-  const clrBreak=pl=>colors.length?`<div style="font-size:9.5px;color:#44515e;font-weight:600;line-height:1.5">${rsDistribute(pl,colors).map(c=>`${esc(c.name)} <b>${c.plies}</b>`).join(' · ')}</div>`:'';
+  const clrBreak=x=>colors.length&&x.csplit&&x.csplit.length?`<div style="font-size:9.5px;color:#44515e;font-weight:600;line-height:1.5">${x.csplit.filter(c=>c.plies>0).map(c=>`${esc(c.name)} <b>${c.plies}</b>`).join(' · ')}</div>`:'';
   const rows=d.rows.map((x,k)=>{const bg=x.color?`background:${x.color};`:'',pct=Math.round(x.run/maxRun*100),top=d.top.has(k);
     // لون الصف من النظام يظهر شريطاً في خانتي الرقم والكود فقط — كي لا يختلط بألوان الأعمدة الثابتة (قياس الفرد/أعلى ٣/الأشرطة)
     return `<tr>${td(k+1,bg+`color:#${C.num};font-weight:800;font-size:14px`)}${td(esc(x.code)+(x.bad?' ⚠':''),bg+`color:#${x.bad?'C00000':C.navy};font-weight:800`)}
       ${Array.from({length:K},(_,j)=>td(x.parts[j]?rsFormPartHtml(x.parts[j]):'',`white-space:nowrap;padding:3px 2px;${sepR}`)).join('')}${td(x.pcs,`color:#${C.ink}`)}
-      ${td(x.plies+clrBreak(x.plies),`color:#${C.ink};font-weight:700`)}
+      ${td(x.plies+clrBreak(x),`color:#${C.ink};font-weight:700`)}
       ${td(I(x.run),`background-color:#fff;background-image:linear-gradient(to ${LANG==='ar'?'left':'right'},#${C.bar} ${pct}%,transparent ${pct}%);font-weight:700`)}
       ${td(x.meas.toFixed(2),`background:#${C.grn}`)}
       ${td(N(x.fabf),top?`background:#${C.pinkF};color:#${C.pinkT};font-weight:800`:'font-weight:800')}</tr>`;}).join('')
@@ -4080,7 +4187,7 @@ function rsSpreadForm(){const r=rsResult();if(!r)return {err:'mkNeed'};
   const mk=(r.markers||[]).filter(m=>m.pairs.length&&m.plies>0);if(!mk.length)return {err:'rsNoValidMk'};
   const uf=r.uf||1,u=rsUnitTxt(r.unit),R2=v=>Math.round(v*100)/100,spD=R2((r.spread||0)/100*uf);
   const rows=mk.map(m=>{const len=R2((m.effLen||m.len||0)*uf),meas=R2(len+spD);
-    return {code:m.code,bad:!m.ok,status:m.ok?'':m.status,desc:m.pairs.map(p=>p.size+'×'+p.cnt).join(' ┃ '),parts:m.pairs.map(p=>[p.size,p.cnt]),pcs:m.pcs,plies:m.plies,run:m.pcs*m.plies,len,meas,fabf:R2(meas*m.plies),color:rsMkColor(m.pairs)};});
+    return {code:m.code,bad:!m.ok,status:m.ok?'':m.status,csplit:m.csplit||[],desc:m.pairs.map(p=>p.size+'×'+p.cnt).join(' ┃ '),parts:m.pairs.map(p=>[p.size,p.cnt]),pcs:m.pcs,plies:m.plies,run:m.pcs*m.plies,len,meas,fabf:R2(meas*m.plies),color:rsMkColor(m.pairs)};});
   const plies=rows.reduce((a,x)=>a+x.plies,0),run=rows.reduce((a,x)=>a+x.run,0),fabf=R2(rows.reduce((a,x)=>a+x.fabf,0)),cq=R2(rows.reduce((a,x)=>a+x.len*x.plies,0));
   const top=new Set(rows.map((x,k)=>[x.fabf,k]).sort((a,b)=>b[0]-a[0]).slice(0,3).map(x=>x[1]));
   const w=rsFabW();
