@@ -4250,38 +4250,44 @@ function rsAnalysisData(){const uf=rsUF(),u=rsUL(),sp=rsSpreadM(),R2=v=>Math.rou
   if(!rows.length)return {err:'mkNeed'};
   const qty=rows.reduce((a,x)=>a+x.qty,0),ratio=R2(rows.reduce((a,x)=>a+x.ratio,0)),cq=R2(rows.reduce((a,x)=>a+x.cq,0)),cf=R2(rows.reduce((a,x)=>a+x.cf,0));
   rows.forEach(x=>x.share=qty>0?x.qty/qty:0);
+  // الألوان: كمية كل لون لكل مقاس (عمود مستقل لكل لون بعد «الكمية المطلوبة»)
+  const cols=rsCMOn()?rsColors():[],cnames=cols.map(c=>c.name);rows.forEach(x=>{x.cqty=cols.map(c=>c.sq[x.size]||0);});
+  const ctot=cols.map((c,ci)=>rows.reduce((a,x)=>a+x.cqty[ci],0));
   const top=new Set(rows.map((x,k)=>[x.cf,k]).sort((a,b)=>b[0]-a[0]).slice(0,3).map(x=>x[1])),w=rsFabW();
   return {u,uf,spD:R2(sp*uf),title:$('rs-title')?$('rs-title').value.trim():'',model:$('rs-product')?$('rs-product').value:'',fabric:w?tf('rsFormWidth',{w}):'',date:fmtDate(today()),
-    rows,qty,ratio,cq,cf,avg:qty>0?Math.round(cf/qty*1000)/1000:0,top};}
-function rsAnalysisHtml(a){const C=RS_FORM_C,u=a.u,n=a.rows.length,maxQ=Math.max(1,...a.rows.map(x=>x.qty)),dense=n>28;
+    rows,qty,ratio,cq,cf,cnames,ctot,avg:qty>0?Math.round(cf/qty*1000)/1000:0,top};}
+function rsAnalysisHtml(a){const C=RS_FORM_C,u=a.u,n=a.rows.length,maxQ=Math.max(1,...a.rows.map(x=>x.qty)),dense=n>28,cn=a.cnames||[],nC=cn.length,NC=8+nC;
+  const ctint=ci=>RS_COLORS[ci%RS_COLORS.length];
   const N=v=>Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),I=v=>Number(v).toLocaleString('en-US');
   const bd='border:1px solid #bfbfbf',pad=dense?'2px 5px':'3px 5px',fs=dense?11.5:12;
   const hd=txt=>`<th style="${bd};background:#${C.blue};color:#fff;font-weight:800;font-size:11.5px;padding:6px 5px;text-align:center;vertical-align:middle;line-height:1.3">${txt}</th>`;
   const td=(v,x)=>`<td style="${bd};padding:${pad};text-align:center;vertical-align:middle;font-size:${fs}px;${x||''}">${v}</td>`;
   const box=(cells,bg,fg,f)=>`<tr>${cells.map(c=>`<td colspan="${c[1]||1}" style="${bd};background:#${bg};color:#${fg};font-weight:800;font-size:${f}px;padding:6px 5px;text-align:center">${c[0]}</td>`).join('')}</tr>`;
-  const cg='<colgroup><col style="width:5%"><col style="width:15%"><col style="width:13%"><col style="width:11%"><col style="width:11%"><col style="width:13%"><col style="width:15%"><col style="width:17%"></colgroup>';
+  const sc=(100-8*nC)/100,W=v=>(v*sc).toFixed(3)+'%';// كل عمود لون 8٪
+  const cg=`<colgroup><col style="width:${W(5)}"><col style="width:${W(15)}"><col style="width:${W(13)}">${'<col style="width:8%">'.repeat(nC)}<col style="width:${W(11)}"><col style="width:${W(11)}"><col style="width:${W(13)}"><col style="width:${W(15)}"><col style="width:${W(17)}"></colgroup>`;
   const rows=a.rows.map((x,k)=>{const bg=x.color?`background:${x.color};`:'',pct=Math.round(x.qty/maxQ*100);
     return `<tr>${td(k+1,bg+`color:#${C.num};font-weight:800`)}${td(`<span dir="ltr">${esc(x.size)}</span>`,bg+`color:#${C.navy};font-weight:800`)}
       ${td(I(x.qty),`background-color:#fff;background-image:linear-gradient(to ${LANG==='ar'?'left':'right'},#${C.bar} ${pct}%,transparent ${pct}%);font-weight:700`)}
+      ${(x.cqty||[]).map((v,ci)=>td(v?I(v):'',`background:${ctint(ci)};color:#${C.navy};font-weight:800`)).join('')}
       ${td(x.ratio||'',`color:#${C.ink}`)}${td((x.share*100).toFixed(1)+'%',`color:#${C.ink}`)}
       ${td(x.cons?x.cons.toFixed(3):'—',`background:#${C.grn}`)}${td(N(x.cq),`color:#${C.ink}`)}
       ${td(N(x.cf),a.top.has(k)?`background:#${C.pinkF};color:#${C.pinkT};font-weight:800`:'font-weight:800')}</tr>`;}).join('');
   return `<div style="font-family:'Segoe UI',Tahoma,Arial;color:#1c2530;max-width:860px;margin:auto;padding-top:6px;-webkit-print-color-adjust:exact;print-color-adjust:exact" dir="${LANG==='ar'?'rtl':'ltr'}">
     <style>@page{size:A4 portrait;margin:8mm}</style>
     <table style="width:100%;border-collapse:collapse;table-layout:fixed">${cg}
-      <tr><td colspan="8" style="${bd};background:#${C.navy};color:#fff;font-weight:800;font-size:20px;padding:9px;text-align:center">${esc(t('rsAnaTitle'))}${MEMBER&&MEMBER.wsName?` <span style="font-size:13px;opacity:.85">— ${esc(MEMBER.wsName)}</span>`:''}</td></tr>
-      <tr><td colspan="8" style="height:6px"></td></tr>
-      ${box([[esc(t('rsFormOrderNo')),3],[esc(t('rsFormModel')),2],[esc(t('rsFormFabric'))],[esc(t('dateLbl'))],[esc(tf('rsFormSpread',{u}))]],C.blue,'ffffff',11)}
-      ${box([[esc(a.title)||'&nbsp;',3],[esc(a.model)||'&nbsp;',2],[esc(a.fabric)||'&nbsp;'],[esc(a.date)],[a.spD.toFixed(2)]],C.yel,C.ink,12.5)}
-      <tr><td colspan="8" style="height:6px"></td></tr>
-      ${box([[esc(t('rsAnaSizes')),2],[esc(t('rsAnaQty')),2],[esc(tf('rsAnaCq',{u})),2],[esc(tf('rsAnaCf',{u}))],[esc(tf('rsFormAvg',{u}))]],C.navy,'ffffff',11)}
-      ${box([[n,2],[I(a.qty),2],[N(a.cq),2],[N(a.cf)],[a.avg.toFixed(2)]],C.kpi,C.navy,19)}
+      <tr><td colspan="${NC}" style="${bd};background:#${C.navy};color:#fff;font-weight:800;font-size:20px;padding:9px;text-align:center">${esc(t('rsAnaTitle'))}${MEMBER&&MEMBER.wsName?` <span style="font-size:13px;opacity:.85">— ${esc(MEMBER.wsName)}</span>`:''}</td></tr>
+      <tr><td colspan="${NC}" style="height:6px"></td></tr>
+      ${box([[esc(t('rsFormOrderNo')),3],[esc(t('rsFormModel')),2+nC],[esc(t('rsFormFabric'))],[esc(t('dateLbl'))],[esc(tf('rsFormSpread',{u}))]],C.blue,'ffffff',11)}
+      ${box([[esc(a.title)||'&nbsp;',3],[esc(a.model)||'&nbsp;',2+nC],[esc(a.fabric)||'&nbsp;'],[esc(a.date)],[a.spD.toFixed(2)]],C.yel,C.ink,12.5)}
+      <tr><td colspan="${NC}" style="height:6px"></td></tr>
+      ${box([[esc(t('rsAnaSizes')),2],[esc(t('rsAnaQty')),2+nC],[esc(tf('rsAnaCq',{u})),2],[esc(tf('rsAnaCf',{u}))],[esc(tf('rsFormAvg',{u}))]],C.navy,'ffffff',11)}
+      ${box([[n,2],[I(a.qty),2+nC],[N(a.cq),2],[N(a.cf)],[a.avg.toFixed(2)]],C.kpi,C.navy,19)}
     </table>
     <table style="width:100%;border-collapse:collapse;table-layout:fixed;margin-top:8px">${cg}
-      <thead><tr>${hd(esc(t('rsCbNo')))}${hd(esc(t('sizeName')))}${hd(esc(t('mkQtyOrder')))}${hd(esc(t('rsRatio')))}${hd(esc(t('rsAnaShare')))}${hd(esc(tf('rsAnaCp',{u})))}${hd(esc(tf('rsAnaCq',{u})))}${hd(esc(tf('rsAnaCf',{u})))}</tr></thead>
+      <thead><tr>${hd(esc(t('rsCbNo')))}${hd(esc(t('sizeName')))}${hd(esc(t('mkQtyOrder')))}${cn.map(nm=>hd('🎨 '+esc(nm))).join('')}${hd(esc(t('rsRatio')))}${hd(esc(t('rsAnaShare')))}${hd(esc(tf('rsAnaCp',{u})))}${hd(esc(tf('rsAnaCq',{u})))}${hd(esc(tf('rsAnaCf',{u})))}</tr></thead>
       <tbody>${rows}
       <tr><td colspan="2" style="${bd};background:#${C.navy};color:#fff;font-weight:800;padding:7px;text-align:center">${esc(t('total'))}</td>
-        ${[I(a.qty),a.ratio||'','100%','',N(a.cq),N(a.cf)].map(v=>`<td style="${bd};background:#${C.navy};color:#fff;font-weight:800;padding:7px;text-align:center">${v}</td>`).join('')}</tr></tbody>
+        ${[I(a.qty),...(a.ctot||[]).map(I),a.ratio||'','100%','',N(a.cq),N(a.cf)].map(v=>`<td style="${bd};background:#${C.navy};color:#fff;font-weight:800;padding:7px;text-align:center">${v}</td>`).join('')}</tr></tbody>
     </table></div>`;}
 function printRsAnalysis(){const a=rsAnalysisData();if(a.err)return toast(t(a.err));const d=rsSpreadForm();
   $('print-area').innerHTML=rsAnalysisHtml(a)+(d.err?'':`<div style="break-before:page;page-break-before:always"></div>`+rsSpreadHtml(d,{extra:rsCmpHtml(a,d),cut:7}));
@@ -4305,38 +4311,44 @@ function rsCmpSheetRows(sh,a,d,off){const C=RS_FORM_C,W='FFFFFF',u=a.u,K=d.K,iP=
   const sv={b:1,sz:16,color:'15803D',fill:'E2EFDA',bd:1,nf:'[Color10]#,##0.00;[Red]-#,##0.00;0.00'},sp={...sv,sz:18,nf:'[Color10]0.00%;[Red]-0.00%;0.00%'};
   sh.rows[r0-1]={h:24,c:[{v:t('rsSaveTitle'),s:{b:1,sz:13,color:W,fill:C.navy,bd:1}}]};sh.merges.push(`A${r0}:H${r0}`);
   sh.rows[r0]={h:30,c:[{v:tf('rsSaveOrder',{u}),s:hd},null,{v:tf('rsSavePlan',{u}),s:hd},null,{v:tf('rsSaveAmt',{u}),s:hd},null,{v:t('rsSavePct'),s:hd},null]};
-  sh.rows[r0+1]={h:34,c:[{f:'G8',v:x.o,s:kv},null,{f:pf,v:x.pl,s:kv},null,{f:`A${r0+2}-C${r0+2}`,v:x.sv,s:sv},null,{f:`IF(A${r0+2}=0,0,E${r0+2}/A${r0+2})`,v:x.pct,s:sp},null]};
+  sh.rows[r0+1]={h:34,c:[{f:xlCol(6+(a.cnames||[]).length)+'8',v:x.o,s:kv},null,{f:pf,v:x.pl,s:kv},null,{f:`A${r0+2}-C${r0+2}`,v:x.sv,s:sv},null,{f:`IF(A${r0+2}=0,0,E${r0+2}/A${r0+2})`,v:x.pct,s:sp},null]};
   [r0+1,r0+2].forEach(r=>sh.merges.push(`A${r}:B${r}`,`C${r}:D${r}`,`E${r}:F${r}`,`G${r}:H${r}`));
   const rn=r0+3;sh.rows[rn-1]={h:18,c:[{v:t('rsSaveNote'),s:{i:1,sz:9,color:'44515E',h:LANG==='ar'?'right':'left'}}]};sh.merges.push(`A${rn}:H${rn}`);
   return sh;}
 // ورقة Excel «تحليل» بمعادلات حيّة (النسبة من الكمية، الاستهلاك، المجاميع) + ورقة «نموذج الفرد والقص» في نفس الملف
-function rsAnalysisSheet(a){const C=RS_FORM_C,u=a.u,W='FFFFFF',n=a.rows.length;
+function rsAnalysisSheet(a){const C=RS_FORM_C,u=a.u,W='FFFFFF',n=a.rows.length,L=xlCol,cn=a.cnames||[],nC=cn.length;
+  // الأعمدة: م · المقاس · الكمية · [عمود لكل لون] · النسبة · النسبة من الكمية · استهلاك القطعة · استهلاك الكمية · مع الفرد
+  const iRa=3+nC,iSh=4+nC,iCo=5+nC,iCq=6+nC,iCf=7+nC,Co=L(iCo),Cq=L(iCq),Cf=L(iCf),Ra=L(iRa),Sh=L(iSh);
   const S={title:{b:1,sz:16,color:W,fill:C.navy,bd:1},
     ih:{b:1,sz:10,color:W,fill:C.blue,bd:1,wrap:1},iv:{b:1,color:C.ink,fill:C.yel,bd:1},ivn:{b:1,color:C.ink,fill:C.yel,bd:1,nf:'0.00'},
     kh:{b:1,sz:10,color:W,fill:C.navy,bd:1,wrap:1},kv:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'#,##0'},kvd:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'#,##0.00'},kva:{b:1,sz:16,color:C.navy,fill:C.kpi,bd:1,nf:'0.00'},
     th:{b:1,sz:10,color:W,fill:C.blue,bd:1,wrap:1},tot:{b:1,color:W,fill:C.navy,bd:1},totn:{b:1,color:W,fill:C.navy,bd:1,nf:'#,##0'},totd:{b:1,color:W,fill:C.navy,bd:1,nf:'#,##0.00'},totp:{b:1,color:W,fill:C.navy,bd:1,nf:'0%'}};
-  const first=11,last=first+n-1,T=last+1;
-  const rows=[],merges=['A1:H1','A4:C4','D4:E4','A5:C5','D5:E5','A7:B7','C7:D7','E7:F7','A8:B8','C8:D8','E8:F8',`A${T}:B${T}`];
+  const first=11,last=first+n-1,T=last+1,pad=arr=>{const o=[];arr.forEach(([i,v])=>o[i]=v);return o;};
+  const rows=[],merges=[`A1:${Cf}1`,'A4:C4',`D4:${Sh}4`,'A5:C5',`D5:${Sh}5`,'A7:B7',`C7:${L(3+nC)}7`,`${Sh}7:${Co}7`,'A8:B8',`C8:${L(3+nC)}8`,`${Sh}8:${Co}8`,`A${T}:B${T}`];
   rows[0]={h:34,c:[{v:t('rsAnaTitle'),s:S.title}]};rows[1]={h:3,c:[]};rows[2]={h:6,c:[]};
-  rows[3]={h:22,c:[{v:t('rsFormOrderNo'),s:S.ih},null,null,{v:t('rsFormModel'),s:S.ih},null,{v:t('rsFormFabric'),s:S.ih},{v:t('dateLbl'),s:S.ih},{v:tf('rsFormSpread',{u}),s:S.ih}]};
-  rows[4]={h:24,c:[{v:a.title,s:S.iv},null,null,{v:a.model,s:S.iv},null,{v:a.fabric,s:S.iv},{v:a.date,s:S.iv},{v:a.spD,s:S.ivn}]};
+  rows[3]={h:22,c:pad([[0,{v:t('rsFormOrderNo'),s:S.ih}],[3,{v:t('rsFormModel'),s:S.ih}],[iCo,{v:t('rsFormFabric'),s:S.ih}],[iCq,{v:t('dateLbl'),s:S.ih}],[iCf,{v:tf('rsFormSpread',{u}),s:S.ih}]])};
+  rows[4]={h:24,c:pad([[0,{v:a.title,s:S.iv}],[3,{v:a.model,s:S.iv}],[iCo,{v:a.fabric,s:S.iv}],[iCq,{v:a.date,s:S.iv}],[iCf,{v:a.spD,s:S.ivn}]])};
   rows[5]={h:6,c:[]};
-  rows[6]={h:30,c:[{v:t('rsAnaSizes'),s:S.kh},null,{v:t('rsAnaQty'),s:S.kh},null,{v:tf('rsAnaCq',{u}),s:S.kh},null,{v:tf('rsAnaCf',{u}),s:S.kh},{v:tf('rsFormAvg',{u}),s:S.kh}]};
-  rows[7]={h:34,c:[{f:`COUNTA(B${first}:B${last})`,v:n,s:S.kv},null,{f:`C${T}`,v:a.qty,s:S.kv},null,{f:`G${T}`,v:a.cq,s:S.kvd},null,{f:`H${T}`,v:a.cf,s:S.kvd},{f:`IF(C${T}>0,H${T}/C${T},0)`,v:a.avg,s:S.kva}]};
+  rows[6]={h:30,c:pad([[0,{v:t('rsAnaSizes'),s:S.kh}],[2,{v:t('rsAnaQty'),s:S.kh}],[iSh,{v:tf('rsAnaCq',{u}),s:S.kh}],[iCq,{v:tf('rsAnaCf',{u}),s:S.kh}],[iCf,{v:tf('rsFormAvg',{u}),s:S.kh}]])};
+  rows[7]={h:34,c:pad([[0,{f:`COUNTA(B${first}:B${last})`,v:n,s:S.kv}],[2,{f:`C${T}`,v:a.qty,s:S.kv}],[iSh,{f:`${Cq}${T}`,v:a.cq,s:S.kvd}],[iCq,{f:`${Cf}${T}`,v:a.cf,s:S.kvd}],[iCf,{f:`IF(C${T}>0,${Cf}${T}/C${T},0)`,v:a.avg,s:S.kva}]])};
   rows[8]={h:6,c:[]};
-  rows[9]={h:40,c:[t('rsCbNo'),t('sizeName'),t('mkQtyOrder'),t('rsRatio'),t('rsAnaShare'),tf('rsAnaCp',{u}),tf('rsAnaCq',{u}),tf('rsAnaCf',{u})].map(v=>({v,s:S.th}))};
+  rows[9]={h:40,c:[t('rsCbNo'),t('sizeName'),t('mkQtyOrder'),...cn.map(nm=>'🎨 '+nm),t('rsRatio'),t('rsAnaShare'),tf('rsAnaCp',{u}),tf('rsAnaCq',{u}),tf('rsAnaCf',{u})].map(v=>({v,s:S.th}))};
   a.rows.forEach((x,k)=>{const rr=first+k,f=x.color?x.color.replace('#','').toUpperCase():'',inp={color:C.ink,bd:1};
     rows[rr-1]={h:19,c:[{v:k+1,s:{b:1,color:C.num,bd:1,...(f?{fill:f}:{})}},{v:x.size,s:{b:1,color:C.navy,bd:1,...(f?{fill:f}:{})}},
-      {v:x.qty,s:{...inp,b:1,nf:'#,##0'}},{v:x.ratio||'',s:inp},
+      {v:x.qty,s:{...inp,b:1,nf:'#,##0'}},
+      ...cn.map((_,ci)=>({v:(x.cqty||[])[ci]||'',s:{...inp,b:1,nf:'#,##0',fill:RS_COLORS[ci%RS_COLORS.length].replace('#','').toUpperCase()}})),
+      {v:x.ratio||'',s:inp},
       {f:`IF($C$${T}>0,C${rr}/$C$${T},"")`,v:x.share,s:{...inp,nf:'0.0%'}},
       {v:x.cons||'',s:{...inp,fill:C.grn,nf:'0.000'}},
-      {f:`IF(F${rr}="","",C${rr}*F${rr})`,v:x.cq,s:{...inp,nf:'#,##0.00'}},
-      {f:`IF(F${rr}="","",C${rr}*(F${rr}+$H$5))`,v:x.cf,s:{b:1,bd:1,nf:'#,##0.00'}}]};});
-  rows[T-1]={h:24,c:[{v:t('total'),s:S.tot},null,{f:`SUM(C${first}:C${last})`,v:a.qty,s:S.totn},{f:`SUM(D${first}:D${last})`,v:a.ratio,s:S.totd},{f:`SUM(E${first}:E${last})`,v:1,s:S.totp},{v:'',s:S.tot},
-    {f:`SUM(G${first}:G${last})`,v:a.cq,s:S.totd},{f:`SUM(H${first}:H${last})`,v:a.cf,s:S.totd}]};
+      {f:`IF(${Co}${rr}="","",C${rr}*${Co}${rr})`,v:x.cq,s:{...inp,nf:'#,##0.00'}},
+      {f:`IF(${Co}${rr}="","",C${rr}*(${Co}${rr}+$${Cf}$5))`,v:x.cf,s:{b:1,bd:1,nf:'#,##0.00'}}]};});
+  rows[T-1]={h:24,c:pad([[0,{v:t('total'),s:S.tot}],[2,{f:`SUM(C${first}:C${last})`,v:a.qty,s:S.totn}],
+    ...cn.map((_,ci)=>{const cl=L(3+ci);return [3+ci,{f:`SUM(${cl}${first}:${cl}${last})`,v:a.ctot[ci],s:S.totn}];}),
+    [iRa,{f:`SUM(${Ra}${first}:${Ra}${last})`,v:a.ratio,s:S.totd}],[iSh,{f:`SUM(${Sh}${first}:${Sh}${last})`,v:1,s:S.totp}],[iCo,{v:'',s:S.tot}],
+    [iCq,{f:`SUM(${Cq}${first}:${Cq}${last})`,v:a.cq,s:S.totd}],[iCf,{f:`SUM(${Cf}${first}:${Cf}${last})`,v:a.cf,s:S.totd}]])};
   const cf=[`<conditionalFormatting sqref="C${first}:C${last}"><cfRule type="dataBar" priority="1"><dataBar><cfvo type="min"/><cfvo type="max"/><color rgb="FF5B9BD5"/></dataBar></cfRule></conditionalFormatting>`,
-    `<conditionalFormatting sqref="H${first}:H${last}"><cfRule type="top10" dxfId="0" priority="2" rank="3"/></conditionalFormatting>`];
-  return {sheet:t('rsAnaSheet'),cols:[5,12,12,11,11,13,15,16],rows,merges,cf};}
+    `<conditionalFormatting sqref="${Cf}${first}:${Cf}${last}"><cfRule type="top10" dxfId="0" priority="2" rank="3"/></conditionalFormatting>`];
+  return {sheet:t('rsAnaSheet'),cols:[5,12,12,...Array(nC).fill(10),11,11,13,15,16],rows,merges,cf};}
 function exportRsAnalysisExcel(){const a=rsAnalysisData();if(a.err)return toast(t(a.err));const d=rsSpreadForm(),A=rsAnalysisSheet(a);
   // الاثنان في ورقة واحدة جنباً إلى جنب (نفس ترتيب الصفوف: العنوان، البيانات، الملخّص، رأس الجدول، الصفوف)
   const sh=d.err?A:rsCmpSheetRows({...xlSideBySide(A,rsSpreadSheet(d)),sheet:t('rsAnaSheet'),landscape:true},a,d,A.cols.length+1);
