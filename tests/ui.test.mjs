@@ -154,6 +154,25 @@ chk('colors: each marker stores an exact per-color ply split (saved in draft)', 
 chk('colors: adding a third color then completing → 100% exact', col.mm3 === 0, col);
 chk('colors: restored plan shows colour columns and stays 100% exact after editing', col.cinR === 3 && col.mmR === 0, col);
 chk('colors: completing never asks questions', col.asked === 0, col);
+
+// ٢ج) رسالة «جارٍ الحساب…»: تظهر قبل الحساب (تُرسم أولاً) وأثناءه، وتختفي بعده — والضغط المكرر أثناء الحساب يُتجاهل
+const busy = await page.evaluate(async () => {
+  const el = () => $('rs-busy'), vis = () => !!el() && getComputedStyle(el()).display !== 'none';
+  let runs = 0, during = false;
+  const p1 = rsBusy(() => { runs++; during = vis(); });
+  const before = vis(), txt = el() ? el().textContent : '', okTxt = txt.includes(t('rsBusyPlan')) && txt.includes(t('rsBusySub'));
+  const p2 = rsBusy(() => { runs++; });
+  await p1; await p2; const hidden = !vis();
+  // الزر الفعلي «أكمل الخطة»: يحسب ثم يُخفي الرسالة
+  $('rs-colors').innerHTML = ''; rsColorMatrixRender(); document.querySelectorAll('.rs-mrow1,.rs-mrow2').forEach(tr => tr.remove());
+  $('rs-qty-rows').innerHTML = ''; [['S-56', 10, 2.25], ['M-57', 40, 2.52], ['L-59', 30, 2.75]].forEach(([s, q, c]) => rsAddQtyRow({ size: s, qty: q, cons: c })); rsCalc();
+  await rsAutoPlanUI(); const n = document.querySelectorAll('.rs-mrow1').length, hidden2 = !vis();
+  rsResetPlan(false);
+  return { runs, during, before, okTxt, hidden, n, hidden2 };
+});
+chk('busy: «calculating…» shown before and during the calculation, hidden after', busy.before && busy.during && busy.okTxt && busy.hidden, busy);
+chk('busy: repeated click while calculating is ignored', busy.runs === 1, busy);
+chk('busy: auto-plan button computes the plan then hides the message', busy.n > 0 && busy.hidden2, busy);
 await page.waitForTimeout(300);
 chk('Excel exports download 4 .xlsx files', downloads.filter(f => f.endsWith('.xlsx')).length >= 4, downloads);
 
