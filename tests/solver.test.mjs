@@ -35,12 +35,12 @@ function grabConst(name) {
 
 const code = [
   grabConst('RS_LIB_TOL'), grabConst('XL_CRC'), grabConst('rsP2'), grabConst('SIZE_ORDER'), grabConst('CV_HI'),
-  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus'].map(grabFn),
+  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus', 'rsColorPlan'].map(grabFn),
 ].join('\n');
 // rsSolve يقرأ الهدف/الفائض من الواجهة عند غياب الخيارات — نعيد قيمة فارغة فيُستعمل الافتراضي («أقل ماركرات»، فائض 0)
 const ctx = { $: () => ({ value: '' }), Date, Math, Object, Set, Array, String, Number, Uint32Array, TextEncoder, console };
 vm.createContext(ctx);
-vm.runInContext(code + '\n;globalThis.__x={rsCombos,rsSolve,rsPlanSolve,rsComboSig,rsLibComp,rsLibOk,rsBakSlot,rsBakSlotId,xlCrc,consCheck,rsTrimSurplus};', ctx);
+vm.runInContext(code + '\n;globalThis.__x={rsCombos,rsSolve,rsPlanSolve,rsComboSig,rsLibComp,rsLibOk,rsBakSlot,rsBakSlotId,xlCrc,consCheck,rsTrimSurplus,rsColorPlan};', ctx);
 const X = ctx.__x;
 
 let pass = 0, fail = 0;
@@ -132,6 +132,30 @@ chk('xlCrc("123456789") = CBF43926', X.xlCrc(new TextEncoder().encode('123456789
   // مسار المرشّحين (مكتبة): يقبل المقيس ضمن الحد
   const lib = X.rsSolve({ ...q }, cons, 9.5, 6, 5, { mode: 'markers', sur: 0, cands: [[{ size: 'A', cnt: 1 }, { size: 'B', cnt: 1 }]], meas: [{ pairs: [{ size: 'A', cnt: 1 }, { size: 'B', cnt: 1 }], len: 9.4 }] });
   chk('meas: library candidate accepted by measured length', lib.length === 1 && lib[0].plies === 10, lib); }
+
+// ── خطة الألوان: كل لون يغطّي كمياته بالضبط، والماركرات مشتركة ──
+{ const SZ = ['S-53', 'S-54', 'S-55', 'S-56', 'S-57', 'M-53', 'M-54', 'M-55', 'M-56', 'L-55', 'L-56', 'L-57'];
+  const cons = {}; SZ.forEach((s, i) => cons[s] = 2.1 + i * 0.05);
+  let x = 5; const rnd = () => (x = (x * 16807) % 2147483647) / 2147483647;
+  const mkQ = f => { const Q = { G: {}, B: {}, E: {} }; SZ.forEach(s => { const v = f(); Q.G[s] = v[0]; Q.B[s] = v[1]; Q.E[s] = v[2]; }); return Q; };
+  const check = (Q, plan) => { let bad = 0; Object.keys(Q).forEach(c => { const made = {}; plan.forEach(m => m.combo.forEach(p => made[p.size] = (made[p.size] || 0) + p.cnt * (m.sp[c] || 0)));
+    SZ.forEach(s => { if ((made[s] || 0) !== (Q[c][s] || 0)) bad++; }); }); return bad; };
+  const Qr = mkQ(() => [15 + Math.floor(rnd() * 20), 15 + Math.floor(rnd() * 20), 15 + Math.floor(rnd() * 20)]);
+  const pr = X.rsColorPlan(Qr, cons, 9, 6, 100, { sur: 0 });
+  chk('colors: random quantities → every color exact', check(Qr, pr) === 0, check(Qr, pr));
+  // نسب متطابقة تماماً: لا ماركرات زائدة عن خطة الإجمالي
+  const Qp = mkQ(() => { const b = 8 + Math.floor(rnd() * 10); return [b * 3, b * 3, b * 4]; });
+  const tot = {}; SZ.forEach(s => tot[s] = Qp.G[s] + Qp.B[s] + Qp.E[s]);
+  const pp = X.rsColorPlan(Qp, cons, 9, 6, 100, { sur: 0 }), plain = X.rsSolve({ ...tot }, cons, 9, 6, 100, { mode: 'markers', sur: 0 }).length;
+  chk('colors: proportional colors → exact and no more markers than the total plan', check(Qp, pp) === 0 && pp.length <= plain, { colors: pp.length, plain });
+  // يعيد استعمال الماركرات الحالية (seed) أولاً
+  const seed = pr.slice(0, 3).map(m => m.combo), ps = X.rsColorPlan(Qr, cons, 9, 6, 100, { sur: 0, seed });
+  chk('colors: seed combos reused, still exact', check(Qr, ps) === 0 && seed.every(c => ps.some(m => X.rsComboSig(m.combo) === X.rsComboSig(c))), ps.length);
+  // الفائض المسموح يقلّل الماركرات ولا يتجاوز حدّه لكل لون/مقاس
+  const p2 = X.rsColorPlan(Qr, cons, 9, 6, 100, { sur: 2 }); let maxOver = 0, short = 0;
+  Object.keys(Qr).forEach(c => { const made = {}; p2.forEach(m => m.combo.forEach(p => made[p.size] = (made[p.size] || 0) + p.cnt * (m.sp[c] || 0)));
+    SZ.forEach(s => { const d = (made[s] || 0) - Qr[c][s]; if (d < 0) short -= d; else maxOver = Math.max(maxOver, d); }); });
+  chk('colors: surplus 2 → no shortage, ≤2 over per size/color, fewer or equal markers', short === 0 && maxOver <= 2 && p2.length <= pr.length, { n2: p2.length, n0: pr.length, maxOver, short }); }
 
 // ── إزالة الإنتاج الزائد ──
 { const mk = (pairs, plies) => ({ pairs: pairs.map(([size, cnt]) => ({ size, cnt })), plies });
