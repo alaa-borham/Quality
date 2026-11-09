@@ -35,12 +35,12 @@ function grabConst(name) {
 
 const code = [
   grabConst('RS_LIB_TOL'), grabConst('XL_CRC'), grabConst('rsP2'), grabConst('SIZE_ORDER'), grabConst('CV_HI'),
-  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus', 'rsColorPlan'].map(grabFn),
+  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus', 'rsColorPlan', 'rsColorAlloc'].map(grabFn),
 ].join('\n');
 // rsSolve يقرأ الهدف/الفائض من الواجهة عند غياب الخيارات — نعيد قيمة فارغة فيُستعمل الافتراضي («أقل ماركرات»، فائض 0)
 const ctx = { $: () => ({ value: '' }), Date, Math, Object, Set, Array, String, Number, Uint32Array, TextEncoder, console };
 vm.createContext(ctx);
-vm.runInContext(code + '\n;globalThis.__x={rsCombos,rsSolve,rsPlanSolve,rsComboSig,rsLibComp,rsLibOk,rsBakSlot,rsBakSlotId,xlCrc,consCheck,rsTrimSurplus,rsColorPlan};', ctx);
+vm.runInContext(code + '\n;globalThis.__x={rsCombos,rsSolve,rsPlanSolve,rsComboSig,rsLibComp,rsLibOk,rsBakSlot,rsBakSlotId,xlCrc,consCheck,rsTrimSurplus,rsColorPlan,rsColorAlloc};', ctx);
 const X = ctx.__x;
 
 let pass = 0, fail = 0;
@@ -156,6 +156,17 @@ chk('xlCrc("123456789") = CBF43926', X.xlCrc(new TextEncoder().encode('123456789
   Object.keys(Qr).forEach(c => { const made = {}; p2.forEach(m => m.combo.forEach(p => made[p.size] = (made[p.size] || 0) + p.cnt * (m.sp[c] || 0)));
     SZ.forEach(s => { const d = (made[s] || 0) - Qr[c][s]; if (d < 0) short -= d; else maxOver = Math.max(maxOver, d); }); });
   chk('colors: surplus 2 → no shortage, ≤2 over per size/color, fewer or equal markers', short === 0 && maxOver <= 2 && p2.length <= pr.length, { n2: p2.length, n0: pr.length, maxOver, short }); }
+
+// ── إعادة توزيع طبقات خطة قائمة على الألوان: بلا زيادة أبداً، ونقص أقل ──
+{ const need = { A: { X: 30, Y: 30 }, B: { X: 10, Y: 20 } };
+  const mk = [{ vp: [{ size: 'X', cnt: 1 }, { size: 'Y', cnt: 1 }], sp: { A: 20, B: 20 }, fixed: false }, { vp: [{ size: 'Y', cnt: 1 }], sp: { A: 5, B: 5 }, fixed: false }];
+  X.rsColorAlloc(mk, need, ['A', 'B']);
+  const made = c => { const o = {}; mk.forEach(m => m.vp.forEach(q => o[q.size] = (o[q.size] || 0) + q.cnt * (m.sp[c] || 0))); return o; };
+  let over = 0, short = 0; ['A', 'B'].forEach(c => { const md = made(c); Object.keys(need[c]).forEach(s => { const d = (md[s] || 0) - need[c][s]; if (d > 0) over += d; else short -= d; }); });
+  chk('alloc: no surplus after re-allocation', over === 0, { mk, over });
+  chk('alloc: this case becomes exact (X+Y×30/10, Y×0/10)', short === 0, { mk, short });
+  const fx = [{ vp: [{ size: 'X', cnt: 1 }], sp: { A: 99 }, fixed: true }]; X.rsColorAlloc(fx, { A: { X: 1 } }, ['A']);
+  chk('alloc: fixed (exact) markers are not touched', fx[0].sp.A === 99); }
 
 // ── إزالة الإنتاج الزائد ──
 { const mk = (pairs, plies) => ({ pairs: pairs.map(([size, cnt]) => ({ size, cnt })), plies });

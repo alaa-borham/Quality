@@ -135,14 +135,25 @@ const col = await page.evaluate(() => {
   ct.colors.forEach(c => new Set([...Object.keys(c.sq), ...Object.keys(ct.per[c.name].made)]).forEach(s => { if ((ct.per[c.name].made[s] || 0) !== (c.sq[s] || 0)) bad++; }));
   const exact = rsReadMarkers().every(m => m.cp && Object.values(m.cp).reduce((a, v) => a + v, 0) === +m.plies);
   const dr = rsBuildDraft(); const saved = dr.markers.every(m => m.cp) && dr.colors.every(c => Object.keys(c.sq).length > 0);
+  // إضافة لون ثالث لخطة لونين ثم الإكمال، ثم حفظ/استرجاع وتعديل كمياته — كل مرة مطابقة ١٠٠٪ وبلا أي سؤال
+  const asked = []; window.confirm = m => { asked.push(m); return true; };
+  step('third color', () => { rsAddColorRow({ name: 'E' }); document.querySelectorAll('.rsq-row').forEach((tr, i) => { const c = tr.querySelectorAll('.rsq-cin')[2]; c.value = 5 + i; rsQtyCInput(c); }); rsAutoPlan(); });
+  const mm3 = rsColorMismatch().length;
+  step('restore + change', () => { const d = JSON.parse(JSON.stringify(rsBuildDraft())); const cons = {}; rsAllSizes().forEach(x => cons[x.size] = x.cons);
+    rsApplyDraft(d); document.querySelectorAll('.rsq-row').forEach(tr => { tr.querySelector('.rsq-cons').value = cons[tr.querySelector('.rsq-size').value.trim()]; }); rsCalc();
+    const c = document.querySelectorAll('.rsq-row')[0].querySelectorAll('.rsq-cin')[1]; c.value = +c.value + 7; rsQtyCInput(c); rsAutoPlan(); });
+  const mmR = rsColorMismatch().length, cinR = document.querySelectorAll('.rsq-row')[0].querySelectorAll('.rsq-cin').length;
   const n = rsReadMarkers().length;
   step('cleanup', () => { rsResetPlan(false); rsColorMatrixRender(); });
-  return { log, bad, exact, saved, n, qtyKept };
+  return { log, bad, exact, saved, n, qtyKept, mm3, mmR, cinR, asked: asked.length };
 });
 chk('colors: per-color plan runs without errors', col.log.length === 0, col.log);
 chk('colors: order qty = sum of color columns (unchanged total 266)', col.qtyKept === 266, col);
 chk('colors: every color covers its per-size quantities exactly', col.bad === 0 && col.n > 0, col);
 chk('colors: each marker stores an exact per-color ply split (saved in draft)', col.exact && col.saved, col);
+chk('colors: adding a third color then completing → 100% exact', col.mm3 === 0, col);
+chk('colors: restored plan shows colour columns and stays 100% exact after editing', col.cinR === 3 && col.mmR === 0, col);
+chk('colors: completing never asks questions', col.asked === 0, col);
 await page.waitForTimeout(300);
 chk('Excel exports download 4 .xlsx files', downloads.filter(f => f.endsWith('.xlsx')).length >= 4, downloads);
 
