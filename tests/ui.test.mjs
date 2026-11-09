@@ -155,6 +155,27 @@ chk('colors: adding a third color then completing → 100% exact', col.mm3 === 0
 chk('colors: restored plan shows colour columns and stays 100% exact after editing', col.cinR === 3 && col.mmR === 0, col);
 chk('colors: completing never asks questions', col.asked === 0, col);
 
+// ٢ب٢) الفائض المسموح للأوردر كله (قطع): لا نقص في أي لون/مقاس، ومجموع الزيادة ≤ الحد، والفحص يعتبرها سليمة
+const sur = await page.evaluate(() => {
+  const log = []; const step = (n, f) => { try { f(); } catch (e) { log.push(n + ': ' + (e && e.message)); } };
+  let res = {};
+  step('surplus plan', () => { document.querySelectorAll('.rs-mrow1,.rs-mrow2').forEach(tr => tr.remove()); $('rs-colors').innerHTML = ''; $('rs-qty-rows').innerHTML = '';
+    const Q = [['M-56', 41, 33, 2.44], ['M-57', 27, 29, 2.52], ['L-58', 55, 43, 2.72], ['L-60', 38, 31, 2.79], ['XL-58', 33, 28, 2.83], ['XL-60', 26, 25, 2.87], ['2XL-60', 17, 13, 3.01]];
+    Q.forEach(([s, a, b, c]) => rsAddQtyRow({ size: s, qty: a + b, cons: c })); rsCalc();
+    $('rs-maxlen').value = '9'; $('rs-maxpcs').value = '5'; $('rs-surplus').value = '30';
+    rsAddColorRow({ name: 'W' }); rsAddColorRow({ name: 'C' });
+    document.querySelectorAll('.rsq-row').forEach(tr => { const sz = tr.querySelector('.rsq-size').value.trim(), q = Q.find(x => x[0] === sz); const [w, c] = tr.querySelectorAll('.rsq-cin'); w.value = q[1]; rsQtyCInput(w); c.value = q[2]; rsQtyCInput(c); });
+    rsAutoPlan();
+    const ct = rsColorTotals(); let short = 0, over = 0;
+    ct.colors.forEach(c => new Set([...Object.keys(c.sq), ...Object.keys(ct.per[c.name].made)]).forEach(s => { const d = (ct.per[c.name].made[s] || 0) - (c.sq[s] || 0); if (d < 0) short -= d; else over += d; }));
+    const d = rsColorDiag();
+    res = { short, over, mm: rsColorMismatch().length, issues: Object.keys(d.issues).length, n: rsReadMarkers().length }; });
+  step('cleanup', () => { $('rs-surplus').value = '0'; rsResetPlan(false); $('rs-colors').innerHTML = ''; rsColorMatrixRender(); });
+  return { log, ...res };
+});
+chk('order surplus: plan runs without errors', sur.log.length === 0, sur.log);
+chk('order surplus: no shortage, total extra ≤ 30, accepted by the colour check', sur.n > 0 && sur.short === 0 && sur.over <= 30 && sur.mm === 0 && sur.issues === 0, sur);
+
 // ٢ج) رسالة «جارٍ الحساب…»: تظهر قبل الحساب (تُرسم أولاً) وأثناءه، وتختفي بعده — والضغط المكرر أثناء الحساب يُتجاهل
 const busy = await page.evaluate(async () => {
   const el = () => $('rs-busy'), vis = () => !!el() && getComputedStyle(el()).display !== 'none';

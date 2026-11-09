@@ -183,7 +183,16 @@ chk('xlCrc("123456789") = CBF43926', X.xlCrc(new TextEncoder().encode('123456789
   // لون واحد، ولون كمياته صفر، وحالة فارغة
   const one = X.rsColorBeam({ G: Q.G }, cons, 9, 6, 5, {});
   chk('beam: single color exact', bad({ G: Q.G }, one) === 0);
-  chk('beam: no quantities → empty plan', X.rsColorBeam({ G: { A: 0 } }, { A: 2 }, 9, 6, 5, {}).length === 0); }
+  chk('beam: no quantities → empty plan', X.rsColorBeam({ G: { A: 0 } }, { A: 2 }, 9, 6, 5, {}).length === 0);
+  // الفائض المسموح للأوردر كله: لا نقص أبداً، ومجموع الزيادة (كل المقاسات والألوان) ≤ الحد، وماركرات أقل
+  const ev = (Qx, plan) => { let short = 0, over = 0; Object.keys(Qx).forEach(c => { const md = {}; plan.forEach(m => m.combo.forEach(p => md[p.size] = (md[p.size] || 0) + p.cnt * (m.sp[c] || 0)));
+    new Set([...Object.keys(Qx[c]), ...Object.keys(md)]).forEach(s => { const d = (md[s] || 0) - (Qx[c][s] || 0); if (d < 0) short -= d; else over += d; }); }); return { short, over }; };
+  const s40 = X.rsColorBeam(Q, cons, 9, 6, 5, { surTot: 40 }), e40 = ev(Q, s40);
+  chk('order surplus 40: no shortage, total surplus ≤ 40, fewer markers than exact', e40.short === 0 && e40.over <= 40 && s40.length < bm.length, { n: s40.length, exact: bm.length, ...e40 });
+  const s1 = X.rsColorBeam({ G: Q.G }, cons, 9, 6, 5, { surTot: 20 }), e1 = ev({ G: Q.G }, s1);
+  chk('order surplus 20 (no colors): no shortage, total surplus ≤ 20, fewer markers', e1.short === 0 && e1.over <= 20 && s1.length < one.length, { n: s1.length, exact: one.length, ...e1 });
+  const s0 = X.rsColorBeam(Q, cons, 9, 6, 5, { surTot: 0 });
+  chk('order surplus 0: exact', ev(Q, s0).short === 0 && ev(Q, s0).over === 0); }
 
 // ── إعادة توزيع طبقات خطة قائمة على الألوان: بلا زيادة أبداً، ونقص أقل ──
 { const need = { A: { X: 30, Y: 30 }, B: { X: 10, Y: 20 } };
