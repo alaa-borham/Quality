@@ -2581,7 +2581,85 @@ function rsColorPlan(Qs,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
       res.forEach(a=>{const sg=rsComboSig(a.combo);pool.set(sg,a.combo);const e=plan.get(sg)||{combo:a.combo.map(p=>({size:p.size,cnt:p.cnt})),sp:{},len:a.len};e.sp[cn]=(e.sp[cn]||0)+a.plies;plan.set(sg,e);});});
     const arr=[...plan.values()],nNew=arr.filter(x=>!seedS.has(rsComboSig(x.combo))).length,fab=arr.reduce((a,x)=>a+x.len*Object.values(x.sp).reduce((t,v)=>t+v,0),0);
     if(!best||nNew<best.nNew||(nNew===best.nNew&&fab<best.fab-1e-9))best={nNew,fab,arr};});
+  // البحث الشعاعي المشترك للألوان (أقل ماركرات غالباً) — نأخذه إن أعطى ماركرات جديدة أقل (ثم قماشاً أقل)
+  // في «أقل طبقات» نقارن بالطبقات أولاً (الشعاعي يقلّل الماركرات وقد يزيد الطبقات)
+  const bm=opt.noBeam?null:rsColorBeam(Qs,cons,maxlen,maxsizes,maxpcs,{meas:opt.meas,seed,budget:opt.beamBudget||3000});
+  if(bm&&bm.length){const pl=a=>a.reduce((t,x)=>t+Object.values(x.sp).reduce((u,v)=>u+v,0),0),fabA=a=>a.reduce((t,x)=>t+x.len*Object.values(x.sp).reduce((u,v)=>u+v,0),0);
+    const mode=opt.mode||($('rs-objective')&&$('rs-objective').value)||'markers',nNew=bm.filter(x=>!seedS.has(rsComboSig(x.combo))).length,fab=fabA(bm);
+    const key=(n,p)=>mode==='plies'?[p,n]:[n,0],k1=key(nNew,pl(bm)),k0=key(best.nNew,pl(best.arr));
+    if(k1[0]<k0[0]||(k1[0]===k0[0]&&(k1[1]<k0[1]||(k1[1]===k0[1]&&fab<best.fab-1e-9))))return bm;}
   return best.arr;}
+// خطة ألوان بالبحث الشعاعي المشترك (دالة نقية — تُختبر في tests/solver.test.mjs) — دقيقة ١٠٠٪ لكل لون ومقاس بلا زيادة:
+// كل خطوة تضيف ماركراً جديداً، ولكل لون مشارك فيه عدد طبقات يُنهي أصغر بواقي قياساته (وقد لا يشارك لون الآن ليستعمله لاحقاً)؛
+// ثم «إعادة استعمال مجانية»: أي ماركر موجود يأخذ طبقات لون إن كانت تُنهي قياساً له — بلا ماركر جديد.
+// نحتفظ في كل خطوة بأفضل W حالات بمقياس: عدد (لون×مقاس) غير المنتهية + λ × عدد البواقي المختلفة في كل لون
+// (البواقي المتساوية تُنهى معاً بماركر واحد لاحقاً). نجرّب عدة قيم λ ضمن ميزانية زمنية ونأخذ الأقل ماركرات ثم الأقل قماشاً.
+// opt.seed: توليفات موجودة في الخطة (مجانية)، opt.meas: أطوال مقيسة. يعيد null إن تعذّر (توليفات كثيرة جداً) فيبقى الحلّال التتابعي
+function rsColorBeam(Qs,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
+  const names=Object.keys(Qs).filter(c=>Object.values(Qs[c]).some(v=>v>0));if(!names.length)return [];
+  const all=[...new Set(names.flatMap(c=>Object.keys(Qs[c]).filter(s=>Qs[c][s]>0)))];if(all.some(s=>!(cons[s]>0)))return null;
+  const sz=all.sort((a,b)=>cons[a]-cons[b]),NS=sz.length,NC=names.length,CS=sz.map(s=>cons[s]),N=NC*NS;if(NC>24)return null;
+  const R0=new Int32Array(N);names.forEach((c,k)=>sz.forEach((s,i)=>R0[k*NS+i]=Math.max(0,Math.round(+Qs[c][s]||0))));
+  const meas=opt.meas||[],MM=new Map(meas.map(x=>[rsComboSig(x.pairs),x.len]));let lim=maxlen;
+  if(MM.size&&maxlen>0){let rmin=1;meas.forEach(x=>{const comp=x.pairs.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);if(comp>0&&x.len>0)rmin=Math.min(rmin,x.len/comp);});lim=maxlen/Math.max(0.8,rmin);}
+  // كل التوليفات الصالحة (حد الطول — المقيس إن وُجد — وعدد القطع والمقاسات) التي يحتاج كل قياساتها لونٌ واحد على الأقل
+  const CAP=opt.cap||60000,CI=[],CA=[],CL=[],ci=[],ca=[];let over=false;
+  const rec=(st,pcs,len)=>{
+    if(ci.length){const ml=MM.size?MM.get(rsComboSig(ci.map((i,q)=>({size:sz[i],cnt:ca[q]})))):0,eff=ml>0?ml:len;
+      if(!(maxlen>0)||eff<=maxlen+1e-9){let ok=false;for(let k=0;k<NC&&!ok;k++){ok=true;for(const i of ci)if(!R0[k*NS+i]){ok=false;break;}}
+        if(ok){CI.push(Int32Array.from(ci));CA.push(Int32Array.from(ca));CL.push(eff);if(CI.length>CAP){over=true;return;}}}}
+    if(ci.length>=maxsizes)return;
+    for(let i=st;i<NS;i++){if(lim>0&&len+CS[i]>lim+1e-9)break;
+      for(let c=1;pcs+c<=maxpcs;c++){const nl=len+c*CS[i];if(lim>0&&nl>lim+1e-9)break;ci.push(i);ca.push(c);rec(i+1,pcs+c,nl);ci.pop();ca.pop();if(over)return;}}};
+  rec(0,0,0);if(over||!CI.length)return null;
+  const NJ=CI.length,CP=CA.map(b=>b.reduce((a,v)=>a+v,0));let seedIdx=[],PB=0;// PB: ترجيح خفيف للتوليفات الأكثر قطعاً (طبقات أقل) — في بعض المحاولات
+  if(opt.seed&&opt.seed.length){const ix=new Map();for(let j=0;j<NJ;j++)ix.set(rsComboSig([...CI[j]].map((i,q)=>({size:sz[i],cnt:CA[j][q]}))),j);
+    seedIdx=[...new Set(opt.seed.map(c=>ix.get(rsComboSig(c))).filter(j=>j!=null))];}
+  // طبقات تُنهي أصغر بواقي قياسات التوليفة j في اللون k (0 = لا يمكن)
+  const zp=(R,k,j)=>{const a=CI[j],b=CA[j],o=k*NS;let p=1e9;for(let q=0;q<a.length;q++){const r=R[o+a[q]];if(r<b[q])return 0;const v=(r/b[q])|0;if(v<p)p=v;}
+    for(let q=0;q<a.length;q++)if(R[o+a[q]]===p*b[q])return p;return 0;};
+  const zc=(R,k,j,p)=>{const a=CI[j],b=CA[j],o=k*NS;let z=0;for(let q=0;q<a.length;q++)if(R[o+a[q]]===p*b[q])z++;return z;};
+  const app=(R,j,ps)=>{const X=R.slice(),a=CI[j],b=CA[j];for(let k=0;k<NC;k++)if(ps[k]){const o=k*NS;for(let q=0;q<a.length;q++)X[o+a[q]]-=ps[k]*b[q];}return X;};
+  const score=(R,lam)=>{let nz=0,dv=0;for(let k=0;k<NC;k++){const st=new Set(),o=k*NS;for(let i=0;i<NS;i++){const v=R[o+i];if(v){nz++;st.add(v);}}dv+=st.size;}return nz+lam*dv;};
+  const free=(R,used,h)=>{let X=R;for(let g=0;g<5000;g++){let bj=-1,bk=0,bp=0,bz=0;
+      for(const j of used)for(let k=0;k<NC;k++){const p=zp(X,k,j);if(p){const z=zc(X,k,j,p);if(z>bz){bz=z;bj=j;bk=k;bp=p;}}}
+      if(bj<0)break;const ps=new Int32Array(NC);ps[bk]=bp;X=app(X,bj,ps);h.push([bj,ps]);}return X;};
+  // تغيّر المقياس في لون واحد (أهداف منتهية، وقيم بواقٍ تختفي/تظهر) — محلي بلا نسخ للحالة
+  const VS=new Int32Array(32),DS=new Int32Array(32);
+  const delta=(R,m,k,j,p,lam)=>{const a=CI[j],b=CA[j],o=k*NS;let n=0,z=0;
+    for(let q=0;q<a.length;q++){const r=R[o+a[q]],nv=r-p*b[q];let t=0;for(;t<n;t++)if(VS[t]===r)break;if(t===n){VS[n]=r;DS[n]=0;n++;}DS[t]--;
+      if(nv){let u=0;for(;u<n;u++)if(VS[u]===nv)break;if(u===n){VS[n]=nv;DS[n]=0;n++;}DS[u]++;}else z++;}
+    let dd=0;for(let t=0;t<n;t++){if(!DS[t])continue;const c0=m.get(VS[t])||0,c1=c0+DS[t];if(c0>0&&c1===0)dd--;else if(c0===0&&c1>0)dd++;}
+    return -z+lam*dd;};
+  // مجموعات الألوان المشاركة لكل قناع ممكن (حتى ٤ ألوان: كل المجموعات الجزئية؛ أكثر: الكل، ناقص لون، لون واحد)
+  const MK=[];for(let fm=0;fm<(1<<Math.min(NC,12));fm++){if(NC<=4){const o=[];for(let m=fm;m>0;m=(m-1)&fm)o.push(m);MK.push(o);}
+    else{const o=new Set(fm?[fm]:[]);for(let k=0;k<NC;k++)if(fm>>k&1){o.add(1<<k);if(fm!==1<<k)o.add(fm&~(1<<k));}MK.push([...o]);}}
+  const masks=fm=>MK[fm]||[fm];
+  const fabOf=h=>h.reduce((a,[j,ps])=>{let t=0;for(let k=0;k<NC;k++)t+=ps[k];return a+CL[j]*t;},0),plOf=h=>h.reduce((a,[j,ps])=>{for(let k=0;k<NC;k++)a+=ps[k];return a;},0);
+  const run=(lam,W,T,pb,deadline)=>{PB=pb||0;const h0=[],S0=free(R0,seedIdx,h0);let beam=[{R:S0,h:h0,used:seedIdx.slice(),s:score(S0,lam)}];
+    for(let L=0;L<1000&&beam.length;L++){const done=beam.filter(x=>x.R.every(v=>!v));if(done.length)return done.sort((a,b)=>fabOf(a.h)-fabOf(b.h)||plOf(a.h)-plOf(b.h))[0];
+      if(Date.now()>deadline)return null;const cand=new Map();
+      for(const st of beam){const R=st.R,us=new Set(st.used),cm=[];
+        for(let k=0;k<NC;k++){const m=new Map(),o=k*NS;for(let i=0;i<NS;i++){const v=R[o+i];if(v)m.set(v,(m.get(v)||0)+1);}cm.push(m);}
+        const top=[];let worst=Infinity;const pc=new Int32Array(NC),dl=new Float64Array(NC);
+        for(let j=0;j<NJ;j++){if(us.has(j))continue;let fm=0;
+          for(let k=0;k<NC;k++){const p=zp(R,k,j);pc[k]=p;if(p){fm|=1<<k;dl[k]=delta(R,cm[k],k,j,p,lam);}}
+          if(!fm)continue;
+          for(const m of masks(fm)){let sc=-PB*CP[j];for(let k=0;k<NC;k++)if(m>>k&1)sc+=dl[k];
+            if(top.length<T||sc<worst){const ps=new Int32Array(NC);for(let k=0;k<NC;k++)if(m>>k&1)ps[k]=pc[k];
+              let lo=0,hi=top.length;while(lo<hi){const md=(lo+hi)>>1;if(top[md].sc<=sc)lo=md+1;else hi=md;}top.splice(lo,0,{sc,j,ps});
+              if(top.length>T)top.pop();if(top.length===T)worst=top[T-1].sc;}}}
+        for(const x of top){const h=st.h.concat([[x.j,x.ps]]),used=st.used.concat([x.j]),X=free(app(R,x.j,x.ps),used,h),key=X.join(','),s=score(X,lam),o=cand.get(key);
+          if(!o||o.s>s)cand.set(key,{R:X,h,used,s});}}
+      beam=[...cand.values()].sort((a,b)=>a.s-b.s).slice(0,W);}
+    return null;};
+  const t0=Date.now(),B=opt.budget||6000,tries=opt.tries||[[0.25,10,20,0],[0.2,10,20,0.05],[0.2,10,20,0],[0.5,10,20,0],[0.1,10,20,0],[0.35,12,20,0.05]];let best=null;
+  for(let i=0;i<tries.length;i++){if(i&&Date.now()-t0>B*0.6)break;const [lam,W,T,pb]=tries[i];const r=run(lam,W,T,pb,t0+(i?B:B*3));if(!r)continue;
+    const nNew=r.used.length-seedIdx.length,fab=fabOf(r.h),pl=plOf(r.h);if(!best||nNew<best.nNew||(nNew===best.nNew&&(fab<best.fab-1e-9||(Math.abs(fab-best.fab)<=1e-9&&pl<best.pl))))best={nNew,fab,pl,h:r.h};}
+  if(!best)return null;
+  const agg=new Map();best.h.forEach(([j,ps])=>{const e=agg.get(j)||new Int32Array(NC);for(let k=0;k<NC;k++)e[k]+=ps[k];agg.set(j,e);});
+  const out=[];agg.forEach((e,j)=>{const sp={};names.forEach((c,k)=>{if(e[k]>0)sp[c]=e[k];});if(Object.keys(sp).length)out.push({combo:[...CI[j]].map((i,q)=>({size:sz[i],cnt:CA[j][q]})),sp,len:CL[j]});});
+  return out;}
 // إعادة توزيع طبقات ماركرات قائمة على الألوان (دالة نقية — تُختبر): mk=[{vp,sp,fixed}] — تُعدَّل sp لغير الثابتة فقط
 // تحسين تدريجي (±طبقة لون، أو نقل طبقة بين لونين) يقلّل النقص ويمنع الزيادة (الزيادة مكلفة جداً) — ثم يكمل الحلّال ما نقص
 function rsColorAlloc(mk,need,names){const r={};names.forEach(c=>{r[c]={};Object.keys(need[c]||{}).forEach(s=>r[c][s]=-(+need[c][s]||0));});

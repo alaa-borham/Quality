@@ -35,12 +35,12 @@ function grabConst(name) {
 
 const code = [
   grabConst('RS_LIB_TOL'), grabConst('XL_CRC'), grabConst('rsP2'), grabConst('SIZE_ORDER'), grabConst('CV_HI'),
-  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus', 'rsColorPlan', 'rsColorAlloc'].map(grabFn),
+  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus', 'rsColorPlan', 'rsColorBeam', 'rsColorAlloc'].map(grabFn),
 ].join('\n');
 // rsSolve يقرأ الهدف/الفائض من الواجهة عند غياب الخيارات — نعيد قيمة فارغة فيُستعمل الافتراضي («أقل ماركرات»، فائض 0)
-const ctx = { $: () => ({ value: '' }), Date, Math, Object, Set, Array, String, Number, Uint32Array, TextEncoder, console };
+const ctx = { $: () => ({ value: '' }), Date, Math, Object, Set, Map, Array, String, Number, Uint32Array, Int32Array, Float64Array, TextEncoder, console };
 vm.createContext(ctx);
-vm.runInContext(code + '\n;globalThis.__x={rsCombos,rsSolve,rsPlanSolve,rsComboSig,rsLibComp,rsLibOk,rsBakSlot,rsBakSlotId,xlCrc,consCheck,rsTrimSurplus,rsColorPlan,rsColorAlloc};', ctx);
+vm.runInContext(code + '\n;globalThis.__x={rsCombos,rsSolve,rsPlanSolve,rsComboSig,rsLibComp,rsLibOk,rsBakSlot,rsBakSlotId,xlCrc,consCheck,rsTrimSurplus,rsColorPlan,rsColorBeam,rsColorAlloc};', ctx);
 const X = ctx.__x;
 
 let pass = 0, fail = 0;
@@ -156,6 +156,34 @@ chk('xlCrc("123456789") = CBF43926', X.xlCrc(new TextEncoder().encode('123456789
   Object.keys(Qr).forEach(c => { const made = {}; p2.forEach(m => m.combo.forEach(p => made[p.size] = (made[p.size] || 0) + p.cnt * (m.sp[c] || 0)));
     SZ.forEach(s => { const d = (made[s] || 0) - Qr[c][s]; if (d < 0) short -= d; else maxOver = Math.max(maxOver, d); }); });
   chk('colors: surplus 2 → no shortage, ≤2 over per size/color, fewer or equal markers', short === 0 && maxOver <= 2 && p2.length <= pr.length, { n2: p2.length, n0: pr.length, maxOver, short }); }
+
+// ── البحث الشعاعي المشترك للألوان: دقيق ١٠٠٪، يحترم القيود، وأقل ماركرات بوضوح من الحلّال التتابعي ──
+{ const mkInst = (n, seed) => { let x = seed; const rnd = () => (x = (x * 16807) % 2147483647) / 2147483647;
+    const SZ = Array.from({ length: n }, (_, i) => 'Z' + String(i).padStart(2, '0')), cons = {}; SZ.forEach((s, i) => cons[s] = +(2.1 + i * (1.0 / n)).toFixed(3));
+    const Q = { G: {}, B: {}, E: {} }; SZ.forEach(s => { const b = 10 + Math.floor(rnd() * 120); Q.G[s] = Math.round(b * (0.8 + rnd() * 0.4)); Q.B[s] = rnd() < 0.15 ? 0 : Math.round(b * (0.6 + rnd() * 0.5)); Q.E[s] = Math.round(b * (0.8 + rnd() * 0.4)); });
+    return { SZ, cons, Q }; };
+  const bad = (Q, plan) => { let b = 0; Object.keys(Q).forEach(c => { const md = {}; plan.forEach(m => m.combo.forEach(p => md[p.size] = (md[p.size] || 0) + p.cnt * (m.sp[c] || 0)));
+    Object.keys(Q[c]).forEach(s => { if ((md[s] || 0) !== (Q[c][s] || 0)) b++; }); Object.keys(md).forEach(s => { if (!(s in Q[c]) && md[s]) b++; }); }); return b; };
+  const { cons, Q } = mkInst(20, 3);
+  const seq = X.rsColorPlan(Q, cons, 9, 6, 5, { sur: 0, noBeam: true }), bm = X.rsColorBeam(Q, cons, 9, 6, 5, {});
+  chk('beam: every color × size exact (no surplus, no shortage)', bm && bad(Q, bm) === 0, bm && bad(Q, bm));
+  chk('beam: limits respected (length ≤ 9, ≤ 6 sizes, ≤ 5 pieces)', bm.every(m => m.combo.reduce((a, p) => a + p.cnt * cons[p.size], 0) <= 9 + 1e-9 && m.combo.length <= 6 && m.combo.reduce((a, p) => a + p.cnt, 0) <= 5));
+  chk('beam: clearly fewer markers than the sequential planner (20 sizes: ≤ 22 vs 26)', bm.length <= 22 && bm.length < seq.length, { beam: bm.length, seq: seq.length });
+  const pl = X.rsColorPlan(Q, cons, 9, 6, 5, { sur: 0 });
+  chk('colors plan: picks the beam when it has fewer markers, still exact', pl.length <= bm.length && bad(Q, pl) === 0, { plan: pl.length, beam: bm.length });
+  // توليفات الخطة الحالية (seed) تُستعمل مجاناً — والنتيجة دقيقة
+  const seedC = bm.slice(0, 6).map(m => m.combo), bs = X.rsColorBeam(Q, cons, 9, 6, 5, { seed: seedC });
+  chk('beam: seed combos reused for free, still exact', bad(Q, bs) === 0 && seedC.some(c => bs.some(m => X.rsComboSig(m.combo) === X.rsComboSig(c))), bs.length);
+  // الطول المقيس: توليفة محسوبها فوق الحد ومقيسها ضمنه تُقبل، والعكس يُستبعد
+  const c2 = { A: 4.6, B: 4.6, C: 3.0 }, q2 = { G: { A: 10, B: 10, C: 6 }, B: { A: 4, B: 4, C: 2 } };
+  const mA = X.rsColorBeam(q2, c2, 9, 6, 5, { meas: [{ pairs: [{ size: 'A', cnt: 1 }, { size: 'B', cnt: 1 }], len: 8.8 }] });
+  chk('beam: measured length within the limit allows the combo', bad(q2, mA) === 0 && mA.some(m => X.rsComboSig(m.combo) === X.rsComboSig([{ size: 'A', cnt: 1 }, { size: 'B', cnt: 1 }])), mA);
+  const mB = X.rsColorBeam(q2, { A: 2.9, B: 2.9, C: 3.0 }, 9, 6, 5, { meas: [{ pairs: [{ size: 'A', cnt: 1 }, { size: 'B', cnt: 1 }, { size: 'C', cnt: 1 }], len: 9.6 }] });
+  chk('beam: measured length over the limit excludes the combo', bad(q2, mB) === 0 && !mB.some(m => m.combo.length === 3), mB);
+  // لون واحد، ولون كمياته صفر، وحالة فارغة
+  const one = X.rsColorBeam({ G: Q.G }, cons, 9, 6, 5, {});
+  chk('beam: single color exact', bad({ G: Q.G }, one) === 0);
+  chk('beam: no quantities → empty plan', X.rsColorBeam({ G: { A: 0 } }, { A: 2 }, 9, 6, 5, {}).length === 0); }
 
 // ── إعادة توزيع طبقات خطة قائمة على الألوان: بلا زيادة أبداً، ونقص أقل ──
 { const need = { A: { X: 30, Y: 30 }, B: { X: 10, Y: 20 } };
