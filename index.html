@@ -2595,8 +2595,27 @@ function rsColorPlan(Qs,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
   if(bm&&bm.length){const pl=a=>a.reduce((t,x)=>t+Object.values(x.sp).reduce((u,v)=>u+v,0),0),fabA=a=>a.reduce((t,x)=>t+x.len*Object.values(x.sp).reduce((u,v)=>u+v,0),0);
     const mode=opt.mode||($('rs-objective')&&$('rs-objective').value)||'markers',nNew=bm.filter(x=>!seedS.has(rsComboSig(x.combo))).length,fab=fabA(bm);
     const key=(n,p)=>mode==='plies'?[p,n]:[n,0],k1=key(nNew,pl(bm)),k0=key(best.nNew,pl(best.arr));
-    if(k1[0]<k0[0]||(k1[0]===k0[0]&&(k1[1]<k0[1]||(k1[1]===k0[1]&&fab<best.fab-1e-9))))return bm;}
-  return best.arr;}
+    if(k1[0]<k0[0]||(k1[0]===k0[0]&&(k1[1]<k0[1]||(k1[1]===k0[1]&&fab<best.fab-1e-9))))return rsConsolidate(bm,cons,maxlen,maxsizes,maxpcs,opt.meas);}
+  return rsConsolidate(best.arr,cons,maxlen,maxsizes,maxpcs,opt.meas);}
+// دمج الماركرات القصيرة في الأطول (دالة نقية — تُختبر): ماركر S طبقاته في كل لون ≤ طبقات ماركر T، ومجموعهما ضمن الحدود →
+// ماركر جديد T+S بطبقات S، ويُنقَص من T طبقات S. الإنتاج لكل لون ومقاس لا يتغير أبداً؛ العدد لا يزيد (ويقلّ إن انتهت طبقات T
+// أو وُجدت التوليفة المدموجة أصلاً)، والطبقات تقلّ، والقطع تنتقل لماركرات أطول (تداخل أفضل). نكرر حتى لا يبقى دمج
+function rsConsolidate(plan,cons,maxlen,maxsizes,maxpcs,meas){
+  const MM=new Map((meas||[]).map(x=>[rsComboSig(x.pairs),x.len]));
+  const lenOf=c=>{const m=MM.get(rsComboSig(c));return m>0?m:c.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);};
+  let P=plan.map(x=>({combo:x.combo.map(p=>({size:p.size,cnt:p.cnt})),sp:{...x.sp},len:x.len}));
+  const tot=x=>Object.values(x.sp).reduce((a,v)=>a+(v>0?v:0),0);
+  for(let g=0;g<500;g++){let best=null;
+    P.forEach((S,i)=>P.forEach((T,j)=>{if(i===j)return;const ks=Object.keys(S.sp).filter(k=>S.sp[k]>0);if(!ks.length||!ks.every(k=>(T.sp[k]||0)>=S.sp[k]))return;
+      const mp=new Map();T.combo.concat(S.combo).forEach(p=>mp.set(p.size,(mp.get(p.size)||0)+p.cnt));const U=[...mp].map(([size,cnt])=>({size,cnt}));
+      if(U.length>maxsizes||U.reduce((a,p)=>a+p.cnt,0)>maxpcs)return;const L=lenOf(U);if(maxlen>0&&L>maxlen+1e-9)return;
+      const gain=tot(S)*1000+(ks.every(k=>T.sp[k]===S.sp[k])&&Object.keys(T.sp).every(k=>!(T.sp[k]>0)||S.sp[k]===T.sp[k])?1e7:0)+L;
+      if(!best||gain>best.gain)best={i,j,U,L,gain};}));
+    if(!best)break;const S=P[best.i],T=P[best.j];Object.keys(S.sp).forEach(k=>{if(S.sp[k]>0)T.sp[k]-=S.sp[k];});
+    const sg=rsComboSig(best.U),ex=P.find((x,k)=>k!==best.i&&rsComboSig(x.combo)===sg);
+    if(ex)Object.keys(S.sp).forEach(k=>{if(S.sp[k]>0)ex.sp[k]=(ex.sp[k]||0)+S.sp[k];});else P.push({combo:best.U,sp:{...S.sp},len:best.L});
+    P=P.filter((x,k)=>k!==best.i&&tot(x)>0);P.forEach(x=>Object.keys(x.sp).forEach(k=>{if(!(x.sp[k]>0))delete x.sp[k];}));}
+  return P;}
 // خطة ألوان بالبحث الشعاعي المشترك (دالة نقية — تُختبر في tests/solver.test.mjs) — دقيقة ١٠٠٪ لكل لون ومقاس بلا زيادة:
 // كل خطوة تضيف ماركراً جديداً، ولكل لون مشارك فيه عدد طبقات يُنهي أصغر بواقي قياساته (وقد لا يشارك لون الآن ليستعمله لاحقاً)؛
 // ثم «إعادة استعمال مجانية»: أي ماركر موجود يأخذ طبقات لون إن كانت تُنهي قياساً له — بلا ماركر جديد.
@@ -2880,7 +2899,7 @@ function rsAutoPlan(){if(!$('rs-markers'))return;
   {const keptOver=Object.keys(produced).reduce((a,s)=>a+Math.max(0,produced[s]-(reqMap[s]||0)),0),bud=Math.max(0,SURT-keptOver),q={};
     Object.keys(rem).forEach(s=>{if(rem[s]>0&&cons[s]>0&&!(maxlen>0&&cons[s]>maxlen+1e-9))q[s]=rem[s];});
     const bm=Object.keys(q).length?rsColorBeam({_:q},cons,maxlen,maxsizes,maxpcs,{meas:_meas,surTot:bud,budget:bud>0?4500:3000}):null;
-    if(bm&&bm.length){const b2=bm.map(x=>({combo:x.combo,plies:x.sp._||0,len:x.len})).filter(a=>a.plies>0),pl=a=>a.reduce((t,x)=>t+x.plies,0);
+    if(bm&&bm.length){const b2=rsConsolidate(bm,cons,maxlen,maxsizes,maxpcs,_meas).map(x=>({combo:x.combo,plies:x.sp._||0,len:x.len})).filter(a=>a.plies>0),pl=a=>a.reduce((t,x)=>t+x.plies,0);
       const mode=($('rs-objective')&&$('rs-objective').value)||'markers';
       if(!added.length||(mode==='plies'?pl(b2)<pl(added):b2.length<added.length)){added=b2;libN=0;}}}
   if(noCons.length||tooLong.length){rsFlagSizes(noCons.concat(tooLong));

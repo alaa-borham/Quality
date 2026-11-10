@@ -35,12 +35,12 @@ function grabConst(name) {
 
 const code = [
   grabConst('RS_LIB_TOL'), grabConst('XL_CRC'), grabConst('rsP2'), grabConst('SIZE_ORDER'), grabConst('CV_HI'),
-  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus', 'rsColorPlan', 'rsColorBeam', 'rsColorAlloc'].map(grabFn),
+  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus', 'rsColorPlan', 'rsColorBeam', 'rsConsolidate', 'rsColorAlloc'].map(grabFn),
 ].join('\n');
 // rsSolve يقرأ الهدف/الفائض من الواجهة عند غياب الخيارات — نعيد قيمة فارغة فيُستعمل الافتراضي («أقل ماركرات»، فائض 0)
 const ctx = { $: () => ({ value: '' }), Date, Math, Object, Set, Map, Array, String, Number, Uint32Array, Int32Array, Float64Array, TextEncoder, console };
 vm.createContext(ctx);
-vm.runInContext(code + '\n;globalThis.__x={rsCombos,rsSolve,rsPlanSolve,rsComboSig,rsLibComp,rsLibOk,rsBakSlot,rsBakSlotId,xlCrc,consCheck,rsTrimSurplus,rsColorPlan,rsColorBeam,rsColorAlloc};', ctx);
+vm.runInContext(code + '\n;globalThis.__x={rsCombos,rsSolve,rsPlanSolve,rsComboSig,rsLibComp,rsLibOk,rsBakSlot,rsBakSlotId,xlCrc,consCheck,rsTrimSurplus,rsColorPlan,rsColorBeam,rsConsolidate,rsColorAlloc};', ctx);
 const X = ctx.__x;
 
 let pass = 0, fail = 0;
@@ -193,6 +193,16 @@ chk('xlCrc("123456789") = CBF43926', X.xlCrc(new TextEncoder().encode('123456789
   chk('order surplus 20 (no colors): no shortage, total surplus ≤ 20, fewer markers', e1.short === 0 && e1.over <= 20 && s1.length < one.length, { n: s1.length, exact: one.length, ...e1 });
   const s0 = X.rsColorBeam(Q, cons, 9, 6, 5, { surTot: 0 });
   chk('order surplus 0: exact', ev(Q, s0).short === 0 && ev(Q, s0).over === 0); }
+
+// ── دمج الماركرات القصيرة في الأطول: نفس الإنتاج لكل لون ومقاس، عدد لا يزيد، وطبقات أقل ──
+{ const cons = { A: 2.5, B: 2.6, C: 2.7, D: 2.6 };
+  const plan = [{ combo: [{ size: 'A', cnt: 1 }, { size: 'B', cnt: 1 }], sp: { G: 30, E: 20 }, len: 5.1 }, { combo: [{ size: 'C', cnt: 1 }], sp: { G: 10, E: 20 }, len: 2.7 }, { combo: [{ size: 'D', cnt: 2 }], sp: { B: 9 }, len: 5.2 }];
+  const prod = P => { const o = {}; P.forEach(m => Object.keys(m.sp).forEach(c => m.combo.forEach(p => { const k = c + '|' + p.size; o[k] = (o[k] || 0) + p.cnt * m.sp[c]; }))); return JSON.stringify(Object.keys(o).sort().map(k => [k, o[k]])); };
+  const r = X.rsConsolidate(plan, cons, 9, 6, 5, []), pl = P => P.reduce((a, m) => a + Object.values(m.sp).reduce((u, v) => u + v, 0), 0);
+  chk('consolidate: same production per color and size', prod(r) === prod(plan), r);
+  chk('consolidate: short marker rides on the longer one (no more markers, fewer plies)', r.length <= plan.length && pl(r) < pl(plan) && r.some(m => m.combo.length === 3), r);
+  chk('consolidate: respects the length limit', r.every(m => m.combo.reduce((a, p) => a + p.cnt * cons[p.size], 0) <= 9 + 1e-9));
+  chk('consolidate: not dominated → untouched', X.rsConsolidate([plan[2], { combo: [{ size: 'A', cnt: 1 }], sp: { G: 5 }, len: 2.5 }], cons, 9, 6, 5, []).length === 2); }
 
 // ── إعادة توزيع طبقات خطة قائمة على الألوان: بلا زيادة أبداً، ونقص أقل ──
 { const need = { A: { X: 30, Y: 30 }, B: { X: 10, Y: 20 } };
