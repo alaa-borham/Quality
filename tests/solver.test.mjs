@@ -34,13 +34,13 @@ function grabConst(name) {
 }
 
 const code = [
-  grabConst('RS_LIB_TOL'), grabConst('XL_CRC'), grabConst('rsP2'), grabConst('SIZE_ORDER'), grabConst('CV_HI'),
-  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus', 'rsColorPlan', 'rsColorBeam', 'rsConsolidate', 'rsColorAlloc'].map(grabFn),
+  grabConst('RS_LIB_TOL'), grabConst('XL_CRC'), grabConst('rsP2'), grabConst('SIZE_ORDER'), grabConst('CV_HI'), grabConst('RL_SZ'),
+  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus', 'rsColorPlan', 'rsColorBeam', 'rsConsolidate', 'rsColorAlloc', 'rsRollPack', 'rsRollGroups', 'normNum', 'rlNum', 'rlInterpret', 'rlMergeRow'].map(grabFn),
 ].join('\n');
 // rsSolve يقرأ الهدف/الفائض من الواجهة عند غياب الخيارات — نعيد قيمة فارغة فيُستعمل الافتراضي («أقل ماركرات»، فائض 0)
 const ctx = { $: () => ({ value: '' }), Date, Math, Object, Set, Map, Array, String, Number, Uint32Array, Int32Array, Float64Array, TextEncoder, console };
 vm.createContext(ctx);
-vm.runInContext(code + '\n;globalThis.__x={rsCombos,rsSolve,rsPlanSolve,rsComboSig,rsLibComp,rsLibOk,rsBakSlot,rsBakSlotId,xlCrc,consCheck,rsTrimSurplus,rsColorPlan,rsColorBeam,rsConsolidate,rsColorAlloc};', ctx);
+vm.runInContext(code + '\n;globalThis.__x={rsCombos,rsSolve,rsPlanSolve,rsComboSig,rsLibComp,rsLibOk,rsBakSlot,rsBakSlotId,xlCrc,consCheck,rsTrimSurplus,rsColorPlan,rsColorBeam,rsConsolidate,rsColorAlloc,rsRollPack,rsRollGroups,rlInterpret,rlMergeRow};', ctx);
 const X = ctx.__x;
 
 let pass = 0, fail = 0;
@@ -203,6 +203,37 @@ chk('xlCrc("123456789") = CBF43926', X.xlCrc(new TextEncoder().encode('123456789
   chk('consolidate: short marker rides on the longer one (no more markers, fewer plies)', r.length <= plan.length && pl(r) < pl(plan) && r.some(m => m.combo.length === 3), r);
   chk('consolidate: respects the length limit', r.every(m => m.combo.reduce((a, p) => a + p.cnt * cons[p.size], 0) <= 9 + 1e-9));
   chk('consolidate: not dominated → untouched', X.rsConsolidate([plan[2], { combo: [{ size: 'A', cnt: 1 }], sp: { G: 5 }, len: 2.5 }], cons, 9, 6, 5, []).length === 2); }
+
+// ── خطة الرولات: توزيع الطبقات على الرولات، ولكل لون وحده ──
+{ const p = X.rsRollPack([{ code: 'A', len: 9, n: 11 }, { code: 'B', len: 5, n: 3 }], 100, 'nosplice');
+  chk('rolls: no-splice — every ply whole inside one roll, all plies placed', p.rolls.every(r => r.used <= 100 + 1e-9) && p.rolls.reduce((a, r) => a + r.plies, 0) === 14 && p.nRolls === 2, p);
+  const c = X.rsRollPack([{ code: 'A', len: 9, n: 23 }], 100, 'continuous');
+  chk('rolls: continuous — minimum rolls, splices counted', c.nRolls === 3 && c.splices >= 1 && Math.abs(c.totalFab - 207) < 1e-9, c);
+  const g = X.rsRollGroups([{ name: 'G', items: [{ code: 'A', len: 9, n: 11 }] }, { name: 'B', items: [{ code: 'A', len: 9, n: 5 }] }], 100, 'nosplice');
+  chk('rolls: each color rolled separately, totals summed', g.groups.length === 2 && g.groups[0].nRolls === 1 && g.groups[1].nRolls === 1 && g.nRolls === 2 && Math.abs(g.totalFab - 144) < 1e-9, g); }
+
+// ── قراءة ملف الماركرات (Excel/PDF): القياسات والطبقات لكل لون والطول ──
+{ const row = (arr, step = 10) => arr.map((t, i) => t === '' ? null : { t: String(t), x: i * step, w: 0 }).filter(Boolean);
+  const xl = [row(['خطة الفرد والقص المقترحة']), row(['سماحية الفرد (متر)']), row([0.02]),
+    row(['م', 'الكود', 'البيان', '', '', 'إجمالي القطع في الماركر', 'عدد الطبقات', '🎨 GREY', '🎨 BLUE', 'إجمالي القطع في التشغيل', 'قياس الفرد (متر)', 'استهلاك مع الفرد (متر)']),
+    row([1, 'M01', 'L-59×1', 'XL-62×1', '2XL-62×1', 3, 10, 6, 4, 30, 8.9, 89]), row([2, 'M02 ⚠', 'M-58×2', 'M-60×1', '', 3, 7, '', 7, 21, 7.8, 54.6]), row(['الإجمالي', '', '', '', '', '', 17, 6, 11, 51, '', 143.6])];
+  const r = X.rlInterpret(xl);
+  chk('file (Excel): markers, sizes, plies per color, spread length', r.mk.length === 2 && r.mk[0].code === 'M01' && r.mk[0].plies === 10 && r.mk[0].len === 8.9 && r.mk[0].cp.GREY === 6 && r.mk[0].cp.BLUE === 4
+    && r.mk[1].code === 'M02' && r.mk[1].sizes[0][0] === 'M-58' && r.mk[1].sizes[0][1] === 2 && r.mk[1].cp.GREY === 0 && r.mk[1].cp.BLUE === 7 && r.incl === true && r.unit === 'm' && JSON.stringify(r.colors) === '["GREY","BLUE"]', r);
+  // PDF من اليمين لليسار: عناوين عربية غير مقروءة — الأعمدة من مواضع 🎨 والأرقام (الطبقات = مجموع الألوان، الطول × الطبقات = الاستهلاك)
+  const P = (items) => items.map(([t, x, w]) => ({ t, x, w: w || 8 }));
+  const pdf = [P([['🎨 BLUE', 176, 24], ['🎨 GREY', 216, 24], ['ﺕﺎﻘﺒﻄﻟا', 260, 30]]),
+    P([['89.00', 40, 20], ['8.90', 90, 16], ['30', 140, 8], ['4', 186, 4], ['6', 226, 4], ['10', 262, 8], ['3', 300, 4], ['2XL-62×1', 360, 30], ['XL-62×1', 420, 28], ['L-59×1', 480, 26], ['M01', 530, 16], ['1', 568, 4]]),
+    P([['1,054.80', 36, 30], ['8.79', 90, 16], ['360', 138, 12], ['51', 182, 10], ['69', 222, 10], ['120', 260, 12], ['3', 300, 4], ['M-60×1', 420, 26], ['M-58×2', 480, 26], ['M02', 530, 16], ['2', 568, 4]])];
+  const q = X.rlInterpret(pdf);
+  chk('file (PDF, right-to-left, unreadable headers): plies = colors total, length from length × plies', q.mk.length === 2 && q.mk[0].plies === 10 && q.mk[0].len === 8.9 && q.mk[0].cp.GREY === 6 && q.mk[0].cp.BLUE === 4
+    && q.mk[1].plies === 120 && q.mk[1].len === 8.79 && JSON.stringify(q.colors) === '["GREY","BLUE"]', q);
+  // أجزاء النص في PDF: حروف متلاصقة تُلصق، ورموز خاصة بدل - و×، و«×n» بالقياس قبله
+  const m = X.rlMergeRow([{ t: '2', x: 10, w: 6 }, { t: 'XL', x: 16, w: 12 }, { t: '', x: 28, w: 4 }, { t: '60', x: 32, w: 12 }, { t: '', x: 44, w: 6 }, { t: '1', x: 50, w: 4 }, { t: 'L-58', x: 60, w: 15 }, { t: '×1', x: 75.5, w: 9 }]);
+  chk('file (PDF): split glyphs and private symbols rebuilt into sizes', m.map(c => c.t).join('|') === '2XL-60×1|L-58×1', m.map(c => c.t));
+  // بلا ألوان: الطبقات والطول من العلاقة بين الأرقام
+  const n = X.rlInterpret([row(['M01', 'S-53×1', 'M-56×2', 3, 40, 120, 7.5, 300])]);
+  chk('file without colors: plies and length inferred', n.mk.length === 1 && n.mk[0].plies === 40 && n.mk[0].len === 7.5 && !n.colors.length, n); }
 
 // ── إعادة توزيع طبقات خطة قائمة على الألوان: بلا زيادة أبداً، ونقص أقل ──
 { const need = { A: { X: 30, Y: 30 }, B: { X: 10, Y: 20 } };

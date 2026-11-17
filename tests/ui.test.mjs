@@ -176,6 +176,33 @@ const sur = await page.evaluate(() => {
 chk('order surplus: plan runs without errors', sur.log.length === 0, sur.log);
 chk('order surplus: no shortage, total extra ≤ 30, accepted by the colour check', sur.n > 0 && sur.short === 0 && sur.over <= 30 && sur.mm === 0 && sur.issues === 0, sur);
 
+// ٢ب٣) خطة الرولات: في الريشو لكل لون وحده مع مسافة الفرد، وصفحة «خطة الرولات من ملف» (رفع ملف → رولات كل لون)
+const rl = await page.evaluate(async () => {
+  const log = []; const step = async (n, f) => { try { await f(); } catch (e) { log.push(n + ': ' + (e && e.message)); } };
+  const res = {};
+  await step('marker page per-color rolls', () => { document.querySelectorAll('.rs-mrow1,.rs-mrow2').forEach(tr => tr.remove()); $('rs-colors').innerHTML = ''; $('rs-qty-rows').innerHTML = '';
+    [['M-56', 41, 33, 2.44], ['L-58', 55, 43, 2.72], ['XL-60', 26, 25, 2.87]].forEach(([s, a, b, c]) => rsAddQtyRow({ size: s, qty: a + b, cons: c })); rsCalc();
+    $('rs-maxlen').value = '9'; $('rs-maxpcs').value = '5'; $('rs-surplus').value = '0'; $('rs-spread').value = '2';
+    rsAddColorRow({ name: 'W' }); rsAddColorRow({ name: 'C' });
+    const Q = { 'M-56': [41, 33], 'L-58': [55, 43], 'XL-60': [26, 25] };
+    document.querySelectorAll('.rsq-row').forEach(tr => { const sz = tr.querySelector('.rsq-size').value.trim(); const [w, c] = tr.querySelectorAll('.rsq-cin'); w.value = Q[sz][0]; rsQtyCInput(w); c.value = Q[sz][1]; rsQtyCInput(c); });
+    rsAutoPlan(); $('rs-rolllen').value = '50'; rsRollPlan();
+    const d = rsRollCompute(), plies = rsReadMarkers().reduce((a, m) => a + (+m.plies || 0), 0);
+    res.mGroups = d.groups.map(g => g.name).join(','); res.mPlies = d.groups.reduce((a, g) => a + g.rolls.reduce((x, r) => x + r.plies, 0), 0); res.plies = plies;
+    res.spreadIn = d.mk.every(m => m.len > 0) && Math.abs(d.spread - 0.02) < 1e-9; res.shown = $('rs-rolls').textContent.includes('W') && $('rs-rolls').textContent.includes('C'); });
+  await step('cleanup marker', () => { $('rs-spread').value = '0'; rsResetPlan(false); $('rs-colors').innerHTML = ''; rsColorMatrixRender(); });
+  await step('file page', async () => { goMarker('rl');
+    const csv = 'م,الكود,البيان,,إجمالي القطع في الماركر,عدد الطبقات,🎨 GREY,🎨 BLUE,قياس الفرد (متر)\n1,M01,L-59×1,XL-62×1,2,30,18,12,5.9\n2,M02,M-58×2,,2,14,,14,5.2\n3,M03,S-53×1,M-60×1,2,9,4,5,4.9';
+    await rlFile(new File([csv], 'markers.csv', { type: 'text/csv' })); $('rl-roll').value = '60'; rlCalc();
+    const d = rlData(); res.fN = RL.mk.length; res.fColors = RL.colors.join(','); res.fGroups = d.groups.map(g => g.name + ':' + g.rolls.reduce((a, r) => a + r.plies, 0)).join(',');
+    res.fShown = !$('rl-body').classList.contains('hide') && $('rl-res').textContent.includes('GREY');
+    window.print = () => {}; rlPrint(); $('print-area').innerHTML = ''; goMarker('rs'); });
+  return { log, ...res };
+});
+chk('rolls: no errors (marker page + file page)', rl.log.length === 0, rl.log);
+chk('rolls (marker page): one roll plan per color, all plies placed, spread allowance included', rl.mGroups === 'W,C' && rl.mPlies === rl.plies && rl.spreadIn && rl.shown, rl);
+chk('rolls from file: markers and colors read, rolls per color (GREY 22 plies, BLUE 31)', rl.fN === 3 && rl.fColors === 'GREY,BLUE' && rl.fGroups === 'GREY:22,BLUE:31' && rl.fShown, rl);
+
 // ٢ج) رسالة «جارٍ الحساب…»: تظهر قبل الحساب (تُرسم أولاً) وأثناءه، وتختفي بعده — والضغط المكرر أثناء الحساب يُتجاهل
 const busy = await page.evaluate(async () => {
   const el = () => $('rs-busy'), vis = () => !!el() && getComputedStyle(el()).display !== 'none';

@@ -389,6 +389,28 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
       <button type="button" id="rs-fab-save" onclick="saveRsPlan()" title="حفظ الخطة" style="display:none;position:fixed;bottom:18px;left:18px;z-index:9000;background:var(--teal);color:#fff;border:none;border-radius:999px;padding:12px 20px;font-weight:800;font-size:15px;box-shadow:0 6px 20px rgba(0,0,0,.28);cursor:pointer"><span data-i18n="saveCheck">💾 حفظ</span></button>
       <div class="sec-h" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><span>📊 <span data-i18n="rsTitle">الريشو — خطة الماركرات</span></span><span style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span id="rs-autosave" style="font-size:12px;color:var(--mut);font-weight:700;transition:opacity .4s" title="حفظ تلقائي كل دقيقة وعند كل تغيير"></span><button class="btn sec" style="padding:6px 14px;font-size:14px;flex:0 0 auto;width:auto" onclick="rsOpenSaved()" data-i18n="rsSavedPlans">📂 الخطط المحفوظة</button><button id="rs-newplan-btn" class="btn g" style="padding:6px 14px;font-size:14px;flex:0 0 auto;width:auto" onclick="rsNewPlan()" title="يحفظ الخطة الحالية في «الخطط المحفوظة» ثم يفتح صفحة فارغة لخطة جديدة بنفس المنتج والإعدادات" data-i18n-title="rsNewPlanTip">➕ <span data-i18n="rsNewPlanBtn">خطة جديدة</span></button><button class="btn sec" style="padding:6px 14px;font-size:14px;flex:0 0 auto;width:auto" onclick="rsAutoBakList()" title="نسخ احتياطية تلقائية على السحابة وعلى هذا الجهاز مرتين يومياً (٥ مساءً و١ صباحاً)">🕒 <span data-i18n="rsAutoBakBtn">النسخ الاحتياطية</span></button></span></div>
       <div id="ws-size-warn" style="display:none;margin-bottom:12px;border-radius:10px;padding:10px 14px;font-size:13.5px;font-weight:800;line-height:1.7"></div>
+      <div class="subnav" id="marker-subnav" style="margin-top:2px"><button type="button" class="on" data-mk="rs" onclick="goMarker('rs',this)" data-i18n="rsTabPlan">📊 خطة الماركرات</button><button type="button" data-mk="rl" onclick="goMarker('rl',this)" data-i18n="rlTab">📦 خطة الرولات من ملف</button></div>
+      <div id="tool-rl" class="card hide">
+        <div style="font-weight:900;font-size:16px" data-i18n="rlTitle">📦 خطة الرولات من ملف الماركرات</div>
+        <div class="note" style="margin-top:6px;line-height:1.7" data-i18n="rlHint">ارفع ملف Excel أو PDF فيه الماركرات: القياسات، وعدد الطبقات لكل لون، وطول الماركر أو قياس الفرد — مثل «خطة الفرد والقص» المصدَّرة من النظام. ثم أدخل طول الرول، فتُحسب رولات كل لون وحدها.</div>
+        <div id="rl-drop" style="margin-top:10px;border:2px dashed var(--line);border-radius:12px;padding:16px;text-align:center;background:var(--soft)">
+          <input id="rl-file" type="file" accept=".xlsx,.csv,.txt,.pdf,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" style="display:none" onchange="rlFile(this.files[0]);this.value=''">
+          <button type="button" class="btn g" style="width:auto;padding:8px 18px" onclick="$('rl-file').click()" data-i18n="rlPick">📂 اختر ملف (Excel أو PDF)</button>
+          <div style="margin-top:6px;font-size:12.5px;color:var(--mut)" data-i18n="rlDrop">أو اسحب الملف وأفلته هنا</div>
+          <div id="rl-status" style="margin-top:8px;font-weight:800"></div></div>
+        <div id="rl-body" class="hide">
+          <div class="grid4" style="margin-top:12px">
+            <div><label class="inl" data-i18n="rlUnitFile">وحدة الأطوال في الملف</label><select id="rl-funit" onchange="rlCalc()"><option value="m" data-i18n="unitMOpt">متر</option><option value="yd" data-i18n="unitYdOpt">ياردة</option></select></div>
+            <div><label class="inl" data-i18n="rlSpread">مسافة الفرد تُضاف لكل طبقة (سم)</label><input id="rl-spread" type="number" min="0" step="0.1" value="0" oninput="rlCalc()"></div>
+            <div><label class="inl" data-i18n="rlRollLen">طول الرول</label><input id="rl-roll" type="number" min="0" step="0.01" value="100" oninput="rlCalc()"></div>
+            <div><label class="inl" data-i18n="rlRollUnit">وحدة الرول والنتائج</label><select id="rl-unit" onchange="rlCalc()"><option value="m" data-i18n="unitMOpt">متر</option><option value="yd" data-i18n="unitYdOpt">ياردة</option></select></div></div>
+          <div class="grid2" style="margin-top:8px"><div><label class="inl" data-i18n="rsRollMode">طريقة الفرد</label><select id="rl-mode" onchange="rlCalc()"><option value="nosplice" data-i18n="rsRollNoSplice">بلا وصل — كل طبقة من رول واحد</option><option value="continuous" data-i18n="rsRollCont">متصل بوصل الرولات — أقل هدر</option></select></div>
+            <div id="rl-info" class="note" style="align-self:end;line-height:1.7"></div></div>
+          <details id="rl-rev" style="margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--card)"><summary id="rl-revsum" style="cursor:pointer;font-weight:800"></summary>
+            <div id="rl-table" style="overflow-x:auto;margin-top:10px"></div></details>
+          <div class="row-btns" style="margin-top:10px"><button type="button" class="btn sec" onclick="rlPrint()" data-i18n="rlPrintBtn">🖨️ طباعة / PDF</button><button type="button" class="btn sec" onclick="rlExcel()" data-i18n="rlXlsBtn">📊 Excel</button></div>
+          <div id="rl-res" style="margin-top:12px"></div></div>
+      </div>
       <div id="tool-rs" class="card">
         <div class="grid4" style="margin-top:4px"><div><label class="inl" data-i18n="mkReportName">اسم التقرير (اختياري)</label><input id="rs-title" data-i18n-ph="mkReportNamePh" placeholder="مثال: أوردر رمضان — العميل أحمد" oninput="rsSaveDraft()"></div>
           <div><label class="inl" data-i18n="productLbl">المنتج</label><select id="rs-product" onchange="rsProductChanged()"></select></div>
@@ -622,7 +644,7 @@ rsReviewTbl:'مطابقة الخطة',rsProdFromMk:'إجمالي القطع من
 rsAutoBtn:'أكمل الخطة تلقائياً (أقل استهلاك)',rsAutoDone:'الخطة مكتملة — لا كميات متبقية',rsTrimQ:'يوجد إنتاج زائد عن الأوردر ({n} قطعة). إزالة الزائد بتقليل طبقات الماركرات المسبّبة (وحذف ما يصبح بلا طبقات) ثم إكمال أي نقص تلقائياً؟',rsTrimmed:'✂️ أُزيل الإنتاج الزائد: {x}',rsTrimDel:'حُذف {n} ماركر',rsTrimRed:'خُفّضت طبقات {n} ماركر',rsAutoAdded:'أُضيف {n} ماركر تلقائياً',rsAutoAddedLib:'أُضيف {n} ماركر تلقائياً — منها {l} من مكتبتك المقيسة (مطابقة للكاد)',rsNoSug:'تعذّر توليد خطة — تأكّد من إدخال الكميات والاستهلاك، وأن حدّ طول الماركر يتّسع للقياسات',rsScNoData:'لا توجد كميات في الأوردر — أدخِل الكميات في جدول الكميات أولاً',
 rsReducePliesBtn:'قلّل الطبقات',rsReduceDone:'قُلّلت الطبقات في {n} ماركر: {a} ← {b} طبقة (القماش والكمية دون تغيير)',rsReduceNone:'لا يمكن تقليل الطبقات أكثر — الماركرات مضبوطة على حدّ الطول أو أقصى قطع',
 rsClearMkBtn:'امسح الماركرات',rsClearMkQ:'حذف كل الماركرات؟ يمكنك بعدها الضغط على «أكمل الخطة تلقائياً» لبناء خطة بلا زيادة إنتاج.',rsSortBtn:'ترتيب حسب الطول',rsSortPcBtn:'الأفضل حسب استهلاك القطعة',
-rsColTitle:'🎨 توزيع الألوان (اختياري)',rsCMQtyAuto:'محسوبة من أعمدة الألوان في جدول كميات الأوردر',rsColDone:'✅ يغطّي كمياته بالضبط',rsColShort:'ناقص {n} قطعة',rsColOver:'زائد {n} قطعة',rsColAutoDone:'✅ وُزّعت الطبقات على الألوان: أُضيف {a} ماركر · عُدّل {e} · حُذف {d}',rsCpApprox:'توزيع تقريبي بالنسبة — اضغط «أكمل الخطة تلقائياً» لتوزيع دقيق لكل لون',rsColBuilt:'✅ خطة الألوان: {n} ماركر',rsCdTitle:'خلل في مطابقة الألوان: {n} ماركر به خلل (مميّز بالأحمر في جدول المراكر)',rsCdMarkers:'الماركرات المعيبة:',rsCdShort:'نقص',rsCdOver:'زيادة',rsCdFix:'صحّح الماركرات تلقائياً (مطابقة 100%)',rsCdDetails:'التفاصيل',rsCdZero:'{c} في {s} غير مطلوب ({n})',rsCdDec:'{c}: −{n} طبقة (كل قياساته زائدة)',rsCdInc:'{c}: +{n} طبقة (كل قياساته ناقصة)',rsCdDiffs:'الفروقات لكل لون ومقاس (الماركرات − قائمة الكميات):',rsCdOk:'✅ مطابقة الألوان 100% — كل الماركرات سليمة ومطابقة لقائمة الكميات',rsCdApprox:'{n} ماركر بتوزيع تقريبي',rsColRebuilt:'✅ أُعيد بناء الخطة بالألوان (أقل ماركرات): {n} ماركر',rsColExact:'كل لون وكل مقاس مطابق ١٠٠٪ (بلا زيادة ولا نقص)',rsColExactSur:'لا نقص في أي لون أو مقاس · زيادة {n} قطعة ضمن الفائض المسموح للأوردر ({m})',rsBusyPlan:'⏳ جارٍ حساب أفضل خطة للماركرات…',rsBusyRebuild:'⏳ جارٍ إعادة بناء الخطة…',rsBusySub:'قد يستغرق ذلك بضع ثوانٍ — الرجاء الانتظار',rsColNotExact:'لم تكتمل المطابقة: {s} — راجع الماركرات غير الصالحة أو استهلاك المقاسات',rsColAdd:'إضافة لون',rsColName:'اسم اللون',rsColQty:'الكمية',rsColUnnamed:'لون',rsColPcs:'القطع',rsColMismatch:'مجموع كميات الألوان ({c}) لا يساوي كمية الطلب ({o})',
+rsColTitle:'🎨 توزيع الألوان (اختياري)',rsCMQtyAuto:'محسوبة من أعمدة الألوان في جدول كميات الأوردر',rsColDone:'✅ يغطّي كمياته بالضبط',rsColShort:'ناقص {n} قطعة',rsColOver:'زائد {n} قطعة',rsColAutoDone:'✅ وُزّعت الطبقات على الألوان: أُضيف {a} ماركر · عُدّل {e} · حُذف {d}',rsCpApprox:'توزيع تقريبي بالنسبة — اضغط «أكمل الخطة تلقائياً» لتوزيع دقيق لكل لون',rsColBuilt:'✅ خطة الألوان: {n} ماركر',rsCdTitle:'خلل في مطابقة الألوان: {n} ماركر به خلل (مميّز بالأحمر في جدول المراكر)',rsCdMarkers:'الماركرات المعيبة:',rsCdShort:'نقص',rsCdOver:'زيادة',rsCdFix:'صحّح الماركرات تلقائياً (مطابقة 100%)',rsCdDetails:'التفاصيل',rsCdZero:'{c} في {s} غير مطلوب ({n})',rsCdDec:'{c}: −{n} طبقة (كل قياساته زائدة)',rsCdInc:'{c}: +{n} طبقة (كل قياساته ناقصة)',rsCdDiffs:'الفروقات لكل لون ومقاس (الماركرات − قائمة الكميات):',rsCdOk:'✅ مطابقة الألوان 100% — كل الماركرات سليمة ومطابقة لقائمة الكميات',rsCdApprox:'{n} ماركر بتوزيع تقريبي',rsColRebuilt:'✅ أُعيد بناء الخطة بالألوان (أقل ماركرات): {n} ماركر',rsColExact:'كل لون وكل مقاس مطابق ١٠٠٪ (بلا زيادة ولا نقص)',rsTabPlan:'📊 خطة الماركرات',rlTab:'📦 خطة الرولات من ملف',rlTitle:'📦 خطة الرولات من ملف الماركرات',rlHint:'ارفع ملف Excel أو PDF فيه الماركرات: القياسات، وعدد الطبقات لكل لون، وطول الماركر أو قياس الفرد — مثل «خطة الفرد والقص» المصدَّرة من النظام. ثم أدخل طول الرول، فتُحسب رولات كل لون وحدها.',rlPick:'📂 اختر ملف (Excel أو PDF)',rlDrop:'أو اسحب الملف وأفلته هنا',rlReading:'⏳ جارٍ قراءة الملف…',rlRead:'قُرئ {n} ماركر · {c} لون — من «{f}». راجع الجدول ثم أدخل طول الرول',rlNoMk:'لم أجد ماركرات في الملف — يلزم أن يحوي القياسات بصيغة مثل M-58×1 مع عدد الطبقات وطول الماركر',rlBadFile:'نوع الملف غير مدعوم — استعمل Excel (.xlsx) أو PDF أو CSV',rlXls:'ملف Excel القديم (.xls) غير مدعوم — احفظه بصيغة .xlsx ثم ارفعه',rlPdfFail:'تعذّر تحميل قارئ PDF — تحقّق من الاتصال بالإنترنت أو استعمل ملف Excel',rlReadFail:'تعذّرت قراءة الملف — تأكّد أنه غير تالف أو جرّب Excel',rlUnitFile:'وحدة الأطوال في الملف',rlSpread:'مسافة الفرد تُضاف لكل طبقة (سم)',rlRollLen:'طول الرول',rlRollUnit:'وحدة الرول والنتائج',rlPrintBtn:'🖨️ طباعة / PDF',rlXlsBtn:'📊 Excel',rlLenPly:'طول الطبقة',rlSumWarn:'مجموع الألوان لا يساوي عدد الطبقات',rlNoColor:'بلا لون',rlGroupHdr:'🎨 {c} — {n} رول',rlOverall:'الإجمالي لكل الألوان',rlSpreadNote:'طول كل طبقة يشمل مسافة الفرد ({v})',rlSpreadLbl:'مسافة الفرد لكل طبقة',rlSpreadFound:'سماحية الفرد المكتوبة في الملف: {v}',rlInclYes:'الطول في الملف = قياس الفرد (يشمل مسافة الفرد) — لا تُضاف مسافة أخرى إلا إن أردت',rlInclNo:'الطول في الملف = طول الماركر فقط — أضف مسافة الفرد بالسنتيمتر',rlInclUnk:'تأكّد هل الطول في الملف يشمل مسافة الفرد؛ وإن لم يشملها فأضفها بالسنتيمتر',rlMissing:'{n} ماركر بلا طول أو طبقات لم يُحسب: {c} — أكملها في الجدول',rlMissAll:'لا ماركرات بطول وطبقات — أكمل الجدول',rlNoFile:'ارفع ملف الماركرات أولاً',rlReview:'📋 مراجعة الماركرات المقروءة ({n}) — اضغط للعرض والتعديل',rlReviewBad:'{n} تحتاج إكمالاً',rsColExactSur:'لا نقص في أي لون أو مقاس · زيادة {n} قطعة ضمن الفائض المسموح للأوردر ({m})',rsBusyPlan:'⏳ جارٍ حساب أفضل خطة للماركرات…',rsBusyRebuild:'⏳ جارٍ إعادة بناء الخطة…',rsBusySub:'قد يستغرق ذلك بضع ثوانٍ — الرجاء الانتظار',rsColNotExact:'لم تكتمل المطابقة: {s} — راجع الماركرات غير الصالحة أو استهلاك المقاسات',rsColAdd:'إضافة لون',rsColName:'اسم اللون',rsColQty:'الكمية',rsColUnnamed:'لون',rsColPcs:'القطع',rsColMismatch:'مجموع كميات الألوان ({c}) لا يساوي كمية الطلب ({o})',
 rsSugTbl:'إكمال الخطة',rsSugPliesC:'الطبقات المقترحة',rsEditPliesC:'تعديل الطبقات يدويًا (اختياري)',rsRemWithRun:'إجمالي المتبقي مع التشغيل',rsApplyAll:'✔ اعتماد كل الاقتراحات كماركر',rsSugEmpty:'لا كميات متبقية — الاقتراحات فارغة',
 rsSpreadBtn:'🧵 أمر الفرد',rsAnaBtn:'📊 تحليل',rsSaveTitle:'نسبة التوفير',rsSaveOrder:'استهلاك تحليل الأوردر — مع الفرد ({u})',rsSavePlan:'استهلاك خطة الفرد والقص — مع الفرد ({u})',rsSaveAmt:'التوفير ({u})',rsSavePct:'نسبة التوفير',rsSaveNote:'التوفير = استهلاك التحليل − استهلاك الخطة (مع الفرد) · النسبة = التوفير ÷ استهلاك التحليل · بالأحمر (−) = زيادة',rsAnaTitle:'تحليل استهلاك الأوردر',rsAnaSheet:'تحليل',rsAnaSizes:'عدد المقاسات',rsAnaQty:'إجمالي الكمية',rsAnaShare:'النسبة من الكمية',rsAnaCp:'استهلاك القطعة ({u})',rsAnaCq:'استهلاك الكمية ({u})',rsAnaCf:'استهلاك مع الفرد ({u})',rsNoValidMk:'لا ماركرات صالحة للفرد',
 rsFarradSig:'توقيع الفرّاد',rsCutSupSig:'مشرف القص',
@@ -777,7 +799,7 @@ rsReviewTbl:'Plan match',rsProdFromMk:'Pieces from markers',rsRemFromOrder:'Rema
 rsAutoBtn:'Auto-complete plan (least consumption)',rsAutoDone:'Plan complete — nothing remaining',rsTrimQ:'The plan overproduces the order ({n} pieces). Remove the surplus by reducing plies of the markers causing it (deleting any left with no plies), then auto-complete any shortage?',rsTrimmed:'✂️ Surplus removed: {x}',rsTrimDel:'{n} marker(s) deleted',rsTrimRed:'{n} marker(s) reduced',rsAutoAdded:'{n} markers added automatically',rsAutoAddedLib:'{n} markers added automatically — {l} from your measured library (CAD-matched)',rsNoSug:'Could not generate a plan — check quantities, consumption, and that the marker length limit fits the sizes',rsScNoData:'No order quantities — enter quantities in the quantities table first',
 rsReducePliesBtn:'Reduce plies',rsReduceDone:'Plies reduced in {n} marker(s): {a} → {b} plies (fabric & quantity unchanged)',rsReduceNone:'Cannot reduce plies further — markers are capped by length limit or max pieces',
 rsClearMkBtn:'Clear markers',rsClearMkQ:'Delete all markers? You can then press “Auto-complete plan” to build a plan with no overproduction.',rsSortBtn:'Sort by length',rsSortPcBtn:'Best by consumption/piece',
-rsColTitle:'🎨 Color split (optional)',rsCMQtyAuto:'Computed from the color columns of the order quantities table',rsColDone:'✅ Covers its quantities exactly',rsColShort:'short {n} pcs',rsColOver:'over {n} pcs',rsColAutoDone:'✅ Plies split across colors: {a} marker(s) added · {e} adjusted · {d} removed',rsCpApprox:'Approximate proportional split — press “Auto-complete plan” for an exact per-color split',rsColBuilt:'✅ Color plan: {n} markers',rsCdTitle:'Color mismatch: {n} faulty marker(s) (highlighted in red in the markers table)',rsCdMarkers:'Faulty markers:',rsCdShort:'Shortage',rsCdOver:'Surplus',rsCdFix:'Fix the markers automatically (100% match)',rsCdDetails:'Details',rsCdZero:'{c} in {s} not required ({n})',rsCdDec:'{c}: −{n} plies (all its sizes over)',rsCdInc:'{c}: +{n} plies (all its sizes short)',rsCdDiffs:'Differences per color and size (markers − quantities list):',rsCdOk:'✅ Colors match 100% — every marker is correct against the quantities list',rsCdApprox:'{n} marker(s) with approximate split',rsColRebuilt:'✅ Plan rebuilt with colors (fewer markers): {n} markers',rsColExact:'every color and size matches 100% (no surplus, no shortage)',rsColExactSur:'no shortage in any color or size · {n} extra pcs within the order allowance ({m})',rsBusyPlan:'⏳ Calculating the best marker plan…',rsBusyRebuild:'⏳ Rebuilding the plan…',rsBusySub:'This may take a few seconds — please wait',rsColNotExact:'Not fully matched: {s} — check invalid markers or size consumption',rsColAdd:'Add color',rsColName:'Color name',rsColQty:'Quantity',rsColUnnamed:'Color',rsColPcs:'Pieces',rsColMismatch:'Colors total ({c}) ≠ order quantity ({o})',
+rsColTitle:'🎨 Color split (optional)',rsCMQtyAuto:'Computed from the color columns of the order quantities table',rsColDone:'✅ Covers its quantities exactly',rsColShort:'short {n} pcs',rsColOver:'over {n} pcs',rsColAutoDone:'✅ Plies split across colors: {a} marker(s) added · {e} adjusted · {d} removed',rsCpApprox:'Approximate proportional split — press “Auto-complete plan” for an exact per-color split',rsColBuilt:'✅ Color plan: {n} markers',rsCdTitle:'Color mismatch: {n} faulty marker(s) (highlighted in red in the markers table)',rsCdMarkers:'Faulty markers:',rsCdShort:'Shortage',rsCdOver:'Surplus',rsCdFix:'Fix the markers automatically (100% match)',rsCdDetails:'Details',rsCdZero:'{c} in {s} not required ({n})',rsCdDec:'{c}: −{n} plies (all its sizes over)',rsCdInc:'{c}: +{n} plies (all its sizes short)',rsCdDiffs:'Differences per color and size (markers − quantities list):',rsCdOk:'✅ Colors match 100% — every marker is correct against the quantities list',rsCdApprox:'{n} marker(s) with approximate split',rsColRebuilt:'✅ Plan rebuilt with colors (fewer markers): {n} markers',rsColExact:'every color and size matches 100% (no surplus, no shortage)',rsTabPlan:'📊 Marker plan',rlTab:'📦 Roll plan from file',rlTitle:'📦 Roll plan from a markers file',rlHint:'Upload an Excel or PDF file with the markers: sizes, plies per color, and marker length or spread length — e.g. the “Spreading & cutting plan” exported from this system. Then enter the roll length; rolls are computed for each color separately.',rlPick:'📂 Choose a file (Excel or PDF)',rlDrop:'or drag and drop the file here',rlReading:'⏳ Reading the file…',rlRead:'Read {n} markers · {c} color(s) — from “{f}”. Check the table, then enter the roll length',rlNoMk:'No markers found — the file needs sizes like M-58×1 with plies and marker length',rlBadFile:'Unsupported file type — use Excel (.xlsx), PDF or CSV',rlXls:'Old Excel files (.xls) are not supported — save as .xlsx and upload again',rlPdfFail:'Could not load the PDF reader — check the internet connection or use an Excel file',rlReadFail:'Could not read the file — make sure it is not damaged or try Excel',rlUnitFile:'Length unit in the file',rlSpread:'Spread allowance added per ply (cm)',rlRollLen:'Roll length',rlRollUnit:'Roll & results unit',rlPrintBtn:'🖨️ Print / PDF',rlXlsBtn:'📊 Excel',rlLenPly:'Ply length',rlSumWarn:'Colors total does not equal plies',rlNoColor:'No color',rlGroupHdr:'🎨 {c} — {n} rolls',rlOverall:'Total for all colors',rlSpreadNote:'Each ply length includes the spread allowance ({v})',rlSpreadLbl:'Spread allowance per ply',rlSpreadFound:'Spread allowance written in the file: {v}',rlInclYes:'File length = spread length (includes the allowance) — add nothing unless you want to',rlInclNo:'File length = marker length only — add the spread allowance in cm',rlInclUnk:'Check whether the file length includes the spread allowance; if not, add it in cm',rlMissing:'{n} marker(s) without length or plies were skipped: {c} — complete them in the table',rlMissAll:'No markers with length and plies — complete the table',rlNoFile:'Upload the markers file first',rlReview:'📋 Review the markers read ({n}) — click to view and edit',rlReviewBad:'{n} need completing',rsColExactSur:'no shortage in any color or size · {n} extra pcs within the order allowance ({m})',rsBusyPlan:'⏳ Calculating the best marker plan…',rsBusyRebuild:'⏳ Rebuilding the plan…',rsBusySub:'This may take a few seconds — please wait',rsColNotExact:'Not fully matched: {s} — check invalid markers or size consumption',rsColAdd:'Add color',rsColName:'Color name',rsColQty:'Quantity',rsColUnnamed:'Color',rsColPcs:'Pieces',rsColMismatch:'Colors total ({c}) ≠ order quantity ({o})',
 rsSugTbl:'Plan completion',rsSugPliesC:'Suggested plies',rsEditPliesC:'Adjust plies (optional)',rsRemWithRun:'Remaining after run',rsApplyAll:'✔ Apply all suggestions as markers',rsSugEmpty:'Nothing remaining — no suggestions',
 rsSpreadBtn:'🧵 Spreading order',rsAnaBtn:'📊 Analysis',rsSaveTitle:'Saving rate',rsSaveOrder:'Order analysis consumption — incl. spread ({u})',rsSavePlan:'Cutting plan consumption — incl. spread ({u})',rsSaveAmt:'Saving ({u})',rsSavePct:'Saving rate',rsSaveNote:'Saving = analysis − plan consumption (incl. spread) · rate = saving ÷ analysis · red (−) = extra',rsAnaTitle:'Order consumption analysis',rsAnaSheet:'Analysis',rsAnaSizes:'Sizes',rsAnaQty:'Total quantity',rsAnaShare:'Share of quantity',rsAnaCp:'Per-piece consumption ({u})',rsAnaCq:'Quantity consumption ({u})',rsAnaCf:'Consumption incl. spread ({u})',rsNoValidMk:'No valid markers to spread',
 rsFarradSig:'Spreader signature',rsCutSupSig:'Cutting supervisor',
@@ -1691,8 +1713,9 @@ function goTool(id,btn){const all=id==='all';
   $('tool-all').classList.toggle('hide',!all);
   document.querySelectorAll('#tools-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');}
 function goMarker(id,btn){document.querySelectorAll('#marker-subnav button').forEach(b=>b.classList.remove('on'));if(btn)btn.classList.add('on');
-  ['mk','rs'].forEach(x=>{const el=$('tool-'+x);if(el)el.classList.toggle('hide',x!==id);});
-  if(id==='rs'){renderRsProducts();rsInit();}}
+  if(!btn){const b=document.querySelector('#marker-subnav [data-mk="'+id+'"]');if(b)b.classList.add('on');}
+  ['mk','rs','rl'].forEach(x=>{const el=$('tool-'+x);if(el)el.classList.toggle('hide',x!==id);});
+  if(id==='rs'){renderRsProducts();rsInit();}if(id==='rl')rlInit();}
 const TOOL_TITLES={fp:'fpTitle',sh:'shTitle',aq:'aqlTitle',mk:'mkTitle',rs:'rsTitle',all:'allTitle'};
 function toolInfo(id,e){e.preventDefault();modal(`<h3>${esc(t(TOOL_TITLES[id]))}</h3>
   <p style="line-height:1.7;color:var(--mut)">${esc(t('toolDesc'+id))}</p>
@@ -4263,100 +4286,98 @@ function rsSpreadHtml(d,opt){opt=opt||{};
     <div style="margin-top:18px;display:flex;gap:16px;break-inside:avoid;page-break-inside:avoid">${sigBox(t('rsFarradSig'))}${sigBox(t('rsCutSupSig'))}${sigBox(t('repInspector')+(MEMBER.name?' — '+esc(MEMBER.name):''))}</div></div>`;}
 /* ---- خطة الأثواب: توزيع طبقات الماركرات على أثواب بطول محدّد (First-Fit Decreasing) ---- */
 // يُرجع {mk,roll,rolls,totalFab,nRolls,totRoll,loss,eff} بوحدات داخلية (متر) أو رسالة خطأ عبر err
+// توزيع طبقات على رولات (دالة نقية — تُختبر): items=[{code,len,n}] — len طول الطبقة الواحدة بالمتر (شاملاً مسافة الفرد) و n عدد طبقاتها
+// nosplice: كل طبقة كاملة من رول واحد (الأطول أولاً، في أول رول يتّسع لها — الباقي يخدم طبقة أقصر أو يُهدر)؛ continuous: فرد متصل بوصلة عند نهاية الرول
+function rsRollPack(items,roll,mode){const rnd=v=>Math.round(v*100)/100,rolls=[];let splices=0;
+  const dem=[];items.forEach(m=>{for(let k=0;k<m.n;k++)dem.push({len:m.len,code:m.code});});
+  const nr=()=>{const r={rem:roll,used:0,plies:0,by:{},spl:0};rolls.push(r);return r;};
+  if(mode==='continuous'){let cur=null;
+    dem.forEach(d=>{let need=d.len,first=true;while(need>1e-6){if(!cur||cur.rem<1e-6)cur=nr();const take=Math.min(need,cur.rem);
+      cur.rem=rnd(cur.rem-take);cur.used=rnd(cur.used+take);need=rnd(need-take);
+      if(first){cur.by[d.code]=(cur.by[d.code]||0)+1;cur.plies++;first=false;}else{cur.spl++;splices++;}}});}
+  else{dem.sort((x,y)=>y.len-x.len);dem.forEach(d=>{let r=rolls.find(x=>x.rem>=d.len-1e-9);if(!r)r=nr();
+    r.rem=rnd(r.rem-d.len);r.used=rnd(r.used+d.len);r.plies++;r.by[d.code]=(r.by[d.code]||0)+1;});}
+  const fab=rnd(items.reduce((a,m)=>a+m.len*m.n,0)),nRolls=rolls.length,totRoll=rnd(nRolls*roll);
+  return {rolls,nRolls,totRoll,totalFab:fab,loss:rnd(totRoll-fab),eff:totRoll>0?Math.round(fab/totRoll*10000)/100:0,splices};}
+// تجميع مجموعات الرولات (لون لكل مجموعة) في نتيجة واحدة: الإجماليات + بديل «متصل» لكل مجموعة للتلميح
+function rsRollGroups(groups,roll,mode,salvage){const rnd=v=>Math.round(v*100)/100;
+  groups.forEach(g=>{Object.assign(g,rsRollPack(g.items,roll,mode==='continuous'?'continuous':'nosplice'));g.extra={};g.extraTotal=0;g.salvLen=0;
+    if(mode==='salvage'&&salvage)salvage(g);
+    if(mode!=='continuous'){const alt=rsRollPack(g.items,roll,'continuous');g.alt={nRolls:alt.nRolls,loss:alt.loss,eff:alt.eff};}});
+  const sum=k=>rnd(groups.reduce((a,g)=>a+(g[k]||0),0));
+  const nRolls=groups.reduce((a,g)=>a+g.nRolls,0),totRoll=sum('totRoll'),used=rnd(sum('totalFab')+sum('salvLen'));
+  return {roll,mode,groups,nRolls,totRoll,totalFab:sum('totalFab'),loss:rnd(totRoll-used),eff:totRoll>0?Math.round(used/totRoll*10000)/100:0,
+    splices:groups.reduce((a,g)=>a+(g.splices||0),0),extraTotal:groups.reduce((a,g)=>a+g.extraTotal,0),salvLen:sum('salvLen')};}
+// خطة الرولات لصفحة الريشو: طول الطبقة = طول الماركر الفعّال + مسافة الفرد؛ وبالألوان: رولات كل لون وحدها بطبقاته فقط
 function rsRollCompute(){
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
-  const ufA=rsUF();// الطول الفعلي يُدخَل بوحدة العرض الحالية — يُحوَّل لمتر (وحدة الحساب الداخلية) قبل استخدامه
-  const mk=[],mprod={};rsReadMarkers().forEach((m,i)=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
+  const ufA=rsUF(),sp=rsSpreadM(),colors=rsCMOn()?rsColors():[];
+  const mk=[],mprod={},cprod={};rsReadMarkers().forEach((m,i)=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
     if(!rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs,m.actlen))return;
     const calcLen=vp.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);
-    const len=Math.round(rsMkEffLen(m.pairs,calcLen,m.actlen,ufA)*100)/100;// طول الرول: المقيس من المكتبة إن تطابق وإلا الفعلي وإلا المحسوب
+    const len=Math.round((rsMkEffLen(m.pairs,calcLen,m.actlen,ufA)+sp)*100)/100;// طول الطبقة على الطاولة: المقيس/الفعلي/المحسوب + مسافة الفرد
     vp.forEach(p=>mprod[p.size]=(mprod[p.size]||0)+p.cnt*plies);
-    mk.push({code:'M'+String(i+1).padStart(2,'0'),len,plies});});
+    const cp={};if(colors.length)rsMkSplit(m,colors).forEach(x=>{if(x.plies>0){cp[x.name]=x.plies;const o=cprod[x.name]=cprod[x.name]||{};vp.forEach(p=>o[p.size]=(o[p.size]||0)+p.cnt*x.plies);}});
+    mk.push({code:'M'+String(i+1).padStart(2,'0'),len,plies,cp,vp});});
   if(!mk.length)return {err:'empty'};
   const uf=rsUF();const rollDisp=+($('rs-rolllen')&&$('rs-rolllen').value)||0;
   if(rollDisp<=0)return {err:'nolen'};
   const roll=Math.round((rollDisp/uf)*100)/100;
   const maxMk=Math.max(...mk.map(m=>m.len));
   if(maxMk>roll+1e-9)return {err:'short',maxMk};
-  const totalFab=Math.round(mk.reduce((s,m)=>s+m.len*m.plies,0)*100)/100;
-  const rnd=v=>Math.round(v*100)/100;
   const mode=($('rs-rollmode')&&$('rs-rollmode').value)||'nosplice';
-  const rolls=[];let splices=0;
-  if(mode==='continuous'){
-    // فرد متصل: الأثواب تُفرد بلا انقطاع، وقد تُوصَل طبقة عند نهاية الثوب (أقل هدر)
-    const demands=[];mk.forEach(m=>{for(let k=0;k<m.plies;k++)demands.push({len:m.len,code:m.code});});
-    let cur={rem:roll,used:0,plies:0,by:{},spl:0};rolls.push(cur);
-    demands.forEach(d=>{let need=d.len,first=true;
-      while(need>1e-6){
-        if(cur.rem<1e-6){cur={rem:roll,used:0,plies:0,by:{},spl:0};rolls.push(cur);}
-        const take=Math.min(need,cur.rem);cur.rem=rnd(cur.rem-take);cur.used=rnd(cur.used+take);need=rnd(need-take);
-        if(first){cur.by[d.code]=(cur.by[d.code]||0)+1;cur.plies++;first=false;}
-        else{cur.spl++;splices++;} // هذه الطبقة تُكمَّل هنا بوصلة
-      }});
-  }else{
-    // بلا وصل: كل طبقة كاملة من ثوب واحد (First-Fit Decreasing)، والباقي القصير يُهدر أو يخدم ماركراً أقصر
-    const demands=[];mk.forEach(m=>{for(let k=0;k<m.plies;k++)demands.push({len:m.len,code:m.code});});
-    demands.sort((a,b)=>b.len-a.len);
-    demands.forEach(d=>{let r=rolls.find(x=>x.rem>=d.len-1e-9);
-      if(!r){r={rem:roll,used:0,plies:0,by:{},spl:0};rolls.push(r);}
-      r.rem=rnd(r.rem-d.len);r.used=rnd(r.used+d.len);r.plies++;r.by[d.code]=(r.by[d.code]||0)+1;});
-  }
-  // استغلال البواقي: ملء باقي كل ثوب بقياسات صغيرة (قطع إضافية) لتقليل الهدر
-  const extra={};let salvLen=0;
-  if(mode==='salvage'){
-    const sizes=rsAllSizes().filter(x=>x.cons>0).sort((a,b)=>a.cons-b.cons);
-    const minC=sizes.length?sizes[0].cons:Infinity;
-    // تُحسب قطع البواقي من الكمية: تُقصّ فقط للقياسات الناقصة (المطلوب ناقص إنتاج الماركرات) وبحدّ المتبقّي
-    const reqMap={};[...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();const q=+tr.querySelector('.rsq-qty').value||0;if(s&&q>0)reqMap[s]=q;});
-    const hasReq=Object.keys(reqMap).length>0;
-    const need={};sizes.forEach(x=>{need[x.size]=hasReq?Math.max(0,(reqMap[x.size]||0)-(mprod[x.size]||0)):Infinity;});
-    rolls.forEach(r=>{r.salv={};let g=0;
-      while(r.rem>=minC-1e-9&&g++<300){
-        // أصغر قياس يتّسع له الباقي وما زال ناقصاً في الأوردر
-        const pick=sizes.find(x=>x.cons<=r.rem+1e-9&&need[x.size]>0);
-        if(!pick)break;
-        r.salv[pick.size]=(r.salv[pick.size]||0)+1;extra[pick.size]=(extra[pick.size]||0)+1;need[pick.size]--;
-        r.rem=rnd(r.rem-pick.cons);r.used=rnd(r.used+pick.cons);salvLen=rnd(salvLen+pick.cons);}});
-  }
-  const nRolls=rolls.length,totRoll=rnd(nRolls*roll),usedFab=rnd(totalFab+salvLen),loss=rnd(totRoll-usedFab);
-  const eff=totRoll>0?Math.round(usedFab/totRoll*10000)/100:0;
-  const extraTotal=Object.values(extra).reduce((s,n)=>s+n,0);
-  return {mk,roll,rolls,totalFab,nRolls,totRoll,loss,eff,mode,splices,extra,extraTotal,salvLen:rnd(salvLen)};}
+  const reqMap={};[...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();const q=+tr.querySelector('.rsq-qty').value||0;if(s&&q>0)reqMap[s]=q;});
+  const groups=colors.length?colors.map(c=>({name:c.name,items:mk.filter(m=>m.cp[c.name]>0).map(m=>({code:m.code,len:m.len,n:m.cp[c.name]})),
+      need:Object.fromEntries(Object.keys(c.sq).map(s=>[s,Math.max(0,c.sq[s]-((cprod[c.name]||{})[s]||0))]))})).filter(g=>g.items.length)
+    :[{name:'',items:mk.map(m=>({code:m.code,len:m.len,n:m.plies})),need:Object.keys(reqMap).length?Object.fromEntries(Object.keys(reqMap).map(s=>[s,Math.max(0,reqMap[s]-(mprod[s]||0))])):null}];
+  // استغلال البواقي: ملء باقي كل رول بأصغر القياسات الناقصة في الأوردر (أو في هذا اللون) فقط
+  const sizes=rsAllSizes().filter(x=>x.cons>0).sort((a,b)=>a.cons-b.cons),minC=sizes.length?sizes[0].cons:Infinity,rnd=v=>Math.round(v*100)/100;
+  const salvage=g=>{const need={};sizes.forEach(x=>need[x.size]=g.need?(g.need[x.size]||0):Infinity);
+    g.rolls.forEach(r=>{r.salv={};let k=0;
+      while(r.rem>=minC-1e-9&&k++<300){const pick=sizes.find(x=>x.cons<=r.rem+1e-9&&need[x.size]>0);if(!pick)break;
+        r.salv[pick.size]=(r.salv[pick.size]||0)+1;g.extra[pick.size]=(g.extra[pick.size]||0)+1;need[pick.size]--;
+        r.rem=rnd(r.rem-pick.cons);r.used=rnd(r.used+pick.cons);g.salvLen=rnd(g.salvLen+pick.cons);g.extraTotal++;}});
+    g.loss=rnd(g.totRoll-g.totalFab-g.salvLen);g.eff=g.totRoll>0?Math.round((g.totalFab+g.salvLen)/g.totRoll*10000)/100:0;};
+  const d=rsRollGroups(groups,roll,mode,salvage);d.mk=mk;d.spread=sp;
+  // توافق: قائمة الرولات والقطع الإضافية مجمّعة
+  d.rolls=d.groups.flatMap(g=>g.rolls);d.extra={};d.groups.forEach(g=>Object.keys(g.extra).forEach(s=>d.extra[s]=(d.extra[s]||0)+g.extra[s]));
+  return d;}
+// عرض خطة الرولات (مشترك بين صفحة الريشو وصفحة «خطة الرولات من ملف»): بطاقات + جدول لكل لون، وإجمالي كل الألوان
+function rsRollHtml(d,uf,u){const R=v=>Math.round(v*uf*100)/100;
+  const card=(l,v,col)=>`<div style="flex:1 1 120px;min-width:120px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;text-align:center;background:var(--card)">
+    <div style="font-size:11px;color:var(--mut);font-weight:700">${l}</div><div style="font-size:18px;font-weight:800;color:${col||'var(--teal)'};margin-top:2px">${v}</div></div>`;
+  const cards=x=>`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+    ${card(t('rsRollCount'),x.nRolls)}${card(t('rsRollTotalLen'),R(x.totRoll)+' '+u)}${card(t('rsRollWaste'),R(x.loss)+' '+u,x.loss>0.5?'var(--bad)':'var(--ok)')}${card(t('rsRollEff'),x.eff+'%',x.eff>=90?'var(--ok)':x.eff>=80?'var(--warn)':'var(--bad)')}${d.mode==='continuous'?card(t('rsRollSplices'),x.splices,x.splices>0?'var(--warn)':'var(--ok)'):''}</div>`;
+  const multi=d.groups.length>1||!!(d.groups[0]&&d.groups[0].name);
+  const grp=(g,gi)=>{let tip='';
+    if(d.mode!=='continuous'&&g.eff<90&&g.alt&&g.alt.nRolls<g.nRolls)tip=`<div style="margin-bottom:10px;font-size:12px;color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn-bd);border-radius:8px;padding:8px 11px">💡 ${tf('rsRollTip',{n:g.alt.nRolls,l:R(g.alt.loss)+' '+u,e:g.alt.eff})}</div>`;
+    const extra=d.mode==='salvage'&&g.extraTotal>0?`<div style="margin-bottom:10px;background:var(--ok-bg);border:1px solid var(--ok-bd);border-radius:8px;padding:8px 11px">
+      <b style="color:var(--ok)">🎁 ${tf('rsRollExtra',{n:g.extraTotal,l:R(g.salvLen)+' '+u})}</b>
+      <div style="margin-top:4px">${Object.entries(g.extra).sort((a,b)=>b[1]-a[1]).map(([s,n])=>`<span class="chip" style="margin:2px;background:var(--ok-bg)">${esc(s)} +${n}</span>`).join(' ')}</div></div>`:'';
+    const rows=g.rolls.map((r,i)=>`<tr><td style="font-weight:800">${t('rsRollNo')} ${i+1}</td>
+      <td style="text-align:start">${Object.entries(r.by).map(([c,n])=>`<span class="chip" style="margin:2px">${esc(c)} ×${n}</span>`).join(' ')}${r.spl?` <span style="color:var(--warn);font-weight:700">✂${r.spl}</span>`:''}${r.salv&&Object.keys(r.salv).length?' '+Object.entries(r.salv).map(([s,n])=>`<span class="chip" style="margin:2px;background:var(--ok-bg);color:var(--ok)">🎁${esc(s)}×${n}</span>`).join(' '):''}</td>
+      <td style="font-weight:700">${r.plies}</td><td>${R(r.used)} ${u}</td>
+      <td style="font-weight:800;color:${r.rem>0.5?'var(--bad)':'var(--ok)'}">${R(r.rem)} ${u}</td></tr>`).join('');
+    const hdr=multi?`<div style="background:${RS_COLORS[gi%RS_COLORS.length]};color:#111;font-weight:900;padding:7px 12px;border-radius:8px;margin:${gi?'18px':'4px'} 0 10px">${esc(tf('rlGroupHdr',{c:g.name||t('rlNoColor'),n:g.nRolls}))}</div>`:'';
+    return hdr+tip+extra+cards(g)+`<div style="overflow-x:auto"><table class="xtbl" style="min-width:560px">
+      <tr><th>${t('rsRollNo2')}</th><th>${t('rsRollPlies')}</th><th>${t('rsPlies')}</th><th>${t('rsRollUsed')} (${u})</th><th>${t('rsRollRem')} (${u})</th></tr>${rows}</table></div>`;};
+  const tot=d.groups.length>1?`<div style="font-weight:900;margin-bottom:6px">${esc(t('rlOverall'))}</div>`+cards(d):'';
+  return tot+d.groups.map(grp).join('');}
 function rsRollPlan(){const host=$('rs-rolls');if(!host)return;const uf=rsUF(),u=rsUL();const R=v=>Math.round(v*uf*100)/100;
   const d=rsRollCompute();
   if(d.err==='empty'){host.innerHTML=`<div class="note">${t('rsRollNoMk')}</div>`;return;}
   if(d.err==='nolen'){host.innerHTML=`<div class="note">${t('rsRollNeedLen')}</div>`;return;}
   if(d.err==='short'){host.innerHTML=`<div class="msg err" style="padding:8px 12px;border-radius:8px">${tf('rsRollTooShort',{n:R(d.maxMk)+' '+u})}</div>`;return;}
-  const card=(l,v,col)=>`<div style="flex:1 1 120px;min-width:120px;border:1px solid #dbe5e4;border-radius:10px;padding:8px 10px;text-align:center;background:var(--card)">
-    <div style="font-size:11px;color:var(--mut);font-weight:700">${l}</div><div style="font-size:18px;font-weight:800;color:${col||'#14504f'};margin-top:2px">${v}</div></div>`;
-  const cards=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-    ${card(t('rsRollCount'),d.nRolls)}${card(t('rsRollTotalLen'),R(d.totRoll)+' '+u)}${card(t('rsRollWaste'),R(d.loss)+' '+u,d.loss>0.5?'var(--bad)':'var(--ok)')}${card(t('rsRollEff'),d.eff+'%',d.eff>=90?'var(--ok)':d.eff>=80?'var(--warn)':'var(--bad)')}${d.mode==='continuous'?card(t('rsRollSplices'),d.splices,d.splices>0?'var(--warn)':'var(--ok)'):''}</div>`;
-  // تلميح: إن كان الهدر مرتفعاً في وضع «بلا وصل»، اعرض بديل الفرد المتصل
-  let hint='';
-  if(d.mode!=='continuous'&&d.eff<90){const alt=rsRollAlt('continuous');
-    if(alt&&!alt.err&&alt.nRolls<d.nRolls)hint=`<div style="margin-bottom:10px;font-size:12px;color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn-bd);border-radius:8px;padding:8px 11px">💡 ${tf('rsRollTip',{n:alt.nRolls,l:R(alt.loss)+' '+u,e:alt.eff})}</div>`;}
-  // اقتراح طول الرول المثالي — أساس الحساب طول الماركر (لا يتغيّر)؛ نقترح رولاً = مضاعف لطول الماركر السائد
+  // اقتراح طول الرول المثالي — مضاعف لطول الطبقة السائدة
   let rollHint='';
   if(d.mode!=='continuous'){const id=rsRollIdeal(d);
     if(id&&Math.abs(id.ideal-d.roll)>0.05){
       rollHint=`<div style="margin-bottom:10px;font-size:12px;color:var(--teal);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:8px 11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <span>🎯 ${tf('rsRollIdeal',{L:R(id.Ldom)+' '+u,k:id.k,y:R(id.ideal)+' '+u})}</span>
         <button type="button" class="mini g" onclick="rsSetRoll(${R(id.ideal)})">${t('rsRollApplyIdeal')}</button></div>`;}}
-  // قطع إضافية مستخرَجة من بواقي الأثواب
-  let extraBox='';
-  if(d.mode==='salvage'&&d.extraTotal>0){extraBox=`<div style="margin-bottom:10px;background:var(--ok-bg);border:1px solid var(--ok-bd);border-radius:8px;padding:8px 11px">
-    <b style="color:var(--ok)">🎁 ${tf('rsRollExtra',{n:d.extraTotal,l:R(d.salvLen)+' '+u})}</b>
-    <div style="margin-top:4px">${Object.entries(d.extra).sort((a,b)=>b[1]-a[1]).map(([s,n])=>`<span class="chip" style="margin:2px;background:var(--ok-bg)">${esc(s)} +${n}</span>`).join(' ')}</div></div>`;}
-  const rows=d.rolls.map((r,i)=>`<tr>
-    <td style="font-weight:800">${t('rsRollNo')} ${i+1}</td>
-    <td style="text-align:start">${Object.entries(r.by).map(([c,n])=>`<span class="chip" style="margin:2px">${esc(c)} ×${n}</span>`).join(' ')}${r.spl?` <span style="color:var(--warn);font-weight:700">✂${r.spl}</span>`:''}${r.salv&&Object.keys(r.salv).length?' '+Object.entries(r.salv).map(([s,n])=>`<span class="chip" style="margin:2px;background:var(--ok-bg);color:var(--ok)">🎁${esc(s)}×${n}</span>`).join(' '):''}</td>
-    <td style="font-weight:700">${r.plies}</td>
-    <td>${R(r.used)} ${u}</td>
-    <td style="font-weight:800;color:${r.rem>0.5?'var(--bad)':'var(--ok)'}">${R(r.rem)} ${u}</td></tr>`).join('');
-  host.innerHTML=rollHint+hint+extraBox+cards+`<div style="overflow-x:auto"><table class="xtbl" style="min-width:560px">
-    <tr><th data-i18n="rsRollNo2">${t('rsRollNo2')}</th><th>${t('rsRollPlies')}</th><th>${t('rsPlies')}</th><th>${t('rsRollUsed')} (${u})</th><th>${t('rsRollRem')} (${u})</th></tr>
-    ${rows}</table></div>`;}
+  const spN=d.spread>0?`<div class="note" style="margin-bottom:8px">${esc(tf('rlSpreadNote',{v:R(d.spread)+' '+u}))}</div>`:'';
+  host.innerHTML=rollHint+spN+rsRollHtml(d,uf,u);}
 // حساب بديل بوضع مختلف دون تغيير الاختيار الحالي (للتلميح المقارن)
 function rsRollAlt(mode){const sel=$('rs-rollmode');if(!sel)return null;const cur=sel.value;sel.value=mode;const r=rsRollCompute();sel.value=cur;return r;}
 // طول الرول المثالي: أقرب مضاعف لطول الماركر السائد (الأكثر طبقات) — يقسم الرول بلا باقٍ دون تغيير الماركر
@@ -4372,25 +4393,30 @@ function rsSetRoll(v){if($('rs-rolllen')){$('rs-rolllen').value=v;rsRollPlan();r
 function printRsRolls(){const d=rsRollCompute();
   if(d.err==='empty'||d.err==='short')return toast(t('rsNoValidMk'));
   if(d.err==='nolen')return toast(t('rsRollNeedLen'));
-  const uf=rsUF(),u=rsUL();const R=v=>Math.round(v*uf*100)/100;const title=$('rs-title')?$('rs-title').value.trim():'';
+  rsRollPrint(d,rsUF(),rsUL(),$('rs-title')?$('rs-title').value.trim():'');}
+// طباعة/PDF أمر الرولات (مشتركة): قسم لكل لون مع بطاقاته وجدول رولاته
+function rsRollPrint(d,uf,u,title){const R=v=>Math.round(v*uf*100)/100;
   const card=(l,v)=>`<div style="flex:1;min-width:96px;border:1px solid #dbe5e4;border-radius:11px;padding:9px 8px;text-align:center;background:#f7faf9"><div style="font-size:10.5px;color:#6b7683;font-weight:700">${l}</div><div style="font-size:19px;color:#14504f;font-weight:800;margin-top:2px">${v}</div></div>`;
-  const rows=d.rolls.map((r,i)=>`<tr style="background:${i%2?'#f6faf9':'#fff'}">
-    <td style="text-align:center;padding:8px"><span style="display:inline-block;background:#14504f;color:#fff;font-weight:800;padding:3px 10px;border-radius:7px">${t('rsRollNo')} ${i+1}</span></td>
-    <td style="padding:8px;text-align:${LANG==='ar'?'right':'left'}">${Object.entries(r.by).map(([c,n])=>`<span style="display:inline-block;background:#fff;border:1.5px solid #cfe0df;border-radius:999px;padding:2px 9px;margin:2px;font-weight:800">${esc(c)} <span style="color:#1f6e6e">×${n}</span></span>`).join('')}${r.spl?` <b style="color:var(--warn)">✂${r.spl}</b>`:''}${r.salv&&Object.keys(r.salv).length?' '+Object.entries(r.salv).map(([s,n])=>`<span style="display:inline-block;background:var(--ok-bg);border:1.5px solid var(--ok-bd);border-radius:999px;padding:2px 9px;margin:2px;font-weight:800;color:var(--ok)">🎁 ${esc(s)} ×${n}</span>`).join(''):''}</td>
-    <td style="text-align:center;padding:8px;font-weight:800">${r.plies}</td>
-    <td style="text-align:center;padding:8px">${R(r.used)} ${u}</td>
-    <td style="text-align:center;padding:8px;font-weight:800;color:${r.rem>0.5?'var(--bad)':'var(--ok)'}">${R(r.rem)} ${u}</td>
-    <td style="padding:8px;min-width:90px"></td></tr>`).join('');
+  const cards=x=>`<div style="display:flex;gap:8px;margin-top:10px">${card(t('rsRollCount'),x.nRolls)}${card(t('rsRollTotalLen'),R(x.totRoll)+' '+u)}${card(t('rsRollWaste'),R(x.loss)+' '+u)}${card(t('rsRollEff'),x.eff+'%')}${d.mode==='continuous'?card(t('rsRollSplices'),x.splices):''}</div>`;
+  const th=v=>`<th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${v}</th>`;
+  const multi=d.groups.length>1||!!(d.groups[0]&&d.groups[0].name);
+  const grp=(g,gi)=>{const rows=g.rolls.map((r,i)=>`<tr style="background:${i%2?'#f6faf9':'#fff'}">
+      <td style="text-align:center;padding:7px"><span style="display:inline-block;background:#14504f;color:#fff;font-weight:800;padding:3px 10px;border-radius:7px">${t('rsRollNo')} ${i+1}</span></td>
+      <td style="padding:7px;text-align:${LANG==='ar'?'right':'left'}">${Object.entries(r.by).map(([c,n])=>`<span style="display:inline-block;background:#fff;border:1.5px solid #cfe0df;border-radius:999px;padding:2px 9px;margin:2px;font-weight:800">${esc(c)} <span style="color:#1f6e6e">×${n}</span></span>`).join('')}${r.spl?` <b style="color:#b45309">✂${r.spl}</b>`:''}${r.salv&&Object.keys(r.salv).length?' '+Object.entries(r.salv).map(([s2,n])=>`<span style="display:inline-block;border:1.5px solid #86efac;border-radius:999px;padding:2px 9px;margin:2px;font-weight:800;color:#15803d">🎁${esc(s2)}×${n}</span>`).join(''):''}</td>
+      <td style="text-align:center;padding:7px;font-weight:800">${r.plies}</td><td style="text-align:center;padding:7px">${R(r.used)} ${u}</td>
+      <td style="text-align:center;padding:7px;font-weight:800;color:${r.rem>0.5?'#c81e1e':'#15803d'}">${R(r.rem)} ${u}</td><td style="padding:7px;min-width:80px"></td></tr>`).join('');
+    return `<div style="${gi?'page-break-before:auto;margin-top:22px':''}">${multi?`<div style="margin-top:12px;background:${RS_COLORS[gi%RS_COLORS.length]};font-weight:900;padding:6px 12px;border-radius:8px;color:#111">${esc(tf('rlGroupHdr',{c:g.name||t('rlNoColor'),n:g.nRolls}))}</div>`:''}
+      ${cards(g)}
+      ${d.mode==='salvage'&&g.extraTotal>0?`<div style="margin-top:8px;border:1px solid #86efac;border-radius:9px;padding:7px 12px;font-weight:800;color:#15803d">🎁 ${tf('rsRollExtra',{n:g.extraTotal,l:R(g.salvLen)+' '+u})} — ${Object.entries(g.extra).sort((a,b)=>b[1]-a[1]).map(([s2,n])=>esc(s2)+' +'+n).join(' · ')}</div>`:''}
+      <table class="prt-grid" style="width:100%;border-collapse:collapse;margin-top:10px;border:1px solid #d5dee2;font-size:12.5px">
+        <thead><tr style="background:#e6efee">${th(t('rsRollNo2'))}${th(t('rsRollPlies'))}${th(t('rsPlies'))}${th(t('rsRollUsed'))}${th(t('rsRollRem'))}${th('✔')}</tr></thead><tbody>${rows}</tbody></table></div>`;};
   $('print-area').innerHTML=`<div style="font-family:'Segoe UI',Tahoma,Arial;color:#1c2530;max-width:840px;margin:auto;padding-top:8px" dir="${LANG==='ar'?'rtl':'ltr'}">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #14504f;padding-bottom:10px">
       <div><div style="font-size:23px;font-weight:800;color:#14504f">📦 ${esc(MEMBER.wsName||'')}</div>
       <div style="display:inline-block;margin-top:6px;background:#14504f;color:#fff;font-size:13px;font-weight:800;padding:3px 12px;border-radius:7px">${t('rsRollTitle')}</div></div>
-      <div style="text-align:${LANG==='ar'?'left':'right'};font-size:12px;color:#6b7683;line-height:1.9"><div>📅 ${fmtDate(today())}</div>${title?`<div>📝 ${esc(title)}</div>`:''}<div>📏 ${t('rsRollLenLbl')}: ${R(d.roll)} ${u}</div></div></div>
-    <div style="display:flex;gap:8px;margin-top:12px">${card(t('rsRollCount'),d.nRolls)}${card(t('rsRollTotalLen'),R(d.totRoll)+' '+u)}${card(t('rsRollWaste'),R(d.loss)+' '+u)}${card(t('rsRollEff'),d.eff+'%')}</div>
-    ${d.mode==='salvage'&&d.extraTotal>0?`<div style="margin-top:10px;background:var(--ok-bg);border:1px solid var(--ok-bd);border-radius:9px;padding:8px 12px;font-weight:800;color:var(--ok)">🎁 ${tf('rsRollExtra',{n:d.extraTotal,l:R(d.salvLen)+' '+u})} — ${Object.entries(d.extra).sort((a,b)=>b[1]-a[1]).map(([s,n])=>esc(s)+' +'+n).join(' · ')}</div>`:''}
-    <table class="prt-grid" style="width:100%;border-collapse:collapse;margin-top:14px;border:1px solid #d5dee2;border-radius:10px;overflow:hidden;font-size:13px">
-      <thead><tr style="background:#e6efee"><th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${t('rsRollNo2')}</th><th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${t('rsRollPlies')}</th><th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${t('rsPlies')}</th><th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${t('rsRollUsed')} (${u})</th><th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${t('rsRollRem')} (${u})</th><th style="padding:9px;border-bottom:2px solid #14504f;color:#0e3f3e">${t('signature')}</th></tr></thead>
-      <tbody>${rows}</tbody></table>
+      <div style="text-align:${LANG==='ar'?'left':'right'};font-size:12px;color:#6b7683;line-height:1.9"><div>📅 ${fmtDate(today())}</div>${title?`<div>📝 ${esc(title)}</div>`:''}<div>📏 ${t('rsRollLenLbl')}: ${R(d.roll)} ${u}</div>${d.spread>0?`<div>↔ ${esc(tf('rlSpreadNote',{v:R(d.spread)+' '+u}))}</div>`:''}</div></div>
+    ${d.groups.length>1?`<div style="margin-top:10px;font-weight:900">${esc(t('rlOverall'))}</div>`+cards(d):''}
+    ${d.groups.map(grp).join('')}
     <div style="margin-top:28px;display:flex;gap:16px"><div style="flex:1;text-align:center"><div style="border-bottom:1.5px solid #7c8894;margin:0 14px 6px;height:38px"></div><div style="font-size:12px;color:#44515e;font-weight:700">${t('rsFarradSig')}</div></div><div style="flex:1;text-align:center"><div style="border-bottom:1.5px solid #7c8894;margin:0 14px 6px;height:38px"></div><div style="font-size:12px;color:#44515e;font-weight:700">${t('rsStoreKeeper')}</div></div></div></div>`;
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 /* ---- قائمة التصدير (كليك يمين / ضغطة مطوّلة على زر التقرير): PDF أو Excel ---- */
@@ -4617,15 +4643,181 @@ function xlSideBySide(A,B,gap){gap=gap==null?2:gap;const off=A.cols.length+1,n=M
 // Excel لأمر الرولات
 function exportRsRollsExcel(){const d=rsRollCompute();
   if(d.err==='empty'||d.err==='short')return toast(t('rsNoValidMk'));if(d.err==='nolen')return toast(t('rsRollNeedLen'));
-  const uf=rsUF(),u=rsUL();const R=v=>Math.round(v*uf*100)/100;const title=$('rs-title')?$('rs-title').value.trim():'';
+  rsRollXlsx(d,rsUF(),rsUL(),$('rs-title')?$('rs-title').value.trim():'',rsExpFileBase('rolls')+'.xlsx');}
+// Excel أمر الرولات (مشترك): ملخّص ثم قسم لكل لون
+function rsRollXlsx(d,uf,u,title,fname){const R=v=>Math.round(v*uf*100)/100;
   const rows=[{s:'title',c:[(MEMBER.wsName?MEMBER.wsName+' — ':'')+t('rsRollTitle')]}];
   if(title)rows.push({s:'kv',c:[t('mkReportName'),title]});
-  rows.push({s:'kv',c:[t('dateLbl'),fmtDate(today())]},{s:'kv',c:[t('rsRollLenLbl'),R(d.roll)+' '+u]},{s:'kv',c:[t('rsRollCount'),d.nRolls]},{s:'kv',c:[t('rsRollWaste'),R(d.loss)+' '+u]},{s:'kv',c:[t('rsRollEff'),d.eff+'%']},[]);
-  rows.push({s:'head',c:[t('rsRollNo2'),t('rsRollPlies'),t('rsPlies'),t('rsRollUsed')+' ('+u+')',t('rsRollRem')+' ('+u+')']});
-  let tp=0,tu=0,trm=0;
-  d.rolls.forEach((r,i)=>{tp+=r.plies;tu+=r.used;trm+=r.rem;rows.push([t('rsRollNo')+' '+(i+1),Object.entries(r.by).map(([c,n])=>c+' ×'+n).join(' · ')+(r.salv&&Object.keys(r.salv).length?' 🎁 '+Object.entries(r.salv).map(([s2,n])=>s2+' ×'+n).join(' · '):''),r.plies,R(r.used),R(r.rem)]);});
-  rows.push({s:'total',c:[t('total'),'',tp,R(tu),R(trm)]});
-  xlsxDownload(rsExpFileBase('rolls')+'.xlsx',rows,{sheet:t('rsRollTitle')});toast(t('saved'));}
+  rows.push({s:'kv',c:[t('dateLbl'),fmtDate(today())]},{s:'kv',c:[t('rsRollLenLbl'),R(d.roll)+' '+u]});
+  if(d.spread>0)rows.push({s:'kv',c:[t('rlSpreadLbl'),R(d.spread)+' '+u]});
+  rows.push({s:'kv',c:[t('rsRollCount'),d.nRolls]},{s:'kv',c:[t('rsRollTotalLen'),R(d.totRoll)+' '+u]},{s:'kv',c:[t('rsRollWaste'),R(d.loss)+' '+u]},{s:'kv',c:[t('rsRollEff'),d.eff+'%']});
+  const multi=d.groups.length>1||!!(d.groups[0]&&d.groups[0].name);
+  d.groups.forEach(g=>{rows.push([]);
+    if(multi)rows.push({s:'head',c:[tf('rlGroupHdr',{c:g.name||t('rlNoColor'),n:g.nRolls}),'',t('rsRollWaste')+': '+R(g.loss)+' '+u,t('rsRollEff')+': '+g.eff+'%','']});
+    rows.push({s:'head',c:[t('rsRollNo2'),t('rsRollPlies'),t('rsPlies'),t('rsRollUsed')+' ('+u+')',t('rsRollRem')+' ('+u+')']});
+    let tp=0,tu=0,trm=0;
+    g.rolls.forEach((r,i)=>{tp+=r.plies;tu+=r.used;trm+=r.rem;rows.push([t('rsRollNo')+' '+(i+1),Object.entries(r.by).map(([c,n])=>c+' ×'+n).join(' · ')+(r.spl?' ✂'+r.spl:'')+(r.salv&&Object.keys(r.salv).length?' 🎁 '+Object.entries(r.salv).map(([s2,n])=>s2+' ×'+n).join(' · '):''),r.plies,R(r.used),R(r.rem)]);});
+    rows.push({s:'total',c:[t('total'),'',tp,R(tu),R(trm)]});});
+  xlsxDownload(fname,rows,{sheet:t('rsRollTitle')});toast(t('saved'));}
+/* ---- «خطة الرولات من ملف»: رفع Excel/PDF/CSV فيه الماركرات (القياسات، الطبقات لكل لون، الطول) → خطة رولات لكل لون ---- */
+let RL=null;
+// قراءة ملف xlsx بلا مكتبات: فكّ ZIP (DecompressionStream) ثم XML — يعيد أوراقاً [{name,rows:[[{t,x,w}]]}]
+async function rlUnzip(buf,want){const dv=new DataView(buf),u8=new Uint8Array(buf),dec=new TextDecoder();let e=-1;
+  for(let i=u8.length-22;i>=Math.max(0,u8.length-65557);i--)if(dv.getUint32(i,true)===0x06054b50){e=i;break;}
+  if(e<0)throw new Error('zip');const n=dv.getUint16(e+10,true);let q=dv.getUint32(e+16,true);const out={};
+  for(let k=0;k<n;k++){if(dv.getUint32(q,true)!==0x02014b50)break;const meth=dv.getUint16(q+10,true),csz=dv.getUint32(q+20,true),nl=dv.getUint16(q+28,true),el=dv.getUint16(q+30,true),cl=dv.getUint16(q+32,true),lo=dv.getUint32(q+42,true);
+    const name=dec.decode(u8.subarray(q+46,q+46+nl));q+=46+nl+el+cl;if(want&&!want(name))continue;
+    const st=lo+30+dv.getUint16(lo+26,true)+dv.getUint16(lo+28,true),raw=u8.subarray(st,st+csz);let data=null;
+    if(meth===0)data=raw;else if(meth===8)data=new Uint8Array(await new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer());
+    if(data)out[name]=dec.decode(data);}
+  return out;}
+async function rlReadXlsx(buf){const z=await rlUnzip(buf,n=>/^xl\/(sharedStrings\.xml|workbook\.xml|worksheets\/sheet\d+\.xml)$/.test(n));
+  const X=x=>new DOMParser().parseFromString(x,'application/xml'),tags=(d,n)=>[...d.getElementsByTagNameNS('*',n)];
+  const ss=z['xl/sharedStrings.xml']?tags(X(z['xl/sharedStrings.xml']),'si').map(si=>tags(si,'t').map(t=>t.textContent).join('')):[];
+  const names=z['xl/workbook.xml']?tags(X(z['xl/workbook.xml']),'sheet').map(x=>x.getAttribute('name')):[];
+  const col=r=>{const m=/^([A-Z]+)/.exec(r||'');let c=0;if(m)for(const ch of m[1])c=c*26+ch.charCodeAt(0)-64;return c-1;};
+  return Object.keys(z).filter(k=>/worksheets\/sheet\d+\.xml$/.test(k)).sort((a,b)=>+a.match(/(\d+)\.xml/)[1]-+b.match(/(\d+)\.xml/)[1]).map((k,i)=>{
+    const rows=tags(X(z[k]),'row').map(r=>tags(r,'c').map(c=>{const tp=c.getAttribute('t'),v=tags(c,'v')[0];
+      let t=tp==='s'?(ss[+(v&&v.textContent)]||''):tp==='inlineStr'?tags(c,'t').map(x=>x.textContent).join(''):(v?v.textContent:'');
+      return {t:String(t).trim(),x:col(c.getAttribute('r'))*10,w:0};}).filter(c=>c.t!==''));
+    return {name:names[i]||('Sheet'+(i+1)),rows};});}
+function rlReadCsv(txt){const lines=txt.split(/\r?\n/).filter(l=>l.trim());const d=['\t',';',','].find(c=>lines.slice(0,5).some(l=>l.includes(c)))||',';
+  return [{name:'csv',rows:lines.map(l=>l.split(d).map((t,i)=>({t:t.replace(/^"|"$/g,'').trim(),x:i*10,w:0})).filter(c=>c.t!==''))}];}
+// PDF: مكتبة pdf.js تُحمَّل عند الحاجة فقط؛ النصوص تُجمَّع صفوفاً حسب الارتفاع، ويُلصق «×n» بالقياس قبله و«🎨» باسم اللون بعده
+let RL_PDFJS=null;
+function rlLoadPdfJs(){if(window.pdfjsLib)return Promise.resolve(window.pdfjsLib);if(RL_PDFJS)return RL_PDFJS;
+  const V='3.11.174',srcs=[`https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${V}/pdf.min.js`,`https://cdn.jsdelivr.net/npm/pdfjs-dist@${V}/build/pdf.min.js`];
+  RL_PDFJS=new Promise((res,rej)=>{let i=0;const next=()=>{if(i>=srcs.length){RL_PDFJS=null;return rej(new Error('pdfjs'));}const u=srcs[i++],sc=document.createElement('script');sc.src=u;
+    sc.onload=()=>{if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc=u.replace('pdf.min.js','pdf.worker.min.js');res(pdfjsLib);}else next();};sc.onerror=next;document.head.appendChild(sc);};next();});
+  return RL_PDFJS;}
+async function rlReadPdf(buf){const lib=await rlLoadPdfJs();const doc=await lib.getDocument({data:new Uint8Array(buf)}).promise;const rows=[];
+  for(let pn=1;pn<=doc.numPages;pn++){const pg=await doc.getPage(pn),tc=await pg.getTextContent();
+    const it=tc.items.filter(o=>o.str&&o.str.trim()).map(o=>({t:o.str.trim(),x:o.transform[4],y:o.transform[5],w:o.width||0})).sort((a,b)=>b.y-a.y||a.x-b.x);
+    const grp=[];it.forEach(o=>{const g=grp.find(r=>Math.abs(r.y-o.y)<=3);if(g)g.c.push(o);else grp.push({y:o.y,c:[o]});});
+    const pr=grp.map(g=>rlMergeRow(g.c.sort((a,b)=>a.x-b.x)));
+    // «🎨» في سطر واسم اللون تحته (عنوان ملتفّ): نلصق الاسم الأقرب أفقياً من السطرين التاليين
+    pr.forEach((r,i)=>r.forEach(c=>{if(c.t!=='🎨')return;const cc=c.x+c.w/2;
+      for(let j=i+1;j<=Math.min(pr.length-1,i+2);j++){const k=pr[j].findIndex(o=>rlNum(o.t)==null&&Math.abs(o.x+o.w/2-cc)<=16);if(k>=0){c.t='🎨 '+pr[j][k].t;pr[j].splice(k,1);break;}}}));
+    pr.forEach(r=>rows.push(r));}
+  return [{name:'pdf',rows}];}
+function rlMergeRow(c){const out=[];
+  c.forEach(o=>{const L=out[out.length-1];
+    // أجزاء الكلمة الواحدة (حروف متلاصقة بلا فراغ) تُلصق — بعض الخطوط تُخرج كل حرف أو مقطع وحده
+    const ar=x=>/[\u0600-\u06ff\ufb50-\ufeff]/.test(x);
+    if(L&&L.t!=='🎨'&&o.t!=='🎨'&&o.x-(L.x+L.w)<=1.5&&o.x>=L.x&&ar(L.t)===ar(o.t)&&!/^[A-Za-z0-9]+[-\ue000-\uf8ff]\d+[×\ue000-\uf8ff]\d$/.test(L.t)){L.t+=o.t;L.w=Math.max(L.w,o.x+o.w-L.x);return;}
+    if(L&&/^[×xX]\s*\d{1,2}$/.test(o.t)&&Math.abs(L.x+L.w-o.x)<=4&&/[A-Za-z0-9]$/.test(L.t)){L.t+=o.t.replace(/^[xX]/,'×').replace(/\s/g,'');L.w=o.x+o.w-L.x;return;}
+    if(L&&L.t==='🎨'&&o.x-(L.x+L.w)<=12){L.t='🎨 '+o.t;L.w=o.x+o.w-L.x;return;}
+    out.push({...o});});
+  // رموز خاصة بدل «-» و«×» (خطوط بلا جدول تحويل): XL␣62␣1 → XL-62×1
+  out.forEach(o=>{o.t=o.t.replace(/^([A-Za-z0-9]+)[\ue000-\uf8ff](\d+)[\ue000-\uf8ff](\d{1,2})$/,'$1-$2×$3');});
+  return out;}
+// تفسير الجدول (دالة نقية — تُختبر): صفوف خلايا {t,x,w} → ماركرات {code,sizes:[[مقاس,عدد]],plies,len,cp:{لون:طبقات}}
+// الأعمدة من صف العناوين إن وُجد (🎨 اللون، الطبقات، قياس الفرد/الطول)؛ وإلا تُستنتج من الأرقام: الطبقات = مجموع الألوان، والطول L بحيث L×الطبقات = الاستهلاك
+const RL_SZ=/^([A-Za-z0-9][A-Za-z0-9.\/]*(?:-[A-Za-z0-9.\/]+)*)\s*[×xX*]\s*(\d{1,2})$/;
+function rlNum(t){const s=normNum(String(t)).replace(/[\s٬]/g,'').replace(/,(?=\d{3}(\D|$))/g,'').replace('٫','.').replace(',','.');return /^-?\d+(\.\d+)?$/.test(s)?+s:null;}
+function rlInterpret(rows){const nk=t=>normNum(String(t)).replace(/[\s\u064B-\u0652ـ()]/g,'').toLowerCase();
+  const KW={plies:['عددالطبقات','الطبقات','طبقات','plies','layers'],meas:['قياسالفرد','spreadlength','قياسفرد'],len:['طولالماركر','الطول','طول','length','markerlength'],
+    spread:['سماحيةالفرد','مسافةالفرد','spreadallowance'],yd:['ياردة','yard','yd'],code:['الكود','code']};
+  const has=(t,ks)=>{const v=nk(t);return ks.some(k=>v.includes(k));};
+  const parts=t=>String(t).split(/\s*[┃|·+،;]\s*/).filter(Boolean);
+  const isSize=c=>{const p=parts(c.t);return p.length&&p.every(x=>RL_SZ.test(x));};
+  const firstData=rows.findIndex(r=>r.some(isSize));if(firstData<0)return {mk:[],colors:[]};
+  // صف العناوين: آخر صف قبل أول بيانات فيه 🎨 أو «الطبقات»
+  let hi=-1;for(let i=firstData-1;i>=0;i--){if(rows[i].some(c=>c.t.startsWith('🎨')||has(c.t,KW.plies))){hi=i;break;}}
+  const H=hi>=0?rows[hi]:[],cx=c=>c.x+(c.w||0)/2;
+  const colors=H.filter(c=>c.t.startsWith('🎨')).map(c=>({name:c.t.replace('🎨','').trim()||'?',x:cx(c)}));
+  const plC=H.find(c=>!c.t.startsWith('🎨')&&has(c.t,KW.plies)),msC=H.find(c=>has(c.t,KW.meas)),lnC=msC||H.find(c=>has(c.t,KW.len)&&!has(c.t,KW.spread));
+  const xs=H.map(cx).sort((a,b)=>a-b);let gap=Infinity;for(let i=1;i<xs.length;i++)gap=Math.min(gap,xs[i]-xs[i-1]);const tol=isFinite(gap)?Math.max(4,Math.min(30,gap/2)):30;
+  // أعمدة ألوان بلا 🎨 (ملفات أخرى): عناوين نصية بين «الطبقات» و«الطول» ليست كلمات معروفة
+  if(!colors.length&&plC&&lnC){const a=Math.min(cx(plC),cx(lnC)),b=Math.max(cx(plC),cx(lnC));
+    H.forEach(c=>{const x=cx(c);if(x>a+1&&x<b-1&&!rlNum(c.t)&&!Object.values(KW).some(k=>has(c.t,k))&&!/قطع|pcs|pieces|run|تشغيل|استهلاك|consum/i.test(c.t))colors.push({name:c.t,x});});}
+  let unit=null,spread=null,incl=msC?true:(lnC?false:null);
+  rows.slice(0,firstData).forEach((r,i)=>r.forEach(c=>{if(has(c.t,KW.yd))unit='yd';
+    if(has(c.t,KW.spread)&&spread==null){for(let j=i+1;j<=Math.min(firstData-1,i+2);j++){const v=(rows[j]||[]).find(o=>Math.abs(cx(o)-cx(c))<=tol&&rlNum(o.t)!=null);if(v){spread=rlNum(v.t);break;}}}}));
+  if(!unit&&H.some(c=>/\(م\)|\(متر\)|\(m\)|meter|متر/.test(c.t)))unit='m';
+  const near=(nums,x)=>{let b=null;nums.forEach(n=>{const d=Math.abs(cx(n)-x);if(d<=tol&&(!b||d<b.d))b={n,d};});return b&&b.n;};
+  const mk=[];
+  rows.slice(firstData).forEach(r=>{if(!r.some(isSize))return;const sizes=[],nums=[];let code='',codeX=null;
+    r.forEach(c=>{if(isSize(c)){parts(c.t).forEach(p=>{const m=RL_SZ.exec(p);sizes.push([m[1],+m[2],cx(c)]);});return;}
+      const tt=c.t.replace(/\s*⚠.*$/,'');if(/^M\d{1,3}$/i.test(tt)){code=tt.toUpperCase();codeX=cx(c);return;}
+      const v=rlNum(c.t);if(v!=null)nums.push({...c,v});});
+    // رقم التسلسل (على الجهة الأخرى من الكود بعيداً عن القياسات) لا يُحسب
+    let N=nums;if(codeX!=null){const side=Math.sign(sizes.reduce((a,s)=>a+s[2],0)/sizes.length-codeX);N=nums.filter(n=>Math.sign(cx(n)-codeX)===side);}
+    const take=n=>{N=N.filter(o=>o!==n);return n.v;};
+    const cp={};colors.forEach(c=>{const n=near(N,c.x);cp[c.name]=n?take(n):0;});
+    const sumC=Object.values(cp).reduce((a,v)=>a+v,0),pcs=sizes.reduce((a,s)=>a+s[1],0);
+    let P=null,L=null;
+    if(plC){const n=near(N,cx(plC));if(n)P=take(n);}
+    if(P==null&&colors.length&&sumC>0){const n=N.find(o=>o.v===sumC);if(n)P=take(n);}
+    if(lnC){const n=near(N,cx(lnC));if(n)L=take(n);}
+    const ints=N.filter(o=>Number.isInteger(o.v)&&o.v>0),decs=N.filter(o=>o.v>0.2&&o.v<80);
+    const prodOk=(l,p)=>N.some(o=>Math.abs(o.v-l*p)<=Math.max(0.06,o.v*0.006));
+    if(P==null||L==null){let best=null;
+      (P!=null?[{v:P}]:ints).forEach(pi=>(L!=null?[{v:L}]:decs).forEach(li=>{if(pi===li||!(li.v>0))return;let sc=0;
+        if(prodOk(li.v,pi.v))sc+=3;if(N.some(o=>o.v===pcs*pi.v&&o!==pi))sc+=2;if(!Number.isInteger(li.v))sc+=1;if(!best||sc>best.sc)best={sc,p:pi,l:li};}));
+      if(best){if(P==null&&best.p.x!=null)P=take(best.p);if(L==null&&best.l.x!=null)L=take(best.l);}}
+    if(P==null&&colors.length)P=sumC;
+    mk.push({code:code||('M'+String(mk.length+1).padStart(2,'0')),sizes:sizes.map(s=>[s[0],s[1]]),plies:P||0,len:L||0,cp:colors.length?cp:{}});});
+  // صفحة من اليمين لليسار (الكود يمين القياسات في PDF): ترتيب الألوان بترتيب القراءة
+  const r0=rows[firstData],cd=r0.find(c=>/^M\d{1,3}/i.test(c.t)),sz=r0.filter(isSize);
+  if(cd&&sz.length&&cx(cd)>sz.reduce((a,c)=>a+cx(c),0)/sz.length)colors.sort((a,b)=>b.x-a.x);
+  return {mk,colors:colors.map(c=>c.name),unit,spread,incl};}
+async function rlFile(f){if(!f)return;const st=$('rl-status');const ext=(f.name.split('.').pop()||'').toLowerCase();
+  st.style.color='var(--mut)';st.textContent=t('rlReading');
+  try{const buf=await f.arrayBuffer();let sheets;
+    if(ext==='xlsx'||ext==='xlsm')sheets=await rlReadXlsx(buf);
+    else if(ext==='pdf')sheets=await rlReadPdf(buf).catch(e=>{throw new Error(e&&e.message==='pdfjs'?'pdfjs':(e&&e.message)||'pdf');});
+    else if(ext==='csv'||ext==='txt')sheets=rlReadCsv(new TextDecoder().decode(buf));
+    else if(ext==='xls')throw new Error('xls');
+    else throw new Error('type');
+    // الورقة الأكثر ماركرات (ملف «تحليل» فيه ورقتان: التحليل ونموذج الفرد)
+    let best=null;sheets.forEach(sh=>{const r=rlInterpret(sh.rows);if(!best||r.mk.length>best.mk.length)best=r;});
+    if(!best||!best.mk.length){st.style.color='var(--bad)';st.textContent='⚠️ '+t('rlNoMk');$('rl-body').classList.add('hide');RL=null;return;}
+    RL={file:f.name,...best};
+    if(best.unit)$('rl-funit').value=best.unit;
+    // الطول في الملف = قياس الفرد (يشمل المسافة) → لا نضيف شيئاً؛ طول ماركر فقط مع سماحية في الملف → نضيفها
+    $('rl-spread').value=best.incl===false&&best.spread>0?Math.round(best.spread/(best.unit==='yd'?1.0936133:1)*1000)/10:0;
+    st.style.color='var(--ok)';st.textContent='✅ '+tf('rlRead',{n:best.mk.length,c:best.colors.length||1,f:f.name});
+    $('rl-body').classList.remove('hide');rlRenderTable();rlCalc();}
+  catch(e){console.error(e);const m=e&&e.message;st.style.color='var(--bad)';st.textContent='⚠️ '+t(m==='xls'?'rlXls':m==='pdfjs'?'rlPdfFail':m==='type'?'rlBadFile':'rlReadFail');}}
+function rlInit(){const dz=$('rl-drop');if(!dz||dz._on)return;dz._on=1;
+  ['dragover','dragenter'].forEach(n=>dz.addEventListener(n,e=>{e.preventDefault();dz.style.borderColor='var(--teal)';}));
+  ['dragleave','drop'].forEach(n=>dz.addEventListener(n,e=>{e.preventDefault();dz.style.borderColor='';}));
+  dz.addEventListener('drop',e=>{const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(f)rlFile(f);});}
+// جدول المراجعة: كل ماركر بقياساته وطوله وطبقات كل لون — قابل للتعديل قبل الحساب
+function rlRenderTable(){if(!RL)return;const cs=RL.colors,u=$('rl-funit').value==='yd'?t('unitYdS'):t('unitMS');
+  const th=v=>`<th>${v}</th>`;
+  const rows=RL.mk.map((m,i)=>{const sum=cs.length?cs.reduce((a,c)=>a+(+m.cp[c]||0),0):m.plies,bad=cs.length&&sum!==m.plies&&m.plies>0;
+    return `<tr><td>${i+1}</td><td style="font-weight:800">${esc(m.code)}</td><td dir="ltr" style="text-align:start">${m.sizes.map(([s,n])=>`<span class="chip" style="margin:1px">${esc(s)}×${n}</span>`).join('')}</td>
+    <td><input type="number" step="0.01" min="0" value="${m.len||''}" style="width:80px;padding:4px;text-align:center;${m.len>0?'':'border-color:var(--bad)'}" oninput="RL.mk[${i}].len=+this.value||0;rlCalc()"></td>
+    ${cs.map(c=>`<td><input type="number" step="1" min="0" value="${m.cp[c]||''}" style="width:62px;padding:4px;text-align:center" oninput="RL.mk[${i}].cp['${c.replace(/'/g,"\\'")}']=+this.value||0;RL.mk[${i}].plies=RL.colors.reduce((a,k)=>a+(+RL.mk[${i}].cp[k]||0),0);rlRenderTable();rlCalc()"></td>`).join('')}
+    <td style="font-weight:800;${bad?'color:var(--bad)':''}" title="${bad?esc(t('rlSumWarn')):''}">${cs.length?sum:`<input type="number" step="1" min="0" value="${m.plies||''}" style="width:62px;padding:4px;text-align:center" oninput="RL.mk[${i}].plies=+this.value||0;rlCalc()">`}</td>
+    <td><button type="button" class="mini r" onclick="RL.mk.splice(${i},1);rlRenderTable();rlCalc()">✕</button></td></tr>`;}).join('');
+  const tot=cs.map(c=>RL.mk.reduce((a,m)=>a+(+m.cp[c]||0),0)),tp=RL.mk.reduce((a,m)=>a+(cs.length?cs.reduce((x,c)=>x+(+m.cp[c]||0),0):(+m.plies||0)),0);
+  const nBad=RL.mk.filter(m=>!(m.len>0)||!((cs.length?cs.reduce((a,c)=>a+(+m.cp[c]||0),0):+m.plies)>0)).length;
+  $('rl-revsum').innerHTML=esc(tf('rlReview',{n:RL.mk.length}))+(nBad?` <span style="color:var(--bad)">⚠️ ${esc(tf('rlReviewBad',{n:nBad}))}</span>`:'');if(nBad)$('rl-rev').open=true;
+  $('rl-table').innerHTML=`<table class="xtbl" style="min-width:620px"><tr>${th(t('rsCbNo'))}${th(t('rsCode'))}${th(t('rsDesc'))}${th(t('rlLenPly')+' ('+u+')')}${cs.map(c=>th('🎨 '+esc(c))).join('')}${th(t('rsPlies'))}${th('')}</tr>${rows}
+    <tr style="font-weight:900"><td colspan="4">${t('total')} — ${RL.mk.length}</td>${tot.map(v=>`<td>${v}</td>`).join('')}<td>${tp}</td><td></td></tr></table>`;}
+function rlData(){if(!RL)return {err:'nofile'};const fu=$('rl-funit').value==='yd'?1.0936133:1,uf=$('rl-unit').value==='yd'?1.0936133:1,u=$('rl-unit').value==='yd'?t('unitYdS'):t('unitMS');
+  const sp=Math.max(0,+$('rl-spread').value||0)/100,roll=(+$('rl-roll').value||0)/uf;
+  const mk=RL.mk.map(m=>({code:m.code,len:m.len>0?Math.round((m.len/fu+sp)*100)/100:0,cp:m.cp,plies:RL.colors.length?RL.colors.reduce((a,c)=>a+(+m.cp[c]||0),0):(+m.plies||0)}));
+  const miss=mk.filter(m=>!(m.len>0)||!(m.plies>0));const ok=mk.filter(m=>m.len>0&&m.plies>0);
+  if(!ok.length)return {err:'rlMissAll',uf,u};if(!(roll>0))return {err:'rsRollNeedLen',uf,u};
+  const maxMk=Math.max(...ok.map(m=>m.len));if(maxMk>roll+1e-9)return {err:'short',maxMk,uf,u};
+  const groups=RL.colors.length?RL.colors.map(c=>({name:c,items:ok.filter(m=>(+m.cp[c]||0)>0).map(m=>({code:m.code,len:m.len,n:+m.cp[c]}))})).filter(g=>g.items.length)
+    :[{name:'',items:ok.map(m=>({code:m.code,len:m.len,n:m.plies}))}];
+  const d=rsRollGroups(groups,Math.round(roll*100)/100,$('rl-mode').value);d.spread=sp;d.miss=miss;d.uf=uf;d.u=u;d.mk=ok;return d;}
+function rlCalc(){if(!RL)return;const d=rlData(),res=$('rl-res'),R=v=>Math.round(v*d.uf*100)/100;
+  const fu=$('rl-funit').value==='yd'?t('unitYdS'):t('unitMS');
+  $('rl-info').innerHTML=esc(RL.incl===true?t('rlInclYes'):RL.incl===false?t('rlInclNo'):t('rlInclUnk'))+(RL.spread>0?' · '+esc(tf('rlSpreadFound',{v:RL.spread+' '+fu})):'');
+  if(d.err==='short'){res.innerHTML=`<div class="msg err" style="padding:8px 12px;border-radius:8px">${tf('rsRollTooShort',{n:R(d.maxMk)+' '+d.u})}</div>`;return;}
+  if(d.err){res.innerHTML=`<div class="note">${esc(t(d.err))}</div>`;return;}
+  res.innerHTML=(d.miss.length?`<div class="msg err" style="padding:8px 12px;border-radius:8px;margin-bottom:8px">${esc(tf('rlMissing',{n:d.miss.length,c:d.miss.map(m=>m.code).join('، ')}))}</div>`:'')+
+    (d.spread>0?`<div class="note" style="margin-bottom:8px">${esc(tf('rlSpreadNote',{v:R(d.spread)+' '+d.u}))}</div>`:'')+rsRollHtml(d,d.uf,d.u);}
+function rlTitle(){return RL?RL.file.replace(/\.[^.]+$/,''):'';}
+function rlPrint(){if(!RL)return toast(t('rlNoFile'));const d=rlData();if(d.err)return toast(d.err==='short'?tf('rsRollTooShort',{n:Math.round(d.maxMk*d.uf*100)/100+' '+d.u}):t(d.err));rsRollPrint(d,d.uf,d.u,rlTitle());}
+function rlExcel(){if(!RL)return toast(t('rlNoFile'));const d=rlData();if(d.err)return toast(d.err==='short'?tf('rsRollTooShort',{n:Math.round(d.maxMk*d.uf*100)/100+' '+d.u}):t(d.err));
+  rsRollXlsx(d,d.uf,d.u,rlTitle(),'rolls_'+rlTitle().replace(/[^\w؀-ۿ]+/g,'_').slice(0,30)+'_'+today()+'.xlsx');}
 /* ---- تصدير خطة الريشو كملف Excel/CSV لغرفة القص ---- */
 function exportRsExcel(){
   const uf=rsUF(),u=rsUL();const R=v=>Math.round(v*uf*100)/100;
