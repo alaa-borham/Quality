@@ -34,11 +34,11 @@ function grabConst(name) {
 }
 
 const code = [
-  grabConst('RS_LIB_TOL'), grabConst('XL_CRC'), grabConst('rsP2'), grabConst('SIZE_ORDER'), grabConst('CV_HI'), grabConst('RL_SZ'),
-  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus', 'rsColorPlan', 'rsColorBeam', 'rsConsolidate', 'rsColorAlloc', 'rsRollPack', 'rsRollGroups', 'normNum', 'rlNum', 'rlInterpret', 'rlMergeRow'].map(grabFn),
+  grabConst('RS_LIB_TOL'), grabConst('XL_CRC'), grabConst('rsP2'), grabConst('SIZE_ORDER'), grabConst('CV_HI'), grabConst('RL_SZ'), grabConst('RS_ROLLC'),
+  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus', 'rsColorPlan', 'rsColorBeam', 'rsConsolidate', 'rsColorAlloc', 'rsRollPack', 'rsRollPack0', 'rsRollFin', 'rsRollGroups', 'normNum', 'rlNum', 'rlInterpret', 'rlMergeRow'].map(grabFn),
 ].join('\n');
 // rsSolve يقرأ الهدف/الفائض من الواجهة عند غياب الخيارات — نعيد قيمة فارغة فيُستعمل الافتراضي («أقل ماركرات»، فائض 0)
-const ctx = { $: () => ({ value: '' }), Date, Math, Object, Set, Map, Array, String, Number, Uint32Array, Int32Array, Float64Array, TextEncoder, console };
+const ctx = { $: () => ({ value: '' }), Date, Math, Object, Set, Map, Array, String, Number, Uint32Array, Int32Array, Float64Array, Uint8Array, Int16Array, TextEncoder, console };
 vm.createContext(ctx);
 vm.runInContext(code + '\n;globalThis.__x={rsCombos,rsSolve,rsPlanSolve,rsComboSig,rsLibComp,rsLibOk,rsBakSlot,rsBakSlotId,xlCrc,consCheck,rsTrimSurplus,rsColorPlan,rsColorBeam,rsConsolidate,rsColorAlloc,rsRollPack,rsRollGroups,rlInterpret,rlMergeRow};', ctx);
 const X = ctx.__x;
@@ -207,6 +207,8 @@ chk('xlCrc("123456789") = CBF43926', X.xlCrc(new TextEncoder().encode('123456789
 // ── خطة الرولات: توزيع الطبقات على الرولات، ولكل لون وحده ──
 { const p = X.rsRollPack([{ code: 'A', len: 9, n: 11 }, { code: 'B', len: 5, n: 3 }], 100, 'nosplice');
   chk('rolls: no-splice — every ply whole inside one roll, all plies placed', p.rolls.every(r => r.used <= 100 + 1e-9) && p.rolls.reduce((a, r) => a + r.plies, 0) === 14 && p.nRolls === 2, p);
+  const f = X.rsRollPack([{ code: 'A', len: 9.03, n: 33 }, { code: 'B', len: 6.7, n: 10 }, { code: 'C', len: 4.4, n: 12 }], 100, 'nosplice'), fab = 9.03 * 33 + 6.7 * 10 + 4.4 * 12;
+  chk('rolls: no-splice mixes markers to fill rolls — minimum rolls, waste excludes the last roll (back to store)', f.nRolls === Math.ceil(fab / 100) && Math.abs(f.loss + f.back - (f.totRoll - fab)) < 0.05 && f.back === f.rolls[f.rolls.length - 1].rem && f.loss < 3, { n: f.nRolls, loss: f.loss, back: f.back });
   const c = X.rsRollPack([{ code: 'A', len: 9, n: 23 }], 100, 'continuous');
   chk('rolls: continuous — minimum rolls, splices counted', c.nRolls === 3 && c.splices >= 1 && Math.abs(c.totalFab - 207) < 1e-9, c);
   const g = X.rsRollGroups([{ name: 'G', items: [{ code: 'A', len: 9, n: 11 }] }, { name: 'B', items: [{ code: 'A', len: 9, n: 5 }] }], 100, 'nosplice');
