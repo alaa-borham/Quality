@@ -4415,7 +4415,7 @@ function rsRollHtml(d,uf,u){const R=v=>Math.round(v*uf*100)/100;
       <b style="color:var(--ok)">🎁 ${tf('rsRollExtra',{n:g.extraTotal,l:R(g.salvLen)+' '+u})}</b>
       <div style="margin-top:4px">${Object.entries(g.extra).sort((a,b)=>b[1]-a[1]).map(([s,n])=>`<span class="chip" style="margin:2px;background:var(--ok-bg)">${esc(s)} +${n}</span>`).join(' ')}</div></div>`:'';
     const rows=g.rolls.map((r,i)=>`<tr><td style="font-weight:800">${t('rsRollNo')} ${i+1}</td>
-      <td style="text-align:start">${Object.entries(rsRollWhole(r)).map(([c,n])=>`<span class="chip" style="margin:2px">${esc(c)} ×${n}</span>`).join(' ')}${rsRollSplTxt(r,1,uf,u)}${r.salv&&Object.keys(r.salv).length?' '+Object.entries(r.salv).map(([s,n])=>`<span class="chip" style="margin:2px;background:var(--ok-bg);color:var(--ok)">🎁${esc(s)}×${n}</span>`).join(' '):''}</td>
+      <td style="text-align:start">${rsRollCellHtml(r,uf,u,0)}${r.salv&&Object.keys(r.salv).length?' '+Object.entries(r.salv).map(([s,n])=>`<span class="chip" style="margin:2px;background:var(--ok-bg);color:var(--ok)">🎁${esc(s)}×${n}</span>`).join(' '):''}</td>
       <td style="font-weight:700">${r.plies}</td><td>${R(r.used)} ${u}</td>
       <td style="font-weight:800;color:${r.rem>0.5?'var(--bad)':'var(--ok)'}">${R(r.rem)} ${u}</td></tr>`).join('');
     const hdr=multi?`<div style="background:${RS_COLORS[gi%RS_COLORS.length]};color:#111;font-weight:900;padding:7px 12px;border-radius:8px;margin:${gi?'18px':'4px'} 0 10px">${esc(tf('rlGroupHdr',{c:g.name||t('rlNoColor'),n:g.nRolls}))}</div>`:'';
@@ -4437,13 +4437,22 @@ function rsRollRemHtml(d,uf,u,pr){const L=rsRollRemList(d);if(!L.length)return '
   return pr?`<div style="margin-top:16px;page-break-inside:auto"><div style="font-weight:900;font-size:14px">${esc(t('rsRemTitle'))}</div>${head}${tb}</div>`
     :`<details style="margin-top:14px;border:1px solid var(--line);border-radius:10px;padding:8px 10px"><summary style="cursor:pointer;font-weight:800">${esc(t('rsRemTitle'))} (${L.length})</summary>${head}${tb}</details>`;}
 // وصف الوصلات في رول: «✂ M16 → رول 12» (الطبقة تبدأ هنا وتكتمل هناك) و«✂ M16 ← رول 7» (جزء طبقة بدأت هناك)؛ وفي الفرد المتصل عدد الوصلات
+// خانة رول: كل ماركر في «كبسولة» مستقلة بإطار (فاصل بصري واضح) — الطبقات الكاملة بإطار متصل، وأجزاء الطبقات الموصولة بإطار برتقالي متقطّع
+function rsRollCellHtml(r,uf,u,pr){const R=v=>Math.round(v*uf*100)/100;
+  const pill=(inner,st,ltr)=>`<span${ltr?' dir="ltr"':''} style="display:inline-flex;align-items:center;gap:4px;white-space:nowrap;margin:2px 3px;padding:${pr?'1px 6px':'2px 9px'};border-radius:7px;font-weight:800;${st}">${inner}</span>`;
+  const whole=Object.entries(rsRollWhole(r)).map(([c,n])=>pill(`${esc(c)}<span style="color:${pr?'#1f6e6e':'var(--teal)'}">×${n}</span>`,`border:1.5px solid ${pr?'#9fb7b6':'var(--line)'};background:${pr?'#f4f8f8':'var(--soft)'};color:${pr?'#111':'var(--txt)'}`,1)).join('');
+  const sp=`border:1.5px dashed #d97706;background:${pr?'#fff7e6':'var(--warn-bg)'};color:${pr?'#9a4b05':'var(--warn)'}`;
+  const outs=(r.joins||[]).map(x=>pill(`✂ ${esc(x.code)}${x.len>0?` <small>${R(x.len)}</small>`:''} → ${t('rsRollNo')} ${x.to+1}`,sp)).join('');
+  const ins=(r.joinIn||[]).map(x=>pill(`✂ ${esc(x.code)}${x.len>0?` <small>${R(x.len)}</small>`:''} ← ${t('rsRollNo')} ${x.from+1}`,sp)).join('');
+  const old=!(r.joins||r.joinIn)&&r.spl?pill('✂'+r.spl,sp):'';
+  return `<span style="display:inline-flex;flex-wrap:wrap;align-items:center">${ins}${whole}${outs}${old}</span>`;}
 // الطبقات الكاملة في الرول (عدا الطبقة الموصولة التي بدأت فيه — تُعرض منفصلة بطول جزئها)
 function rsRollWhole(r){const o={...r.by};(r.joins||[]).forEach(j=>{if(o[j.code]>0)o[j.code]--;if(!o[j.code])delete o[j.code];});return o;}
 // وصف الوصلات: «✂ M01 (5.6) → رول 2» جزء طبقة يبدأ هنا ويكمل هناك، و«✂ M01 (4.1) ← رول 1» تكملة طبقة بدأت هناك
 function rsRollSplTxt(r,html,uf,u){uf=uf||1;const L=x=>x.len>0?` (${Math.round(x.len*uf*100)/100}${u?' '+u:''})`:'';
   const J=(r.joins||[]).map(x=>`✂ ${x.code}${L(x)} → ${t('rsRollNo')} ${x.to+1}`).concat((r.joinIn||[]).map(x=>`✂ ${x.code}${L(x)} ← ${t('rsRollNo')} ${x.from+1}`));
-  const txt=J.length?J.join(' · '):(r.spl?'✂'+r.spl:'');if(!txt)return '';
-  return html?` <b style="color:#b45309;white-space:nowrap">${esc(txt).replace(/ · /g,'</b> <b style="color:#b45309;white-space:nowrap">')}</b>`:' '+txt;}
+  const txt=J.length?J.join('  ┃  '):(r.spl?'✂'+r.spl:'');if(!txt)return '';
+  return html?` <b style="color:#b45309;white-space:nowrap">${esc(txt).replace(/  ┃  /g,'</b> <b style="color:#b45309;white-space:nowrap">')}</b>`:' '+txt;}
 // الألوان جنباً إلى جنب: (١) مقارنة لكل لون + الإجمالي، (٢) رولات كل لون في عموده — صف لكل رقم رول. pr=للطباعة (ألوان ثابتة)
 function rsRollSideHtml(d,uf,u,pr){const R=v=>Math.round(v*uf*100)/100,G=d.groups,col=i=>RS_COLORS[i%RS_COLORS.length];
   const bd=pr?'border:1px solid #cfd8dc':'border:1px solid var(--line)',hd=(v,bg)=>`<th style="${bd};padding:${pr?'4px 3px':'6px 8px'};background:${bg||(pr?'#ffc000':'var(--hdr)')};color:#111;font-weight:900;${pr?'':'white-space:nowrap'}">${v}</th>`;
@@ -4458,7 +4467,7 @@ function rsRollSideHtml(d,uf,u,pr){const R=v=>Math.round(v*uf*100)/100,G=d.group
   const n=Math.max(...G.map(g=>g.rolls.length));let body='';
   for(let i=0;i<n;i++){body+=`<tr>${td(`<b>${t('rsRollNo')} ${i+1}</b>`,'white-space:nowrap')}${G.map(g=>{const r=g.rolls[i];if(!r)return td('')+td('');
       const last=i===g.rolls.length-1;
-      return td(Object.entries(rsRollWhole(r)).map(([c,k])=>`<span style="display:inline-block;white-space:nowrap;margin:1px 3px;font-weight:700">${esc(c)}×${k}</span>`).join('')+rsRollSplTxt(r,1,uf,u),'text-align:start')
+      return td(rsRollCellHtml(r,uf,u,pr),'text-align:start')
         +td(R(r.rem),`font-weight:800;white-space:nowrap;color:${last?(pr?'#1d4ed8':'var(--blue)'):r.rem>0.5?(pr?'#c81e1e':'var(--bad)'):(pr?'#15803d':'var(--ok)')}`+(last?';text-decoration:underline':''));}).join('')}</tr>`;}
   const side=`<div style="overflow-x:auto;margin-top:12px"><table style="border-collapse:collapse;width:100%;${pr?'table-layout:fixed;font-size:10.5px':'min-width:'+(120+G.length*230)+'px;font-size:12.5px'}">${pr?`<colgroup><col style="width:9%">${G.map(()=>`<col style="width:${(91/G.length*0.78).toFixed(2)}%"><col style="width:${(91/G.length*0.22).toFixed(2)}%">`).join('')}</colgroup>`:''}
     <tr>${hd(t('rsRollNo2'))}${G.map((g,i)=>`<th colspan="2" style="${bd};padding:6px;background:${col(i)};color:#111;font-weight:900">🎨 ${esc(g.name||t('rlNoColor'))} — ${g.nRolls}</th>`).join('')}</tr>
@@ -4504,7 +4513,7 @@ function rsRollPrint(d,uf,u,title){const R=v=>Math.round(v*uf*100)/100;
   const multi=d.groups.length>1||!!(d.groups[0]&&d.groups[0].name);
   const grp=(g,gi)=>{const rows=g.rolls.map((r,i)=>`<tr style="background:${i%2?'#f6faf9':'#fff'}">
       <td style="text-align:center;padding:7px"><span style="display:inline-block;background:#14504f;color:#fff;font-weight:800;padding:3px 10px;border-radius:7px">${t('rsRollNo')} ${i+1}</span></td>
-      <td style="padding:7px;text-align:${LANG==='ar'?'right':'left'}">${Object.entries(rsRollWhole(r)).map(([c,n])=>`<span style="display:inline-block;background:#fff;border:1.5px solid #cfe0df;border-radius:999px;padding:2px 9px;margin:2px;font-weight:800">${esc(c)} <span style="color:#1f6e6e">×${n}</span></span>`).join('')}${rsRollSplTxt(r,1,uf,u)}${r.salv&&Object.keys(r.salv).length?' '+Object.entries(r.salv).map(([s2,n])=>`<span style="display:inline-block;border:1.5px solid #86efac;border-radius:999px;padding:2px 9px;margin:2px;font-weight:800;color:#15803d">🎁${esc(s2)}×${n}</span>`).join(''):''}</td>
+      <td style="padding:7px;text-align:${LANG==='ar'?'right':'left'}">${rsRollCellHtml(r,uf,u,1)}${r.salv&&Object.keys(r.salv).length?' '+Object.entries(r.salv).map(([s2,n])=>`<span style="display:inline-block;border:1.5px solid #86efac;border-radius:999px;padding:2px 9px;margin:2px;font-weight:800;color:#15803d">🎁${esc(s2)}×${n}</span>`).join(''):''}</td>
       <td style="text-align:center;padding:7px;font-weight:800">${r.plies}</td><td style="text-align:center;padding:7px">${R(r.used)} ${u}</td>
       <td style="text-align:center;padding:7px;font-weight:800;color:${r.rem>0.5?'#c81e1e':'#15803d'}">${R(r.rem)} ${u}</td><td style="padding:7px;min-width:80px"></td></tr>`).join('');
     return `<div style="${gi?'page-break-before:auto;margin-top:22px':''}">${multi?`<div style="margin-top:12px;background:${RS_COLORS[gi%RS_COLORS.length]};font-weight:900;padding:6px 12px;border-radius:8px;color:#111">${esc(tf('rlGroupHdr',{c:g.name||t('rlNoColor'),n:g.nRolls}))}</div>`:''}
@@ -4760,12 +4769,12 @@ function rsRollXlsx(d,uf,u,title,fname){const R=v=>Math.round(v*uf*100)/100;
       .forEach(([l,f,tv])=>rows.push([l,...G.map(f),tv]));
     rows.push([]);rows.push({s:'head',c:[t('rsRollNo2'),...G.flatMap(g=>[nm(g)+' — '+t('rsRollPlies'),t('rsRollRem')+' ('+u+')'])]});
     const n=Math.max(...G.map(g=>g.rolls.length));
-    for(let i=0;i<n;i++)rows.push([t('rsRollNo')+' '+(i+1),...G.flatMap(g=>{const r=g.rolls[i];return r?[Object.entries(rsRollWhole(r)).map(([c,k])=>c+' ×'+k).join(' · ')+rsRollSplTxt(r,0,uf,u),R(r.rem)]:['',''];})]);}
+    for(let i=0;i<n;i++)rows.push([t('rsRollNo')+' '+(i+1),...G.flatMap(g=>{const r=g.rolls[i];return r?[Object.entries(rsRollWhole(r)).map(([c,k])=>c+' ×'+k).join('  ┃  ')+(r.joins||r.joinIn||r.spl?'  ┃ ':'')+rsRollSplTxt(r,0,uf,u).trim(),R(r.rem)]:['',''];})]);}
   d.groups.forEach(g=>{rows.push([]);
     if(multi)rows.push({s:'head',c:[tf('rlGroupHdr',{c:g.name||t('rlNoColor'),n:g.nRolls}),'',t('rsRollWaste')+': '+R(g.loss)+' '+u,t('rsRollEff')+': '+g.eff+'%','']});
     rows.push({s:'head',c:[t('rsRollNo2'),t('rsRollPlies'),t('rsPlies'),t('rsRollUsed')+' ('+u+')',t('rsRollRem')+' ('+u+')']});
     let tp=0,tu=0,trm=0;
-    g.rolls.forEach((r,i)=>{tp+=r.plies;tu+=r.used;trm+=r.rem;rows.push([t('rsRollNo')+' '+(i+1),Object.entries(rsRollWhole(r)).map(([c,n])=>c+' ×'+n).join(' · ')+rsRollSplTxt(r,0,uf,u)+(r.salv&&Object.keys(r.salv).length?' 🎁 '+Object.entries(r.salv).map(([s2,n])=>s2+' ×'+n).join(' · '):''),r.plies,R(r.used),R(r.rem)]);});
+    g.rolls.forEach((r,i)=>{tp+=r.plies;tu+=r.used;trm+=r.rem;rows.push([t('rsRollNo')+' '+(i+1),Object.entries(rsRollWhole(r)).map(([c,n])=>c+' ×'+n).join('  ┃  ')+(r.joins||r.joinIn||r.spl?'  ┃ ':'')+rsRollSplTxt(r,0,uf,u).trim()+(r.salv&&Object.keys(r.salv).length?' 🎁 '+Object.entries(r.salv).map(([s2,n])=>s2+' ×'+n).join(' · '):''),r.plies,R(r.used),R(r.rem)]);});
     rows.push({s:'total',c:[t('total'),'',tp,R(tu),R(trm)]});});
   const RL2=rsRollRemList(d);if(RL2.length){const stx={back:t('rsRemBack'),ok:t('rsRemOk'),scrap:t('rsRemScrap')};rows.push([]);rows.push({s:'head',c:[t('rsRemTitle'),'','','','']});
     rows.push({s:'head',c:[t('rsRemColor'),t('rsRollNo2'),t('rsRemLen')+' ('+u+')',t('rsRemStatus'),'']});RL2.forEach(x=>rows.push([x.c,t('rsRollNo')+' '+x.roll,R(x.rem),stx[x.st],'']));}
@@ -4979,7 +4988,7 @@ function exportRsExcel(){
     rows.push({s:'kv',c:[t('rsRollLenLbl'),R(rp.roll),t('rsRollCount'),rp.nRolls,t('rsRollWaste'),R(rp.loss),t('rsRollEff'),rp.eff+'%']});
     if(rp.mode==='salvage'&&rp.extraTotal>0)rows.push([t('rsRollExtra').replace('{n}',rp.extraTotal).replace('{l}',R(rp.salvLen)+' '+u),Object.entries(rp.extra).map(([s,n])=>s+' +'+n).join(' · ')]);
     rows.push({s:'head',c:[t('rsRollNo2'),t('rsRollPlies'),t('rsPlies'),t('rsRollUsed')+' ('+u+')',t('rsRollRem')+' ('+u+')']});
-    rp.rolls.forEach((r,i)=>rows.push([t('rsRollNo')+' '+(i+1),Object.entries(rsRollWhole(r)).map(([c,n])=>c+' ×'+n).join(' · ')+rsRollSplTxt(r,0,uf,u)+(r.salv&&Object.keys(r.salv).length?' 🎁 '+Object.entries(r.salv).map(([s,n])=>s+' ×'+n).join(' · '):''),r.plies,R(r.used),R(r.rem)]));}
+    rp.rolls.forEach((r,i)=>rows.push([t('rsRollNo')+' '+(i+1),Object.entries(rsRollWhole(r)).map(([c,n])=>c+' ×'+n).join('  ┃  ')+(r.joins||r.joinIn||r.spl?'  ┃ ':'')+rsRollSplTxt(r,0,uf,u).trim()+(r.salv&&Object.keys(r.salv).length?' 🎁 '+Object.entries(r.salv).map(([s,n])=>s+' ×'+n).join(' · '):''),r.plies,R(r.used),R(r.rem)]));}
   xlsxDownload(rsExpFileBase('plan')+'.xlsx',rows,{sheet:t('rsTitle')});toast(t('saved'));}
 /* ---- مقارنة سيناريوهات الريشو: اختيار خطط محفوظة ومقارنتها جنبًا إلى جنب ---- */
 function rsComparePick(){const plans=TOOLCHK.filter(c=>c.type==='rs');const vm=rsPlanVers();
