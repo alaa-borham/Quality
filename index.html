@@ -4450,7 +4450,10 @@ function rsRollCellHtml(r,uf,u,pr,g,roll){const R=v=>Math.round(v*uf*100)/100;
   // الطبقة الموصولة جزءان من طبقة واحدة: نكتب الجزأين معاً (هنا + في الرول الآخر = طول الطبقة) كي لا يُظن أن الجزء «نقص» عند ترحيله
   const LEN={};((g&&g.items)||[]).forEach(it=>LEN[it.code]=it.len);
   const both=(x,key,n)=>{const L=LEN[x.code];if(!(L>0&&x.len>0))return `✂ <span dir="ltr">${esc(x.code)}</span> · ${esc(tf(key,{n}))}`;
-    return `✂ <span dir="ltr">${esc(x.code)}</span> · ${esc(tf(key+'2',{a:R(x.len),b:R(L-x.len),n,L:R(L)}))}`;};
+    // الكمية المرحّلة (الجزء الذي ينتقل للرول الآخر) بالأحمر — في الرولين: «4.63 في رول 2» هنا، و«4.63 هنا» هناك
+    const red=v=>`<span style="color:#dc2626;font-weight:900;background:#fee2e2;border-radius:4px;padding:0 3px">${v}</span>`;
+    const out=key==='rsJoinTo',txt=esc(tf(key+'2',{a:'\u0001',b:'\u0002',n,L:R(L)}));
+    return `✂ <span dir="ltr">${esc(x.code)}</span> · `+txt.replace('\u0001',out?R(x.len):red(R(x.len))).replace('\u0002',out?red(R(L-x.len)):R(L-x.len));};
   const outs=(r.joins||[]).map(x=>pill(both(x,'rsJoinTo',x.to+1),spOut)).join('');
   const ins=(r.joinIn||[]).map(x=>pill(both(x,'rsJoinFrom',x.from+1),spIn)).join('');
   const old=!(r.joins||r.joinIn)&&r.spl?pill('✂'+r.spl,sp):'';
