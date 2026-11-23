@@ -404,7 +404,8 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
             <div><label class="inl" data-i18n="rlSpread">مسافة الفرد تُضاف لكل طبقة (سم)</label><input id="rl-spread" type="number" min="0" step="0.1" value="0" oninput="rlCalc()"></div>
             <div><label class="inl" data-i18n="rlRollLen">طول الرول</label><input id="rl-roll" type="number" min="0" step="0.01" value="100" oninput="rlCalcSoon()"></div>
             <div><label class="inl" data-i18n="rlRollUnit">وحدة الرول والنتائج</label><select id="rl-unit" onchange="rlCalc()"><option value="m" data-i18n="unitMOpt">متر</option><option value="yd" data-i18n="unitYdOpt">ياردة</option></select></div></div>
-          <div class="grid2" style="margin-top:8px"><div><label class="inl" data-i18n="rsRollMode">طريقة الفرد</label><select id="rl-mode" onchange="rlCalc()"><option value="nosplice" data-i18n="rsRollNoSplice">بلا وصل — كل طبقة من رول واحد</option><option value="continuous" data-i18n="rsRollCont">متصل بوصل الرولات — أقل هدر</option></select></div>
+          <div class="grid2" style="margin-top:8px"><div><label class="inl" data-i18n="rsRollMode">طريقة الفرد</label><select id="rl-mode" onchange="rlCalc()"><option value="nosplice" data-i18n="rsRollNoSplice">بلا وصل — كل طبقة من رول واحد</option><option value="remsplice" data-i18n="rsRollRemSpl">بلا وصل + وصل البواقي (وصلة واحدة للطبقة)</option><option value="continuous" data-i18n="rsRollCont">متصل بوصل الرولات — أقل هدر</option></select>
+              <label class="inl" style="margin-top:6px" data-i18n="rsRollMinLbl">أقل طول باقٍ صالح للاستعمال</label><input id="rl-min" type="number" step="0.1" min="0.1" value="1" oninput="rlCalcSoon()"></div>
             <div id="rl-info" class="note" style="align-self:end;line-height:1.7"></div></div>
           <details id="rl-rev" style="margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--card)"><summary id="rl-revsum" style="cursor:pointer;font-weight:800"></summary>
             <div id="rl-table" style="overflow-x:auto;margin-top:10px"></div></details>
@@ -510,7 +511,10 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
             <select id="rs-rollmode" onchange="rsRollPlan();rsSaveDraft()" style="padding:6px;font-weight:700;margin-inline-start:8px;background:var(--inp)">
               <option value="nosplice" data-i18n="rsRollNoSplice">بلا وصل — كل طبقة من رول واحد</option>
               <option value="salvage" data-i18n="rsRollSalvage">بلا وصل + استغلال البواقي بقياسات صغيرة</option>
+              <option value="remsplice" data-i18n="rsRollRemSpl">بلا وصل + وصل البواقي (وصلة واحدة للطبقة)</option>
               <option value="continuous" data-i18n="rsRollCont">متصل بوصل الرولات — أقل هدر</option></select>
+            <label class="inl" data-i18n="rsRollMinLbl" style="display:inline;font-size:13px;margin-inline-start:14px">أقل طول باقٍ صالح للاستعمال</label>
+            <input id="rs-rollmin" type="number" step="0.1" min="0.1" value="1" oninput="rsRollPlanSoon();rsSaveDraft()" style="max-width:90px;padding:6px;margin-inline-start:8px;background:var(--inp)">
             <div id="rs-rolls" style="margin-top:12px"></div></div></div>
         <div class="row-btns" style="margin-top:14px"><button class="btn sec rs-exp" data-exp="plan" onclick="printRsPlan()" oncontextmenu="return rsExpMenu(event,'plan')" title="كليك يمين (أو ضغطة مطوّلة): تصدير PDF أو Excel" data-i18n-title="rsExpTip" data-i18n="rsPrint">🖨 طباعة الخطة</button>
         <button class="btn sec rs-exp" data-exp="spread" onclick="printRsSpread()" oncontextmenu="return rsExpMenu(event,'spread')" title="كليك يمين (أو ضغطة مطوّلة): تصدير PDF أو Excel" data-i18n-title="rsExpTip" data-i18n="rsSpreadBtn">🧵 أمر الفرد</button>
@@ -648,7 +652,7 @@ rsColTitle:'🎨 توزيع الألوان (اختياري)',rsCMQtyAuto:'محس
 rsSugTbl:'إكمال الخطة',rsSugPliesC:'الطبقات المقترحة',rsEditPliesC:'تعديل الطبقات يدويًا (اختياري)',rsRemWithRun:'إجمالي المتبقي مع التشغيل',rsApplyAll:'✔ اعتماد كل الاقتراحات كماركر',rsSugEmpty:'لا كميات متبقية — الاقتراحات فارغة',
 rsSpreadBtn:'🧵 أمر الفرد',rsAnaBtn:'📊 تحليل',rsSaveTitle:'نسبة التوفير',rsSaveOrder:'استهلاك تحليل الأوردر — مع الفرد ({u})',rsSavePlan:'استهلاك خطة الفرد والقص — مع الفرد ({u})',rsSaveAmt:'التوفير ({u})',rsSavePct:'نسبة التوفير',rsSaveNote:'التوفير = استهلاك التحليل − استهلاك الخطة (مع الفرد) · النسبة = التوفير ÷ استهلاك التحليل · بالأحمر (−) = زيادة',rsAnaTitle:'تحليل استهلاك الأوردر',rsAnaSheet:'تحليل',rsAnaSizes:'عدد المقاسات',rsAnaQty:'إجمالي الكمية',rsAnaShare:'النسبة من الكمية',rsAnaCp:'استهلاك القطعة ({u})',rsAnaCq:'استهلاك الكمية ({u})',rsAnaCf:'استهلاك مع الفرد ({u})',rsNoValidMk:'لا ماركرات صالحة للفرد',
 rsFarradSig:'توقيع الفرّاد',rsCutSupSig:'مشرف القص',
-rsRollTbl:'📦 خطة الرولات',rsRollTitle:'أمر الرولات',rsRollBtn:'📦 أمر الرولات',rsRollNo:'رول',rsRollNo2:'رقم الرول',rsRollLenLbl:'طول الرول',rsStoreKeeper:'أمين المخزن',rsRollNeedLen:'أدخل طول الرول لحساب التوزيع',rsRollNoMk:'لا ماركرات صالحة بعد — أكمل الخطة أولاً',rsRollTooShort:'طول الرول أقصر من أطول ماركر ({n}) — زِد طول الرول',rsRollCount:'عدد الرولات المطلوبة',rsRollTotalLen:'إجمالي طول الرولات',rsRollWaste:'الهدر الفعلي (بواقي الرولات)',rsRollBack:'باقي آخر رول (يرجع للمخزن)',rsRollEff:'كفاءة الاستخدام',rsRollPlies:'الطبقات المفرودة (ماركر×عدد)',rsRollUsed:'الطول المستخدم',rsRollRem:'الباقي',
+rsRollTbl:'📦 خطة الرولات',rsRollTitle:'أمر الرولات',rsRollBtn:'📦 أمر الرولات',rsRollNo:'رول',rsRollNo2:'رقم الرول',rsRollLenLbl:'طول الرول',rsStoreKeeper:'أمين المخزن',rsRollNeedLen:'أدخل طول الرول لحساب التوزيع',rsRollNoMk:'لا ماركرات صالحة بعد — أكمل الخطة أولاً',rsRollTooShort:'طول الرول أقصر من أطول ماركر ({n}) — زِد طول الرول',rsRollCount:'عدد الرولات المطلوبة',rsRollTotalLen:'إجمالي طول الرولات',rsRollWaste:'الهدر الفعلي (بواقي الرولات)',rsRollRemSpl:'بلا وصل + وصل البواقي (وصلة واحدة للطبقة)',rsRollMinLbl:'أقل طول باقٍ صالح للاستعمال',rsRollUsable:'بواقي صالحة للاستعمال (≥ {m})',rsRollScrap:'هدر (بواقي أقصر من الحد)',rsRemBack:'يرجع للمخزن (آخر رول)',rsRemOk:'صالح للاستعمال',rsRemScrap:'هدر',rsRemColor:'اللون',rsRemLen:'طول الباقي',rsRemStatus:'الحالة',rsRemTitle:'📦 قائمة البواقي للمخزن',rsRemSum:'صالحة للاستعمال: {a} قطعة ({b}) · هدر: {c} قطعة ({d}) · آخر رول يرجع للمخزن: {e} ({f})',rsRollBack:'باقي آخر رول (يرجع للمخزن)',rsRollEff:'كفاءة الاستخدام',rsRollPlies:'الطبقات المفرودة (ماركر×عدد)',rsRollUsed:'الطول المستخدم',rsRollRem:'الباقي',
 rsRollMode:'طريقة الفرد',rsRollNoSplice:'بلا وصل — كل طبقة من رول واحد',rsRollCont:'متصل بوصل الرولات — أقل هدر',rsRollSalvage:'بلا وصل + استغلال البواقي بقياسات صغيرة',rsRollSplices:'عدد الوصلات',rsRollTip:'الفرد المتصل يوفّر: {n} رول فقط · هدر {l} · كفاءة {e}% (تحدث وصلة عند نهاية الرول)',
 rsRollIdeal:'أساس الحساب طول الماركر ({L}). لأقل هدر: اطلب الرول بطول {y} = {k}× الماركر (يقسمه بلا باقٍ)',rsRollApplyIdeal:'طبّق الطول المثالي',rsRollExtra:'قطع من البواقي تُغطّي الأوردر: {n} قطعة ({l} مستغَلة من الهدر)',
 rsCompareBtn:'⚖️ مقارنة السيناريوهات',rsCompareTitle:'مقارنة سيناريوهات الريشو',rsCmpPick:'اختر خطتين أو أكثر للمقارنة',rsCmpNeed2:'اختر خطتين على الأقل للمقارنة',rsCmpNone:'لا خطط ريشو محفوظة للمقارنة',rsCmpMetric:'المؤشر',rsCmpMarkers:'عدد الماركرات الصالحة',rsCmpWaste:'الهدر مقابل الأقل',rsCmpDate:'التاريخ',rsCmpDo:'قارن',rsCmpPrint:'🖨 طباعة المقارنة',
@@ -803,7 +807,7 @@ rsColTitle:'🎨 Color split (optional)',rsCMQtyAuto:'Computed from the color co
 rsSugTbl:'Plan completion',rsSugPliesC:'Suggested plies',rsEditPliesC:'Adjust plies (optional)',rsRemWithRun:'Remaining after run',rsApplyAll:'✔ Apply all suggestions as markers',rsSugEmpty:'Nothing remaining — no suggestions',
 rsSpreadBtn:'🧵 Spreading order',rsAnaBtn:'📊 Analysis',rsSaveTitle:'Saving rate',rsSaveOrder:'Order analysis consumption — incl. spread ({u})',rsSavePlan:'Cutting plan consumption — incl. spread ({u})',rsSaveAmt:'Saving ({u})',rsSavePct:'Saving rate',rsSaveNote:'Saving = analysis − plan consumption (incl. spread) · rate = saving ÷ analysis · red (−) = extra',rsAnaTitle:'Order consumption analysis',rsAnaSheet:'Analysis',rsAnaSizes:'Sizes',rsAnaQty:'Total quantity',rsAnaShare:'Share of quantity',rsAnaCp:'Per-piece consumption ({u})',rsAnaCq:'Quantity consumption ({u})',rsAnaCf:'Consumption incl. spread ({u})',rsNoValidMk:'No valid markers to spread',
 rsFarradSig:'Spreader signature',rsCutSupSig:'Cutting supervisor',
-rsRollTbl:'📦 Fabric roll plan',rsRollTitle:'Roll pull order',rsRollBtn:'📦 Roll order',rsRollNo:'Roll',rsRollNo2:'Roll #',rsRollLenLbl:'Roll length',rsStoreKeeper:'Store keeper',rsRollNeedLen:'Enter roll length to compute allocation',rsRollNoMk:'No valid markers yet — complete the plan first',rsRollTooShort:'Roll shorter than the longest marker ({n}) — increase roll length',rsRollCount:'Rolls needed',rsRollTotalLen:'Total roll length',rsRollWaste:'Actual waste (roll remnants)',rsRollBack:'Last roll remainder (back to store)',rsRollEff:'Utilization',rsRollPlies:'Plies laid (marker×count)',rsRollUsed:'Used length',rsRollRem:'Remnant',
+rsRollTbl:'📦 Fabric roll plan',rsRollTitle:'Roll pull order',rsRollBtn:'📦 Roll order',rsRollNo:'Roll',rsRollNo2:'Roll #',rsRollLenLbl:'Roll length',rsStoreKeeper:'Store keeper',rsRollNeedLen:'Enter roll length to compute allocation',rsRollNoMk:'No valid markers yet — complete the plan first',rsRollTooShort:'Roll shorter than the longest marker ({n}) — increase roll length',rsRollCount:'Rolls needed',rsRollTotalLen:'Total roll length',rsRollWaste:'Actual waste (roll remnants)',rsRollRemSpl:'No splice + join remnants (one splice per ply)',rsRollMinLbl:'Minimum usable remnant length',rsRollUsable:'Usable remnants (≥ {m})',rsRollScrap:'Waste (remnants under the minimum)',rsRemBack:'Back to store (last roll)',rsRemOk:'Usable',rsRemScrap:'Waste',rsRemColor:'Color',rsRemLen:'Remnant length',rsRemStatus:'Status',rsRemTitle:'📦 Remnants list for the store',rsRemSum:'Usable: {a} pcs ({b}) · Waste: {c} pcs ({d}) · Last rolls back to store: {e} ({f})',rsRollBack:'Last roll remainder (back to store)',rsRollEff:'Utilization',rsRollPlies:'Plies laid (marker×count)',rsRollUsed:'Used length',rsRollRem:'Remnant',
 rsRollMode:'Spreading method',rsRollNoSplice:'No splice — each ply from one roll',rsRollCont:'Continuous (spliced) — least waste',rsRollSalvage:'No splice + salvage remnants with small sizes',rsRollSplices:'Splices',rsRollTip:'Continuous spreading saves: only {n} rolls · {l} loss · {e}% utilization (a splice occurs at each roll end)',
 rsRollIdeal:'Marker length is the basis ({L}). For least waste: order rolls of {y} = {k}× the marker (divides with no remnant)',rsRollApplyIdeal:'Apply ideal length',rsRollExtra:'Remnant pieces covering the order: {n} pcs ({l} salvaged from waste)',
 rsCompareBtn:'⚖️ Compare scenarios',rsCompareTitle:'Compare ratio scenarios',rsCmpPick:'Pick two or more plans to compare',rsCmpNeed2:'Select at least two plans to compare',rsCmpNone:'No saved ratio plans to compare',rsCmpMetric:'Metric',rsCmpMarkers:'Valid markers',rsCmpWaste:'Waste vs best',rsCmpDate:'Date',rsCmpDo:'Compare',rsCmpPrint:'🖨 Print comparison',
@@ -2177,7 +2181,7 @@ function rsApplyDraft(d){
   if($('rs-unit')){$('rs-unit').value=d.unit||'متر';RS_PREV_UNIT=$('rs-unit').value;}
   if(d.maxlen!=null)$('rs-maxlen').value=d.maxlen;
   if(d.rolllen&&$('rs-rolllen'))$('rs-rolllen').value=d.rolllen;
-  if(d.rollmode&&$('rs-rollmode'))$('rs-rollmode').value=d.rollmode;
+  if(d.rollmode&&$('rs-rollmode'))$('rs-rollmode').value=d.rollmode;if(d.rollmin&&$('rs-rollmin'))$('rs-rollmin').value=d.rollmin;
   if(d.price&&$('rs-price'))$('rs-price').value=d.price;
   if($('rs-colors')){$('rs-colors').innerHTML='';(d.colors||[]).forEach(c=>rsAddColorRow(c));}
   if(d.maxsizes!=null)$('rs-maxsizes').value=Math.min(6,Math.max(1,+d.maxsizes||6));
@@ -2200,7 +2204,7 @@ function rsProductChanged(){RS_LOADED=true;$('rs-qty-rows').innerHTML='';if($('r
 function rsBuildDraft(){return {title:($('rs-title')?$('rs-title').value.trim():''),product:($('rs-product')?$('rs-product').value:''),
   unit:($('rs-unit')?$('rs-unit').value:'متر'),
   maxlen:+$('rs-maxlen').value||0,maxsizes:+$('rs-maxsizes').value||6,maxpcs:+$('rs-maxpcs').value||5,surplus:+($('rs-surplus')&&$('rs-surplus').value)||0,fabwidth:($('rs-fabwidth')?$('rs-fabwidth').value:''),
-  objective:($('rs-objective')?$('rs-objective').value:'markers'),objV:2,rolllen:+($('rs-rolllen')&&$('rs-rolllen').value)||0,rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,spread:+($('rs-spread')&&$('rs-spread').value)||0,colors:rsColors(),
+  objective:($('rs-objective')?$('rs-objective').value:'markers'),objV:2,rolllen:+($('rs-rolllen')&&$('rs-rolllen').value)||0,rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),rollmin:+($('rs-rollmin')&&$('rs-rollmin').value)||1,price:+($('rs-price')&&$('rs-price').value)||0,spread:+($('rs-spread')&&$('rs-spread').value)||0,colors:rsColors(),
   qty:[...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0})).filter(x=>x.size),
   rowcol:RS_ROWCOL,combocol:RS_COMBOCOL,comboAct:rsComboActMap(),
   markers:rsReadMarkers().filter(m=>m.pairs.length||m.plies).map(m=>({pairs:m.pairs,plies:+m.plies||0,actlen:m.actlen||0,...(m.cp?{cp:m.cp}:{})}))};}
@@ -4077,7 +4081,7 @@ function rsResult(){const qty=rsReadQty();if(!qty.length)return null;
     unit:($('rs-unit')?$('rs-unit').value:'متر'),uf:rsUF(),
     surplus:+($('rs-surplus')&&$('rs-surplus').value)||0,objective:($('rs-objective')&&$('rs-objective').value)||'markers',
     fabwidth:($('rs-fabwidth')?$('rs-fabwidth').value:''),rolllen:+($('rs-rolllen')&&$('rs-rolllen').value)||0,
-    rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),price:+($('rs-price')&&$('rs-price').value)||0,spread:+($('rs-spread')&&$('rs-spread').value)||0,colors:rsColors(),rowcol:RS_ROWCOL,combocol:RS_COMBOCOL,
+    rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),rollmin:+($('rs-rollmin')&&$('rs-rollmin').value)||1,price:+($('rs-price')&&$('rs-price').value)||0,spread:+($('rs-spread')&&$('rs-spread').value)||0,colors:rsColors(),rowcol:RS_ROWCOL,combocol:RS_COMBOCOL,
     qty,markers,cover,totalReq,totalMade:tRun,totRem:totalReq-tRun,totFab:Math.round(tFab*100)/100,
     valid:markers.filter(m=>m.ok).length,decision:ready?'PASS':'FAIL'};}
 // حفظ الخطة كسجل جديد — يُرجع وعداً بـ true عند النجاح (تستعمله «خطة جديدة» كي لا تمسح قبل تأكيد الحفظ)
@@ -4182,7 +4186,7 @@ function rsOpenInCalc(id){const c=TOOLCHK.find(x=>x.id===id);if(!c||c.type!=='rs
   if(r.objective&&$('rs-objective'))$('rs-objective').value=r.objective;
   rsSetFabW(r.fabwidth!=null?r.fabwidth:'');
   if(r.rolllen&&$('rs-rolllen'))$('rs-rolllen').value=r.rolllen;
-  if(r.rollmode&&$('rs-rollmode'))$('rs-rollmode').value=r.rollmode;
+  if(r.rollmode&&$('rs-rollmode'))$('rs-rollmode').value=r.rollmode;if(r.rollmin&&$('rs-rollmin'))$('rs-rollmin').value=r.rollmin;
   if(r.price&&$('rs-price'))$('rs-price').value=r.price;
   if(r.spread!=null&&$('rs-spread'))$('rs-spread').value=r.spread;
   if($('rs-colors')){$('rs-colors').innerHTML='';(r.colors||[]).forEach(cc=>rsAddColorRow(cc));}
@@ -4289,10 +4293,10 @@ function rsSpreadHtml(d,opt){opt=opt||{};
 // توزيع طبقات على رولات (دالة نقية — تُختبر): items=[{code,len,n}] — len طول الطبقة الواحدة بالمتر (شاملاً مسافة الفرد) و n عدد طبقاتها
 // nosplice: كل طبقة كاملة من رول واحد (الأطول أولاً، في أول رول يتّسع لها — الباقي يخدم طبقة أقصر أو يُهدر)؛ continuous: فرد متصل بوصلة عند نهاية الرول
 const RS_ROLLC=new Map();
-function rsRollPack(items,roll,mode){const key=roll+'|'+mode+'|'+items.map(m=>m.code+':'+m.len+':'+m.n).join(',');
+function rsRollPack(items,roll,mode,minP){minP=minP>0?minP:1;const key=roll+'|'+mode+'|'+minP+'|'+items.map(m=>m.code+':'+m.len+':'+m.n).join(',');
   if(RS_ROLLC.has(key)){const c=RS_ROLLC.get(key);return {...c,rolls:c.rolls.map(r=>({...r,by:{...r.by}}))};}
-  const res=rsRollPack0(items,roll,mode);if(RS_ROLLC.size>200)RS_ROLLC.clear();RS_ROLLC.set(key,{...res,rolls:res.rolls.map(r=>({...r,by:{...r.by}}))});return res;}
-function rsRollPack0(items,roll,mode){const rnd=v=>Math.round(v*100)/100,rolls=[];let splices=0;
+  const res=rsRollPack0(items,roll,mode,minP);if(RS_ROLLC.size>200)RS_ROLLC.clear();RS_ROLLC.set(key,{...res,rolls:res.rolls.map(r=>({...r,by:{...r.by}}))});return res;}
+function rsRollPack0(items,roll,mode,minP){minP=minP>0?minP:1;const rnd=v=>Math.round(v*100)/100,rolls=[];let splices=0;
   const dem=[];items.forEach(m=>{for(let k=0;k<m.n;k++)dem.push({len:m.len,code:m.code});});
   const nr=()=>{const r={rem:roll,used:0,plies:0,by:{},spl:0};rolls.push(r);return r;};
   if(mode==='continuous'){let cur=null;
@@ -4322,21 +4326,45 @@ function rsRollPack0(items,roll,mode){const rnd=v=>Math.round(v*100)/100,rolls=[
       let bestR={r:ffd,w:ffd.length?ffd.slice(0,-1).reduce((a,x)=>a+x.rem,0):0};for(const o of ords){const r=one(o);const w=r.length?r.slice(0,-1).reduce((a,x)=>a+x.rem,0):0;
         if(!bestR||r.length<bestR.r.length||(r.length===bestR.r.length&&w<bestR.w-1e-9))bestR={r,w};
         if(bestR.r.length<=minR&&bestR.w<0.5)break;}
-      bestR.r.forEach(r=>rolls.push(r));}}
-  return rsRollFin({rolls,nRolls:rolls.length,totRoll:rnd(rolls.length*roll),totalFab:rnd(items.reduce((a,m)=>a+m.len*m.n,0)),splices,salvLen:0});}
+      bestR.r.forEach(r=>rolls.push(r));}
+    // «وصل البواقي»: طبقات الرولات الأخيرة تُبنى من باقيين في رولات أخرى (وصلة واحدة، وكل قطعة ≥ أقل طول صالح) — يُفرغ رولات كاملة أو يكبّر باقي الرول الأخير للمخزن
+    if(mode==='remsplice'&&rolls.length>1){const LEN={};items.forEach(m=>LEN[m.code]=m.len);
+      // نفرغ الرولات الأقل استعمالاً (غير المشاركة في وصلات) بنقل طبقاتها إلى البواقي: باقٍ واحد يتّسع، أو أصغر باقيين مجموعهما يكفي (مؤشران على البواقي المرتّبة)
+      const done=new Set();
+      for(let guard=0;guard<100000;guard++){const cand=rolls.filter(r=>!done.has(r)&&!r.jo&&!r.ji&&r.plies>0).sort((x,y)=>x.used-y.used)[0];if(!cand)break;
+        const codes=Object.keys(cand.by).filter(c=>cand.by[c]>0).sort((x,y)=>LEN[y]-LEN[x]);let stuck=false;
+        for(const c of codes){while(cand.by[c]>0){const L=LEN[c],pool=rolls.filter(r=>r!==cand&&r.rem>=minP-1e-9).sort((x,y)=>x.rem-y.rem);
+            let one=pool.find(r=>r.rem>=L-1e-9),best=null;
+            if(!one){let i=0,j=pool.length-1;while(i<j){const A=pool[i],B=pool[j],sm=A.rem+B.rem;
+                if(sm>=L-1e-9){const need=rnd(L-A.rem);if(need>=minP-1e-9&&B.rem>=need-1e-9&&(!best||sm<best.sm))best={A,B,need,sm};j--;}else i++;}}
+            if(!one&&!best){stuck=true;break;}
+            cand.by[c]--;cand.plies--;cand.used=rnd(cand.used-L);cand.rem=rnd(roll-cand.used);if(!cand.by[c])delete cand.by[c];
+            if(one){one.by[c]=(one.by[c]||0)+1;one.plies++;one.used=rnd(one.used+L);one.rem=rnd(one.rem-L);continue;}
+            const {A,B,need}=best;(A.jo=A.jo||[]).push({code:c,r:B});(B.ji=B.ji||[]).push({code:c,r:A});
+            A.by[c]=(A.by[c]||0)+1;A.plies++;A.used=rnd(A.used+A.rem);A.rem=0;A.spl++;B.used=rnd(B.used+need);B.rem=rnd(B.rem-need);B.spl++;splices++;}
+          if(stuck)break;}
+        if(cand.plies===0&&!cand.jo&&!cand.ji){rolls.splice(rolls.indexOf(cand),1);continue;}
+        done.add(cand);}
+      rolls.sort((a,b)=>b.used-a.used);
+      // مراجع الوصل → أرقام الرولات بعد الترتيب
+      rolls.forEach(r=>{if(r.jo)r.joins=r.jo.map(x=>({code:x.code,to:rolls.indexOf(x.r)}));if(r.ji)r.joinIn=r.ji.map(x=>({code:x.code,from:rolls.indexOf(x.r)}));});
+      rolls.forEach(r=>{delete r.jo;delete r.ji;});}}
+  return rsRollFin({minP,rolls,nRolls:rolls.length,totRoll:rnd(rolls.length*roll),totalFab:rnd(items.reduce((a,m)=>a+m.len*m.n,0)),splices,salvLen:0});}
 // الهدر الحقيقي = بواقي كل الرولات عدا الأخير؛ باقي الرول الأخير رول ناقص يرجع للمخزن (لا يُحسب هدراً)؛ الكفاءة على المستهلك فعلاً
 function rsRollFin(g){const rnd=v=>Math.round(v*100)/100,rs=g.rolls,last=rs.length?rs[rs.length-1].rem:0;
   g.back=rnd(Math.max(0,last));g.loss=rnd(rs.reduce((a,r)=>a+r.rem,0)-g.back);const usedRolls=g.totRoll-g.back,used=g.totalFab+(g.salvLen||0);
-  g.eff=usedRolls>0?Math.round(used/usedRolls*10000)/100:0;return g;}
+  g.eff=usedRolls>0?Math.round(used/usedRolls*10000)/100:0;
+  // البواقي (عدا الرول الأخير): صالحة للاستعمال إن كانت ≥ أقل طول صالح، وإلا هدر
+  const mp=g.minP||1;g.usable=rnd(rs.slice(0,-1).reduce((a,r)=>a+(r.rem>=mp-0.005?r.rem:0),0));g.scrap=rnd(g.loss-g.usable);return g;}
 // تجميع مجموعات الرولات (لون لكل مجموعة) في نتيجة واحدة: الإجماليات + بديل «متصل» لكل مجموعة للتلميح
-function rsRollGroups(groups,roll,mode,salvage){const rnd=v=>Math.round(v*100)/100;
-  groups.forEach(g=>{Object.assign(g,rsRollPack(g.items,roll,mode==='continuous'?'continuous':'nosplice'));g.extra={};g.extraTotal=0;g.salvLen=0;
+function rsRollGroups(groups,roll,mode,salvage,minP){const rnd=v=>Math.round(v*100)/100;
+  groups.forEach(g=>{Object.assign(g,rsRollPack(g.items,roll,mode==='continuous'||mode==='remsplice'?mode:'nosplice',minP));g.extra={};g.extraTotal=0;g.salvLen=0;
     if(mode==='salvage'&&salvage)salvage(g);
     if(mode!=='continuous'){const alt=rsRollPack(g.items,roll,'continuous');g.alt={nRolls:alt.nRolls,loss:alt.loss,eff:alt.eff};}});
   const sum=k=>rnd(groups.reduce((a,g)=>a+(g[k]||0),0));
   const nRolls=groups.reduce((a,g)=>a+g.nRolls,0),totRoll=sum('totRoll'),used=rnd(sum('totalFab')+sum('salvLen')),back=sum('back');
   return {roll,mode,groups,nRolls,totRoll,totalFab:sum('totalFab'),loss:sum('loss'),back,eff:totRoll-back>0?Math.round(used/(totRoll-back)*10000)/100:0,
-    splices:groups.reduce((a,g)=>a+(g.splices||0),0),extraTotal:groups.reduce((a,g)=>a+g.extraTotal,0),salvLen:sum('salvLen')};}
+    minP:minP>0?minP:1,usable:sum('usable'),scrap:sum('scrap'),splices:groups.reduce((a,g)=>a+(g.splices||0),0),extraTotal:groups.reduce((a,g)=>a+g.extraTotal,0),salvLen:sum('salvLen')};}
 // خطة الرولات لصفحة الريشو: طول الطبقة = طول الماركر الفعّال + مسافة الفرد؛ وبالألوان: رولات كل لون وحدها بطبقاته فقط
 function rsRollCompute(){
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
@@ -4368,7 +4396,7 @@ function rsRollCompute(){
         r.salv[pick.size]=(r.salv[pick.size]||0)+1;g.extra[pick.size]=(g.extra[pick.size]||0)+1;need[pick.size]--;
         r.rem=rnd(r.rem-pick.cons);r.used=rnd(r.used+pick.cons);g.salvLen=rnd(g.salvLen+pick.cons);g.extraTotal++;}});
     rsRollFin(g);};
-  const d=rsRollGroups(groups,roll,mode,salvage);d.mk=mk;d.spread=sp;
+  const d=rsRollGroups(groups,roll,mode,salvage,Math.max(0.1,+($('rs-rollmin')&&$('rs-rollmin').value)||1)/uf);d.mk=mk;d.spread=sp;
   // توافق: قائمة الرولات والقطع الإضافية مجمّعة
   d.rolls=d.groups.flatMap(g=>g.rolls);d.extra={};d.groups.forEach(g=>Object.keys(g.extra).forEach(s=>d.extra[s]=(d.extra[s]||0)+g.extra[s]));
   return d;}
@@ -4377,7 +4405,7 @@ function rsRollHtml(d,uf,u){const R=v=>Math.round(v*uf*100)/100;
   const card=(l,v,col)=>`<div style="flex:1 1 120px;min-width:120px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;text-align:center;background:var(--card)">
     <div style="font-size:11px;color:var(--mut);font-weight:700">${l}</div><div style="font-size:18px;font-weight:800;color:${col||'var(--teal)'};margin-top:2px">${v}</div></div>`;
   const cards=x=>`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-    ${card(t('rsRollCount'),x.nRolls)}${card(t('rsRollTotalLen'),R(x.totRoll)+' '+u)}${card(t('rsRollWaste'),R(x.loss)+' '+u,x.loss>Math.max(1,x.nRolls*0.5)?'var(--bad)':'var(--ok)')}${card(t('rsRollBack'),R(x.back||0)+' '+u,'var(--blue)')}${card(t('rsRollEff'),x.eff+'%',x.eff>=90?'var(--ok)':x.eff>=80?'var(--warn)':'var(--bad)')}${d.mode==='continuous'?card(t('rsRollSplices'),x.splices,x.splices>0?'var(--warn)':'var(--ok)'):''}</div>`;
+    ${card(t('rsRollCount'),x.nRolls)}${card(t('rsRollTotalLen'),R(x.totRoll)+' '+u)}${card(t('rsRollWaste'),R(x.loss)+' '+u,x.loss>Math.max(1,x.nRolls*0.5)?'var(--bad)':'var(--ok)')}${card(tf('rsRollUsable',{m:R(d.minP||1)+' '+u}),R(x.usable||0)+' '+u,'var(--ok)')}${card(t('rsRollBack'),R(x.back||0)+' '+u,'var(--blue)')}${card(t('rsRollEff'),x.eff+'%',x.eff>=90?'var(--ok)':x.eff>=80?'var(--warn)':'var(--bad)')}${d.mode==='continuous'||d.mode==='remsplice'?card(t('rsRollSplices'),x.splices,x.splices>0?'var(--warn)':'var(--ok)'):''}</div>`;
   const multi=d.groups.length>1||!!(d.groups[0]&&d.groups[0].name);
   const grp=(g,gi)=>{let tip='';
     if(d.mode!=='continuous'&&g.eff<90&&g.alt&&g.alt.nRolls<g.nRolls)tip=`<div style="margin-bottom:10px;font-size:12px;color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn-bd);border-radius:8px;padding:8px 11px">💡 ${tf('rsRollTip',{n:g.alt.nRolls,l:R(g.alt.loss)+' '+u,e:g.alt.eff})}</div>`;
@@ -4385,29 +4413,46 @@ function rsRollHtml(d,uf,u){const R=v=>Math.round(v*uf*100)/100;
       <b style="color:var(--ok)">🎁 ${tf('rsRollExtra',{n:g.extraTotal,l:R(g.salvLen)+' '+u})}</b>
       <div style="margin-top:4px">${Object.entries(g.extra).sort((a,b)=>b[1]-a[1]).map(([s,n])=>`<span class="chip" style="margin:2px;background:var(--ok-bg)">${esc(s)} +${n}</span>`).join(' ')}</div></div>`:'';
     const rows=g.rolls.map((r,i)=>`<tr><td style="font-weight:800">${t('rsRollNo')} ${i+1}</td>
-      <td style="text-align:start">${Object.entries(r.by).map(([c,n])=>`<span class="chip" style="margin:2px">${esc(c)} ×${n}</span>`).join(' ')}${r.spl?` <span style="color:var(--warn);font-weight:700">✂${r.spl}</span>`:''}${r.salv&&Object.keys(r.salv).length?' '+Object.entries(r.salv).map(([s,n])=>`<span class="chip" style="margin:2px;background:var(--ok-bg);color:var(--ok)">🎁${esc(s)}×${n}</span>`).join(' '):''}</td>
+      <td style="text-align:start">${Object.entries(r.by).map(([c,n])=>`<span class="chip" style="margin:2px">${esc(c)} ×${n}</span>`).join(' ')}${rsRollSplTxt(r,1)}${r.salv&&Object.keys(r.salv).length?' '+Object.entries(r.salv).map(([s,n])=>`<span class="chip" style="margin:2px;background:var(--ok-bg);color:var(--ok)">🎁${esc(s)}×${n}</span>`).join(' '):''}</td>
       <td style="font-weight:700">${r.plies}</td><td>${R(r.used)} ${u}</td>
       <td style="font-weight:800;color:${r.rem>0.5?'var(--bad)':'var(--ok)'}">${R(r.rem)} ${u}</td></tr>`).join('');
     const hdr=multi?`<div style="background:${RS_COLORS[gi%RS_COLORS.length]};color:#111;font-weight:900;padding:7px 12px;border-radius:8px;margin:${gi?'18px':'4px'} 0 10px">${esc(tf('rlGroupHdr',{c:g.name||t('rlNoColor'),n:g.nRolls}))}</div>`:'';
     return hdr+tip+extra+cards(g)+`<div style="overflow-x:auto"><table class="xtbl" style="min-width:560px">
       <tr><th>${t('rsRollNo2')}</th><th>${t('rsRollPlies')}</th><th>${t('rsPlies')}</th><th>${t('rsRollUsed')} (${u})</th><th>${t('rsRollRem')} (${u})</th></tr>${rows}</table></div>`;};
-  if(d.groups.length<2)return d.groups.map(grp).join('');
+  if(d.groups.length<2)return d.groups.map(grp).join('')+rsRollRemHtml(d,uf,u,false);
   // ألوان متعددة: الألوان جنباً إلى جنب (مثل جدول الماركرات) — جدول مقارنة ثم جدول الرولات، والتفاصيل لكل لون في قسم قابل للفتح
-  return rsRollSideHtml(d,uf,u,false)+`<details style="margin-top:14px;border:1px solid var(--line);border-radius:10px;padding:8px 10px"><summary style="cursor:pointer;font-weight:800">${esc(t('rlDetails'))}</summary>`+d.groups.map(grp).join('')+'</details>';}
+  return rsRollSideHtml(d,uf,u,false)+`<details style="margin-top:14px;border:1px solid var(--line);border-radius:10px;padding:8px 10px"><summary style="cursor:pointer;font-weight:800">${esc(t('rlDetails'))}</summary>`+d.groups.map(grp).join('')+'</details>'+rsRollRemHtml(d,uf,u,false);}
+// قائمة البواقي للمخزن: كل باقٍ برقم روله ولونه وطوله — صالح للاستعمال (≥ أقل طول) أو هدر؛ وباقي آخر رول يرجع للمخزن
+function rsRollRemList(d){const out=[];d.groups.forEach(g=>g.rolls.forEach((r,i)=>{if(r.rem<0.005)return;const last=i===g.rolls.length-1;
+    out.push({c:g.name||t('rlNoColor'),roll:i+1,rem:r.rem,st:last?'back':r.rem>=(d.minP||1)-0.005?'ok':'scrap'});}));
+  const ord={back:0,ok:1,scrap:2};return out.sort((a,b)=>ord[a.st]-ord[b.st]||b.rem-a.rem);}
+function rsRollRemHtml(d,uf,u,pr){const L=rsRollRemList(d);if(!L.length)return '';const R=v=>Math.round(v*uf*100)/100;
+  const bd=pr?'border:1px solid #cfd8dc':'border:1px solid var(--line)',st={back:[t('rsRemBack'),pr?'#1d4ed8':'var(--blue)'],ok:[t('rsRemOk'),pr?'#15803d':'var(--ok)'],scrap:[t('rsRemScrap'),pr?'#c81e1e':'var(--bad)']};
+  const cnt=k=>L.filter(x=>x.st===k),sumL=a=>R(a.reduce((s2,x)=>s2+x.rem,0));
+  const head=`<div style="margin:6px 0;font-weight:800">${esc(tf('rsRemSum',{a:cnt('ok').length,b:sumL(cnt('ok'))+' '+u,c:cnt('scrap').length,d:sumL(cnt('scrap'))+' '+u,e:cnt('back').length,f:sumL(cnt('back'))+' '+u}))}</div>`;
+  const tb=`<table style="border-collapse:collapse;width:100%;${pr?'font-size:11px':'max-width:640px;font-size:13px'}"><tr>${[t('rsRemColor'),t('rsRollNo2'),t('rsRemLen')+' ('+u+')',t('rsRemStatus')].map(h=>`<th style="${bd};padding:5px;background:${pr?'#ffc000':'var(--hdr)'};color:#111">${h}</th>`).join('')}</tr>
+    ${L.map(x=>`<tr><td style="${bd};padding:4px 8px;font-weight:700">🎨 ${esc(x.c)}</td><td style="${bd};padding:4px 8px;text-align:center">${t('rsRollNo')} ${x.roll}</td><td style="${bd};padding:4px 8px;text-align:center;font-weight:800">${R(x.rem)}</td><td style="${bd};padding:4px 8px;font-weight:800;color:${st[x.st][1]}">${esc(st[x.st][0])}</td></tr>`).join('')}</table>`;
+  return pr?`<div style="margin-top:16px;page-break-inside:auto"><div style="font-weight:900;font-size:14px">${esc(t('rsRemTitle'))}</div>${head}${tb}</div>`
+    :`<details style="margin-top:14px;border:1px solid var(--line);border-radius:10px;padding:8px 10px"><summary style="cursor:pointer;font-weight:800">${esc(t('rsRemTitle'))} (${L.length})</summary>${head}${tb}</details>`;}
+// وصف الوصلات في رول: «✂ M16 → رول 12» (الطبقة تبدأ هنا وتكتمل هناك) و«✂ M16 ← رول 7» (جزء طبقة بدأت هناك)؛ وفي الفرد المتصل عدد الوصلات
+function rsRollSplTxt(r,html){const J=(r.joins||[]).map(x=>`✂ ${x.code} → ${t('rsRollNo')} ${x.to+1}`).concat((r.joinIn||[]).map(x=>`✂ ${x.code} ← ${t('rsRollNo')} ${x.from+1}`));
+  const txt=J.length?J.join(' · '):(r.spl?'✂'+r.spl:'');if(!txt)return '';
+  return html?` <b style="color:#b45309;white-space:nowrap">${esc(txt)}</b>`:' '+txt;}
 // الألوان جنباً إلى جنب: (١) مقارنة لكل لون + الإجمالي، (٢) رولات كل لون في عموده — صف لكل رقم رول. pr=للطباعة (ألوان ثابتة)
 function rsRollSideHtml(d,uf,u,pr){const R=v=>Math.round(v*uf*100)/100,G=d.groups,col=i=>RS_COLORS[i%RS_COLORS.length];
   const bd=pr?'border:1px solid #cfd8dc':'border:1px solid var(--line)',hd=(v,bg)=>`<th style="${bd};padding:${pr?'4px 3px':'6px 8px'};background:${bg||(pr?'#ffc000':'var(--hdr)')};color:#111;font-weight:900;${pr?'':'white-space:nowrap'}">${v}</th>`;
   const td=(v,st)=>`<td style="${bd};padding:5px 8px;text-align:center;${st||''}">${v}</td>`;
   const rows=[[t('rsRollCount'),g=>g.nRolls,d.nRolls],[t('rsRollTotalLen'),g=>R(g.totRoll)+' '+u,R(d.totRoll)+' '+u],[t('rsPlies'),g=>g.rolls.reduce((a,r)=>a+r.plies,0),G.reduce((a,g)=>a+g.rolls.reduce((x,r)=>x+r.plies,0),0)],
-    [t('rsRollWaste'),g=>R(g.loss)+' '+u,R(d.loss)+' '+u],[t('rsRollBack'),g=>R(g.back||0)+' '+u,R(d.back||0)+' '+u],[t('rsRollEff'),g=>g.eff+'%',d.eff+'%']];
-  if(d.mode==='continuous')rows.push([t('rsRollSplices'),g=>g.splices,d.splices]);
+    [t('rsRollWaste'),g=>R(g.loss)+' '+u,R(d.loss)+' '+u],[tf('rsRollUsable',{m:R(d.minP)+' '+u}),g=>R(g.usable||0)+' '+u,R(d.usable||0)+' '+u],[t('rsRollScrap'),g=>R(g.scrap||0)+' '+u,R(d.scrap||0)+' '+u],
+    [t('rsRollBack'),g=>R(g.back||0)+' '+u,R(d.back||0)+' '+u],[t('rsRollEff'),g=>g.eff+'%',d.eff+'%']];
+  if(d.mode==='continuous'||d.mode==='remsplice')rows.push([t('rsRollSplices'),g=>g.splices,d.splices]);
   const cmp=`<div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;${pr?'font-size:11.5px':'min-width:'+(200+G.length*110)+'px;font-size:13px'}">
     <tr>${hd('')}${G.map((g,i)=>hd('🎨 '+esc(g.name||t('rlNoColor')),col(i))).join('')}${hd(esc(t('total')))}</tr>
     ${rows.map(([l,f,tv])=>`<tr>${td(esc(l),'font-weight:800;text-align:start')}${G.map(g=>td(f(g),'font-weight:700')).join('')}${td(tv,'font-weight:900')}</tr>`).join('')}</table></div>`;
   const n=Math.max(...G.map(g=>g.rolls.length));let body='';
   for(let i=0;i<n;i++){body+=`<tr>${td(`<b>${t('rsRollNo')} ${i+1}</b>`,'white-space:nowrap')}${G.map(g=>{const r=g.rolls[i];if(!r)return td('')+td('');
       const last=i===g.rolls.length-1;
-      return td(Object.entries(r.by).map(([c,k])=>`<span style="display:inline-block;white-space:nowrap;margin:1px 3px;font-weight:700">${esc(c)}×${k}</span>`).join('')+(r.spl?` <b style="color:#b45309">✂${r.spl}</b>`:''),'text-align:start')
+      return td(Object.entries(r.by).map(([c,k])=>`<span style="display:inline-block;white-space:nowrap;margin:1px 3px;font-weight:700">${esc(c)}×${k}</span>`).join('')+rsRollSplTxt(r,1),'text-align:start')
         +td(R(r.rem),`font-weight:800;white-space:nowrap;color:${last?(pr?'#1d4ed8':'var(--blue)'):r.rem>0.5?(pr?'#c81e1e':'var(--bad)'):(pr?'#15803d':'var(--ok)')}`+(last?';text-decoration:underline':''));}).join('')}</tr>`;}
   const side=`<div style="overflow-x:auto;margin-top:12px"><table style="border-collapse:collapse;width:100%;${pr?'table-layout:fixed;font-size:10.5px':'min-width:'+(120+G.length*230)+'px;font-size:12.5px'}">${pr?`<colgroup><col style="width:9%">${G.map(()=>`<col style="width:${(91/G.length*0.78).toFixed(2)}%"><col style="width:${(91/G.length*0.22).toFixed(2)}%">`).join('')}</colgroup>`:''}
     <tr>${hd(t('rsRollNo2'))}${G.map((g,i)=>`<th colspan="2" style="${bd};padding:6px;background:${col(i)};color:#111;font-weight:900">🎨 ${esc(g.name||t('rlNoColor'))} — ${g.nRolls}</th>`).join('')}</tr>
@@ -4453,7 +4498,7 @@ function rsRollPrint(d,uf,u,title){const R=v=>Math.round(v*uf*100)/100;
   const multi=d.groups.length>1||!!(d.groups[0]&&d.groups[0].name);
   const grp=(g,gi)=>{const rows=g.rolls.map((r,i)=>`<tr style="background:${i%2?'#f6faf9':'#fff'}">
       <td style="text-align:center;padding:7px"><span style="display:inline-block;background:#14504f;color:#fff;font-weight:800;padding:3px 10px;border-radius:7px">${t('rsRollNo')} ${i+1}</span></td>
-      <td style="padding:7px;text-align:${LANG==='ar'?'right':'left'}">${Object.entries(r.by).map(([c,n])=>`<span style="display:inline-block;background:#fff;border:1.5px solid #cfe0df;border-radius:999px;padding:2px 9px;margin:2px;font-weight:800">${esc(c)} <span style="color:#1f6e6e">×${n}</span></span>`).join('')}${r.spl?` <b style="color:#b45309">✂${r.spl}</b>`:''}${r.salv&&Object.keys(r.salv).length?' '+Object.entries(r.salv).map(([s2,n])=>`<span style="display:inline-block;border:1.5px solid #86efac;border-radius:999px;padding:2px 9px;margin:2px;font-weight:800;color:#15803d">🎁${esc(s2)}×${n}</span>`).join(''):''}</td>
+      <td style="padding:7px;text-align:${LANG==='ar'?'right':'left'}">${Object.entries(r.by).map(([c,n])=>`<span style="display:inline-block;background:#fff;border:1.5px solid #cfe0df;border-radius:999px;padding:2px 9px;margin:2px;font-weight:800">${esc(c)} <span style="color:#1f6e6e">×${n}</span></span>`).join('')}${rsRollSplTxt(r,1)}${r.salv&&Object.keys(r.salv).length?' '+Object.entries(r.salv).map(([s2,n])=>`<span style="display:inline-block;border:1.5px solid #86efac;border-radius:999px;padding:2px 9px;margin:2px;font-weight:800;color:#15803d">🎁${esc(s2)}×${n}</span>`).join(''):''}</td>
       <td style="text-align:center;padding:7px;font-weight:800">${r.plies}</td><td style="text-align:center;padding:7px">${R(r.used)} ${u}</td>
       <td style="text-align:center;padding:7px;font-weight:800;color:${r.rem>0.5?'#c81e1e':'#15803d'}">${R(r.rem)} ${u}</td><td style="padding:7px;min-width:80px"></td></tr>`).join('');
     return `<div style="${gi?'page-break-before:auto;margin-top:22px':''}">${multi?`<div style="margin-top:12px;background:${RS_COLORS[gi%RS_COLORS.length]};font-weight:900;padding:6px 12px;border-radius:8px;color:#111">${esc(tf('rlGroupHdr',{c:g.name||t('rlNoColor'),n:g.nRolls}))}</div>`:''}
@@ -4467,6 +4512,7 @@ function rsRollPrint(d,uf,u,title){const R=v=>Math.round(v*uf*100)/100;
       <div style="display:inline-block;margin-top:6px;background:#14504f;color:#fff;font-size:13px;font-weight:800;padding:3px 12px;border-radius:7px">${t('rsRollTitle')}</div></div>
       <div style="text-align:${LANG==='ar'?'left':'right'};font-size:12px;color:#6b7683;line-height:1.9"><div>📅 ${fmtDate(today())}</div>${title?`<div>📝 ${esc(title)}</div>`:''}<div>📏 ${t('rsRollLenLbl')}: ${R(d.roll)} ${u}</div>${d.spread>0?`<div>↔ ${esc(tf('rlSpreadNote',{v:R(d.spread)+' '+u}))}</div>`:''}</div></div>
     ${d.groups.length>1?`<div style="margin-top:10px">${rsRollSideHtml(d,uf,u,true)}</div>`:d.groups.map(grp).join('')}
+    ${rsRollRemHtml(d,uf,u,true)}
     <div style="margin-top:28px;display:flex;gap:16px"><div style="flex:1;text-align:center"><div style="border-bottom:1.5px solid #7c8894;margin:0 14px 6px;height:38px"></div><div style="font-size:12px;color:#44515e;font-weight:700">${t('rsFarradSig')}</div></div><div style="flex:1;text-align:center"><div style="border-bottom:1.5px solid #7c8894;margin:0 14px 6px;height:38px"></div><div style="font-size:12px;color:#44515e;font-weight:700">${t('rsStoreKeeper')}</div></div></div></div>`;
   window.print();setTimeout(()=>{$('print-area').innerHTML='';},500);}
 /* ---- قائمة التصدير (كليك يمين / ضغطة مطوّلة على زر التقرير): PDF أو Excel ---- */
@@ -4708,13 +4754,15 @@ function rsRollXlsx(d,uf,u,title,fname){const R=v=>Math.round(v*uf*100)/100;
       .forEach(([l,f,tv])=>rows.push([l,...G.map(f),tv]));
     rows.push([]);rows.push({s:'head',c:[t('rsRollNo2'),...G.flatMap(g=>[nm(g)+' — '+t('rsRollPlies'),t('rsRollRem')+' ('+u+')'])]});
     const n=Math.max(...G.map(g=>g.rolls.length));
-    for(let i=0;i<n;i++)rows.push([t('rsRollNo')+' '+(i+1),...G.flatMap(g=>{const r=g.rolls[i];return r?[Object.entries(r.by).map(([c,k])=>c+' ×'+k).join(' · ')+(r.spl?' ✂'+r.spl:''),R(r.rem)]:['',''];})]);}
+    for(let i=0;i<n;i++)rows.push([t('rsRollNo')+' '+(i+1),...G.flatMap(g=>{const r=g.rolls[i];return r?[Object.entries(r.by).map(([c,k])=>c+' ×'+k).join(' · ')+rsRollSplTxt(r,0),R(r.rem)]:['',''];})]);}
   d.groups.forEach(g=>{rows.push([]);
     if(multi)rows.push({s:'head',c:[tf('rlGroupHdr',{c:g.name||t('rlNoColor'),n:g.nRolls}),'',t('rsRollWaste')+': '+R(g.loss)+' '+u,t('rsRollEff')+': '+g.eff+'%','']});
     rows.push({s:'head',c:[t('rsRollNo2'),t('rsRollPlies'),t('rsPlies'),t('rsRollUsed')+' ('+u+')',t('rsRollRem')+' ('+u+')']});
     let tp=0,tu=0,trm=0;
-    g.rolls.forEach((r,i)=>{tp+=r.plies;tu+=r.used;trm+=r.rem;rows.push([t('rsRollNo')+' '+(i+1),Object.entries(r.by).map(([c,n])=>c+' ×'+n).join(' · ')+(r.spl?' ✂'+r.spl:'')+(r.salv&&Object.keys(r.salv).length?' 🎁 '+Object.entries(r.salv).map(([s2,n])=>s2+' ×'+n).join(' · '):''),r.plies,R(r.used),R(r.rem)]);});
+    g.rolls.forEach((r,i)=>{tp+=r.plies;tu+=r.used;trm+=r.rem;rows.push([t('rsRollNo')+' '+(i+1),Object.entries(r.by).map(([c,n])=>c+' ×'+n).join(' · ')+rsRollSplTxt(r,0)+(r.salv&&Object.keys(r.salv).length?' 🎁 '+Object.entries(r.salv).map(([s2,n])=>s2+' ×'+n).join(' · '):''),r.plies,R(r.used),R(r.rem)]);});
     rows.push({s:'total',c:[t('total'),'',tp,R(tu),R(trm)]});});
+  const RL2=rsRollRemList(d);if(RL2.length){const stx={back:t('rsRemBack'),ok:t('rsRemOk'),scrap:t('rsRemScrap')};rows.push([]);rows.push({s:'head',c:[t('rsRemTitle'),'','','','']});
+    rows.push({s:'head',c:[t('rsRemColor'),t('rsRollNo2'),t('rsRemLen')+' ('+u+')',t('rsRemStatus'),'']});RL2.forEach(x=>rows.push([x.c,t('rsRollNo')+' '+x.roll,R(x.rem),stx[x.st],'']));}
   xlsxDownload(fname,rows,{sheet:t('rsRollTitle')});toast(t('saved'));}
 /* ---- «خطة الرولات من ملف»: رفع Excel/PDF/CSV فيه الماركرات (القياسات، الطبقات لكل لون، الطول) → خطة رولات لكل لون ---- */
 let RL=null;
@@ -4863,7 +4911,7 @@ function rlData(){if(!RL)return {err:'nofile'};const fu=$('rl-funit').value==='y
   const maxMk=Math.max(...ok.map(m=>m.len));if(maxMk>roll+1e-9)return {err:'short',maxMk,uf,u};
   const groups=RL.colors.length?RL.colors.map(c=>({name:c,items:ok.filter(m=>(+m.cp[c]||0)>0).map(m=>({code:m.code,len:m.len,n:+m.cp[c]}))})).filter(g=>g.items.length)
     :[{name:'',items:ok.map(m=>({code:m.code,len:m.len,n:m.plies}))}];
-  const d=rsRollGroups(groups,Math.round(roll*100)/100,$('rl-mode').value);d.spread=sp;d.miss=miss;d.uf=uf;d.u=u;d.mk=ok;return d;}
+  const d=rsRollGroups(groups,Math.round(roll*100)/100,$('rl-mode').value,null,Math.max(0.1,+$('rl-min').value||1)/uf);d.spread=sp;d.miss=miss;d.uf=uf;d.u=u;d.mk=ok;return d;}
 function rlCalc(){if(!RL)return;const d=rlData(),res=$('rl-res'),R=v=>Math.round(v*d.uf*100)/100;
   const fu=$('rl-funit').value==='yd'?t('unitYdS'):t('unitMS');
   $('rl-info').innerHTML=esc(RL.incl===true?t('rlInclYes'):RL.incl===false?t('rlInclNo'):t('rlInclUnk'))+(RL.spread>0?' · '+esc(tf('rlSpreadFound',{v:RL.spread+' '+fu})):'');

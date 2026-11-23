@@ -35,7 +35,7 @@ function grabConst(name) {
 
 const code = [
   grabConst('RS_LIB_TOL'), grabConst('XL_CRC'), grabConst('rsP2'), grabConst('SIZE_ORDER'), grabConst('CV_HI'), grabConst('RL_SZ'), grabConst('RS_ROLLC'),
-  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus', 'rsColorPlan', 'rsColorBeam', 'rsConsolidate', 'rsColorAlloc', 'rsRollPack', 'rsRollPack0', 'rsRollFin', 'rsRollGroups', 'normNum', 'rlNum', 'rlInterpret', 'rlMergeRow'].map(grabFn),
+  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus', 'rsColorPlan', 'rsColorBeam', 'rsConsolidate', 'rsColorAlloc', 'rsRollPack', 'rsRollPack0', 'rsRollFin', 'rsRollGroups', 'rsRollSplTxt', 'normNum', 'rlNum', 'rlInterpret', 'rlMergeRow'].map(grabFn),
 ].join('\n');
 // rsSolve يقرأ الهدف/الفائض من الواجهة عند غياب الخيارات — نعيد قيمة فارغة فيُستعمل الافتراضي («أقل ماركرات»، فائض 0)
 const ctx = { $: () => ({ value: '' }), Date, Math, Object, Set, Map, Array, String, Number, Uint32Array, Int32Array, Float64Array, Uint8Array, Int16Array, TextEncoder, console };
@@ -211,6 +211,10 @@ chk('xlCrc("123456789") = CBF43926', X.xlCrc(new TextEncoder().encode('123456789
   chk('rolls: no-splice mixes markers to fill rolls — minimum rolls, waste excludes the last roll (back to store)', f.nRolls === Math.ceil(fab / 100) && Math.abs(f.loss + f.back - (f.totRoll - fab)) < 0.05 && f.back === f.rolls[f.rolls.length - 1].rem && f.loss < 3, { n: f.nRolls, loss: f.loss, back: f.back });
   const c = X.rsRollPack([{ code: 'A', len: 9, n: 23 }], 100, 'continuous');
   chk('rolls: continuous — minimum rolls, splices counted', c.nRolls === 3 && c.splices >= 1 && Math.abs(c.totalFab - 207) < 1e-9, c);
+  const rj = X.rsRollPack([{ code: 'A', len: 9.0, n: 40 }, { code: 'B', len: 8.2, n: 20 }], 22.86, 'remsplice', 0.9144), rn = X.rsRollPack([{ code: 'A', len: 9.0, n: 40 }, { code: 'B', len: 8.2, n: 20 }], 22.86, 'nosplice');
+  const okJ = rj.rolls.every((r, i) => r.used <= 22.86 + 1e-6 && (r.joins || []).every(j => (rj.rolls[j.to].joinIn || []).some(k => k.from === i && k.code === j.code)));
+  const pl = P => P.rolls.reduce((a, r) => { Object.entries(r.by).forEach(([c, n]) => a[c] = (a[c] || 0) + n); return a; }, {});
+  chk('rolls: join remnants — fewer rolls than no-splice, every ply placed once, joins linked, within roll length', okJ && rj.nRolls < rn.nRolls && pl(rj).A === 40 && pl(rj).B === 20 && rj.splices > 0 && Math.abs(rj.rolls.reduce((a, r) => a + r.used, 0) - (360 + 164)) < 0.1, { j: rj.nRolls, n: rn.nRolls, s: rj.splices });
   const g = X.rsRollGroups([{ name: 'G', items: [{ code: 'A', len: 9, n: 11 }] }, { name: 'B', items: [{ code: 'A', len: 9, n: 5 }] }], 100, 'nosplice');
   chk('rolls: each color rolled separately, totals summed', g.groups.length === 2 && g.groups[0].nRolls === 1 && g.groups[1].nRolls === 1 && g.nRolls === 2 && Math.abs(g.totalFab - 144) < 1e-9, g); }
 
