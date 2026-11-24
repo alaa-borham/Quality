@@ -440,7 +440,7 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
           <tr class="rsq-hide"><th data-i18n="rsCbNo">م</th><th data-i18n="sizeName">المقاس</th><th class="or" data-i18n="mkQtyOrder">الكمية المطلوبة</th><th data-i18n="rsRatio">نسبة بحسب الموديل</th><th class="or rsu-h" data-b="استهلاك الكمية">استهلاك الكمية (متر)</th><th data-i18n="rsPieceConsM">استهلاك القطعة الأساسي (متر)</th><th class="or rsu-h" data-b="استهلاك مع الفرد" title="الكمية × (استهلاك القطعة + مسافة الفرد)">استهلاك مع الفرد (متر)</th></tr>
           <tbody id="rs-qty-rows" class="rsq-hide"></tbody>
           <tr class="tot rsq-hide"><td></td><td data-i18n="total">الإجمالي</td><td id="rs-qt-q">—</td><td id="rs-qt-r">—</td><td id="rs-qt-c">—</td><td>—</td><td id="rs-qt-cf">—</td></tr></table></div>
-        <div class="rsq-hide" style="margin-top:6px;font-size:13px;color:var(--mut)"><span data-i18n="rsSpreadLbl">مسافة الفرد لكل قطعة</span>: <input id="rs-spread" type="number" step="0.5" min="0" value="4" oninput="rsCalc();rsSaveDraft()" style="width:56px;padding:4px;text-align:center;font-weight:800"> <span data-i18n="rsCm">سم</span></div>
+        <div class="rsq-hide" style="margin-top:6px;font-size:13px;color:var(--mut)"><span data-i18n="rsSpreadLbl">مسافة الفرد لكل قطعة</span>: <input id="rs-spread" type="number" step="0.5" min="0" value="4" oninput="rsCalc();rsSaveDraft()" onchange="rsSpreadChanged()" style="width:56px;padding:4px;text-align:center;font-weight:800"> <span data-i18n="rsCm">سم</span></div>
         <button type="button" class="mini rsq-hide" style="margin-top:6px" onclick="rsAddQtyRow()">➕ <span data-i18n="mkAddRow">إضافة مقاس</span></button>
         <span class="rsq-hide note" style="margin-inline-start:10px" data-i18n="rsRowHint">💡 نقرة يمين على أي صف مقاس لتمييزه بلون</span>
         <div class="grid5" style="margin-top:14px">
@@ -3520,6 +3520,8 @@ function rsRebuildPlan(){
 // تغيّر أي حدّ (طول الماركر / أقصى قياسات / أقصى قطع) → إعادة بناء الخطة ضمن الحدود الجديدة
 function rsLimitsChanged(){rsSaveDraft();if(document.querySelector('.rs-mrow1'))rsBusy(rsRebuildPlan,t('rsBusyRebuild'));else rsRebuildPlan();}
 function rsMaxLenChanged(){rsLimitsChanged();}
+// مسافة الفرد تدخل في اختيار الخطة عند هدف «أفضل استهلاك» (قماش كل طبقة = طول الماركر + الفرد) → إعادة بناء تلقائية
+function rsSpreadChanged(){rsSaveDraft();if($('rs-objective')&&$('rs-objective').value==='fabric'&&document.querySelector('.rs-mrow1'))rsLimitsChanged();}
 /* ---- توزيع الألوان (اختياري): يوزّع طبقات كل ماركر على الألوان حسب حصصها ---- */
 function rsAddColorRow(c){c=c||{};if(!$('rs-colors'))return;
   const row=document.createElement('div');row.className='rs-color-row';row.style.cssText='display:flex;gap:6px;align-items:center';

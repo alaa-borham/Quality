@@ -176,6 +176,33 @@ const sur = await page.evaluate(() => {
 chk('order surplus: plan runs without errors', sur.log.length === 0, sur.log);
 chk('order surplus: no shortage, total extra ≤ 30, accepted by the colour check', sur.n > 0 && sur.short === 0 && sur.over <= 30 && sur.mm === 0 && sur.issues === 0, sur);
 
+// ٢ب٢ب) تغيير مسافة الفرد في هدف «أفضل استهلاك» يعيد بناء الخطة تلقائياً، وتبقى مطابقة ١٠٠٪
+const spr = await page.evaluate(async () => {
+  const log = []; const res = {};
+  try {
+    document.querySelectorAll('.rs-mrow1,.rs-mrow2').forEach(tr => tr.remove()); $('rs-colors').innerHTML = ''; $('rs-qty-rows').innerHTML = '';
+    const Q = [['M-56', 41, 33, 2.44], ['L-58', 55, 43, 2.72], ['XL-60', 26, 25, 2.87]];
+    Q.forEach(([s, a, b, c]) => rsAddQtyRow({ size: s, qty: a + b, cons: c })); rsCalc();
+    $('rs-maxlen').value = '9'; $('rs-maxpcs').value = '5'; $('rs-surplus').value = '0'; $('rs-spread').value = '0'; $('rs-objective').value = 'fabric';
+    rsAddColorRow({ name: 'W' }); rsAddColorRow({ name: 'C' });
+    document.querySelectorAll('.rsq-row').forEach(tr => { const sz = tr.querySelector('.rsq-size').value.trim(), q = Q.find(x => x[0] === sz); const [w, c] = tr.querySelectorAll('.rsq-cin'); w.value = q[1]; rsQtyCInput(w); c.value = q[2]; rsQtyCInput(c); });
+    rsAutoPlan();
+    let calls = 0; const orig = window.rsRebuildPlan; window.rsRebuildPlan = function () { calls++; return orig.apply(this, arguments); };
+    $('rs-spread').value = '40'; $('rs-spread').dispatchEvent(new Event('change'));
+    for (let i = 0; i < 100 && !calls; i++) await new Promise(r => setTimeout(r, 50));
+    for (let i = 0; i < 100 && document.querySelector('.rs-busy-on,#rs-busy:not([hidden])'); i++) await new Promise(r => setTimeout(r, 50));
+    window.rsRebuildPlan = orig;
+    res.calls = calls; res.mm = rsColorMismatch().length; res.n = rsReadMarkers().length; res.saved = rsBuildDraft().spread;
+    // في هدف «أقل مراكر» لا داعي لإعادة البناء
+    $('rs-objective').value = 'markers'; let c2 = 0; window.rsRebuildPlan = function () { c2++; return orig.apply(this, arguments); };
+    $('rs-spread').value = '10'; $('rs-spread').dispatchEvent(new Event('change')); await new Promise(r => setTimeout(r, 300)); window.rsRebuildPlan = orig; res.calls2 = c2;
+  } catch (e) { log.push(e && e.message); }
+  try { $('rs-spread').value = '0'; $('rs-objective').value = 'fabric'; rsResetPlan(false); $('rs-colors').innerHTML = ''; rsColorMatrixRender(); } catch (e) { log.push('cleanup: ' + (e && e.message)); }
+  return { log, ...res };
+});
+chk('spread change (best consumption): plan rebuilt automatically, still 100% exact', spr.log.length === 0 && spr.calls >= 1 && spr.mm === 0 && spr.n > 0, spr);
+chk('spread change (fewest markers): no rebuild needed', spr.calls2 === 0, spr);
+
 // ٢ب٣) خطة الرولات: في الريشو لكل لون وحده مع مسافة الفرد، وصفحة «خطة الرولات من ملف» (رفع ملف → رولات كل لون)
 const rl = await page.evaluate(async () => {
   const log = []; const step = async (n, f) => { try { await f(); } catch (e) { log.push(n + ': ' + (e && e.message)); } };
