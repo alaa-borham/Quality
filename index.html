@@ -2599,7 +2599,18 @@ function rsLibCands(cons,maxlen,maxsizes,maxpcs,reqMap,measM){const seen=new Set
 // حلّ الألوان (دالة نقية — تُختبر في tests/solver.test.mjs): Qs={لون:{مقاس:كمية}} → ماركرات مشتركة [{combo,sp:{لون:طبقات},len}]
 // كل لون يُغطّى بالضبط؛ والألوان تُحَلّ بالتتابع: كل لون يعيد استعمال توليفات من سبقه أولاً ثم يكمل الباقي —
 // ونجرّب كل ترتيبات الألوان (حتى ٤ ألوان؛ أكثر: بضعة ترتيبات) ونأخذ الأقل ماركرات جديدة ثم الأقل قماشاً
+// خطة الألوان: نحلّ بالهدف المختار، ثم بالهدف الآخر أيضاً (بلا البحث الشعاعي — لا يتأثر بالهدف)، ونأخذ الأفضل للهدف المختار
+// («أقل طبقات» قد يعطي طبقات أكثر من «أقل ماركرات» في بعض الأوامر — فلا نعتمد على طريق واحد)
 function rsColorPlan(Qs,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
+  const mode=opt.mode||($('rs-objective')&&$('rs-objective').value)||'markers',other=mode==='plies'?'markers':'plies';
+  const A=rsColorPlan1(Qs,cons,maxlen,maxsizes,maxpcs,{...opt,mode});if(opt.noAlt)return A;
+  const B=rsColorPlan1(Qs,cons,maxlen,maxsizes,maxpcs,{...opt,mode:other,noBeam:true,budget:opt.budget?Math.round(opt.budget/2):undefined});
+  const seedS=new Set((opt.seed||[]).map(rsComboSig)),pl=a=>a.reduce((t,x)=>t+Object.values(x.sp).reduce((u,v)=>u+v,0),0),
+    fab=a=>a.reduce((t,x)=>t+x.len*Object.values(x.sp).reduce((u,v)=>u+v,0),0),nN=a=>a.filter(x=>!seedS.has(rsComboSig(x.combo))).length;
+  const key=a=>mode==='plies'?[pl(a),nN(a),fab(a)]:[nN(a),fab(a),pl(a)],ka=key(A),kb=key(B);
+  for(let i=0;i<3;i++){if(kb[i]<ka[i]-1e-9)return B;if(kb[i]>ka[i]+1e-9)return A;}
+  return A;}
+function rsColorPlan1(Qs,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
   const names=Object.keys(Qs).filter(c=>Object.values(Qs[c]).some(v=>v>0));if(!names.length)return [];
   const qsum=c=>Object.values(Qs[c]).reduce((a,v)=>a+(v>0?v:0),0),desc=names.slice().sort((a,b)=>qsum(b)-qsum(a));
   const perms=a=>a.length<=1?[a]:a.flatMap((x,i)=>perms(a.slice(0,i).concat(a.slice(i+1))).map(q=>[x,...q]));
@@ -2619,11 +2630,14 @@ function rsColorPlan(Qs,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
   // البحث الشعاعي المشترك للألوان (أقل ماركرات غالباً) — نأخذه إن أعطى ماركرات جديدة أقل (ثم قماشاً أقل)
   // في «أقل طبقات» نقارن بالطبقات أولاً (الشعاعي يقلّل الماركرات وقد يزيد الطبقات)
   const bm=opt.noBeam?null:rsColorBeam(Qs,cons,maxlen,maxsizes,maxpcs,{meas:opt.meas,seed,surTot:opt.surTot,budget:opt.beamBudget||(opt.surTot>0?4500:3000)});
-  if(bm&&bm.length){const pl=a=>a.reduce((t,x)=>t+Object.values(x.sp).reduce((u,v)=>u+v,0),0),fabA=a=>a.reduce((t,x)=>t+x.len*Object.values(x.sp).reduce((u,v)=>u+v,0),0);
-    const mode=opt.mode||($('rs-objective')&&$('rs-objective').value)||'markers',nNew=bm.filter(x=>!seedS.has(rsComboSig(x.combo))).length,fab=fabA(bm);
-    const key=(n,p)=>mode==='plies'?[p,n]:[n,0],k1=key(nNew,pl(bm)),k0=key(best.nNew,pl(best.arr));
-    if(k1[0]<k0[0]||(k1[0]===k0[0]&&(k1[1]<k0[1]||(k1[1]===k0[1]&&fab<best.fab-1e-9))))return rsConsolidate(bm,cons,maxlen,maxsizes,maxpcs,opt.meas);}
-  return rsConsolidate(best.arr,cons,maxlen,maxsizes,maxpcs,opt.meas);}
+  // نقارن الخطتين بعد دمج القصير في الطويل (الدمج يقلّل الطبقات وقد يقلّل الماركرات) — وإلا تُختار الخطة الخطأ في «أقل طبقات»
+  const A=rsConsolidate(best.arr,cons,maxlen,maxsizes,maxpcs,opt.meas);
+  if(bm&&bm.length){const B=rsConsolidate(bm,cons,maxlen,maxsizes,maxpcs,opt.meas);
+    const pl=a=>a.reduce((t,x)=>t+Object.values(x.sp).reduce((u,v)=>u+v,0),0),fabA=a=>a.reduce((t,x)=>t+x.len*Object.values(x.sp).reduce((u,v)=>u+v,0),0),nN=a=>a.filter(x=>!seedS.has(rsComboSig(x.combo))).length;
+    const mode=opt.mode||($('rs-objective')&&$('rs-objective').value)||'markers';
+    const key=a=>mode==='plies'?[pl(a),nN(a),fabA(a)]:[nN(a),fabA(a),pl(a)],k1=key(B),k0=key(A);
+    for(let i=0;i<3;i++){if(k1[i]<k0[i]-1e-9)return B;if(k1[i]>k0[i]+1e-9)return A;}}
+  return A;}
 // دمج الماركرات القصيرة في الأطول (دالة نقية — تُختبر): ماركر S طبقاته في كل لون ≤ طبقات ماركر T، ومجموعهما ضمن الحدود →
 // ماركر جديد T+S بطبقات S، ويُنقَص من T طبقات S. الإنتاج لكل لون ومقاس لا يتغير أبداً؛ العدد لا يزيد (ويقلّ إن انتهت طبقات T
 // أو وُجدت التوليفة المدموجة أصلاً)، والطبقات تقلّ، والقطع تنتقل لماركرات أطول (تداخل أفضل). نكرر حتى لا يبقى دمج
@@ -2657,7 +2671,7 @@ function rsColorBeam(Qs,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
   const meas=opt.meas||[],MM=new Map(meas.map(x=>[rsComboSig(x.pairs),x.len]));let lim=maxlen;
   if(MM.size&&maxlen>0){let rmin=1;meas.forEach(x=>{const comp=x.pairs.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);if(comp>0&&x.len>0)rmin=Math.min(rmin,x.len/comp);});lim=maxlen/Math.max(0.8,rmin);}
   // كل التوليفات الصالحة (حد الطول — المقيس إن وُجد — وعدد القطع والمقاسات) التي يحتاج كل قياساتها لونٌ واحد على الأقل
-  const CAP=opt.cap||60000,CI=[],CA=[],CL=[],ci=[],ca=[];let over=false;
+  const CAP=opt.cap||150000,CI=[],CA=[],CL=[],ci=[],ca=[];let over=false;
   const rec=(st,pcs,len)=>{
     if(ci.length){const ml=MM.size?MM.get(rsComboSig(ci.map((i,q)=>({size:sz[i],cnt:ca[q]})))):0,eff=ml>0?ml:len;
       if(!(maxlen>0)||eff<=maxlen+1e-9){let ok=false;for(let k=0;k<NC&&!ok;k++){ok=true;for(const i of ci)if(!R0[k*NS+i]){ok=false;break;}}

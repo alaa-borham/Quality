@@ -35,7 +35,7 @@ function grabConst(name) {
 
 const code = [
   grabConst('RS_LIB_TOL'), grabConst('XL_CRC'), grabConst('rsP2'), grabConst('SIZE_ORDER'), grabConst('CV_HI'), grabConst('RL_SZ'), grabConst('RS_ROLLC'),
-  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus', 'rsColorPlan', 'rsColorBeam', 'rsConsolidate', 'rsColorAlloc', 'rsRollPack', 'rsRollPack0', 'rsRollFin', 'rsRollGroups', 'rsRollSplTxt', 'normNum', 'rlNum', 'rlInterpret', 'rlMergeRow'].map(grabFn),
+  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus', 'rsColorPlan', 'rsColorPlan1', 'rsColorBeam', 'rsConsolidate', 'rsColorAlloc', 'rsRollPack', 'rsRollPack0', 'rsRollFin', 'rsRollGroups', 'rsRollSplTxt', 'normNum', 'rlNum', 'rlInterpret', 'rlMergeRow'].map(grabFn),
 ].join('\n');
 // rsSolve يقرأ الهدف/الفائض من الواجهة عند غياب الخيارات — نعيد قيمة فارغة فيُستعمل الافتراضي («أقل ماركرات»، فائض 0)
 const ctx = { $: () => ({ value: '' }), Date, Math, Object, Set, Map, Array, String, Number, Uint32Array, Int32Array, Float64Array, Uint8Array, Int16Array, TextEncoder, console };
