@@ -59,6 +59,8 @@ page.on('download', d => downloads.push(d.suggestedFilename()));
 await page.goto('file://' + page_path, { waitUntil: 'domcontentloaded' });
 await page.waitForTimeout(400);
 chk('page loads without JS errors', pageErrors.length === 0, pageErrors);
+const bld = await page.evaluate(() => ({ n: APP_BUILD.n, txt: [...document.querySelectorAll('.app-build')].map(e => e.textContent), stored: localStorage.getItem('qcBuild') }));
+chk('update number shown (login + top bar) and remembered on the device', bld.n > 0 && bld.txt.length >= 2 && bld.txt.every(x => x.includes(String(bld.n))) && bld.stored === String(bld.n), bld);
 
 // ── إعداد: مالك مسجّل، أوردر بست مقاسات ──
 await page.evaluate(() => {

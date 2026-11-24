@@ -255,7 +255,7 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 <div id="s-auth" class="screen auth-wrap">
   <div class="auth-card">
     <button class="langbtn" onclick="toggleLang()">🌐 <span id="lang-name">EN</span></button>
-    <div class="brand"><div class="logo">🧵</div><h1 data-i18n="appTitle">نظام متابعة الجودة</h1><p>QC Tracking · الشياكة</p></div>
+    <div class="brand"><div class="logo">🧵</div><h1 data-i18n="appTitle">نظام متابعة الجودة</h1><p>QC Tracking · الشياكة</p><p class="app-build" style="font-size:11px;opacity:.7;margin-top:2px"></p></div>
     <div id="auth-msg"></div>
     <div class="field"><label id="a-email-lbl" data-i18n="loginIdLbl">البريد الإلكتروني أو اسم المستخدم</label><input id="a-email" type="text" autocomplete="username" data-i18n-ph="loginIdPh" placeholder="you@example.com أو اسم المستخدم"></div>
     <div class="field"><label data-i18n="password">كلمة المرور</label><div style="position:relative"><input id="a-pass" type="password" autocomplete="current-password" placeholder="••••••" style="padding-right:40px" onkeydown="if(event.key==='Enter')doAuth()"><button type="button" onclick="pwEye(this)" tabindex="-1" title="إظهار كلمة المرور" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:17px;padding:2px 4px;line-height:1">👁</button></div></div>
@@ -291,7 +291,7 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 <div id="s-app" class="screen hide">
   <div id="net-off" class="hide" role="status" style="position:sticky;top:0;z-index:30;background:var(--warn-bg);color:var(--warn);border-bottom:2px solid var(--warn-bd);padding:7px 14px;font-size:13px;font-weight:800;text-align:center" data-i18n="netOff">📡 لا يوجد اتصال — تعديلاتك تُحفظ على هذا الجهاز وتُرسل تلقائياً عند عودة الإنترنت</div>
   <div class="topbar">
-    <div class="tt">🧵 <div><div data-i18n="appName">متابعة الجودة</div><div class="ws" id="ws-label">—</div></div></div>
+    <div class="tt">🧵 <div><div data-i18n="appName">متابعة الجودة</div><div class="ws" id="ws-label">—</div><div class="ws app-build" style="font-size:10px;opacity:.75"></div></div></div>
     <div class="right">
       <button class="iconbtn" id="theme-btn" onclick="cycleTheme()" title="الوضع">🌗</button>
       <button class="iconbtn" onclick="toggleLang()">🌐 <span class="lang-name2">EN</span></button>
@@ -542,6 +542,8 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 <div id="print-area"></div>
 
 <script>
+// رقم التحديث: يُرفع مع كل تحديث للنظام ويظهر في شاشة الدخول والشريط العلوي والإعدادات
+const APP_BUILD={n:73,date:'2026-11-24'};
 /* ============ Firebase ============ */
 const FB_CONFIG={apiKey:"AIzaSyCLSc1yXa5F5E89RzUJoOsj2eErjXsQjus",authDomain:"level7alaa.firebaseapp.com",
 projectId:"level7alaa",storageBucket:"level7alaa.firebasestorage.app",messagingSenderId:"924441815217",
@@ -559,7 +561,7 @@ appTitle:'نظام متابعة الجودة',login:'تسجيل الدخول',si
 name:'الاسم',namePh:'اسمك الكامل',loginBtn:'دخول',createAccBtn:'إنشاء الحساب',forgot:'نسيت كلمة المرور؟',
 wsTitle:'مساحة العمل',wsSub:'أنشئ مساحة جديدة أو انضم بكود',wsSubJoin:'انضم بكود مساحة العمل الذي يعطيك إياه مدير النظام',createTab:'إنشاء مساحة',joinTab:'انضمام بكود',
 wsNameLbl:'اسم مساحة العمل (الشركة/القسم)',wsNamePh:'مثال: جودة الشياكة',createBtn:'إنشاء',codeLbl:'كود مساحة العمل',joinBtn:'انضمام',logout:'تسجيل الخروج',
-appName:'متابعة الجودة',navDash:'المؤشرات',navInsp:'الفحوصات',inspProd:'فحوصات الإنتاج',navOrders:'الطلبيات',navFact:'المصانع',navTools:'الأدوات',navMarker:'الريشو',navRef:'المراجع',navToolChk:'سجل فحص القماش',
+appName:'متابعة الجودة',appBuild:'تحديث رقم {n} · {d}',appUpdated:'✅ تم تحديث النظام — رقم التحديث {n}',navDash:'المؤشرات',navInsp:'الفحوصات',inspProd:'فحوصات الإنتاج',navOrders:'الطلبيات',navFact:'المصانع',navTools:'الأدوات',navMarker:'الريشو',navRef:'المراجع',navToolChk:'سجل فحص القماش',
 navDescmarker:'حاسبة الماركر والاستهلاك: تدخل بيانات الأوردر (المقاس · الاستهلاك · الكمية · اللون) فتحسب إجمالي القطع والقماش وعدد الطبقات لكل لون. مكان مستقل ستُضاف بجانبه لاحقاً حاسبة الإنتاج الكمي.',
 navDescfact:'إدارة قائمة المصانع والموردين الذين تتعامل معهم: إضافة مصنع جديد باسمه ودولته وجهة الاتصال، وتعديل أو حذف المصانع الحالية. كل طلبية وكل فحص يُربط بمصنع من هذه القائمة.',
 navDescorders:'تسجيل طلبيات الإنتاج (PO): ربط كل طلبية بمصنع مع رقمها والموديل والصنف والكمية واللون. الكمية تُستخدم تلقائياً لتحديد حجم عينة الفحص حسب جدول AQL.',
@@ -714,7 +716,7 @@ appTitle:'QC Tracking System',login:'Login',signup:'Sign up',email:'Email',passw
 name:'Name',namePh:'Your full name',loginBtn:'Login',createAccBtn:'Create account',forgot:'Forgot password?',
 wsTitle:'Workspace',wsSub:'Create a new workspace or join by code',wsSubJoin:'Join with the workspace code given to you by the system admin',createTab:'Create',joinTab:'Join by code',
 wsNameLbl:'Workspace name (company/dept)',wsNamePh:'e.g. Shiaka QC',createBtn:'Create',codeLbl:'Workspace code',joinBtn:'Join',logout:'Sign out',
-appName:'QC Tracking',navDash:'Dashboard',navInsp:'Inspections',inspProd:'Production inspections',navOrders:'Orders',navFact:'Factories',navTools:'Tools',navMarker:'Ratio plan',navRef:'Reference',navToolChk:'Fabric Test Log',
+appName:'QC Tracking',appBuild:'Update #{n} · {d}',appUpdated:'✅ System updated — update #{n}',navDash:'Dashboard',navInsp:'Inspections',inspProd:'Production inspections',navOrders:'Orders',navFact:'Factories',navTools:'Tools',navMarker:'Ratio plan',navRef:'Reference',navToolChk:'Fabric Test Log',
 navDescmarker:'Marker & consumption calculator: enter the order lines (size, consumption, quantity, color) to get total pieces, fabric, and plies per color. A standalone place where a bulk-production calculator will be added later.',
 navDescfact:'Manage the list of factories and suppliers you work with: add a factory with its name, country, and contact, and edit or delete existing ones. Every order and inspection is linked to a factory from this list.',
 navDescorders:'Register production orders (POs): link each order to a factory with its number, model, item, quantity, and color. The quantity automatically determines the inspection sample size per the AQL table.',
@@ -874,6 +876,7 @@ function applyI18n(){
   document.documentElement.lang=LANG;document.documentElement.dir=LANG==='ar'?'rtl':'ltr';
   document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));
   document.querySelectorAll('[data-i18n-ph]').forEach(el=>el.placeholder=t(el.dataset.i18nPh));
+  document.querySelectorAll('.app-build').forEach(el=>el.textContent=appBuildTxt());
   document.querySelectorAll('[data-i18n-title]').forEach(el=>el.title=t(el.dataset.i18nTitle));
   // التلميحات المكتوبة بالعربية مباشرةً في الصفحة: تُحفظ الأصلية وتُترجم من قاموس TITLE_EN
   document.querySelectorAll('[title]:not([data-i18n-title])').forEach(el=>{if(el.dataset.tar==null){if(!/[\u0600-\u06FF]/.test(el.title))return;el.dataset.tar=el.title;}
@@ -901,6 +904,9 @@ function cycleTheme(){const cur=localStorage.getItem('qcTheme')||'light';applyTh
 const $=id=>document.getElementById(id);
 applyTheme(localStorage.getItem('qcTheme')||'light');
 const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function appBuildTxt(){return t('appBuild').replace('{n}',APP_BUILD.n).replace('{d}','\u2066'+APP_BUILD.date+'\u2069');}
+// بعد وصول تحديث جديد للجهاز: رسالة مرة واحدة برقم التحديث
+function appBuildNotice(){try{const k='qcBuild',old=+localStorage.getItem(k)||0;localStorage.setItem(k,APP_BUILD.n);if(old&&old<APP_BUILD.n)setTimeout(()=>toast(t('appUpdated').replace('{n}',APP_BUILD.n)),800);}catch(e){}}
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 function fmtDate(d){if(!d)return'';const x=d.toDate?d.toDate():new Date(d);return x.toLocaleDateString(LANG==='ar'?'ar-EG':'en-GB',{day:'2-digit',month:'2-digit',year:'numeric'});}
 function today(){return new Date().toISOString().slice(0,10);}
@@ -1036,7 +1042,7 @@ function navInfo(id,e){e.preventDefault();modal(`<h3>${esc(t(NAV_TITLE[id]))}</h
   <p style="line-height:1.7;color:var(--mut)">${esc(t('navDesc'+id))}</p>
   <div class="row-btns"><button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);return false;}
 function openMenu(){const owner=isOwner();modal(`<h3>${t('settings')}</h3>
-  <div class="item"><div class="s">${esc(ME.email)} · ${roleTxt()}</div></div>
+  <div class="item"><div class="s">${esc(ME.email)} · ${roleTxt()}</div><div class="s app-build-m" style="font-weight:700">🔄 ${esc(appBuildTxt())}</div></div>
   ${isQcAdmin()?`<button class="btn" style="margin-top:8px" onclick="adminPanel()">🛡 ${t('adminTitle')}</button>`:''}
   <label class="inl">${t('yourName')}</label>
   <div style="display:flex;gap:8px"><input id="set-name" value="${esc(MEMBER.name||'')}" placeholder="${t('namePh')}">
@@ -5332,7 +5338,7 @@ if('serviceWorker' in navigator){
   let refreshing=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(refreshing)return;refreshing=true;location.reload();});
 }
-applyI18n();
+applyI18n();appBuildNotice();
 </script>
 </body>
 </html>
