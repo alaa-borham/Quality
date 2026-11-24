@@ -444,12 +444,13 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
         <button type="button" class="mini rsq-hide" style="margin-top:6px" onclick="rsAddQtyRow()">➕ <span data-i18n="mkAddRow">إضافة مقاس</span></button>
         <span class="rsq-hide note" style="margin-inline-start:10px" data-i18n="rsRowHint">💡 نقرة يمين على أي صف مقاس لتمييزه بلون</span>
         <div class="grid5" style="margin-top:14px">
-          <div><label class="inl rsu-h" data-b="حد طول الماركر">حد طول الماركر (متر)</label><input id="rs-maxlen" type="number" step="0.01" value="17" oninput="rsMkCalc()" onchange="rsMaxLenChanged()"></div>
-          <div><label class="inl" data-i18n="rsMaxSizes">أقصى عدد قياسات في الماركر</label><input id="rs-maxsizes" type="number" min="1" max="6" value="6" oninput="if(+this.value>6)this.value=6;rsMkCalc()" onchange="if(+this.value>6)this.value=6;if(+this.value<1)this.value=1;rsLimitsChanged()"></div>
-          <div><label class="inl" data-i18n="rsMaxPcs">أقصى عدد قطع في الماركر</label><input id="rs-maxpcs" type="number" value="5" oninput="rsMkCalc()" onchange="rsLimitsChanged()"></div>
+          <div><label class="inl rsu-h" data-b="حد طول الماركر">حد طول الماركر (متر)</label><input id="rs-maxlen" type="number" step="0.01" value="17" oninput="rsMkCalc();rsLimitsSoon()" onchange="rsMaxLenChanged()"></div>
+          <div><label class="inl" data-i18n="rsMaxSizes">أقصى عدد قياسات في الماركر</label><input id="rs-maxsizes" type="number" min="1" max="6" value="6" oninput="if(+this.value>6)this.value=6;rsMkCalc();rsLimitsSoon()" onchange="if(+this.value>6)this.value=6;if(+this.value<1)this.value=1;rsLimitsChanged()"></div>
+          <div><label class="inl" data-i18n="rsMaxPcs">أقصى عدد قطع في الماركر</label><input id="rs-maxpcs" type="number" min="0" step="1" value="" placeholder="مفتوح" data-i18n-ph="rsPcsOpen" title="اتركه فارغاً = مفتوح بلا حد (الماركر يمتلئ حتى حد الطول فقط)" data-i18n-title="rsPcsOpenTip" oninput="rsMkCalc();rsLimitsSoon()" onchange="rsLimitsChanged()"></div>
           <div><label class="inl" data-i18n="rsFabW" title="عرض القماش الفعلي — قياسات المكتبة خاصة بكل عرض؛ عند تطابق التوليفة يُستخدم الطول المقيس لهذا العرض بدل التقدير">عرض القماش (سم)</label><select id="rs-fabwidth" onchange="rsFabWSel()" style="padding:7px 8px"><option value="">—</option><option value="96">96</option><option value="98">98</option><option value="100">100</option><option value="142">142</option><option value="144">144</option><option value="146">146</option><option value="148">148</option><option value="__other" data-i18n="rsFabWOtherOpt">➕ عرض آخر…</option></select></div>
           <div><label class="inl" data-i18n="rsSurplus" title="إجمالي القطع الزائدة المسموحة في الأوردر كله (كل المقاسات والألوان معاً) لتقليل عدد الماركرات — بلا أي نقص في أي مقاس. 0 = مطابقة تامة بلا زيادة (افتراضي)">فائض مسموح للأوردر كله (قطعة)</label><input id="rs-surplus" type="number" min="0" step="1" value="0" oninput="rsMkCalc()" onchange="rsLimitsChanged()"></div></div>
         <div id="rs-fabwarn" style="display:none;margin-top:8px;border-radius:8px;padding:8px 12px;font-size:13px;font-weight:800"></div>
+        <div id="rs-limhint" style="display:none;margin-top:8px;border-radius:8px;padding:8px 12px;font-size:13px;font-weight:800;background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-bd)"></div>
         <div id="rs-effnote" style="display:none;margin-top:8px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:13px;font-weight:700"></div>
         <div id="rs-cadcov" style="display:none;margin-top:8px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px 12px"></div>
         <div id="rs-mkwaste" style="display:none;margin-top:8px;border-radius:8px;padding:9px 12px;font-size:13px;font-weight:800"></div>
@@ -543,7 +544,7 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 
 <script>
 // رقم التحديث: يُرفع مع كل تحديث للنظام ويظهر في شاشة الدخول والشريط العلوي والإعدادات
-const APP_BUILD={n:74,date:'2026-11-24'};
+const APP_BUILD={n:75,date:'2026-11-24'};
 /* ============ Firebase ============ */
 const FB_CONFIG={apiKey:"AIzaSyCLSc1yXa5F5E89RzUJoOsj2eErjXsQjus",authDomain:"level7alaa.firebaseapp.com",
 projectId:"level7alaa",storageBucket:"level7alaa.firebasestorage.app",messagingSenderId:"924441815217",
@@ -561,7 +562,7 @@ appTitle:'نظام متابعة الجودة',login:'تسجيل الدخول',si
 name:'الاسم',namePh:'اسمك الكامل',loginBtn:'دخول',createAccBtn:'إنشاء الحساب',forgot:'نسيت كلمة المرور؟',
 wsTitle:'مساحة العمل',wsSub:'أنشئ مساحة جديدة أو انضم بكود',wsSubJoin:'انضم بكود مساحة العمل الذي يعطيك إياه مدير النظام',createTab:'إنشاء مساحة',joinTab:'انضمام بكود',
 wsNameLbl:'اسم مساحة العمل (الشركة/القسم)',wsNamePh:'مثال: جودة الشياكة',createBtn:'إنشاء',codeLbl:'كود مساحة العمل',joinBtn:'انضمام',logout:'تسجيل الخروج',
-appName:'متابعة الجودة',appBuild:'تحديث رقم {n} · {d}',appUpdated:'✅ تم تحديث النظام — رقم التحديث {n}',navDash:'المؤشرات',navInsp:'الفحوصات',inspProd:'فحوصات الإنتاج',navOrders:'الطلبيات',navFact:'المصانع',navTools:'الأدوات',navMarker:'الريشو',navRef:'المراجع',navToolChk:'سجل فحص القماش',
+appName:'متابعة الجودة',rsLimPcsHint:'أطول ماركر ممكن ≈ {l} لأن «أقصى عدد قطع في الماركر» = {p} — رفع حد الطول فوق ذلك لن يغيّر المراكر. لماركرات أطول ارفع عدد القطع.',rsLimPcsOpen:'اجعله مفتوحاً (بلا حد)',rsPcsOpen:'مفتوح',rsPcsOpenTip:'اتركه فارغاً = مفتوح بلا حد (الماركر يمتلئ حتى حد الطول فقط)',appBuild:'تحديث رقم {n} · {d}',appUpdated:'✅ تم تحديث النظام — رقم التحديث {n}',navDash:'المؤشرات',navInsp:'الفحوصات',inspProd:'فحوصات الإنتاج',navOrders:'الطلبيات',navFact:'المصانع',navTools:'الأدوات',navMarker:'الريشو',navRef:'المراجع',navToolChk:'سجل فحص القماش',
 navDescmarker:'حاسبة الماركر والاستهلاك: تدخل بيانات الأوردر (المقاس · الاستهلاك · الكمية · اللون) فتحسب إجمالي القطع والقماش وعدد الطبقات لكل لون. مكان مستقل ستُضاف بجانبه لاحقاً حاسبة الإنتاج الكمي.',
 navDescfact:'إدارة قائمة المصانع والموردين الذين تتعامل معهم: إضافة مصنع جديد باسمه ودولته وجهة الاتصال، وتعديل أو حذف المصانع الحالية. كل طلبية وكل فحص يُربط بمصنع من هذه القائمة.',
 navDescorders:'تسجيل طلبيات الإنتاج (PO): ربط كل طلبية بمصنع مع رقمها والموديل والصنف والكمية واللون. الكمية تُستخدم تلقائياً لتحديد حجم عينة الفحص حسب جدول AQL.',
@@ -716,7 +717,7 @@ appTitle:'QC Tracking System',login:'Login',signup:'Sign up',email:'Email',passw
 name:'Name',namePh:'Your full name',loginBtn:'Login',createAccBtn:'Create account',forgot:'Forgot password?',
 wsTitle:'Workspace',wsSub:'Create a new workspace or join by code',wsSubJoin:'Join with the workspace code given to you by the system admin',createTab:'Create',joinTab:'Join by code',
 wsNameLbl:'Workspace name (company/dept)',wsNamePh:'e.g. Shiaka QC',createBtn:'Create',codeLbl:'Workspace code',joinBtn:'Join',logout:'Sign out',
-appName:'QC Tracking',appBuild:'Update #{n} · {d}',appUpdated:'✅ System updated — update #{n}',navDash:'Dashboard',navInsp:'Inspections',inspProd:'Production inspections',navOrders:'Orders',navFact:'Factories',navTools:'Tools',navMarker:'Ratio plan',navRef:'Reference',navToolChk:'Fabric Test Log',
+appName:'QC Tracking',rsLimPcsHint:'Longest possible marker ≈ {l} because “Max pieces per marker” = {p} — raising the length limit above that changes nothing. Raise the pieces for longer markers.',rsLimPcsOpen:'Make it open (no limit)',rsPcsOpen:'Open',rsPcsOpenTip:'Leave empty = open, no limit (the marker fills up to the length limit only)',appBuild:'Update #{n} · {d}',appUpdated:'✅ System updated — update #{n}',navDash:'Dashboard',navInsp:'Inspections',inspProd:'Production inspections',navOrders:'Orders',navFact:'Factories',navTools:'Tools',navMarker:'Ratio plan',navRef:'Reference',navToolChk:'Fabric Test Log',
 navDescmarker:'Marker & consumption calculator: enter the order lines (size, consumption, quantity, color) to get total pieces, fabric, and plies per color. A standalone place where a bulk-production calculator will be added later.',
 navDescfact:'Manage the list of factories and suppliers you work with: add a factory with its name, country, and contact, and edit or delete existing ones. Every order and inspection is linked to a factory from this list.',
 navDescorders:'Register production orders (POs): link each order to a factory with its number, model, item, quantity, and color. The quantity automatically determines the inspection sample size per the AQL table.',
@@ -2168,6 +2169,9 @@ function rsUF(){return ($('rs-unit')&&$('rs-unit').value==='ياردة')?1.09361
 function pctS(){return LANG==='ar'?'٪':'%';}
 function rsUnitTxt(v){return v==='ياردة'?t('unitYdS'):t('unitMS');}
 function rsUL(){return rsUnitTxt($('rs-unit')&&$('rs-unit').value);}
+// أقصى عدد قطع في الماركر: فارغ/0 = مفتوح بلا حد → أقصى ما يتسع له حد الطول بأصغر قطعة (رقم محدود لأمان الحلقات)
+function rsMaxPcs(){const v=+(($('rs-maxpcs')||{}).value);if(v>=1)return Math.floor(v);
+  const cv=rsAllSizes().map(x=>+x.cons).filter(x=>x>0),mn=cv.length?Math.min(...cv):0,L=rsMaxLenM();return mn>0&&L>0?Math.max(1,Math.floor((L+1e-9)/mn)):99;}
 function rsMaxLenM(){return (+($('rs-maxlen')&&$('rs-maxlen').value)||0)/rsUF();}
 const RS_UB_EN={'إجمالي استهلاك الأوردر':'Order total consumption','إجمالي استهلاك التشغيل':'Total run consumption','استهلاك القطعة داخل الماركر':'Per-piece in marker','استهلاك الكمية':'Qty consumption','استهلاك الماركر/طبقة':'Marker consumption / ply','استهلاك مع الفرد':'Consumption incl. spread','الطول المحسوب':'Calculated length','حد طول الماركر':'Max marker length','سعر متر القماش (اختياري)':'Fabric price per unit (optional)','طول الرول':'Roll length'};
 function rsUpdateUnitLabels(){const u=rsUL();document.querySelectorAll('.rsu-h').forEach(e=>{const b=e.getAttribute('data-b');e.textContent=(LANG==='en'?(RS_UB_EN[b]||b):b)+' ('+u+')';});
@@ -2196,7 +2200,7 @@ function rsApplyDraft(d){
   if(d.price&&$('rs-price'))$('rs-price').value=d.price;
   if($('rs-colors')){$('rs-colors').innerHTML='';(d.colors||[]).forEach(c=>rsAddColorRow(c));}
   if(d.maxsizes!=null)$('rs-maxsizes').value=Math.min(6,Math.max(1,+d.maxsizes||6));
-  if(d.maxpcs!=null)$('rs-maxpcs').value=d.maxpcs;
+  if(d.maxpcs!=null)$('rs-maxpcs').value=d.maxpcs>0?d.maxpcs:'';
   if(d.surplus!=null&&$('rs-surplus'))$('rs-surplus').value=d.surplus;
   if(d.fabwidth!=null)rsSetFabW(d.fabwidth);
   if($('rs-objective'))$('rs-objective').value=(d.objV&&d.objective)?d.objective:'fabric';// المسودات القديمة تنتقل مرة واحدة للافتراضي الجديد
@@ -2214,7 +2218,7 @@ function rsProductChanged(){RS_LOADED=true;$('rs-qty-rows').innerHTML='';if($('r
 // حفظ تلقائي دائم (مسودة العمل) داخل مساحة العمل — تبقى بعد التحديث وإعادة الدخول
 function rsBuildDraft(){return {title:($('rs-title')?$('rs-title').value.trim():''),product:($('rs-product')?$('rs-product').value:''),
   unit:($('rs-unit')?$('rs-unit').value:'متر'),
-  maxlen:+$('rs-maxlen').value||0,maxsizes:+$('rs-maxsizes').value||6,maxpcs:+$('rs-maxpcs').value||5,surplus:+($('rs-surplus')&&$('rs-surplus').value)||0,fabwidth:($('rs-fabwidth')?$('rs-fabwidth').value:''),
+  maxlen:+$('rs-maxlen').value||0,maxsizes:+$('rs-maxsizes').value||6,maxpcs:+$('rs-maxpcs').value||0,surplus:+($('rs-surplus')&&$('rs-surplus').value)||0,fabwidth:($('rs-fabwidth')?$('rs-fabwidth').value:''),
   objective:($('rs-objective')?$('rs-objective').value:'markers'),objV:2,rolllen:+($('rs-rolllen')&&$('rs-rolllen').value)||0,rollmode:($('rs-rollmode')?$('rs-rollmode').value:'nosplice'),rollmin:+($('rs-rollmin')&&$('rs-rollmin').value)||1,price:+($('rs-price')&&$('rs-price').value)||0,spread:+($('rs-spread')&&$('rs-spread').value)||0,colors:rsColors(),
   qty:[...document.querySelectorAll('.rsq-row')].map(tr=>({size:tr.querySelector('.rsq-size').value.trim(),qty:+tr.querySelector('.rsq-qty').value||0})).filter(x=>x.size),
   rowcol:RS_ROWCOL,combocol:RS_COMBOCOL,comboAct:rsComboActMap(),
@@ -2837,7 +2841,7 @@ function rsAutoPlanColors(cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};const col
 // ونقص كل لون لكل مقاس (يحتاج طبقات/ماركرات). يعيد null خارج وضع الألوان
 function rsColorDiag(){if(!rsCMOn())return null;const colors=rsColors();if(!colors.length)return null;
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
-  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5),SURT=rsSurTot();
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=rsMaxPcs(),SURT=rsSurTot();
   const need={},made={};colors.forEach(c=>{need[c.name]=c.sq;made[c.name]={};});
   const mk=rsReadMarkers().map((m,i)=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0),pl=+m.plies||0;if(!rsMarkerValid(vp,pl,cons,maxlen,maxsizes,maxpcs,m.pairs,m.actlen))return null;
     const sp=rsMkSplit(m,colors);sp.forEach(x=>{if(x.plies>0)vp.forEach(q=>made[x.name][q.size]=(made[x.name][q.size]||0)+q.cnt*x.plies);});
@@ -2926,7 +2930,7 @@ function rsBusy(fn,msg){if(RS_BUSY)return Promise.resolve(false);RS_BUSY=true;
 function rsAutoPlanUI(){return rsBusy(rsAutoPlan,t('rsBusyPlan'));}
 function rsAutoPlan(){if(!$('rs-markers'))return;
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
-  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=rsMaxPcs();
   const reqMap={};[...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();if(s)reqMap[s]=+tr.querySelector('.rsq-qty').value||0;});
   if(!Object.keys(reqMap).length)return toast(t('mkNeed'));
   // قيمة استهلاك غير منطقية (مثل 41 بدل 2.1) تُفسد الخطة كلها — نوقف ونميّزها بدل توليد خطة خاطئة
@@ -2981,7 +2985,7 @@ let RS_SUGS=[],RS_SUG_REM0={},RS_SUG_BT=null;
 function rsScheduleSugs(){clearTimeout(RS_SUG_BT);RS_SUG_BT=setTimeout(rsBuildSugs,500);}
 function rsBuildSugs(){if(!$('rs-sug-rows'))return;
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
-  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=rsMaxPcs();
   const reqMap={};[...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();if(s)reqMap[s]=+tr.querySelector('.rsq-qty').value||0;});
   const produced={};rsReadMarkers().forEach(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
     if(rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs,m.actlen))vp.forEach(p=>produced[p.size]=(produced[p.size]||0)+p.cnt*plies);});
@@ -3018,7 +3022,7 @@ function rsApplySugs(){if(!RS_SUGS.length)return toast(t('rsSugEmpty'));
 // النتيجة: نفس القماش ونفس الكمية تماماً، لكن طبقات أقل (k×الطول، الطبقات÷k).
 function rsReducePlies(){if(!$('rs-markers'))return;
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
-  const maxlen=rsMaxLenM(),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const maxlen=rsMaxLenM(),maxpcs=rsMaxPcs();
   const raw=rsReadMarkers();let changed=0,before=0,after=0;
   const next=raw.map(m=>{
     const vp=m.pairs.filter(p=>p.size&&p.cnt>0);
@@ -3325,7 +3329,7 @@ function rsLibDel(sig,w){if(!canEdit('marker'))return toast(t('rsNoPerm'));if(!c
   rsLibWrite(nl,t('deleted'));}
 function rsComboSuggest(){
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
-  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=rsMaxPcs();
   const reqMap={};
   [...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();const q=+tr.querySelector('.rsq-qty').value||0;if(s&&q>0)reqMap[s]=q;});
   if(!Object.keys(reqMap).length){rsReadMarkers().forEach(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const pl=+m.plies||0;
@@ -3361,7 +3365,7 @@ function rsComboSuggest(){
 // توليد أكبر عدد ممكن من التوليفات — يراعي طول الماركر وكمية الأوردر (توليفات صالحة فعلاً لهذا الأوردر)
 function rsComboLibGen(){
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
-  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=rsMaxPcs();
   // كميات الأوردر: المصدر الأساسي لتحديد المقاسات ونِسبها (نفس منطق زر الاقتراح)
   const reqMap={};
   [...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();const q=+tr.querySelector('.rsq-qty').value||0;if(s&&q>0)reqMap[s]=q;});
@@ -3484,7 +3488,7 @@ function rsComboCalc(){const uf=rsUF(),dk=rsDark();
 function rsObjectiveChanged(){rsSaveDraft();if(document.querySelector('.rs-mrow1')||!rsCMOn())rsBusy(rsObjectiveRebuild,t('rsBusyRebuild'));else rsMkCalc();}
 function rsObjectiveRebuild(){
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
-  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=rsMaxPcs();
   // بالألوان: نعيد بناء خطة الألوان (تبقى مطابقة ١٠٠٪ لكل لون ومقاس) بدل خطة إجمالي بلا ألوان
   if(rsCMOn()&&rsColors().length){if(document.querySelector('.rs-mrow1'))rsAutoPlanColors(cons,maxlen,maxsizes,maxpcs,{rebuild:true});else rsMkCalc();return;}
   const reqMap={};
@@ -3507,7 +3511,7 @@ function rsObjectiveRebuild(){
 function rsRebuildPlan(){
   if(![...document.querySelectorAll('.rs-mrow1')].length){rsMkCalc();return false;}
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
-  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=rsMaxPcs();
   if(rsCMOn()&&rsColors().length){rsAutoPlanColors(cons,maxlen,maxsizes,maxpcs,{rebuild:true});return true;}// بالألوان: إعادة بناء خطة الألوان
   const reqMap={};
   [...document.querySelectorAll('.rsq-row')].forEach(tr=>{const s=tr.querySelector('.rsq-size').value.trim();const q=+tr.querySelector('.rsq-qty').value||0;if(s&&q>0)reqMap[s]=q;});
@@ -3528,8 +3532,23 @@ function rsRebuildPlan(){
   $('rs-markers').innerHTML='';added.forEach(a=>rsAddMarker({pairs:a.combo,plies:a.plies}));
   rsMkCalc();rsSaveDraft();return true;}
 // تغيّر أي حدّ (طول الماركر / أقصى قياسات / أقصى قطع) → إعادة بناء الخطة ضمن الحدود الجديدة
-function rsLimitsChanged(){rsSaveDraft();if(document.querySelector('.rs-mrow1'))rsBusy(rsRebuildPlan,t('rsBusyRebuild'));else rsRebuildPlan();}
+// تغيير الحدود يعيد بناء الخطة تلقائياً بعد التوقف عن الكتابة (١٫٥ ث) دون الحاجة للخروج من الخانة؛ وعند الخروج لا تُعاد مرة ثانية لنفس القيم
+let RS_LIM_T=null,RS_LIM_DONE='';
+function rsLimSig(){return ['rs-maxlen','rs-maxpcs','rs-maxsizes'].map(i=>$(i)?$(i).value:'').join('|');}
+function rsLimitsSoon(){clearTimeout(RS_LIM_T);RS_LIM_T=setTimeout(()=>{RS_LIM_T=null;
+  const cv=rsAllSizes().map(x=>+x.cons).filter(v=>v>0),big=cv.length?Math.max(...cv):0,L=rsMaxLenM(),P=(($('rs-maxpcs')||{}).value==='')?1:+($('rs-maxpcs')||{}).value,S=+($('rs-maxsizes')||{}).value;
+  if(!(L>0)||(big>0&&L<big)||!(P>=1)||!(S>=1))return;// قيمة ناقصة أثناء الكتابة (مثل «1» في طريقها إلى «11.43») — ننتظر
+  if(!document.querySelector('.rs-mrow1'))return;RS_LIM_DONE=rsLimSig();rsLimitsRebuild();},1500);}
+function rsLimitsChanged(){clearTimeout(RS_LIM_T);RS_LIM_T=null;if(RS_LIM_DONE&&RS_LIM_DONE===rsLimSig()){RS_LIM_DONE='';return;}RS_LIM_DONE='';rsLimitsRebuild();}
+function rsLimitsRebuild(){rsSaveDraft();if(document.querySelector('.rs-mrow1'))rsBusy(rsRebuildPlan,t('rsBusyRebuild'));else rsRebuildPlan();}
 function rsMaxLenChanged(){rsLimitsChanged();}
+// تنبيه: حد الطول أكبر مما يسمح به «أقصى عدد قطع» (أطول ماركر ممكن = عدد القطع × أكبر استهلاك) → رفع الحد لن يغيّر المراكر
+function rsLimHint(cons,maxlen,maxpcs,uf){const el=$('rs-limhint');if(!el)return;if(!(+(($('rs-maxpcs')||{}).value)>=1)){el.style.display='none';el.innerHTML='';return;}const cv=Object.values(cons||{}).map(Number).filter(v=>v>0);
+  const big=cv.length?Math.max(...cv):0,cap=big*maxpcs;
+  if(!(big>0&&maxlen>0&&cap<maxlen-0.05)){el.style.display='none';el.innerHTML='';return;}
+  const R=v=>Math.round(v*uf*100)/100;
+  el.innerHTML=`💡 ${esc(tf('rsLimPcsHint',{l:R(cap)+' '+rsUL(),p:maxpcs}))} <button type="button" class="mini g" style="margin-inline-start:6px" onclick="rsRaisePcs(0)">${esc(t('rsLimPcsOpen'))}</button>`;el.style.display='block';}
+function rsRaisePcs(n){const e=$('rs-maxpcs');if(!e)return;e.value=n>0?n:'';rsMkCalc();rsLimitsChanged();}
 // مسافة الفرد تدخل في اختيار الخطة عند هدف «أفضل استهلاك» (قماش كل طبقة = طول الماركر + الفرد) → إعادة بناء تلقائية
 function rsSpreadChanged(){rsSaveDraft();if($('rs-objective')&&$('rs-objective').value==='fabric'&&document.querySelector('.rs-mrow1'))rsLimitsChanged();}
 /* ---- توزيع الألوان (اختياري): يوزّع طبقات كل ماركر على الألوان حسب حصصها ---- */
@@ -3593,7 +3612,7 @@ function rsDistribute(P,colors){const sum=colors.reduce((s,c)=>s+c.qty,0);if(sum
 // إجمالي لكل لون (طبقات/قطع/قماش) عبر كل الماركرات الصالحة
 function rsColorTotals(){const colors=rsColors();if(!colors.length)return null;
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
-  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=rsMaxPcs();
   const per={};colors.forEach(c=>per[c.name]={plies:0,fab:0,pcs:0,made:{}});
   rsReadMarkers().forEach(m=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
     if(!rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs,m.actlen))return;
@@ -3737,7 +3756,7 @@ function rsCalibrate(){const rows=rsCalibGather();if(rows.length<2)return {err:'
 // مراجعة الماركرات عالية استهلاك القطعة واقتراح دمج مع قياسات أخرى لتقليل الاستهلاك — مع أولوية الكمية الكبيرة
 function rsReviewHeavy(){const out=$('rs-heavy-out');if(!out)return;
   const uf=rsUF(),u=rsUL();const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
-  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=rsMaxPcs();
   const active=Object.keys(cons).filter(s=>cons[s]>0);
   const mk=rsReadMarkers().map((m,i)=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;const pcs=vp.reduce((a,p)=>a+p.cnt,0);
     if(!vp.length||!(plies>0)||!pcs)return null;
@@ -3806,7 +3825,7 @@ function rsHeavyToCombos(){if(!RS_HEAVY||!RS_HEAVY.length)return;const cons={};r
 // لا يُطبَّق التغيير إلا إذا غطّى الأوردر كما كان وقلّ القماش فعلاً (بالأطوال المقيسة لا التقديرية)
 function rsHeavyApply(){if(!RS_HEAVY||!RS_HEAVY.length)return toast(t('rsHeavyNone'));
   const uf=rsUF(),u=rsUL();const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
-  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=rsMaxPcs();
   const calcL=c=>c.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0),pcsOf=c=>c.reduce((a,p)=>a+p.cnt,0);
   // الطول المقيس: المكتبة لهذا العرض، ثم القياس المُدخَل في جدول المعايرة (حتى قبل حفظه)
   const measLen=c=>{const l=rsMarkerLibLen(c);if(l>0)return l;if(pcsOf(c)===1)return calcL(c);return RS_CBACT[rsComboSig(c)]||0;};
@@ -3931,7 +3950,8 @@ function rsCalibrateApply(){const r=window._rsCalib;if(!r)return;
   closeModal();rsCalc();toast(t('saved'));}
 function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();const spM=rsSpreadM();
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
-  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=rsMaxPcs();
+  rsLimHint(cons,maxlen,maxpcs,uf);
   const raw=rsReadMarkers();let tRun=0,tFab=0,tFabf=0,tFabAdd=0,wasteLen=0,nWaste=0,tPlies=0,tPcs=0,tFabMeas=0,nMeasMk=0;RS_VALIDN=0;
   // تحسين الأداء: نحسب خريطة المكتبة (توليفة→طول مقيس) ومعامل التداخل مرة واحدة، بدل استدعائها لكل ماركر
   const _cw=rsFabW(),_libRecs=prodComboLib(rsComboProd());const _libMap={};
@@ -4106,7 +4126,7 @@ function rsRenderSummary(d){const el=$('rs-summary');if(!el)return;
     +c(t('rsPlanState'),d.ready?t('rsReady'):t('rsReview'),d.ready?'var(--ok)':'var(--bad)');}
 /* ---- \u062d\u0641\u0638 / \u0637\u0628\u0627\u0639\u0629 / \u0641\u062a\u062d \u062e\u0637\u0629 \u0627\u0644\u0631\u064a\u0634\u0648 ---- */
 function rsResult(){const qty=rsReadQty();if(!qty.length)return null;
-  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=rsMaxPcs();
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
   const ufA=rsUF();// الطول الفعلي يُدخَل بوحدة العرض الحالية
   const markers=[];let tRun=0,tFab=0;const _cols=rsColors();
@@ -4229,7 +4249,7 @@ function rsOpenInCalc(id){const c=TOOLCHK.find(x=>x.id===id);if(!c||c.type!=='rs
   if($('rs-title'))$('rs-title').value=c.title||'';
   if(r.product&&prodNames().includes(r.product))$('rs-product').value=r.product;
   if($('rs-unit')){$('rs-unit').value=r.unit||'متر';RS_PREV_UNIT=$('rs-unit').value;}
-  $('rs-maxlen').value=(r.maxlenDisp!=null?r.maxlenDisp:r.maxlen)||'';$('rs-maxsizes').value=Math.min(6,r.maxsizes||6);$('rs-maxpcs').value=r.maxpcs||5;
+  $('rs-maxlen').value=(r.maxlenDisp!=null?r.maxlenDisp:r.maxlen)||'';$('rs-maxsizes').value=Math.min(6,r.maxsizes||6);$('rs-maxpcs').value=r.maxpcs==null?5:(r.maxpcs>0?r.maxpcs:'');
   if($('rs-surplus'))$('rs-surplus').value=(r.surplus!=null?r.surplus:0);
   if(r.objective&&$('rs-objective'))$('rs-objective').value=r.objective;
   rsSetFabW(r.fabwidth!=null?r.fabwidth:'');
@@ -4418,7 +4438,7 @@ function rsRollGroups(groups,roll,mode,salvage,minP){const rnd=v=>Math.round(v*1
 // خطة الرولات لصفحة الريشو: طول الطبقة = طول الماركر الفعّال + مسافة الفرد؛ وبالألوان: رولات كل لون وحدها بطبقاته فقط
 function rsRollCompute(){
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
-  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=rsMaxPcs();
   const ufA=rsUF(),sp=rsSpreadM(),colors=rsCMOn()?rsColors():[];
   const mk=[],mprod={},cprod={};rsReadMarkers().forEach((m,i)=>{const vp=m.pairs.filter(p=>p.size&&p.cnt>0);const plies=+m.plies||0;
     if(!rsMarkerValid(vp,plies,cons,maxlen,maxsizes,maxpcs,m.pairs,m.actlen))return;
@@ -5017,7 +5037,7 @@ function rlExcel(){if(!RL)return toast(t('rlNoFile'));const d=rlData();if(d.err)
 function exportRsExcel(){
   const uf=rsUF(),u=rsUL();const R=v=>Math.round(v*uf*100)/100;
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
-  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=Math.max(1,+$('rs-maxpcs').value||5);
+  const maxlen=rsMaxLenM(),maxsizes=Math.min(6,Math.max(1,+$('rs-maxsizes').value||6)),maxpcs=rsMaxPcs();
   const title=$('rs-title')?$('rs-title').value.trim():'';const product=($('rs-product')&&$('rs-product').value)||'';
   const ov=$('rs-objective')&&$('rs-objective').value,objTxt=ov==='markers'?t('rsObjMarkers'):ov==='fabric'?t('rsObjFabric'):t('rsObjPlies');
   const produced={};let tRun=0,tFab=0,tFabf=0,tPlies=0;const markers=[];const spM=rsSpreadM();

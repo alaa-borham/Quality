@@ -219,6 +219,33 @@ const spr = await page.evaluate(async () => {
 chk('spread change (best consumption): plan rebuilt automatically, still 100% exact', spr.log.length === 0 && spr.calls >= 1 && spr.mm === 0 && spr.n > 0, spr);
 chk('spread change (fewest markers): no rebuild needed', spr.calls2 === 0, spr);
 
+// ٢ب٢ج) «أقصى عدد قطع» فارغ = مفتوح؛ تنبيه عندما يحدّ عدد القطع الطول؛ إعادة البناء بعد التوقف عن الكتابة دون الخروج من الخانة
+const lim = await page.evaluate(async () => {
+  const log = []; const res = {};
+  try {
+    document.querySelectorAll('.rs-mrow1,.rs-mrow2').forEach(tr => tr.remove()); $('rs-colors').innerHTML = ''; $('rs-qty-rows').innerHTML = '';
+    [['M-56', 74, 2.44], ['L-58', 98, 2.72], ['XL-60', 51, 2.87]].forEach(([s, q, c]) => rsAddQtyRow({ size: s, qty: q, cons: c })); rsCalc();
+    $('rs-maxlen').value = '12'; $('rs-maxpcs').value = ''; $('rs-surplus').value = '0'; $('rs-spread').value = '0'; $('rs-objective').value = 'fabric';
+    res.openPcs = rsMaxPcs(); // 12 ÷ 2.44 → 4
+    $('rs-maxpcs').value = '2'; rsMkCalc(); res.hint = $('rs-limhint').style.display !== 'none';
+    $('rs-maxpcs').value = ''; rsMkCalc(); res.hintOpen = $('rs-limhint').style.display !== 'none';
+    rsAutoPlan(); const len0 = Math.max(...rsReadMarkers().map(m => m.pairs.reduce((a, p) => a + (p.cnt || 0) * ({ 'M-56': 2.44, 'L-58': 2.72, 'XL-60': 2.87 }[p.size] || 0), 0)));
+    let calls = 0; const orig = window.rsRebuildPlan; window.rsRebuildPlan = function () { calls++; return orig.apply(this, arguments); };
+    const inp = $('rs-maxlen'); inp.value = '6'; inp.dispatchEvent(new Event('input'));
+    for (let i = 0; i < 80 && !calls; i++) await new Promise(r => setTimeout(r, 50));
+    await new Promise(r => setTimeout(r, 400));
+    inp.dispatchEvent(new Event('change')); await new Promise(r => setTimeout(r, 300)); // الخروج من الخانة بعدها لا يعيد البناء مرة ثانية
+    window.rsRebuildPlan = orig;
+    const len1 = Math.max(...rsReadMarkers().map(m => m.pairs.reduce((a, p) => a + (p.cnt || 0) * ({ 'M-56': 2.44, 'L-58': 2.72, 'XL-60': 2.87 }[p.size] || 0), 0)));
+    Object.assign(res, { calls, len0, len1, saved: rsBuildDraft().maxpcs });
+  } catch (e) { log.push(e && e.message); }
+  try { $('rs-maxpcs').value = '5'; rsResetPlan(false); } catch (e) { log.push('cleanup: ' + (e && e.message)); }
+  return { log, ...res };
+});
+chk('max pieces empty = open (fills up to the length limit), saved as 0', lim.log.length === 0 && lim.openPcs === 4 && lim.saved === 0, lim);
+chk('hint shows when max pieces caps the length, hidden when open', lim.hint === true && lim.hintOpen === false, lim);
+chk('length limit rebuilds after typing stops (once, no second rebuild on leaving the field)', lim.calls === 1 && lim.len1 <= 6 + 1e-9 && lim.len0 > 6, lim);
+
 // ٢ب٣) خطة الرولات: في الريشو لكل لون وحده مع مسافة الفرد، وصفحة «خطة الرولات من ملف» (رفع ملف → رولات كل لون)
 const rl = await page.evaluate(async () => {
   const log = []; const step = async (n, f) => { try { await f(); } catch (e) { log.push(n + ': ' + (e && e.message)); } };
