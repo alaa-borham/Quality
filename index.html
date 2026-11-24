@@ -543,7 +543,7 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 
 <script>
 // رقم التحديث: يُرفع مع كل تحديث للنظام ويظهر في شاشة الدخول والشريط العلوي والإعدادات
-const APP_BUILD={n:73,date:'2026-11-24'};
+const APP_BUILD={n:74,date:'2026-11-24'};
 /* ============ Firebase ============ */
 const FB_CONFIG={apiKey:"AIzaSyCLSc1yXa5F5E89RzUJoOsj2eErjXsQjus",authDomain:"level7alaa.firebaseapp.com",
 projectId:"level7alaa",storageBucket:"level7alaa.firebasestorage.app",messagingSenderId:"924441815217",
@@ -904,6 +904,8 @@ function cycleTheme(){const cur=localStorage.getItem('qcTheme')||'light';applyTh
 const $=id=>document.getElementById(id);
 applyTheme(localStorage.getItem('qcTheme')||'light');
 const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// وسيط JavaScript آمن داخل خاصية HTML (onclick/onchange…) بأي نوع اقتباس: JSON ثم ترميز HTML — لا يستطيع النص الخروج من السلسلة مهما احتوى من ' أو " أو &
+const jsA=v=>esc(JSON.stringify(v===undefined?null:v)).replace(/'/g,'&#39;');
 function appBuildTxt(){return t('appBuild').replace('{n}',APP_BUILD.n).replace('{d}','\u2066'+APP_BUILD.date+'\u2069');}
 // بعد وصول تحديث جديد للجهاز: رسالة مرة واحدة برقم التحديث
 function appBuildNotice(){try{const k='qcBuild',old=+localStorage.getItem(k)||0;localStorage.setItem(k,APP_BUILD.n);if(old&&old<APP_BUILD.n)setTimeout(()=>toast(t('appUpdated').replace('{n}',APP_BUILD.n)),800);}catch(e){}}
@@ -1106,7 +1108,7 @@ function adminPanel(){if(!isQcAdmin())return;
     <div>${list.map(w=>`<div class="item" style="margin-bottom:6px"><div class="h"><div><div class="t" style="font-size:14px">${esc(w.name||'—')}</div>
       <div class="s">${t('codeLbl')}: <b>${esc(w.code||'—')}</b>${MEMBER&&w.id===MEMBER.wsId?' · <b style="color:var(--teal)">✓ '+t('adminCurrent')+'</b>':''}</div></div></div>
       <div class="row-btns">${MEMBER&&w.id===MEMBER.wsId?'':`<button class="mini g" onclick="adminEnterWs('${w.id}')">${t('adminEnter')}</button>`}
-      <button class="mini r" onclick="adminDelWs('${w.id}','${esc(w.name||'').replace(/'/g,"&#39;")}')">${t('del')}</button></div></div>`).join('')||`<span class="note">${t('noWs')}</span>`}</div>
+      <button class="mini r" onclick="adminDelWs(${jsA(w.id)},${jsA(w.name||'')})">${t('del')}</button></div></div>`).join('')||`<span class="note">${t('noWs')}</span>`}</div>
     <button class="btn sec" style="margin-top:8px" onclick="closeModal()">${t('close')}</button>`);
   }).catch(e=>toast(rulesHint(e)));}
 function adminEnterWs(id){if(!isQcAdmin())return;
@@ -1247,7 +1249,7 @@ function customWsCode(){if(!isOwner())return;
   }).catch(e=>toast(rulesHint(e)));}
 function renderItemsManager(){const el=$('items-list');if(!el)return;
   el.innerHTML=ITEMS.length?ITEMS.map(it=>`<span class="chip" style="font-size:13px;padding:5px 10px;margin:0 0 6px 6px;display:inline-flex;align-items:center;gap:6px">${esc(it)}
-    <b style="cursor:pointer;color:var(--red)" onclick="delItem('${esc(it).replace(/'/g,"&#39;")}')">✕</b></span>`).join(''):`<span class="note">${t('noItemsHint')}</span>`;}
+    <b style="cursor:pointer;color:var(--red)" onclick="delItem(${jsA(it)})">✕</b></span>`).join(''):`<span class="note">${t('noItemsHint')}</span>`;}
 function addItem(){const v=$('new-item').value.trim();if(!v)return;
   db.collection('qc_workspaces').doc(MEMBER.wsId).update({items:FV.arrayUnion(v)}).then(()=>{$('new-item').value='';toast(t('itemAdded'));}).catch(e=>toast(rulesHint(e)));}
 function delItem(v){db.collection('qc_workspaces').doc(MEMBER.wsId).update({items:FV.arrayRemove(v)}).catch(e=>toast(rulesHint(e)));}
@@ -1302,7 +1304,7 @@ function renderFact(){const el=$('fact-list');if(!el)return;if(!FACT.length){el.
   el.innerHTML='<div class="cards">'+FACT.map(f=>`<div class="item"><div class="h"><div><div class="t">🏭 ${esc(f.name)}</div>
     <div class="s">${esc(f.country||'—')} ${f.contact?'· '+esc(f.contact):''}</div></div></div>
     <div class="row-btns"><button class="mini" onclick="factReport('${f.id}')">${t('reportBtn')}</button>
-    ${canEdit('fact')?`<button class="mini g" onclick='factForm(${JSON.stringify(f).replace(/'/g,"&#39;")})'>${t('edit')}</button>`:''}
+    ${canEdit('fact')?`<button class="mini g" onclick="factForm(${jsA(f)})">${t('edit')}</button>`:''}
     ${canDel('fact')?`<button class="mini r" onclick="delFact('${f.id}')">${t('del')}</button>`:''}</div></div>`).join('')+'</div>';}
 function factStats(f){const oids=ORDERS.filter(o=>o.factoryId===f.id).map(o=>o.id);
   const insp=INSP.filter(i=>oids.includes(i.orderId)||i.factoryName===f.name);
@@ -1383,7 +1385,7 @@ function renderOrders(){const el=$('orders-list');if(!el)return;if(!ORDERS.lengt
     return `<div class="item"><div class="h"><div><div class="t">📦 ${esc(o.po)} <span class="chip">${esc(o.item||'')}</span> <span class="chip">${ordStatusLabel(o.status||'open')}</span></div>
     <div class="s">🏭 ${esc(o.factoryName||'')} · ${t('qtyShort')} ${o.qty} ${o.color?'· '+esc(o.color):''} · ${t('inspCount')}: ${n}</div></div></div>
     <div class="row-btns">${canEdit('insp')?`<button class="mini" onclick='inspForm(null,"${o.id}")'>${t('inspect')}</button>`:''}
-    ${canEdit('orders')?`<button class="mini g" onclick='orderForm(${JSON.stringify(o).replace(/'/g,"&#39;")})'>${t('edit')}</button>`:''}
+    ${canEdit('orders')?`<button class="mini g" onclick="orderForm(${jsA(o)})">${t('edit')}</button>`:''}
     ${canDel('orders')?`<button class="mini r" onclick="delOrder('${o.id}')">${t('del')}</button>`:''}</div></div>`;}).join('')+'</div>';}
 
 /* ============ INSPECTIONS ============ */
@@ -1521,7 +1523,7 @@ function filteredInsp(){let list=INSP.filter(i=>INSPFILTER==='all'||i.type===INS
   if(q)list=list.filter(i=>((i.po||'')+' '+(i.factoryName||'')+' '+(i.notes||'')+' '+(i.type||'')+' '+(i.inspector||'')).toLowerCase().includes(q));
   return list;}
 function renderInsp(){const el=$('insp-list');if(!el)return;if(!INSP.length){el.innerHTML=empty(t('noInsp'));return;}
-  const fbtn=(v,lbl)=>`<button class="${INSPFILTER===v?'on':''}" onclick="goInspFilter('${v.replace(/'/g,"\\'")}')">${lbl}</button>`;
+  const fbtn=(v,lbl)=>`<button class="${INSPFILTER===v?'on':''}" onclick="goInspFilter(${jsA(v)})">${lbl}</button>`;
   const bar=`<div class="subnav">${fbtn('all','📋 '+t('typeAll'))}${TYPE_ORDER.map(v=>fbtn(v,typeIcon(v)+' '+esc(typeLabel(v)))).join('')}</div>
   <div style="display:flex;gap:8px;margin-bottom:10px"><button class="mini g" onclick="exportCSV()">${t('exportCsv')}</button></div>`;
   const list=filteredInsp();
@@ -1863,18 +1865,18 @@ function renderSizesManager(){const el=$('sizes-list');if(!el)return;
     <span class="note" style="font-size:11.5px">${SM_W?tf('smWHintW',{w:esc(SM_W)}):t('smWHintBase')}</span></div>
     <div style="margin:-4px 0 10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12.5px"><span class="note">${esc(tf('smWWhere',{n:list.length}))}</span>
       <button type="button" class="mini ${SM_W===''?'':'g'}" style="padding:3px 10px" onclick="SM_W='';renderSizesManager()">${esc(t('smWBase'))}: ${nBase}</button>
-      ${Object.keys(nW).sort().map(w=>`<button type="button" class="mini ${SM_W===w?'':'g'}" style="padding:3px 10px" onclick="SM_W='${esc(w)}';renderSizesManager()">${esc(w)}: ${nW[w]}</button>`).join('')}</div>`;
+      ${Object.keys(nW).sort().map(w=>`<button type="button" class="mini ${SM_W===w?'':'g'}" style="padding:3px 10px" onclick="SM_W=${jsA(w)};renderSizesManager()">${esc(w)}: ${nW[w]}</button>`).join('')}</div>`;
   const CV=consCheck(list.map(x=>({size:x.size,cons:SM_W?sizeConsFor(x,SM_W):x.cons})));
   const cvb=cvBox(CV),cvHtml=cvb?`<div id="sm-cv" style="margin:0 0 10px;border-radius:9px;padding:9px 12px;font-size:13px;background:var(--${cvCount(CV).b?'bad':'warn'}-bg);color:var(--txt);border:2px solid var(--${cvCount(CV).b?'bad':'warn'}-bd)">${cvb}</div>`:'';
-  const chip=s=>{const nm=esc(s.size).replace(/'/g,"&#39;"),cv=CV[s.size],cvl=cv?cv[0].lvl:'';
+  const chip=s=>{const nm=jsA(s.size),cv=CV[s.size],cvl=cv?cv[0].lvl:'';
     const hasW=SM_W&&s.consW&&s.consW[SM_W]!=null&&s.consW[SM_W]!=='';
     const val=SM_W?(hasW?s.consW[SM_W]:''):(s.cons||'');
     const wv=!SM_W&&!(+s.cons>0)?Object.entries(s.consW||{}).find(([w,v])=>+v>0):null;// القيمة موجودة لعرض آخر
     const ph=SM_W?(s.cons||'—'):(wv?wv[0]+': '+wv[1]:t('sizeConsPh'));
     return `<span class="chip${cvl?' cv-'+cvl:''}" ${cv?`title="${esc(cvTip(s.size,cv))}"`:''} style="font-size:13px;padding:4px 8px;margin:0 0 6px 6px;display:inline-flex;align-items:center;gap:5px${SM_W&&hasW&&!cvl?';outline:2px solid var(--green)':''}">${cvl?(cvl==='bad'?'🛑':'⚠️'):''}${esc(s.size)}
-    <input type="number" class="sm-num" dir="ltr" step="0.01" value="${val}" placeholder="${ph}" title="${cv?esc(cvTip(s.size,cv)):t('sizeConsPh')}" onchange="editSizeCons('${nm}',this.value)" style="width:74px;padding:4px 4px;font-size:13.5px;font-weight:700;border:1px solid var(--line);border-radius:6px;text-align:center">
-    ${SM_W?'':`<input type="number" step="0.25" value="${s.ratio||''}" title="${t('ratioPh')}" placeholder="${t('ratioShort')}" onchange="editSizeRatio('${nm}',this.value)" class="sm-num" dir="ltr" style="width:54px;padding:4px 4px;font-size:13.5px;font-weight:700;border:1px solid var(--warn-bd);background:var(--warn-bg);color:var(--txt);border-radius:6px;text-align:center">`}
-    <b style="cursor:pointer;color:var(--red)" onclick="delSize('${nm}')">✕</b></span>`;};
+    <input type="number" class="sm-num" dir="ltr" step="0.01" value="${val}" placeholder="${ph}" title="${cv?esc(cvTip(s.size,cv)):t('sizeConsPh')}" onchange="editSizeCons(${nm},this.value)" style="width:74px;padding:4px 4px;font-size:13.5px;font-weight:700;border:1px solid var(--line);border-radius:6px;text-align:center">
+    ${SM_W?'':`<input type="number" step="0.25" value="${s.ratio||''}" title="${t('ratioPh')}" placeholder="${t('ratioShort')}" onchange="editSizeRatio(${nm},this.value)" class="sm-num" dir="ltr" style="width:54px;padding:4px 4px;font-size:13.5px;font-weight:700;border:1px solid var(--warn-bd);background:var(--warn-bg);color:var(--txt);border-radius:6px;text-align:center">`}
+    <b style="cursor:pointer;color:var(--red)" onclick="delSize(${nm})">✕</b></span>`;};
   const groups=sizeGroups(list);
   el.innerHTML=wsel+cvHtml+(groups.length>1
     ?groups.map(g=>`<div style="margin-bottom:8px;padding:6px 8px;border:1px solid var(--line);border-radius:10px">
@@ -2101,11 +2103,11 @@ let RS_DRAFT=null,RS_LOADED=false,RS_SAVE_T=null,RS_SAVED_FADE=null,RS_COL={},RS
 const RS_ROWCOLORS=[['#fff3b0','أصفر'],['#c9f0d0','أخضر'],['#cfe4fb','أزرق'],['#f8c9c9','أحمر'],['#ffd9a8','برتقالي'],['#e6cffb','بنفسجي']];
 function rsCloseRowMenu(e){const m=$('rs-rowmenu');if(!m)return;if(e&&e.target&&m.contains(e.target))return;m.remove();document.removeEventListener('mousedown',rsCloseRowMenu,true);}
 // بناء قائمة الألوان — fnName: اسم الدالة التي تُستدعى بالمفتاح واللون
-function rsBuildColorMenu(e,fnName,keyArg){e.preventDefault();if(!keyArg)return false;rsCloseRowMenu();const kq=String(keyArg).replace(/'/g,"&#39;");
+function rsBuildColorMenu(e,fnName,keyArg){e.preventDefault();if(!keyArg)return false;rsCloseRowMenu();const kq=jsA(String(keyArg));
   const m=document.createElement('div');m.id='rs-rowmenu';
   m.style.cssText='position:fixed;z-index:99999;background:var(--card,#fff);border:1px solid var(--line,#ccc);border-radius:10px;padding:8px;box-shadow:0 8px 26px rgba(0,0,0,.2);display:flex;gap:6px;flex-wrap:wrap;max-width:150px';
-  m.innerHTML=RS_ROWCOLORS.map(c=>`<button type="button" title="${c[1]}" onclick="${fnName}('${kq}','${c[0]}')" style="width:26px;height:26px;border-radius:6px;border:1px solid #0003;cursor:pointer;background:${c[0]}"></button>`).join('')
-    +`<button type="button" title="${esc(t('rsRowClear'))}" onclick="${fnName}('${kq}','')" style="width:26px;height:26px;border-radius:6px;border:1px dashed #999;cursor:pointer;background:transparent;font-weight:800;color:#c00">✕</button>`;
+  m.innerHTML=RS_ROWCOLORS.map(c=>`<button type="button" title="${c[1]}" onclick="${fnName}(${kq},'${c[0]}')" style="width:26px;height:26px;border-radius:6px;border:1px solid #0003;cursor:pointer;background:${c[0]}"></button>`).join('')
+    +`<button type="button" title="${esc(t('rsRowClear'))}" onclick="${fnName}(${kq},'')" style="width:26px;height:26px;border-radius:6px;border:1px dashed #999;cursor:pointer;background:transparent;font-weight:800;color:#c00">✕</button>`;
   document.body.appendChild(m);
   m.style.left=Math.max(6,Math.min(e.clientX,innerWidth-158))+'px';
   m.style.top=Math.max(6,Math.min(e.clientY,innerHeight-90))+'px';
@@ -2113,8 +2115,10 @@ function rsBuildColorMenu(e,fnName,keyArg){e.preventDefault();if(!keyArg)return 
   return false;}
 function rsRowMenu(e,tr){const se=tr.querySelector('.rsq-size');const size=se?se.value.trim():'';return rsBuildColorMenu(e,'rsSetRowColor',size);}
 function rsComboMenu(e,tr){return rsBuildColorMenu(e,'rsSetComboColor',tr.getAttribute('data-sig')||'');}
-function rsSetRowColor(size,color){if(color)RS_ROWCOL[size]=color;else delete RS_ROWCOL[size];rsCloseRowMenu();rsApplyRowColors();rsSaveDraft();}
-function rsSetComboColor(sig,color){if(color)RS_COMBOCOL[sig]=color;else delete RS_COMBOCOL[sig];rsCloseRowMenu();rsComboApplyColors();rsMkApplyColors();rsSaveDraft();}
+// ألوان الصفوف المحفوظة تُدرج في style — نقبل رموز ألوان سداسية فقط (يمنع حقن نص من خطة محفوظة معدّلة)
+function rsSafeColMap(o){const r={};if(o&&typeof o==='object')Object.keys(o).forEach(k=>{const v=o[k];if(typeof v==='string'&&/^#[0-9a-f]{3,8}$/i.test(v))r[k]=v;});return r;}
+function rsSetRowColor(size,color){if(color&&!/^#[0-9a-f]{3,8}$/i.test(color))return;if(color)RS_ROWCOL[size]=color;else delete RS_ROWCOL[size];rsCloseRowMenu();rsApplyRowColors();rsSaveDraft();}
+function rsSetComboColor(sig,color){if(color&&!/^#[0-9a-f]{3,8}$/i.test(color))return;if(color)RS_COMBOCOL[sig]=color;else delete RS_COMBOCOL[sig];rsCloseRowMenu();rsComboApplyColors();rsMkApplyColors();rsSaveDraft();}
 function rsTintRow(tr,col){tr.classList.toggle('rs-tinted',!!col);tr.querySelectorAll('td').forEach(td=>{td.style.background=col;});
   tr.querySelectorAll('input,select,span[dir="ltr"]').forEach(el=>{if(el.dataset.bg0===undefined)el.dataset.bg0=el.style.backgroundColor||'';el.style.backgroundColor=col?'transparent':el.dataset.bg0;});}
 function rsComboApplyColors(){document.querySelectorAll('#rs-combo-rows tr[data-sig]').forEach(tr=>{const sig=tr.getAttribute('data-sig');rsTintRow(tr,(sig&&RS_COMBOCOL[sig])||'');});}
@@ -2181,8 +2185,8 @@ function rsInit(){if(RS_LOADED||!$('rs-qty-rows'))return;if(!prodNames().length)
   else{if(!$('rs-qty-rows').children.length)rsAddQtyRow();rsCalc();}
   rsUpdateUnitLabels();RS_LOADED=true;rsStartAutosave();rsAutoBackupCheck();}
 function rsApplyDraft(d){
-  RS_ROWCOL=(d.rowcol&&typeof d.rowcol==='object')?d.rowcol:{};
-  RS_COMBOCOL=(d.combocol&&typeof d.combocol==='object')?d.combocol:{};
+  RS_ROWCOL=rsSafeColMap(d.rowcol);
+  RS_COMBOCOL=rsSafeColMap(d.combocol);
   if($('rs-title'))$('rs-title').value=d.title||'';
   if(d.product&&prodNames().includes(d.product))$('rs-product').value=d.product;
   if($('rs-unit')){$('rs-unit').value=d.unit||'متر';RS_PREV_UNIT=$('rs-unit').value;}
@@ -3273,11 +3277,11 @@ function rsAutoBakRestore(i){rsBakApply(rsBakLoad().items[i]);}
 function rsCloudBakRestore(i){const b=RS_BAK_CLOUD[i];if(!b)return;let s;try{s=JSON.parse(b.data);}catch(_){return toast(t('rsLibImportBad'));}rsBakApply(s);}
 // مراجعة قياسات المكتبة المشبوهة (أطول من المحسوب بأكثر من الهامش) — عرض وحذف
 function rsLibSusOpen(){const list=rsLibSuspects();if(!list.length)return toast(t('rsLibSusNone'));const uf=rsUF(),u=rsUL(),ce=canEdit('marker');
-  const rows=list.map(o=>{const sg=esc(o.x.sig).replace(/'/g,"&#39;");
+  const rows=list.map(o=>{const sg=jsA(o.x.sig);
     const pills=(o.x.sizes||[]).map(p=>`<span dir="ltr" style="display:inline-block;font-weight:800;font-size:12px;margin:1px 3px;padding:1px 7px;border:1px solid var(--line);border-radius:999px;background:var(--inp)">${esc(p.size)}×${p.cnt}</span>`).join('');
     return `<div class="item" style="margin-bottom:5px"><div class="h" style="display:flex;align-items:center;gap:8px"><div style="flex:1;line-height:2">${pills}</div>
       <div style="white-space:nowrap;font-size:13px;text-align:center"><b style="color:var(--bad)">${Math.round(o.x.actLenM*uf*100)/100}</b> ${esc(u)} <span class="note">/ ${Math.round(o.comp*uf*100)/100}</span><div style="color:var(--bad);font-weight:800">+${o.pct}${pctS()}</div></div>
-      ${ce?`<button class="mini r" onclick="rsLibSusDel('${sg}')">🗑</button>`:''}</div></div>`;}).join('');
+      ${ce?`<button class="mini r" onclick="rsLibSusDel(${sg})">🗑</button>`:''}</div></div>`;}).join('');
   modal(`<h3>🚩 ${t('rsLibSusTitle')}</h3><div class="note" style="margin-bottom:8px">${esc(tf('rsLibSusHint',{t:Math.round(RS_LIB_TOL*100),w:rsFabW()||'—'}))}</div><div id="rs-libsus-body">${rows}</div>
     <div class="row-btns">${ce?`<button class="btn red" onclick="rsLibSusDel(null)">🗑 ${t('rsLibSusDelAll')} (${list.length})</button>`:''}<button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);}
 function rsLibSusDel(sig){if(!canEdit('marker'))return toast(t('rsNoPerm'));const prod=rsComboProd(),cw=String(rsFabW()||'');
@@ -3301,11 +3305,11 @@ function rsLibRender(){const el=$('rs-lib-body');if(!el)return;const uf=rsUF();c
   const byW={};lib.forEach(x=>{const w=String(x.w||'')||'—';(byW[w]=byW[w]||[]).push(x);});
   const widths=Object.keys(byW).sort();
   el.innerHTML=widths.map(w=>{
-    const rows=byW[w].map(x=>{const sg=esc(x.sig).replace(/'/g,"&#39;");
+    const rows=byW[w].map(x=>{const sg=jsA(x.sig);
       const pills=(x.sizes||[]).map(p=>`<span dir="ltr" style="display:inline-block;font-weight:800;font-size:12px;margin:1px 3px;padding:1px 7px;border:1px solid var(--line);border-radius:999px;background:var(--inp)">${esc(p.size)}×${p.cnt}</span>`).join('');
       const lenDisp=Math.round((x.actLenM||0)*uf*100)/100;
-      const lenCell=ce?`<input type="number" step="0.01" value="${lenDisp}" onchange="rsLibEditLen('${sg}','${esc(w)}',this.value)" style="width:78px;padding:4px;text-align:center;font-weight:800">`:`<b>${lenDisp}</b>`;
-      const del=ce?`<button class="mini r" onclick="rsLibDel('${sg}','${esc(w)}')">🗑</button>`:'';
+      const lenCell=ce?`<input type="number" step="0.01" value="${lenDisp}" onchange="rsLibEditLen(${sg},${jsA(w)},this.value)" style="width:78px;padding:4px;text-align:center;font-weight:800">`:`<b>${lenDisp}</b>`;
+      const del=ce?`<button class="mini r" onclick="rsLibDel(${sg},${jsA(w)})">🗑</button>`:'';
       return `<div class="item" style="margin-bottom:5px"><div class="h"><div style="flex:1;line-height:2">${pills}</div><div style="display:flex;align-items:center;gap:6px;white-space:nowrap">${lenCell}<span style="font-size:11px;color:var(--mut)">${esc(u)}</span>${del}</div></div></div>`;
     }).join('');
     return `<div style="margin-bottom:12px"><div style="font-weight:800;color:var(--teal);margin-bottom:4px">${t('rsFabW')}: ${esc(w)} <span class="note" style="font-weight:400">(${byW[w].length})</span></div>${rows}</div>`;
@@ -4040,7 +4044,7 @@ function rsMkCalc(_depth){if(!$('rs-markers'))return;const uf=rsUF();const spM=r
     if(!cwv){warnStyle();fw.innerHTML=`⚠️ ${esc(t('rsFabWReq'))}`;}
     else if(_prod&&!rsWidthHasData(_prod,cwv)&&!rsProdHasBase(_prod)&&rsProdWidths(_prod).length){
       // عرض مختار لكن لا استهلاك له لهذا المنتج، والبيانات موجودة لأعراض أخرى — دلّ المستخدم وأتِح التبديل بضغطة
-      warnStyle();const btns=rsProdWidths(_prod).map(x=>`<button type="button" class="mini" onclick="rsSetFabW('${esc(x.w)}');rsWidthChanged()" style="margin:2px 4px">${esc(x.w)} (${x.n})</button>`).join('');
+      warnStyle();const btns=rsProdWidths(_prod).map(x=>`<button type="button" class="mini" onclick="rsSetFabW(${jsA(x.w)});rsWidthChanged()" style="margin:2px 4px">${esc(x.w)} (${x.n})</button>`).join('');
       fw.innerHTML=`⚠️ ${esc(tf('rsWidthNoData',{w:cwv}))}<div style="margin-top:5px">${btns}</div>`;}
     else fw.style.display='none';}
   const en=$('rs-effnote');if(en){const wf=_wf,cw=_cw;
@@ -4219,8 +4223,8 @@ function rsDelSaved(id){if(!confirm(t('rsDelPlanQ')))return;
   TOOLCHK=TOOLCHK.filter(c=>c.id!==id);
   if(TOOLCHK.filter(c=>c.type==='rs').length)rsOpenSaved();else closeModal();}
 function rsOpenInCalc(id){const c=TOOLCHK.find(x=>x.id===id);if(!c||c.type!=='rs')return;const r=c.result;
-  RS_ROWCOL=(r.rowcol&&typeof r.rowcol==='object')?r.rowcol:{};
-  RS_COMBOCOL=(r.combocol&&typeof r.combocol==='object')?r.combocol:{};
+  RS_ROWCOL=rsSafeColMap(r.rowcol);
+  RS_COMBOCOL=rsSafeColMap(r.combocol);
   go('marker',navBtn('marker'));
   if($('rs-title'))$('rs-title').value=c.title||'';
   if(r.product&&prodNames().includes(r.product))$('rs-product').value=r.product;
@@ -4980,7 +4984,7 @@ function rlRenderTable(){if(!RL)return;const cs=RL.colors,u=$('rl-funit').value=
   const rows=RL.mk.map((m,i)=>{const sum=cs.length?cs.reduce((a,c)=>a+(+m.cp[c]||0),0):m.plies,bad=cs.length&&sum!==m.plies&&m.plies>0;
     return `<tr><td>${i+1}</td><td style="font-weight:800">${esc(m.code)}</td><td dir="ltr" style="text-align:start">${m.sizes.map(([s,n])=>`<span class="chip" style="margin:1px">${esc(s)}×${n}</span>`).join('')}</td>
     <td><input type="number" step="0.01" min="0" value="${m.len||''}" style="width:80px;padding:4px;text-align:center;${m.len>0?'':'border-color:var(--bad)'}" oninput="RL.mk[${i}].len=+this.value||0;rlCalc()"></td>
-    ${cs.map(c=>`<td><input type="number" step="1" min="0" value="${m.cp[c]||''}" style="width:62px;padding:4px;text-align:center" oninput="RL.mk[${i}].cp['${c.replace(/'/g,"\\'")}']=+this.value||0;RL.mk[${i}].plies=RL.colors.reduce((a,k)=>a+(+RL.mk[${i}].cp[k]||0),0);rlRenderTable();rlCalc()"></td>`).join('')}
+    ${cs.map(c=>`<td><input type="number" step="1" min="0" value="${m.cp[c]||''}" style="width:62px;padding:4px;text-align:center" oninput="RL.mk[${i}].cp[${jsA(c)}]=+this.value||0;RL.mk[${i}].plies=RL.colors.reduce((a,k)=>a+(+RL.mk[${i}].cp[k]||0),0);rlRenderTable();rlCalc()"></td>`).join('')}
     <td style="font-weight:800;${bad?'color:var(--bad)':''}" title="${bad?esc(t('rlSumWarn')):''}">${cs.length?sum:`<input type="number" step="1" min="0" value="${m.plies||''}" style="width:62px;padding:4px;text-align:center" oninput="RL.mk[${i}].plies=+this.value||0;rlCalc()">`}</td>
     <td><button type="button" class="mini r" onclick="RL.mk.splice(${i},1);rlRenderTable();rlCalc()">✕</button></td></tr>`;}).join('');
   const tot=cs.map(c=>RL.mk.reduce((a,m)=>a+(+m.cp[c]||0),0)),tp=RL.mk.reduce((a,m)=>a+(cs.length?cs.reduce((x,c)=>x+(+m.cp[c]||0),0):(+m.plies||0)),0);
@@ -5274,10 +5278,10 @@ function chkInfo(i,e){e.preventDefault();modal(`<h3>${esc(refTx(curChk()[i].titl
   <div class="row-btns"><button class="btn sec" onclick="closeModal()">${t('close')}</button></div>`);return false;}
 function renderChk(){const el=$('chk-body');if(!el)return;const cl=curChk()[CHKSUB];const ce=canEdit('ref');
   el.innerHTML=`${ce?`<button class="mini g" style="margin-bottom:8px" onclick="chkItemForm()">${t('addChkItem')}</button>`:''}
-  <table class="rtbl" style="min-width:480px"><tr><th>${t('colItem')}</th><th>${t('critsCol')}</th><th>${t('colTool')}</th><th></th></tr>
+  <div style="overflow-x:auto"><table class="rtbl" style="min-width:480px"><tr><th>${t('colItem')}</th><th>${t('critsCol')}</th><th>${t('colTool')}</th><th></th></tr>
     ${cl.items.map((r,i)=>`<tr><td>${esc(refTx(r.name))}${r.desc?` <span style="cursor:pointer" onclick="chkItemInfo(${i})">ℹ️</span>`:''}</td><td>${r.crits.map(c=>'• '+esc(refTx(c))).join('<br>')}</td><td>${esc(refTx(r.tool))}</td>
     <td style="white-space:nowrap">${ce?`<button class="mini" onclick="chkItemForm(${i})">${t('edit')}</button>`:''}
-    ${canDel('ref')?`<button class="mini" onclick="delChkItem(${i})">${t('del')}</button>`:''}</td></tr>`).join('')}</table>`;}
+    ${canDel('ref')?`<button class="mini" onclick="delChkItem(${i})">${t('del')}</button>`:''}</td></tr>`).join('')}</table></div>`;}
 function chkItemInfo(i){const r=curChk()[CHKSUB].items[i];if(!r)return;
   modal(`<h3>${esc(refTx(r.name))}</h3>
   <p style="line-height:1.7;color:var(--mut)">${esc(refTx(r.desc||''))}</p>
@@ -5306,22 +5310,22 @@ function renderRef(){const el=$('ref-body');if(!el)return;const ce=canEdit('ref'
     const list=curSeq();
     const seqRows=list.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(refTx(r.cat))}</td><td>${LANG==='en'&&r.en?esc(r.en):esc(r.op)+`<div class="en">${esc(r.en)}</div>`}</td>
       <td>${esc(refTx(r.timing))}</td><td>${r.imp==='حرجة'?catTag('حرِج'):esc(refTx(r.imp))}</td><td>${esc(refTx(r.check))}</td><td>${esc(refTx(r.std))}</td>
-      <td style="white-space:nowrap"><button class="mini" onclick="inspFromRef('${esc(r.op).replace(/'/g,"&#39;")}')">${t('recordInsp')}</button>
+      <td style="white-space:nowrap"><button class="mini" onclick="inspFromRef(${jsA(r.op)})">${t('recordInsp')}</button>
       ${ce?`<button class="mini" ${i===0?'disabled':''} onclick="moveSeqStage(${i},-1)">▲</button>
       <button class="mini" ${i===list.length-1?'disabled':''} onclick="moveSeqStage(${i},1)">▼</button>`:''}</td></tr>`).join('');
     el.innerHTML=`${ce?`<button class="btn" style="margin-bottom:12px" onclick="seqForm()">${t('addSeqNew')}</button>`:''}
-      <table class="rtbl"><tr><th>${t('colNo')}</th><th>${t('colStage')}</th><th>${t('colOp')}</th><th>${t('colTiming')}</th><th>${t('colImp')}</th><th>${t('colCheck')}</th><th>${t('colStd')}</th><th></th></tr>${seqRows}</table>`;
+      <div style="overflow-x:auto"><table class="rtbl"><tr><th>${t('colNo')}</th><th>${t('colStage')}</th><th>${t('colOp')}</th><th>${t('colTiming')}</th><th>${t('colImp')}</th><th>${t('colCheck')}</th><th>${t('colStd')}</th><th></th></tr>${seqRows}</table></div>`;
   }else if(REFSUB==='def'){
     const all=allDefects();
     const defRows=all.map((d,i)=>{
       const delBtn=!canDel('ref')?'':(d.built
-        ?`<button class="mini" onclick="hideDef('${esc(d.name).replace(/'/g,"&#39;")}')">${t('del')}</button>`
+        ?`<button class="mini" onclick="hideDef(${jsA(d.name)})">${t('del')}</button>`
         :`<button class="mini" onclick="delDef('${d.id}')">${t('del')}</button>`);
       const editBtn=ce?`<button class="mini" onclick='defForm(${esc(JSON.stringify(d)).replace(/'/g,"&#39;")})'>${t('edit')}</button> `:'';
       return `<tr><td>${i+1}</td><td>${esc(refTx(d.name))}</td><td>${catTag(d.cat)}</td><td>${esc(refTx(d.desc))}</td><td>${esc(refTx(d.cause))}</td><td>${esc(refTx(d.action))}</td>
       <td>${editBtn}${delBtn}</td></tr>`;}).join('');
     el.innerHTML=`${ce?`<button class="btn" style="margin-bottom:12px" onclick="defForm()">${t('addDefNew')}</button>`:''}
-      <table class="rtbl"><tr><th>${t('colNo')}</th><th>${t('colDefect')}</th><th>${t('colCat')}</th><th>${t('colDesc2')}</th><th>${t('colCause')}</th><th>${t('colAction')}</th><th></th></tr>${defRows}</table>`;
+      <div style="overflow-x:auto"><table class="rtbl"><tr><th>${t('colNo')}</th><th>${t('colDefect')}</th><th>${t('colCat')}</th><th>${t('colDesc2')}</th><th>${t('colCause')}</th><th>${t('colAction')}</th><th></th></tr>${defRows}</table></div>`;
   }else if(REFSUB==='chk'){
     el.innerHTML=`<div class="subnav" id="chk-subnav">${CHECKLISTS.map((c,i)=>`<button class="${i===CHKSUB?'on':''}" onclick="goChk(${i},this)" oncontextmenu="return chkInfo(${i},event)">${esc(refTx(c[0]))}</button>`).join('')}</div><div id="chk-body"></div>`;
     renderChk();

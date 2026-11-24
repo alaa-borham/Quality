@@ -58,7 +58,8 @@ match /qc_members/{uid} {
   allow update: if request.auth != null && request.auth.uid == uid
                 && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name']);
   // الحذف والإزالة للمالك فقط (يمنع إعادة ضبط الصلاحيات عبر حذف السجل وإعادة إنشائه)
-  allow update, delete: if qcIsOwner() && resource.data.wsId == qcWs();
+  allow update: if qcIsOwner() && resource.data.wsId == qcWs() && request.resource.data.wsId == resource.data.wsId;
+  allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
 }
 
 // مساحات العمل: أي مستخدم مسجّل يقرأ (للبحث بالكود) وينشئ؛ المالك فقط يعدّل/يحذف
@@ -98,28 +99,28 @@ match /qc_factories/{id} {
   allow read, write: if qcIsAdmin();
   allow read:   if qcIsMember() && resource.data.wsId == qcWs();
   allow create: if qcIsMember() && request.resource.data.wsId == qcWs() && qcLvl('fact') >= 2;
-  allow update: if qcIsMember() && resource.data.wsId == qcWs() && qcLvl('fact') >= 2;
+  allow update: if qcIsMember() && resource.data.wsId == qcWs() && request.resource.data.wsId == resource.data.wsId && qcLvl('fact') >= 2;
   allow delete: if qcIsMember() && resource.data.wsId == qcWs() && qcLvl('fact') >= 3;
 }
 match /qc_orders/{id} {
   allow read, write: if qcIsAdmin();
   allow read:   if qcIsMember() && resource.data.wsId == qcWs();
   allow create: if qcIsMember() && request.resource.data.wsId == qcWs() && qcLvl('orders') >= 2;
-  allow update: if qcIsMember() && resource.data.wsId == qcWs() && qcLvl('orders') >= 2;
+  allow update: if qcIsMember() && resource.data.wsId == qcWs() && request.resource.data.wsId == resource.data.wsId && qcLvl('orders') >= 2;
   allow delete: if qcIsMember() && resource.data.wsId == qcWs() && qcLvl('orders') >= 3;
 }
 match /qc_inspections/{id} {
   allow read, write: if qcIsAdmin();
   allow read:   if qcIsMember() && resource.data.wsId == qcWs();
   allow create: if qcIsMember() && request.resource.data.wsId == qcWs() && qcLvl('insp') >= 2;
-  allow update: if qcIsMember() && resource.data.wsId == qcWs() && qcLvl('insp') >= 2;
+  allow update: if qcIsMember() && resource.data.wsId == qcWs() && request.resource.data.wsId == resource.data.wsId && qcLvl('insp') >= 2;
   allow delete: if qcIsMember() && resource.data.wsId == qcWs() && qcLvl('insp') >= 3;
 }
 match /qc_defects/{id} {
   allow read, write: if qcIsAdmin();
   allow read:   if qcIsMember() && resource.data.wsId == qcWs();
   allow create: if qcIsMember() && request.resource.data.wsId == qcWs() && qcLvl('ref') >= 2;
-  allow update: if qcIsMember() && resource.data.wsId == qcWs() && qcLvl('ref') >= 2;
+  allow update: if qcIsMember() && resource.data.wsId == qcWs() && request.resource.data.wsId == resource.data.wsId && qcLvl('ref') >= 2;
   allow delete: if qcIsMember() && resource.data.wsId == qcWs() && qcLvl('ref') >= 3;
 }
 
@@ -128,7 +129,7 @@ match /qc_models/{id} {
   allow read, write: if qcIsAdmin();
   allow read:   if qcIsMember() && resource.data.wsId == qcWs();
   allow create: if qcIsMember() && request.resource.data.wsId == qcWs();
-  allow update: if qcIsMember() && resource.data.wsId == qcWs();
+  allow update: if qcIsMember() && resource.data.wsId == qcWs() && request.resource.data.wsId == resource.data.wsId;
   allow delete: if qcIsOwner() && resource.data.wsId == qcWs();
 }
 
@@ -151,6 +152,6 @@ match /qc_toolchecks/{id} {
   allow read, write: if qcIsAdmin();
   allow read:   if qcIsMember() && resource.data.wsId == qcWs();
   allow create: if qcIsMember() && request.resource.data.wsId == qcWs() && (qcLvl('insp') >= 2 || qcLvl('marker') >= 2);
-  allow update: if qcIsMember() && resource.data.wsId == qcWs() && (qcLvl('insp') >= 2 || qcLvl('marker') >= 2);
+  allow update: if qcIsMember() && resource.data.wsId == qcWs() && request.resource.data.wsId == resource.data.wsId && (qcLvl('insp') >= 2 || qcLvl('marker') >= 2);
   allow delete: if qcIsMember() && resource.data.wsId == qcWs() && (qcLvl('insp') >= 3 || qcLvl('marker') >= 3);
 }

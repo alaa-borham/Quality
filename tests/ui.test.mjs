@@ -62,6 +62,20 @@ chk('page loads without JS errors', pageErrors.length === 0, pageErrors);
 const bld = await page.evaluate(() => ({ n: APP_BUILD.n, txt: [...document.querySelectorAll('.app-build')].map(e => e.textContent), stored: localStorage.getItem('qcBuild') }));
 chk('update number shown (login + top bar) and remembered on the device', bld.n > 0 && bld.txt.length >= 2 && bld.txt.every(x => x.includes(String(bld.n))) && bld.stored === String(bld.n), bld);
 
+// ── أمان: نص خبيث (اقتباسات و&quot;) داخل وسيط onclick يصل كما هو ولا يُنفَّذ ──
+const inj = await page.evaluate(() => {
+  const nasty = `a'b"c&quot;);window.__pwn=1;//\\x&#39;);window.__pwn=2;//`; let got = []; window.__cap = v => got.push(v);
+  const d = document.createElement('div');
+  d.innerHTML = `<button onclick="__cap(${jsA(nasty)})"></button><button onclick='__cap(${jsA({ n: nasty })})'></button>`;
+  document.body.appendChild(d); d.children[0].click(); d.children[1].click(); d.remove();
+  // قائمة ألوان الصفوف (النقر الأيمن) بمقاس اسمه خبيث
+  const ev = { preventDefault() {}, clientX: 10, clientY: 10 }; rsBuildColorMenu(ev, 'rsSetRowColor', nasty);
+  const b = document.querySelector('#rs-rowmenu button'); if (b) b.click();
+  const rowOk = typeof RS_ROWCOL === 'object' && !!RS_ROWCOL[nasty]; if (rowOk) delete RS_ROWCOL[nasty];
+  return { plain: got[0] === nasty, obj: got[1] && got[1].n === nasty, rowOk, pwn: window.__pwn || 0 };
+});
+chk('security: quotes/&quot; in names cannot break out of onclick (value arrives intact)', inj.plain && inj.obj && inj.rowOk && !inj.pwn, inj);
+
 // ── إعداد: مالك مسجّل، أوردر بست مقاسات ──
 await page.evaluate(() => {
   window.print = () => {}; window.confirm = () => true; window.alert = () => {}; window.prompt = () => '148';

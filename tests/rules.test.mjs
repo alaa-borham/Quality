@@ -73,6 +73,11 @@ await chk('outsider reads ws1 order DENIED', assertFails(getDoc(doc(as('outU'), 
 await chk('insp self-promote to owner DENIED', assertFails(updateDoc(doc(insp, 'qc_members', 'inspU'), { role: 'owner' })));
 await chk('insp self-grant perms DENIED', assertFails(updateDoc(doc(insp, 'qc_members', 'inspU'), { perms: { _v: 2, orders: 3 } })));
 await chk('insp self name change OK', assertSucceeds(updateDoc(doc(insp, 'qc_members', 'inspU'), { name: 'newname' })));
+// نقل سجل أو عضو إلى مساحة عمل أخرى ممنوع (حتى للمالك) — يمنع حقن بيانات أو تصعيد صلاحيات في مساحة غيرك
+await chk('insp moves order to another ws DENIED', assertFails(updateDoc(doc(insp, 'qc_orders', 'o2'), { wsId: 'ws2' })));
+await chk('owner moves own membership to another ws DENIED', assertFails(updateDoc(doc(owner, 'qc_members', 'ownerU'), { wsId: 'ws2' })));
+await chk('owner moves insp to another ws DENIED', assertFails(updateDoc(doc(owner, 'qc_members', 'inspU'), { wsId: 'ws2', role: 'owner' })));
+await chk('owner renames workspace on own membership OK', assertSucceeds(updateDoc(doc(owner, 'qc_members', 'ownerU'), { wsName: 'W2' })));
 await chk('owner sets insp perms OK', assertSucceeds(updateDoc(doc(owner, 'qc_members', 'inspU'), { perms: { _v: 2, fact: 1, orders: 1, insp: 1, dash: 1, tools: 1, marker: 1, ref: 1 } })));
 await chk('self-create inspector no perms OK', assertSucceeds(setDoc(doc(as('newU'), 'qc_members', 'newU'), { wsId: WS, role: 'inspector', name: 'New' })));
 await chk('self-create as owner DENIED', assertFails(setDoc(doc(as('newU2'), 'qc_members', 'newU2'), { wsId: WS, role: 'owner', name: 'H' })));
