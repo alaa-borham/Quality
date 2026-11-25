@@ -35,12 +35,12 @@ function grabConst(name) {
 
 const code = [
   grabConst('RS_LIB_TOL'), grabConst('XL_CRC'), grabConst('rsP2'), grabConst('SIZE_ORDER'), grabConst('CV_HI'), grabConst('RL_SZ'), grabConst('RS_ROLLC'),
-  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus', 'rsColorPlan', 'rsColorPlan1', 'rsColorBeam', 'rsConsolidate', 'rsColorAlloc', 'rsRollPack', 'rsRollPack0', 'rsRollFin', 'rsRollGroups', 'rsRollSplTxt', 'normNum', 'rlNum', 'rlInterpret', 'rlMergeRow'].map(grabFn),
+  ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus', 'rsColorPlan', 'rsColorPlan1', 'rsColorBeam', 'rsConsolidate', 'rsPlyCompress', 'rsColorAlloc', 'rsRollPack', 'rsRollPack0', 'rsRollFin', 'rsRollGroups', 'rsRollSplTxt', 'normNum', 'rlNum', 'rlInterpret', 'rlMergeRow'].map(grabFn),
 ].join('\n');
 // rsSolve يقرأ الهدف/الفائض من الواجهة عند غياب الخيارات — نعيد قيمة فارغة فيُستعمل الافتراضي («أقل ماركرات»، فائض 0)
 const ctx = { $: () => ({ value: '' }), Date, Math, Object, Set, Map, Array, String, Number, Uint32Array, Int32Array, Float64Array, Uint8Array, Int16Array, TextEncoder, console };
 vm.createContext(ctx);
-vm.runInContext(code + '\n;globalThis.__x={rsCombos,rsSolve,rsPlanSolve,rsComboSig,rsLibComp,rsLibOk,rsBakSlot,rsBakSlotId,xlCrc,consCheck,rsTrimSurplus,rsColorPlan,rsColorBeam,rsConsolidate,rsColorAlloc,rsRollPack,rsRollGroups,rlInterpret,rlMergeRow};', ctx);
+vm.runInContext(code + '\n;globalThis.__x={rsCombos,rsSolve,rsPlanSolve,rsComboSig,rsLibComp,rsLibOk,rsBakSlot,rsBakSlotId,xlCrc,consCheck,rsTrimSurplus,rsColorPlan,rsColorBeam,rsConsolidate,rsPlyCompress,rsColorAlloc,rsRollPack,rsRollGroups,rlInterpret,rlMergeRow};', ctx);
 const X = ctx.__x;
 
 let pass = 0, fail = 0;
@@ -203,6 +203,14 @@ chk('xlCrc("123456789") = CBF43926', X.xlCrc(new TextEncoder().encode('123456789
   chk('consolidate: short marker rides on the longer one (no more markers, fewer plies)', r.length <= plan.length && pl(r) < pl(plan) && r.some(m => m.combo.length === 3), r);
   chk('consolidate: respects the length limit', r.every(m => m.combo.reduce((a, p) => a + p.cnt * cons[p.size], 0) <= 9 + 1e-9));
   chk('consolidate: not dominated → untouched', X.rsConsolidate([plan[2], { combo: [{ size: 'A', cnt: 1 }], sp: { G: 5 }, len: 2.5 }], cons, 9, 6, 5, []).length === 2); }
+// تكثيف الطبقات: M-57×1 بـ 179 طبقة (59/59/61) → M-57×4 بطبقات أقل + باقٍ صغير، الكميات كما هي والقماش مع الفرد أقل
+{ const cons = { 'M-57': 2.52 }, plan = [{ combo: [{ size: 'M-57', cnt: 1 }], sp: { G: 59, B: 59, E: 61 }, len: 2.52 }];
+  const made = P => { const m = {}; P.forEach(x => Object.entries(x.sp).forEach(([c, v]) => x.combo.forEach(p => { m[c] = (m[c] || 0) + p.cnt * v; }))); return m; };
+  const fab = (P, sp) => P.reduce((t, x) => t + (x.len + sp) * Object.values(x.sp).reduce((u, v) => u + v, 0), 0);
+  const r = X.rsPlyCompress(plan, cons, 10.3, 6, 4, [], 0.04), m = made(r), big = r.find(x => x.combo[0].cnt === 4);
+  chk('ply compress: single piece ×179 plies → ×4 marker, exact per colour', !!big && big.sp.G === 14 && big.sp.E === 15 && m.G === 59 && m.B === 59 && m.E === 61, r);
+  chk('ply compress: less fabric with spread, within limits', fab(r, 0.04) < fab(plan, 0.04) - 1 && r.every(x => x.len <= 10.3 + 1e-9 && x.combo.reduce((a, p) => a + p.cnt, 0) <= 4), r);
+  chk('ply compress: no spread → no gain → untouched', X.rsPlyCompress(plan, cons, 10.3, 6, 4, [], 0).length === 1); }
 
 // ── خطة الرولات: توزيع الطبقات على الرولات، ولكل لون وحده ──
 { const p = X.rsRollPack([{ code: 'A', len: 9, n: 11 }, { code: 'B', len: 5, n: 3 }], 100, 'nosplice');
