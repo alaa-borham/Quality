@@ -34,7 +34,7 @@ function grabConst(name) {
 }
 
 const code = [
-  grabConst('RS_LIB_TOL'), grabConst('XL_CRC'), grabConst('rsP2'), grabConst('SIZE_ORDER'), grabConst('CV_HI'), grabConst('RL_SZ'), grabConst('RS_ROLLC'),
+  grabConst('RS_LIB_TOL'), grabConst('XL_CRC'), grabConst('rsP2'), grabConst('SIZE_ORDER'), grabConst('CV_HI'), grabConst('RL_SZ'), grabConst('RS_ROLLC'), grabConst('RS_COMPRESS_MIN'),
   ...['rsCombos', 'rsBestCombo', 'rsSolve', 'rsPlanSolve', 'rsComboSig', 'rsLibComp', 'rsLibOk', 'rsBakSlot', 'rsBakSlotId', 'xlCrc', 'consCheck', 'rsTrimSurplus', 'rsColorPlan', 'rsColorPlan1', 'rsColorBeam', 'rsConsolidate', 'rsPlyCompress', 'rsColorAlloc', 'rsRollPack', 'rsRollPack0', 'rsRollFin', 'rsRollGroups', 'rsRollSplTxt', 'normNum', 'rlNum', 'rlInterpret', 'rlMergeRow'].map(grabFn),
 ].join('\n');
 // rsSolve يقرأ الهدف/الفائض من الواجهة عند غياب الخيارات — نعيد قيمة فارغة فيُستعمل الافتراضي («أقل ماركرات»، فائض 0)
@@ -169,8 +169,11 @@ chk('xlCrc("123456789") = CBF43926', X.xlCrc(new TextEncoder().encode('123456789
   chk('beam: every color × size exact (no surplus, no shortage)', bm && bad(Q, bm) === 0, bm && bad(Q, bm));
   chk('beam: limits respected (length ≤ 9, ≤ 6 sizes, ≤ 5 pieces)', bm.every(m => m.combo.reduce((a, p) => a + p.cnt * cons[p.size], 0) <= 9 + 1e-9 && m.combo.length <= 6 && m.combo.reduce((a, p) => a + p.cnt, 0) <= 5));
   chk('beam: clearly fewer markers than the sequential planner (20 sizes: ≤ 22 vs 26)', bm.length <= 22 && bm.length < seq.length, { beam: bm.length, seq: seq.length });
-  const pl = X.rsColorPlan(Q, cons, 9, 6, 5, { sur: 0 });
+  const pl = X.rsColorPlan(Q, cons, 9, 6, 5, { sur: 0, noCompress: true });
   chk('colors plan: picks the beam when it has fewer markers, still exact', pl.length <= bm.length && bad(Q, pl) === 0, { plan: pl.length, beam: bm.length });
+  // مع تكثيف الطبقات: ماركر إضافي فقط مقابل توفير ٥٠ طبقة أو أكثر لكل ماركر زائد — والكميات تبقى مطابقة
+  const plC = X.rsColorPlan(Q, cons, 9, 6, 5, { sur: 0 }), plies = P => P.reduce((a, m) => a + Object.values(m.sp).reduce((u, v) => u + v, 0), 0);
+  chk('colors plan + ply compression: extra markers only for ≥50 plies saved each, still exact', bad(Q, plC) === 0 && (plC.length <= pl.length || plies(pl) - plies(plC) >= 50 * (plC.length - pl.length)), { plan: pl.length, comp: plC.length, plies: plies(pl), pliesC: plies(plC) });
   // توليفات الخطة الحالية (seed) تُستعمل مجاناً — والنتيجة دقيقة
   const seedC = bm.slice(0, 6).map(m => m.combo), bs = X.rsColorBeam(Q, cons, 9, 6, 5, { seed: seedC });
   chk('beam: seed combos reused for free, still exact', bad(Q, bs) === 0 && seedC.some(c => bs.some(m => X.rsComboSig(m.combo) === X.rsComboSig(c))), bs.length);
@@ -213,6 +216,9 @@ chk('xlCrc("123456789") = CBF43926', X.xlCrc(new TextEncoder().encode('123456789
   chk('ply compress: no spread → no gain → untouched', X.rsPlyCompress(plan, cons, 10.3, 6, 4, [], 0).length === 1);
   // بلا زيادة في عدد الماركرات: الباقي (3/3/1) لا مكان له (الحد 4 قطع) → يبقى كما هو؛ وإن انقسمت الطبقات تماماً يُكثَّف
   chk('ply compress (no extra markers): leftover cannot merge → untouched', X.rsPlyCompress(plan, cons, 10.3, 6, 4, [], 0.04, true).length === 1);
+  const m50 = X.rsPlyCompress(plan, cons, 10.3, 6, 4, [], 0.04, 50), mm50 = made(m50);
+  chk('ply compress (extra marker only if ≥50 plies saved): M19 → ×4 (43) + small (7), exact', m50.length === 2 && m50.reduce((a, x) => a + Object.values(x.sp).reduce((u, v) => u + v, 0), 0) === 50 && mm50.G === 59 && mm50.E === 61, m50);
+  chk('ply compress: small saving (<50 plies) does not add a marker', X.rsPlyCompress([{ combo: [{ size: 'M-57', cnt: 1 }], sp: { G: 9, B: 9, E: 9 }, len: 2.52 }], cons, 10.3, 6, 4, [], 0.04, 50).length === 1);
   const ev = X.rsPlyCompress([{ combo: [{ size: 'M-57', cnt: 1 }], sp: { G: 60, B: 60, E: 60 }, len: 2.52 }], cons, 10.3, 6, 4, [], 0.04, true);
   chk('ply compress (no extra markers): 60/60/60 → one ×4 marker, 15 plies each', ev.length === 1 && ev[0].combo[0].cnt === 4 && ev[0].sp.G === 15 && ev[0].sp.E === 15, ev); }
 

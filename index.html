@@ -544,7 +544,7 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 
 <script>
 // رقم التحديث: يُرفع مع كل تحديث للنظام ويظهر في شاشة الدخول والشريط العلوي والإعدادات
-const APP_BUILD={n:77,date:'2026-11-25'};
+const APP_BUILD={n:78,date:'2026-11-25'};
 /* ============ Firebase ============ */
 const FB_CONFIG={apiKey:"AIzaSyCLSc1yXa5F5E89RzUJoOsj2eErjXsQjus",authDomain:"level7alaa.firebaseapp.com",
 projectId:"level7alaa",storageBucket:"level7alaa.firebasestorage.app",messagingSenderId:"924441815217",
@@ -2625,13 +2625,13 @@ function rsColorPlan(Qs,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
     const C=[rsColorPlan1(Qs,cons,maxlen,maxsizes,maxpcs,{...opt,mode:'markers',noBeam:true}),rsColorPlan1(Qs,cons,maxlen,maxsizes,maxpcs,{...opt,mode:'plies',noBeam:true,budget:opt.budget?Math.round(opt.budget/2):undefined})];
     if(!opt.noBeam){const bm=rsColorBeam(Qs,cons,maxlen,maxsizes,maxpcs,{meas:opt.meas,seed:opt.seed,surTot:opt.surTot,budget:opt.beamBudget||(opt.surTot>0?4500:3000)});if(bm&&bm.length)C.push(rsConsolidate(bm,cons,maxlen,maxsizes,maxpcs,opt.meas));}
     // تكثيف الطبقات: ماركر قصير بطبقات كثيرة (مثل قطعة واحدة × 179 طبقة) يُكرَّر داخل ماركر أطول بطبقات أقل → فرد أقل وقماش أقل
-    if(!opt.noCompress)for(let i=0;i<C.length;i++)C[i]=rsPlyCompress(rsConsolidate(C[i],cons,maxlen,maxsizes,maxpcs,opt.meas),cons,maxlen,maxsizes,maxpcs,opt.meas,Math.max(sp,0.001),true);
+    if(!opt.noCompress)for(let i=0;i<C.length;i++)C[i]=rsPlyCompress(rsConsolidate(C[i],cons,maxlen,maxsizes,maxpcs,opt.meas),cons,maxlen,maxsizes,maxpcs,opt.meas,Math.max(sp,0.001),RS_COMPRESS_MIN);
     const key=a=>[Math.round(F(a)*100)/100,nN(a),pl(a)];let best=null,bk=null;
     C.forEach(a=>{const k=key(a);if(!best||k[0]<bk[0]-1e-9||(Math.abs(k[0]-bk[0])<=1e-9&&(k[1]<bk[1]||(k[1]===bk[1]&&k[2]<bk[2]))))best=a,bk=k;});
     return best;}
   const mode=mode0,other=mode==='plies'?'markers':'plies';
   // تكثيف الطبقات دون زيادة عدد الماركرات (يقلّل الطبقات والفرد فقط) — في كل الأهداف
-  const spv=Math.max(opt.spread!=null?+opt.spread||0:(typeof rsSpreadM==='function'?rsSpreadM():0),0.001),CP=a=>opt.noCompress||!a?a:rsPlyCompress(a,cons,maxlen,maxsizes,maxpcs,opt.meas,spv,true);
+  const spv=Math.max(opt.spread!=null?+opt.spread||0:(typeof rsSpreadM==='function'?rsSpreadM():0),0.001),CP=a=>opt.noCompress||!a?a:rsPlyCompress(a,cons,maxlen,maxsizes,maxpcs,opt.meas,spv,RS_COMPRESS_MIN);
   const A=CP(rsColorPlan1(Qs,cons,maxlen,maxsizes,maxpcs,{...opt,mode}));if(opt.noAlt)return A;
   const B=CP(rsColorPlan1(Qs,cons,maxlen,maxsizes,maxpcs,{...opt,mode:other,noBeam:true,budget:opt.budget?Math.round(opt.budget/2):undefined}));
   const seedS=new Set((opt.seed||[]).map(rsComboSig)),pl=a=>a.reduce((t,x)=>t+Object.values(x.sp).reduce((u,v)=>u+v,0),0),
@@ -2673,8 +2673,12 @@ function rsColorPlan1(Qs,cons,maxlen,maxsizes,maxpcs,opt){opt=opt||{};
 // تكثيف الطبقات (دالة نقية — تُختبر في tests/solver.test.mjs): لكل ماركر نجرّب تكرار قطعه k مرات (×2، ×3 …) ضمن حدود الطول والقطع،
 // فتصير طبقات كل لون floor(طبقات/k) في الماركر المكرَّر ويبقى الباقي (طبقات mod k) في الماركر الأصلي.
 // يُقبل فقط إن قلّ القماش مع الفرد: Σ(الطول + الفرد) × الطبقات — الكميات لكل لون ومقاس تبقى كما هي تماماً
+// ماركر إضافي صغير مقبول فقط إن وفّر هذا العدد من الطبقات أو أكثر (مثل قطعة واحدة × 179 طبقة → ×4 بـ 43 + باقٍ 7 = توفير 129)
+const RS_COMPRESS_MIN=50;
 function rsPlyCompress(plan,cons,maxlen,maxsizes,maxpcs,meas,sp,neutral){sp=+sp||0;
-  // neutral: لا يُقبل تكثيف يزيد عدد الماركرات — إما أن تنقسم الطبقات تماماً، أو يُدمج الباقي في ماركر آخر (rsConsolidate)
+  // neutral: حدّ زيادة الماركرات — true = لا زيادة أبداً (تنقسم الطبقات تماماً أو يُدمج الباقي في ماركر آخر)؛
+  // رقم n = يُسمح بماركر إضافي فقط إن وفّر n طبقة أو أكثر لكل ماركر زائد؛ غير محدد = بلا قيد (أقل قماش فقط)
+  const minS=neutral===true?Infinity:(+neutral||0);
   const MM=new Map((meas||[]).map(x=>[rsComboSig(x.pairs),x.len]));
   const lenOf=c=>{const m=MM.get(rsComboSig(c));return m>0?m:c.reduce((a,p)=>a+p.cnt*(cons[p.size]||0),0);};
   const cp=A=>A.map(x=>({combo:x.combo.map(p=>({size:p.size,cnt:p.cnt})),sp:{...x.sp},len:x.len}));
@@ -2690,7 +2694,8 @@ function rsPlyCompress(plan,cons,maxlen,maxsizes,maxpcs,meas,sp,neutral){sp=+sp|
       if(ex)Object.keys(c.q).forEach(k=>{if(c.q[k]>0)ex.sp[k]=(ex.sp[k]||0)+c.q[k];});
       else Q.push({combo:c.U,sp:Object.fromEntries(Object.entries(c.q).filter(([,v])=>v>0)),len:c.L});
       x.sp=Object.fromEntries(Object.entries(c.r).filter(([,v])=>v>0));Q=Q.filter(y=>tot(y)>0);
-      if(neutral&&Q.length>P.length){Q=rsConsolidate(Q,cons,maxlen,maxsizes,maxpcs,meas);if(Q.length>P.length)continue;}
+      if(neutral&&Q.length>P.length){Q=rsConsolidate(Q,cons,maxlen,maxsizes,maxpcs,meas);const ex=Q.length-P.length,pl=A=>A.reduce((t,y)=>t+tot(y),0);
+        if(ex>0&&!(pl(P)-pl(Q)>=minS*ex))continue;}
       P=Q;done=true;break;}
     if(!done)break;}
   return P;}
