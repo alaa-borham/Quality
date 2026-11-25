@@ -210,7 +210,11 @@ chk('xlCrc("123456789") = CBF43926', X.xlCrc(new TextEncoder().encode('123456789
   const r = X.rsPlyCompress(plan, cons, 10.3, 6, 4, [], 0.04), m = made(r), big = r.find(x => x.combo[0].cnt === 4);
   chk('ply compress: single piece ×179 plies → ×4 marker, exact per colour', !!big && big.sp.G === 14 && big.sp.E === 15 && m.G === 59 && m.B === 59 && m.E === 61, r);
   chk('ply compress: less fabric with spread, within limits', fab(r, 0.04) < fab(plan, 0.04) - 1 && r.every(x => x.len <= 10.3 + 1e-9 && x.combo.reduce((a, p) => a + p.cnt, 0) <= 4), r);
-  chk('ply compress: no spread → no gain → untouched', X.rsPlyCompress(plan, cons, 10.3, 6, 4, [], 0).length === 1); }
+  chk('ply compress: no spread → no gain → untouched', X.rsPlyCompress(plan, cons, 10.3, 6, 4, [], 0).length === 1);
+  // بلا زيادة في عدد الماركرات: الباقي (3/3/1) لا مكان له (الحد 4 قطع) → يبقى كما هو؛ وإن انقسمت الطبقات تماماً يُكثَّف
+  chk('ply compress (no extra markers): leftover cannot merge → untouched', X.rsPlyCompress(plan, cons, 10.3, 6, 4, [], 0.04, true).length === 1);
+  const ev = X.rsPlyCompress([{ combo: [{ size: 'M-57', cnt: 1 }], sp: { G: 60, B: 60, E: 60 }, len: 2.52 }], cons, 10.3, 6, 4, [], 0.04, true);
+  chk('ply compress (no extra markers): 60/60/60 → one ×4 marker, 15 plies each', ev.length === 1 && ev[0].combo[0].cnt === 4 && ev[0].sp.G === 15 && ev[0].sp.E === 15, ev); }
 
 // ── خطة الرولات: توزيع الطبقات على الرولات، ولكل لون وحده ──
 { const p = X.rsRollPack([{ code: 'A', len: 9, n: 11 }, { code: 'B', len: 5, n: 3 }], 100, 'nosplice');
