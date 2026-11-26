@@ -246,6 +246,22 @@ chk('max pieces empty = open (fills up to the length limit), saved as 0', lim.lo
 chk('hint shows when max pieces caps the length, hidden when open', lim.hint === true && lim.hintOpen === false, lim);
 chk('length limit rebuilds after typing stops (once, no second rebuild on leaving the field)', lim.calls === 1 && lim.len1 <= 6 + 1e-9 && lim.len0 > 6, lim);
 
+// ٢ب٢د) الانضمام بالكود: المنضمّ الجديد بلا صلاحيات «مشاهدة فقط» مع شريط تنبيه؛ القديم كما كان؛ والمالك كامل
+const pj = await page.evaluate(() => {
+  const keep = MEMBER, out = {}, ts = d => ({ toMillis: () => +new Date(d) });
+  const lv = m => { MEMBER = m; applyNavPerms(); return { o: pLvl('orders'), i: pLvl('insp'), m: pLvl('marker'), f: pLvl('fact'), edit: canEdit('orders'), bar: !$('perm-wait').classList.contains('hide') }; };
+  out.neu = lv({ role: 'inspector', wsId: 'ws1', createdAt: ts('2026-12-01T00:00:00Z') });
+  out.pending = lv({ role: 'inspector', wsId: 'ws1', createdAt: null });
+  out.old = lv({ role: 'inspector', wsId: 'ws1', createdAt: ts('2026-03-01T00:00:00Z') });
+  out.noDate = lv({ role: 'inspector', wsId: 'ws1' });
+  out.granted = lv({ role: 'inspector', wsId: 'ws1', createdAt: ts('2026-12-01T00:00:00Z'), perms: { _v: 2, orders: 2, insp: 3, marker: 0, fact: 1 } });
+  out.owner = lv({ role: 'owner', wsId: 'ws1', createdAt: ts('2026-12-01T00:00:00Z') });
+  MEMBER = keep; applyNavPerms(); return out;
+});
+chk('join by code: new member is view-only everywhere with a notice bar', pj.neu.o === 1 && pj.neu.i === 1 && pj.neu.m === 1 && pj.neu.f === 1 && !pj.neu.edit && pj.neu.bar && pj.pending.o === 1 && pj.pending.bar, pj);
+chk('join by code: older members keep their previous rights, no bar', pj.old.o === 2 && pj.old.m === 2 && !pj.old.bar && pj.noDate.o === 2 && !pj.noDate.bar, pj);
+chk('join by code: granted permissions and owner unaffected', pj.granted.o === 2 && pj.granted.i === 3 && pj.granted.m === 0 && !pj.granted.bar && pj.owner.o === 3 && !pj.owner.bar, pj);
+
 // ٢ب٣) خطة الرولات: في الريشو لكل لون وحده مع مسافة الفرد، وصفحة «خطة الرولات من ملف» (رفع ملف → رولات كل لون)
 const rl = await page.evaluate(async () => {
   const log = []; const step = async (n, f) => { try { await f(); } catch (e) { log.push(n + ': ' + (e && e.message)); } };

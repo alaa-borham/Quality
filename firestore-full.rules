@@ -78,11 +78,17 @@ service cloud.firestore {
           : (section == 'dash' || section == 'ref' || section == 'tools') ? 1
           : ( m.get('perms', {}).get('del', false) == true ? 3 : 2 );
     }
+    // عضو انضمّ بنفسه (بالكود) بعد 2026-11-26 ولم يمنحه المالك صلاحيات بعد → مشاهدة فقط في كل الأقسام.
+    // الأعضاء الأقدم يبقون على سلوكهم السابق (qcLegacy) حتى لا يتعطّل عملهم
+    function qcNewSelf(m) {
+      return !m.keys().hasAny(['perms']) && m.keys().hasAny(['createdAt'])
+        && m.createdAt is timestamp && m.createdAt >= timestamp.date(2026, 11, 26);
+    }
     function qcSecLvl(m, section) {
       return (m.get('role', '') == 'owner') ? 3
         : (m.get('perms', {}).get('_v', 0) >= 2)
           ? m.get('perms', {}).get(section, 0)
-          : qcLegacy(m, section);
+          : qcNewSelf(m) ? 1 : qcLegacy(m, section);
     }
     function qcLvl(section) {
       return qcIsAdmin() ? 3 : ( qcIsMember() ? qcSecLvl(qcMe(), section) : 0 );
@@ -93,7 +99,9 @@ service cloud.firestore {
       // إنشاء ذاتي: مفتّش فقط وبلا حقل صلاحيات (يمنع رفع الصلاحيات على النفس)
       allow create: if request.auth != null && request.auth.uid == uid
                     && request.resource.data.get('role', '') == 'inspector'
-                    && !request.resource.data.keys().hasAny(['perms']);
+                    && !request.resource.data.keys().hasAny(['perms'])
+                    // تاريخ الانضمام من الخادم فقط (يمنع تأريخ السجل بتاريخ قديم لأخذ صلاحيات الأعضاء القدامى)
+                    && request.resource.data.createdAt == request.time;
       // تعديل ذاتي: الاسم فقط
       allow update: if request.auth != null && request.auth.uid == uid
                     && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name']);

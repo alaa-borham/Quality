@@ -5,7 +5,7 @@
  *        وتقييد إعدادات المرجع — ويعيد رمز خروج 1 عند أي فشل.
  */
 import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
-import { setDoc, getDoc, updateDoc, deleteDoc, doc, setLogLevel } from 'firebase/firestore';
+import { setDoc, getDoc, updateDoc, deleteDoc, doc, setLogLevel, serverTimestamp, Timestamp } from 'firebase/firestore';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -39,6 +39,9 @@ await env.withSecurityRulesDisabled(async ctx => {
   await setDoc(doc(db, 'qc_members', 'refViewU'), { wsId: WS, role: 'inspector', perms: { _v: 2, fact: 0, orders: 1, insp: 1, dash: 1, tools: 0, marker: 1, ref: 1 } });
   await setDoc(doc(db, 'qc_members', 'rstU'), { wsId: WS, role: 'inspector', perms: { _v: 2, fact: 0, orders: 0, insp: 0, dash: 0, tools: 0, marker: 0, ref: 0 } });
   await setDoc(doc(db, 'qc_members', 'outU'), { wsId: 'ws2', role: 'inspector', name: 'X' });
+  // انضمّ بالكود قبل 2026-11-26 وبلا صلاحيات محدّدة: يبقى على سلوكه السابق (تعديل الطلبيات/الفحوصات)
+  await setDoc(doc(db, 'qc_members', 'oldJoinU'), { wsId: WS, role: 'inspector', name: 'Old', createdAt: Timestamp.fromDate(new Date('2026-03-01T00:00:00Z')) });
+  await setDoc(doc(db, 'qc_orders', 'o9'), { wsId: WS, po: 'PO9' });
   await setDoc(doc(db, 'qc_orders', 'o1'), { wsId: WS, po: 'PO1' });
   await setDoc(doc(db, 'qc_orders', 'o2'), { wsId: WS, po: 'PO2' });
   await setDoc(doc(db, 'qc_factories', 'f1'), { wsId: WS, name: 'F' });
@@ -79,7 +82,18 @@ await chk('owner moves own membership to another ws DENIED', assertFails(updateD
 await chk('owner moves insp to another ws DENIED', assertFails(updateDoc(doc(owner, 'qc_members', 'inspU'), { wsId: 'ws2', role: 'owner' })));
 await chk('owner renames workspace on own membership OK', assertSucceeds(updateDoc(doc(owner, 'qc_members', 'ownerU'), { wsName: 'W2' })));
 await chk('owner sets insp perms OK', assertSucceeds(updateDoc(doc(owner, 'qc_members', 'inspU'), { perms: { _v: 2, fact: 1, orders: 1, insp: 1, dash: 1, tools: 1, marker: 1, ref: 1 } })));
-await chk('self-create inspector no perms OK', assertSucceeds(setDoc(doc(as('newU'), 'qc_members', 'newU'), { wsId: WS, role: 'inspector', name: 'New' })));
+await chk('self-create inspector no perms OK', assertSucceeds(setDoc(doc(as('newU'), 'qc_members', 'newU'), { wsId: WS, role: 'inspector', name: 'New', createdAt: serverTimestamp() })));
+// الانضمام بالكود: تاريخ الانضمام من الخادم فقط، والمنضمّ الجديد «مشاهدة فقط» حتى يمنحه المالك الصلاحيات؛ القدامى كما كانوا
+await chk('self-create without join date DENIED', assertFails(setDoc(doc(as('newU4'), 'qc_members', 'newU4'), { wsId: WS, role: 'inspector', name: 'N' })));
+await chk('self-create with back-dated join date DENIED', assertFails(setDoc(doc(as('newU5'), 'qc_members', 'newU5'), { wsId: WS, role: 'inspector', name: 'N', createdAt: Timestamp.fromDate(new Date('2026-01-01T00:00:00Z')) })));
+await chk('new self-joined reads order OK (view-only)', assertSucceeds(getDoc(doc(as('newU'), 'qc_orders', 'o9'))));
+await chk('new self-joined updates order DENIED', assertFails(updateDoc(doc(as('newU'), 'qc_orders', 'o9'), { po: 'hack' })));
+await chk('new self-joined creates inspection DENIED', assertFails(setDoc(doc(as('newU'), 'qc_inspections', 'iNew'), { wsId: WS })));
+await chk('new self-joined saves combo library DENIED', assertFails(updateDoc(doc(as('newU'), 'qc_workspaces', WS), { comboLib: { x: 1 } })));
+await chk('new self-joined cannot change own join date', assertFails(updateDoc(doc(as('newU'), 'qc_members', 'newU'), { createdAt: Timestamp.fromDate(new Date('2026-01-01T00:00:00Z')) })));
+await chk('old self-joined (before the change) still updates order', assertSucceeds(updateDoc(doc(as('oldJoinU'), 'qc_orders', 'o9'), { po: 'PO9b' })));
+await chk('owner grants perms to new self-joined', assertSucceeds(updateDoc(doc(owner, 'qc_members', 'newU'), { perms: { _v: 2, fact: 1, orders: 2, insp: 1, dash: 1, tools: 1, marker: 1, ref: 1 } })));
+await chk('new self-joined updates order after owner grant OK', assertSucceeds(updateDoc(doc(as('newU'), 'qc_orders', 'o9'), { po: 'PO9c' })));
 await chk('self-create as owner DENIED', assertFails(setDoc(doc(as('newU2'), 'qc_members', 'newU2'), { wsId: WS, role: 'owner', name: 'H' })));
 await chk('self-create with perms DENIED', assertFails(setDoc(doc(as('newU3'), 'qc_members', 'newU3'), { wsId: WS, role: 'inspector', perms: { _v: 2, orders: 3 }, name: 'H' })));
 await chk('restricted self-delete DENIED (no reset loophole)', assertFails(deleteDoc(doc(restrict, 'qc_members', 'rstU'))));
