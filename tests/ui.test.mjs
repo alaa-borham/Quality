@@ -256,7 +256,8 @@ const rl = await page.evaluate(async () => {
     rsAddColorRow({ name: 'W' }); rsAddColorRow({ name: 'C' });
     const Q = { 'M-56': [41, 33], 'L-58': [55, 43], 'XL-60': [26, 25] };
     document.querySelectorAll('.rsq-row').forEach(tr => { const sz = tr.querySelector('.rsq-size').value.trim(); const [w, c] = tr.querySelectorAll('.rsq-cin'); w.value = Q[sz][0]; rsQtyCInput(w); c.value = Q[sz][1]; rsQtyCInput(c); });
-    rsAutoPlan(); $('rs-rolllen').value = '50'; rsRollPlan();
+    rsAutoPlan(); { const sf = rsSpreadForm(); res.cpcs = sf.cpcs; res.cpcsHtml = rsSpreadHtml(sf).includes(t('rsFormColPcs')); }
+    $('rs-rolllen').value = '50'; rsRollPlan();
     const d = rsRollCompute(), plies = rsReadMarkers().reduce((a, m) => a + (+m.plies || 0), 0);
     res.mGroups = d.groups.map(g => g.name).join(','); res.mPlies = d.groups.reduce((a, g) => a + g.rolls.reduce((x, r) => x + r.plies, 0), 0); res.plies = plies;
     res.spreadIn = d.mk.every(m => m.len > 0) && Math.abs(d.spread - 0.02) < 1e-9; res.shown = $('rs-rolls').textContent.includes('W') && $('rs-rolls').textContent.includes('C'); });
@@ -269,6 +270,7 @@ const rl = await page.evaluate(async () => {
     window.print = () => {}; rlPrint(); $('print-area').innerHTML = ''; goMarker('rs'); });
   return { log, ...res };
 });
+chk('spreading form: total pieces per colour row (W 122 · C 101)', rl.cpcsHtml === true && JSON.stringify(rl.cpcs) === '[122,101]', { cpcs: rl.cpcs, html: rl.cpcsHtml });
 chk('rolls: no errors (marker page + file page)', rl.log.length === 0, rl.log);
 chk('rolls (marker page): one roll plan per color, all plies placed, spread allowance included', rl.mGroups === 'W,C' && rl.mPlies === rl.plies && rl.spreadIn && rl.shown, rl);
 chk('rolls from file: markers and colors read, rolls per color (GREY 22 plies, BLUE 31)', rl.fN === 3 && rl.fColors === 'GREY,BLUE' && rl.fGroups === 'GREY:22,BLUE:31' && rl.fShown, rl);

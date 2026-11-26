@@ -544,7 +544,7 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 
 <script>
 // رقم التحديث: يُرفع مع كل تحديث للنظام ويظهر في شاشة الدخول والشريط العلوي والإعدادات
-const APP_BUILD={n:78,date:'2026-11-25'};
+const APP_BUILD={n:79,date:'2026-11-26'};
 /* ============ Firebase ============ */
 const FB_CONFIG={apiKey:"AIzaSyCLSc1yXa5F5E89RzUJoOsj2eErjXsQjus",authDomain:"level7alaa.firebaseapp.com",
 projectId:"level7alaa",storageBucket:"level7alaa.firebasestorage.app",messagingSenderId:"924441815217",
@@ -562,7 +562,7 @@ appTitle:'نظام متابعة الجودة',login:'تسجيل الدخول',si
 name:'الاسم',namePh:'اسمك الكامل',loginBtn:'دخول',createAccBtn:'إنشاء الحساب',forgot:'نسيت كلمة المرور؟',
 wsTitle:'مساحة العمل',wsSub:'أنشئ مساحة جديدة أو انضم بكود',wsSubJoin:'انضم بكود مساحة العمل الذي يعطيك إياه مدير النظام',createTab:'إنشاء مساحة',joinTab:'انضمام بكود',
 wsNameLbl:'اسم مساحة العمل (الشركة/القسم)',wsNamePh:'مثال: جودة الشياكة',createBtn:'إنشاء',codeLbl:'كود مساحة العمل',joinBtn:'انضمام',logout:'تسجيل الخروج',
-appName:'متابعة الجودة',rsLimPcsHint:'أطول ماركر ممكن ≈ {l} لأن «أقصى عدد قطع في الماركر» = {p} — رفع حد الطول فوق ذلك لن يغيّر المراكر. لماركرات أطول ارفع عدد القطع.',rsLimPcsOpen:'اجعله مفتوحاً (بلا حد)',rsPcsOpen:'مفتوح',rsPcsOpenTip:'اتركه فارغاً = مفتوح بلا حد (الماركر يمتلئ حتى حد الطول فقط)',appBuild:'تحديث رقم {n} · {d}',appUpdated:'✅ تم تحديث النظام — رقم التحديث {n}',navDash:'المؤشرات',navInsp:'الفحوصات',inspProd:'فحوصات الإنتاج',navOrders:'الطلبيات',navFact:'المصانع',navTools:'الأدوات',navMarker:'الريشو',navRef:'المراجع',navToolChk:'سجل فحص القماش',
+appName:'متابعة الجودة',rsFormColPcs:'إجمالي القطع لكل لون',rsLimPcsHint:'أطول ماركر ممكن ≈ {l} لأن «أقصى عدد قطع في الماركر» = {p} — رفع حد الطول فوق ذلك لن يغيّر المراكر. لماركرات أطول ارفع عدد القطع.',rsLimPcsOpen:'اجعله مفتوحاً (بلا حد)',rsPcsOpen:'مفتوح',rsPcsOpenTip:'اتركه فارغاً = مفتوح بلا حد (الماركر يمتلئ حتى حد الطول فقط)',appBuild:'تحديث رقم {n} · {d}',appUpdated:'✅ تم تحديث النظام — رقم التحديث {n}',navDash:'المؤشرات',navInsp:'الفحوصات',inspProd:'فحوصات الإنتاج',navOrders:'الطلبيات',navFact:'المصانع',navTools:'الأدوات',navMarker:'الريشو',navRef:'المراجع',navToolChk:'سجل فحص القماش',
 navDescmarker:'حاسبة الماركر والاستهلاك: تدخل بيانات الأوردر (المقاس · الاستهلاك · الكمية · اللون) فتحسب إجمالي القطع والقماش وعدد الطبقات لكل لون. مكان مستقل ستُضاف بجانبه لاحقاً حاسبة الإنتاج الكمي.',
 navDescfact:'إدارة قائمة المصانع والموردين الذين تتعامل معهم: إضافة مصنع جديد باسمه ودولته وجهة الاتصال، وتعديل أو حذف المصانع الحالية. كل طلبية وكل فحص يُربط بمصنع من هذه القائمة.',
 navDescorders:'تسجيل طلبيات الإنتاج (PO): ربط كل طلبية بمصنع مع رقمها والموديل والصنف والكمية واللون. الكمية تُستخدم تلقائياً لتحديد حجم عينة الفحص حسب جدول AQL.',
@@ -717,7 +717,7 @@ appTitle:'QC Tracking System',login:'Login',signup:'Sign up',email:'Email',passw
 name:'Name',namePh:'Your full name',loginBtn:'Login',createAccBtn:'Create account',forgot:'Forgot password?',
 wsTitle:'Workspace',wsSub:'Create a new workspace or join by code',wsSubJoin:'Join with the workspace code given to you by the system admin',createTab:'Create',joinTab:'Join by code',
 wsNameLbl:'Workspace name (company/dept)',wsNamePh:'e.g. Shiaka QC',createBtn:'Create',codeLbl:'Workspace code',joinBtn:'Join',logout:'Sign out',
-appName:'QC Tracking',rsLimPcsHint:'Longest possible marker ≈ {l} because “Max pieces per marker” = {p} — raising the length limit above that changes nothing. Raise the pieces for longer markers.',rsLimPcsOpen:'Make it open (no limit)',rsPcsOpen:'Open',rsPcsOpenTip:'Leave empty = open, no limit (the marker fills up to the length limit only)',appBuild:'Update #{n} · {d}',appUpdated:'✅ System updated — update #{n}',navDash:'Dashboard',navInsp:'Inspections',inspProd:'Production inspections',navOrders:'Orders',navFact:'Factories',navTools:'Tools',navMarker:'Ratio plan',navRef:'Reference',navToolChk:'Fabric Test Log',
+appName:'QC Tracking',rsFormColPcs:'Total pieces per colour',rsLimPcsHint:'Longest possible marker ≈ {l} because “Max pieces per marker” = {p} — raising the length limit above that changes nothing. Raise the pieces for longer markers.',rsLimPcsOpen:'Make it open (no limit)',rsPcsOpen:'Open',rsPcsOpenTip:'Leave empty = open, no limit (the marker fills up to the length limit only)',appBuild:'Update #{n} · {d}',appUpdated:'✅ System updated — update #{n}',navDash:'Dashboard',navInsp:'Inspections',inspProd:'Production inspections',navOrders:'Orders',navFact:'Factories',navTools:'Tools',navMarker:'Ratio plan',navRef:'Reference',navToolChk:'Fabric Test Log',
 navDescmarker:'Marker & consumption calculator: enter the order lines (size, consumption, quantity, color) to get total pieces, fabric, and plies per color. A standalone place where a bulk-production calculator will be added later.',
 navDescfact:'Manage the list of factories and suppliers you work with: add a factory with its name, country, and contact, and edit or delete existing ones. Every order and inspection is linked to a factory from this list.',
 navDescorders:'Register production orders (POs): link each order to a factory with its number, model, item, quantity, and color. The quantity automatically determines the inspection sample size per the AQL table.',
@@ -4384,7 +4384,9 @@ function rsSpreadHtml(d,opt){opt=opt||{};
       <thead><tr>${hd(esc(t('rsCbNo')),C.blue)}${hd(esc(t('rsCode')),C.blue)}${hd(esc(t('rsDesc')),C.blue).replace('<th ',`<th colspan="${K}" `)}${hd(esc(t('rsPcsLbl')),C.blue)}${hd(esc(t('rsPlies')),C.blue)}${cn.map(nm=>hd('🎨 '+esc(nm),C.blue)).join('')}${hd(esc(t('rsPcsRun')),C.blue)}${hd(esc(tf('rsFormMeas',{u})),C.blue)}${hd(esc(tf('rsFormFabf',{u})),C.blue)}</tr></thead>
       <tbody>${rows}
       <tr><td colspan="${K+3}" style="${bd};background:#${C.navy};color:#fff;font-weight:800;padding:7px;text-align:center">${esc(t('total'))}</td>
-        ${[I(d.plies),...(d.ctot||[]).map(I),I(d.run),'',N(d.fabf)].map(v=>`<td style="${bd};background:#${C.navy};color:#fff;font-weight:800;padding:7px;text-align:center">${v}</td>`).join('')}</tr></tbody>
+        ${[I(d.plies),...(d.ctot||[]).map(I),I(d.run),'',N(d.fabf)].map(v=>`<td style="${bd};background:#${C.navy};color:#fff;font-weight:800;padding:7px;text-align:center">${v}</td>`).join('')}</tr>
+      ${nC?`<tr><td colspan="${K+4}" style="${bd};background:#${C.blue};color:#fff;font-weight:800;padding:7px;text-align:center">${esc(t('rsFormColPcs'))}</td>
+        ${[...(d.cpcs||[]).map(I),I(d.run),'',''].map((v,i)=>`<td style="${bd};background:#${i<nC?C.blue:C.navy};color:#fff;font-weight:900;padding:7px;text-align:center">${v}</td>`).join('')}</tr>`:''}</tbody>
     </table>
     ${opt.extra||''}
     ${d.rows.some(x=>x.bad)?`<div style="margin-top:6px;font-size:11px;color:#C00000;font-weight:700;line-height:1.6">${d.rows.filter(x=>x.bad).map(x=>`⚠ ${esc(x.code)}: ${esc(x.status)}`).join(' · ')}</div>`:''}
@@ -4700,11 +4702,11 @@ function rsSpreadForm(){const r=rsResult();if(!r)return {err:'mkNeed'};
   const plies=rows.reduce((a,x)=>a+x.plies,0),run=rows.reduce((a,x)=>a+x.run,0),fabf=R2(rows.reduce((a,x)=>a+x.fabf,0)),cq=R2(rows.reduce((a,x)=>a+x.len*x.plies,0));
   // الألوان: عمود مستقل لكل لون بطبقاته في كل ماركر
   const cnames=rsColors().map(c=>c.name);rows.forEach(x=>{x.cpl=cnames.map(nm=>((x.csplit||[]).find(c=>c.name===nm)||{}).plies||0);});
-  const ctot=cnames.map((nm,ci)=>rows.reduce((a,x)=>a+x.cpl[ci],0));
+  const ctot=cnames.map((nm,ci)=>rows.reduce((a,x)=>a+x.cpl[ci],0)),cpcs=cnames.map((nm,ci)=>rows.reduce((a,x)=>a+(x.pcs||0)*x.cpl[ci],0));// طبقات / قطع كل لون
   const top=new Set(rows.map((x,k)=>[x.fabf,k]).sort((a,b)=>b[0]-a[0]).slice(0,3).map(x=>x[1]));
   const w=rsFabW();
   return {u,uf,spD,title:$('rs-title')?$('rs-title').value.trim():'',model:r.product||'',fabric:w?tf('rsFormWidth',{w}):'',date:fmtDate(today()),
-    rows,plies,run,fabf,cq,cnames,ctot,avg:run>0?Math.round(fabf/run*1000)/1000:0,top,blanks:Math.max(3,RS_FORM_MINROWS-rows.length),
+    rows,plies,run,fabf,cq,cnames,ctot,cpcs,avg:run>0?Math.round(fabf/run*1000)/1000:0,top,blanks:Math.max(3,RS_FORM_MINROWS-rows.length),
     K:Math.max(1,...rows.map(x=>x.parts.length))};}// K = أعمدة «البيان»: كل قياس في خانته فتصطفّ القياسات عمودياً
 const RS_FORM_C={num:'595959',navy:'1F3864',blue:'2E75B6',sub:'DDEBF7',kpi:'D9E2F3',yel:'FFF2CC',grn:'E2EFDA',ink:'1F4E79',pinkF:'FFC7CE',pinkT:'9C0006',bar:'9DC3E6'};
 // Excel لأمر الفرد بتصميم «نموذج الفرد والقص والإنتاج» — بمعادلات حيّة (تُعدَّل الأرقام في Excel فتتحدّث المجاميع)
@@ -4751,7 +4753,11 @@ function rsSpreadSheet(d){
       {f:`IF(OR(${Ms}${rr}="",${Pl}${rr}=""),"",${Ms}${rr}*${Pl}${rr})`,v:x?x.fabf:'',s:{b:1,bd:1,nf:'#,##0.00'}}]};}// لون الصف من النظام: خانتا الرقم والكود فقط
   merges.push(`A${T}:${P}${T}`);
   const badN=d.rows.filter(x=>x.bad);
-  if(badN.length){merges.push(`A${T+1}:${Fb}${T+1}`);rows[T]={h:20,c:[{v:badN.map(x=>`⚠ ${x.code}: ${x.status}`).join('   ·   '),s:{b:1,sz:10,color:'C00000',h:LANG==='ar'?'right':'left'}}]};}
+  const T2=nC?T+1:T;// صف قطع الألوان (عند وجود ألوان)
+  if(nC){merges.push(`A${T2}:${Pl}${T2}`);const sl={b:1,color:W,fill:C.blue,bd:1},sb={...sl,nf:'#,##0'};
+    rows[T2-1]={h:24,c:pad([[0,{v:t('rsFormColPcs'),s:sl}],...cn.map((_,ci)=>{const cl=L(iL+1+ci);return [iL+1+ci,{f:`SUMPRODUCT(${P}${first}:${P}${last},${cl}${first}:${cl}${last})`,v:d.cpcs[ci],s:sb}];}),
+      [iR,{f:`SUM(${L(iL+1)}${T2}:${L(iR-1)}${T2})`,v:d.run,s:S.totn}],[iM,{v:'',s:S.tot}],[iF,{v:'',s:S.tot}]])};}
+  if(badN.length){merges.push(`A${T2+1}:${Fb}${T2+1}`);rows[T2]={h:20,c:[{v:badN.map(x=>`⚠ ${x.code}: ${x.status}`).join('   ·   '),s:{b:1,sz:10,color:'C00000',h:LANG==='ar'?'right':'left'}}]};}
   rows[T-1]={h:24,c:pad([[0,{v:t('total'),s:S.tot}],[iL,{f:`SUM(${Pl}${first}:${Pl}${last})`,v:d.plies,s:S.totn}],...cn.map((_,ci)=>{const cl=L(iL+1+ci);return [iL+1+ci,{f:`SUM(${cl}${first}:${cl}${last})`,v:d.ctot[ci],s:S.totn}];}),[iR,{f:`SUM(${Rn}${first}:${Rn}${last})`,v:d.run,s:S.totn}],[iM,{v:'',s:S.tot}],[iF,{f:`SUM(${Fb}${first}:${Fb}${last})`,v:d.fabf,s:S.totd}]])};
   const cf=[`<conditionalFormatting sqref="${Rn}${first}:${Rn}${last}"><cfRule type="dataBar" priority="1"><dataBar><cfvo type="min"/><cfvo type="max"/><color rgb="FF5B9BD5"/></dataBar></cfRule></conditionalFormatting>`,
     `<conditionalFormatting sqref="${Fb}${first}:${Fb}${last}"><cfRule type="top10" dxfId="0" priority="2" rank="3"/></conditionalFormatting>`];
