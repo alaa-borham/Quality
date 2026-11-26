@@ -544,7 +544,7 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 
 <script>
 // رقم التحديث: يُرفع مع كل تحديث للنظام ويظهر في شاشة الدخول والشريط العلوي والإعدادات
-const APP_BUILD={n:80,date:'2026-11-26'};
+const APP_BUILD={n:81,date:'2026-11-26'};
 /* ============ Firebase ============ */
 const FB_CONFIG={apiKey:"AIzaSyCLSc1yXa5F5E89RzUJoOsj2eErjXsQjus",authDomain:"level7alaa.firebaseapp.com",
 projectId:"level7alaa",storageBucket:"level7alaa.firebasestorage.app",messagingSenderId:"924441815217",
@@ -4707,10 +4707,10 @@ function rsSpreadForm(){const r=rsResult();if(!r)return {err:'mkNeed'};
   // الألوان: عمود مستقل لكل لون بطبقاته في كل ماركر
   const cnames=rsColors().map(c=>c.name);rows.forEach(x=>{x.cpl=cnames.map(nm=>((x.csplit||[]).find(c=>c.name===nm)||{}).plies||0);});
   // الاستهلاك الفعلي للقطعة لكل مقاس: قماش كل ماركر مع الفرد (قياس الفرد × الطبقات) يوزَّع على قطعه بنسبة استهلاكها الأساسي، ثم ÷ عدد قطع المقاس
-  const _cm={},_ord=[];rsAllSizes().forEach(x=>{_cm[x.size]=+x.cons||0;_ord.push(x.size);});const _cv=Object.values(_cm).filter(v=>v>0),_df=_cv.length?_cv.reduce((a,v)=>a+v,0)/_cv.length:1,_fab={},_made={};
-  rows.forEach(m=>{const ws=m.parts.map(([sz,c])=>c*(_cm[sz]>0?_cm[sz]:_df)),W=ws.reduce((a,v)=>a+v,0);if(!(W>0))return;
-    m.parts.forEach(([sz,c],i)=>{_fab[sz]=(_fab[sz]||0)+m.meas*m.plies*ws[i]/W;_made[sz]=(_made[sz]||0)+c*m.plies;});});
-  const _ix=z=>{const i=_ord.indexOf(z);return i<0?1e9:i;},act=Object.keys(_made).sort((a,b)=>_ix(a)-_ix(b)).map(sz=>({size:sz,act:Math.round(_fab[sz]/_made[sz]*10000)/10000,made:_made[sz],base:Math.round((_cm[sz]||0)*uf*10000)/10000}));
+  const _cm={},_ord=[];rsAllSizes().forEach(x=>{_cm[x.size]=+x.cons||0;_ord.push(x.size);});const _cv=Object.values(_cm).filter(v=>v>0),_df=_cv.length?_cv.reduce((a,v)=>a+v,0)/_cv.length:1,_fab={},_made={},_tm={};
+  rows.forEach((m,k)=>{const ws=m.parts.map(([sz,c])=>c*(_cm[sz]>0?_cm[sz]:_df)),W=ws.reduce((a,v)=>a+v,0);if(!(W>0))return;
+    m.parts.forEach(([sz,c],i)=>{_fab[sz]=(_fab[sz]||0)+m.meas*m.plies*ws[i]/W;_made[sz]=(_made[sz]||0)+c*m.plies;(_tm[sz]=_tm[sz]||[]).push([k,Math.round(ws[i]/W*1e6)/1e6,c]);});});
+  const _ix=z=>{const i=_ord.indexOf(z);return i<0?1e9:i;},act=Object.keys(_made).sort((a,b)=>_ix(a)-_ix(b)).map(sz=>({size:sz,act:Math.round(_fab[sz]/_made[sz]*10000)/10000,made:_made[sz],base:Math.round((_cm[sz]||0)*uf*10000)/10000,terms:_tm[sz]||[]}));
   const ctot=cnames.map((nm,ci)=>rows.reduce((a,x)=>a+x.cpl[ci],0)),cpcs=cnames.map((nm,ci)=>rows.reduce((a,x)=>a+(x.pcs||0)*x.cpl[ci],0));// طبقات / قطع كل لون
   const top=new Set(rows.map((x,k)=>[x.fabf,k]).sort((a,b)=>b[0]-a[0]).slice(0,3).map(x=>x[1]));
   const w=rsFabW();
@@ -4723,6 +4723,10 @@ function exportRsSpreadExcel(){const d=rsSpreadForm();if(d.err)return toast(t(d.
   xlsxBuild(rsExpFileBase('spread')+'.xlsx',{...rsSpreadSheet(d),dxfs:rsFormDxfs()});toast(t('saved'));}
 function rsFormDxfs(){return [`<dxf><font><b/><color rgb="FF${RS_FORM_C.pinkT}"/></font><fill><patternFill><bgColor rgb="FF${RS_FORM_C.pinkF}"/></patternFill></fill></dxf>`];}
 // ورقة Excel «نموذج الفرد والقص والإنتاج» (مواصفة لـ xlsxBuild) — تُصدَّر وحدها أو كورقة ثانية في «تحليل»
+// معادلة Excel للاستهلاك الفعلي لمقاس x من صفوف ماركرات ورقة خطة الفرد (أعمدة الورقة قبل أي إزاحة)
+function rsActF(d,x){if(!x||!x.terms||!x.terms.length)return null;const iP=2+d.K,Pl=xlCol(iP+1),Ms=xlCol(iP+3+(d.cnames||[]).length),first=11;
+  const num=x.terms.map(([k,sh])=>`${Ms}${first+k}*${Pl}${first+k}*${sh}`).join('+'),den=x.terms.map(([k,sh,c])=>`${c}*${Pl}${first+k}`).join('+');
+  return `IF((${den})=0,"",(${num})/(${den}))`;}
 function rsSpreadSheet(d){
   const C=RS_FORM_C,u=d.u,W='FFFFFF',K=d.K,L=xlCol,cn=d.cnames||[],nC=cn.length;
   // الأعمدة: م · الكود · البيان (K خانة) · قطع الماركر · الطبقات · [عمود لكل لون] · قطع التشغيل · قياس الفرد · الاستهلاك مع الفرد
@@ -4771,13 +4775,13 @@ function rsSpreadSheet(d){
   if((d.act||[]).length){const A0=T2+(badN.length?1:0)+2,per=Math.max(1,Math.floor((iF+1)/2));merges.push(`A${A0}:${Fb}${A0}`);
     rows[A0-1]={h:22,c:[{v:tf('rsAnaAct',{u}),s:{b:1,sz:11,color:W,fill:C.navy,bd:1}}]};
     for(let r=0;r*per<d.act.length;r++){const c=[];for(let k=0;k<per;k++){const x=d.act[r*per+k];if(!x)break;
-        c[k*2]={v:x.size,s:{b:1,color:C.navy,fill:C.sub,bd:1}};c[k*2+1]={v:x.act,s:{b:1,color:x.base&&x.act<x.base?'15803D':C.navy,fill:C.yel,bd:1,nf:'0.000'}};}
+        c[k*2]={v:x.size,s:{b:1,color:C.navy,fill:C.sub,bd:1}};c[k*2+1]={f:rsActF(d,x),v:x.act,s:{b:1,color:x.base&&x.act<x.base?'15803D':C.navy,fill:C.yel,bd:1,nf:'0.000'}};}
       rows[A0+r]={h:19,c};}}
   rows[T-1]={h:24,c:pad([[0,{v:t('total'),s:S.tot}],[iL,{f:`SUM(${Pl}${first}:${Pl}${last})`,v:d.plies,s:S.totn}],...cn.map((_,ci)=>{const cl=L(iL+1+ci);return [iL+1+ci,{f:`SUM(${cl}${first}:${cl}${last})`,v:d.ctot[ci],s:S.totn}];}),[iR,{f:`SUM(${Rn}${first}:${Rn}${last})`,v:d.run,s:S.totn}],[iM,{v:'',s:S.tot}],[iF,{f:`SUM(${Fb}${first}:${Fb}${last})`,v:d.fabf,s:S.totd}]])};
   const cf=[`<conditionalFormatting sqref="${Rn}${first}:${Rn}${last}"><cfRule type="dataBar" priority="1"><dataBar><cfvo type="min"/><cfvo type="max"/><color rgb="FF5B9BD5"/></dataBar></cfRule></conditionalFormatting>`,
     `<conditionalFormatting sqref="${Fb}${first}:${Fb}${last}"><cfRule type="top10" dxfId="0" priority="2" rank="3"/></conditionalFormatting>`];
   const pw=Math.max(10,...d.rows.flatMap(x=>x.parts.map(([sz,c])=>Math.ceil((sz+'×'+c).length*1.2+3))));// عرض موحّد لخانات القياسات
-  return {sheet:t('rsFormTitle'),cols:[5,9,...Array(K).fill(pw),11,10,...Array(nC).fill(9),12,12,16],rows,merges,cf};}
+  return {sheet:t('rsFormTitle'),cols:[5,9,...Array(K).fill(pw),11,10,...Array(nC).fill(9),15,15,17],rows,merges,cf};}
 /* ---- «تحليل»: صفحة تحليل كميات الأوردر (المقاسات · النِّسب · الاستهلاك) + نموذج الفرد والقص في نفس التقرير ---- */
 function rsAnalysisData(){const uf=rsUF(),u=rsUL(),sp=rsSpreadM(),R2=v=>Math.round(v*100)/100;
   const rows=[...document.querySelectorAll('.rsq-row')].map(tr=>{const size=tr.querySelector('.rsq-size').value.trim(),qty=+tr.querySelector('.rsq-qty').value||0,
@@ -4892,6 +4896,9 @@ function rsAnalysisSheet(a){const C=RS_FORM_C,u=a.u,W='FFFFFF',n=a.rows.length,L
     `<conditionalFormatting sqref="${Cf}${first}:${Cf}${last}"><cfRule type="top10" dxfId="0" priority="2" rank="3"/></conditionalFormatting>`];
   return {sheet:t('rsAnaSheet'),cols:[5,12,12,...Array(nC).fill(10),11,11,13,15,16,15],rows,merges,cf};}
 function exportRsAnalysisExcel(){const a=rsAnalysisData();if(a.err)return toast(t(a.err));const d=rsSpreadForm(),A=rsAnalysisSheet(a);
+  if(!d.err){const off=A.cols.length+1,iAc=8+(a.cnames||[]).length,first=11,nCs=(d.cnames||[]).length,iP=2+d.K,Rn=xlCol(iP+2+nCs),Fb=xlCol(iP+4+nCs),Ts=first+d.rows.length+d.blanks;
+    a.rows.forEach((x,k)=>{const f=rsActF(d,(d.act||[]).find(y=>y.size===x.size)),cl=A.rows[first+k-1]&&A.rows[first+k-1].c[iAc];if(f&&cl)cl.f=xlShift(f,off);});
+    const tc=A.rows[first+a.rows.length-1]&&A.rows[first+a.rows.length-1].c[iAc];if(tc)tc.f=xlShift(`IF(${Rn}${Ts}>0,${Fb}${Ts}/${Rn}${Ts},"")`,off);}
   // الاثنان في ورقة واحدة جنباً إلى جنب (نفس ترتيب الصفوف: العنوان، البيانات، الملخّص، رأس الجدول، الصفوف)
   const sh=d.err?A:rsCmpSheetRows({...xlSideBySide(A,rsSpreadSheet(d)),sheet:t('rsAnaSheet'),landscape:true},a,d,A.cols.length+1);
   xlsxBuild(rsExpFileBase('analysis')+'.xlsx',{...sh,dxfs:rsFormDxfs()});toast(t('saved'));}
