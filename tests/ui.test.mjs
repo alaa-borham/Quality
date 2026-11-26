@@ -257,6 +257,9 @@ const rl = await page.evaluate(async () => {
     const Q = { 'M-56': [41, 33], 'L-58': [55, 43], 'XL-60': [26, 25] };
     document.querySelectorAll('.rsq-row').forEach(tr => { const sz = tr.querySelector('.rsq-size').value.trim(); const [w, c] = tr.querySelectorAll('.rsq-cin'); w.value = Q[sz][0]; rsQtyCInput(w); c.value = Q[sz][1]; rsQtyCInput(c); });
     rsAutoPlan(); { const sf = rsSpreadForm(); res.cpcs = sf.cpcs; res.cpcsHtml = rsSpreadHtml(sf).includes(t('rsFormColPcs')); }
+    { const sf = rsSpreadForm(), an = rsAnalysisData(); // الاستهلاك الفعلي للقطعة من الخطة: Σ(فعلي × قطع) = قماش الخطة، ويظهر في التقريرين
+      res.actSum = sf.act.reduce((a, x) => a + x.act * x.made, 0); res.actFab = sf.fabf; res.actMade = sf.act.reduce((a, x) => a + x.made, 0); res.actRun = sf.run;
+      res.actAna = an.rows.every(x => x.act > 0) && an.actAvg > 0; res.actHtml = rsSpreadHtml(sf).includes(tf('rsAnaAct', { u: sf.u })) && rsAnalysisHtml(an).includes(tf('rsAnaAct', { u: an.u })); }
     $('rs-rolllen').value = '50'; rsRollPlan();
     const d = rsRollCompute(), plies = rsReadMarkers().reduce((a, m) => a + (+m.plies || 0), 0);
     res.mGroups = d.groups.map(g => g.name).join(','); res.mPlies = d.groups.reduce((a, g) => a + g.rolls.reduce((x, r) => x + r.plies, 0), 0); res.plies = plies;
@@ -270,6 +273,7 @@ const rl = await page.evaluate(async () => {
     window.print = () => {}; rlPrint(); $('print-area').innerHTML = ''; goMarker('rs'); });
   return { log, ...res };
 });
+chk('actual piece consumption per size: sums back to the plan fabric, shown in analysis + spreading form', Math.abs(rl.actSum - rl.actFab) < 0.5 && rl.actMade === rl.actRun && rl.actAna === true && rl.actHtml === true, { sum: rl.actSum, fab: rl.actFab, made: rl.actMade, run: rl.actRun, ana: rl.actAna, html: rl.actHtml });
 chk('spreading form: total pieces per colour row (W 122 · C 101)', rl.cpcsHtml === true && JSON.stringify(rl.cpcs) === '[122,101]', { cpcs: rl.cpcs, html: rl.cpcsHtml });
 chk('rolls: no errors (marker page + file page)', rl.log.length === 0, rl.log);
 chk('rolls (marker page): one roll plan per color, all plies placed, spread allowance included', rl.mGroups === 'W,C' && rl.mPlies === rl.plies && rl.spreadIn && rl.shown, rl);
