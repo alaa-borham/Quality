@@ -405,7 +405,7 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
             <div><label class="inl" data-i18n="rlSpread">مسافة الفرد تُضاف لكل طبقة (سم)</label><input id="rl-spread" type="number" min="0" step="0.1" value="0" oninput="rlCalc()"></div>
             <div><label class="inl" data-i18n="rlRollLen">طول الرول</label><input id="rl-roll" type="number" min="0" step="0.01" value="100" oninput="rlCalcSoon()"></div>
             <div><label class="inl" data-i18n="rlRollUnit">وحدة الرول والنتائج</label><select id="rl-unit" onchange="rlCalc()"><option value="m" data-i18n="unitMOpt">متر</option><option value="yd" data-i18n="unitYdOpt">ياردة</option></select></div></div>
-          <div class="grid2" style="margin-top:8px"><div><label class="inl" data-i18n="rsRollMode">طريقة الفرد</label><select id="rl-mode" onchange="rlCalc()"><option value="nosplice" data-i18n="rsRollNoSplice">بلا وصل — كل طبقة من رول واحد</option><option value="remsplice" data-i18n="rsRollRemSpl">بلا وصل + وصل البواقي (وصلة واحدة للطبقة)</option><option value="continuous" data-i18n="rsRollCont">متصل بوصل الرولات — أقل هدر</option></select>
+          <div class="grid2" style="margin-top:8px"><div><label class="inl" data-i18n="rsRollMode">طريقة الفرد</label><select id="rl-mode" onchange="rlCalc()"><option value="smart" data-i18n="rsRollSmart" selected>🎯 أفضلية القص — أقل ترحيل وأقل بواقي (موصى به)</option><option value="nosplice" data-i18n="rsRollNoSplice">بلا وصل — كل طبقة من رول واحد</option><option value="remsplice" data-i18n="rsRollRemSpl">بلا وصل + وصل البواقي (وصلة واحدة للطبقة)</option><option value="continuous" data-i18n="rsRollCont">متصل بوصل الرولات — أقل هدر</option></select>
               <label class="inl" style="margin-top:6px" data-i18n="rsRollMinLbl">أقل طول باقٍ صالح للاستعمال</label><input id="rl-min" type="number" step="0.1" min="0.1" value="1" oninput="rlCalcSoon()"></div>
             <div id="rl-info" class="note" style="align-self:end;line-height:1.7"></div></div>
           <details id="rl-rev" style="margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--card)"><summary id="rl-revsum" style="cursor:pointer;font-weight:800"></summary>
@@ -512,6 +512,7 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
             <input id="rs-rolllen" type="number" step="0.01" min="0" value="100" oninput="rsRollPlanSoon();rsSaveDraft()" style="max-width:130px;padding:6px;margin-inline-start:8px;background:var(--inp)">
             <label class="inl" data-i18n="rsRollMode" style="display:inline;font-size:13px;margin-inline-start:14px">طريقة الفرد</label>
             <select id="rs-rollmode" onchange="rsRollPlan();rsSaveDraft()" style="padding:6px;font-weight:700;margin-inline-start:8px;background:var(--inp)">
+              <option value="smart" data-i18n="rsRollSmart" selected>🎯 أفضلية القص — أقل ترحيل وأقل بواقي (موصى به)</option>
               <option value="nosplice" data-i18n="rsRollNoSplice">بلا وصل — كل طبقة من رول واحد</option>
               <option value="salvage" data-i18n="rsRollSalvage">بلا وصل + استغلال البواقي بقياسات صغيرة</option>
               <option value="remsplice" data-i18n="rsRollRemSpl">بلا وصل + وصل البواقي (وصلة واحدة للطبقة)</option>
@@ -545,7 +546,7 @@ table.prt-grid{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 
 <script>
 // رقم التحديث: يُرفع مع كل تحديث للنظام ويظهر في شاشة الدخول والشريط العلوي والإعدادات
-const APP_BUILD={n:82,date:'2026-11-26'};
+const APP_BUILD={n:83,date:'2026-11-27'};
 /* ============ Firebase ============ */
 const FB_CONFIG={apiKey:"AIzaSyCLSc1yXa5F5E89RzUJoOsj2eErjXsQjus",authDomain:"level7alaa.firebaseapp.com",
 projectId:"level7alaa",storageBucket:"level7alaa.firebasestorage.app",messagingSenderId:"924441815217",
@@ -658,7 +659,7 @@ rsSugTbl:'إكمال الخطة',rsSugPliesC:'الطبقات المقترحة',r
 rsSpreadBtn:'🧵 أمر الفرد',rsAnaBtn:'📊 تحليل',rsSaveTitle:'نسبة التوفير',rsSaveOrder:'استهلاك تحليل الأوردر — مع الفرد ({u})',rsSavePlan:'استهلاك خطة الفرد والقص — مع الفرد ({u})',rsSaveAmt:'التوفير ({u})',rsSavePct:'نسبة التوفير',rsSaveNote:'التوفير = استهلاك التحليل − استهلاك الخطة (مع الفرد) · النسبة = التوفير ÷ استهلاك التحليل · بالأحمر (−) = زيادة',rsAnaTitle:'تحليل استهلاك الأوردر',rsAnaSheet:'تحليل',rsAnaSizes:'عدد المقاسات',rsAnaQty:'إجمالي الكمية',rsAnaShare:'النسبة من الكمية',rsAnaCp:'استهلاك القطعة ({u})',rsAnaCq:'استهلاك الكمية ({u})',rsAnaCf:'استهلاك مع الفرد ({u})',rsNoValidMk:'لا ماركرات صالحة للفرد',
 rsFarradSig:'توقيع الفرّاد',rsCutSupSig:'مشرف القص',
 rsRollTbl:'📦 خطة الرولات',rsRollTitle:'أمر الرولات',rsRollBtn:'📦 أمر الرولات',rsRollNo:'رول',rsRollNo2:'رقم الرول',rsRollLenLbl:'طول الرول',rsStoreKeeper:'أمين المخزن',rsRollNeedLen:'أدخل طول الرول لحساب التوزيع',rsRollNoMk:'لا ماركرات صالحة بعد — أكمل الخطة أولاً',rsRollTooShort:'طول الرول أقصر من أطول ماركر ({n}) — زِد طول الرول',rsRollCount:'عدد الرولات المطلوبة',rsRollTotalLen:'إجمالي طول الرولات',rsRollWaste:'الهدر الفعلي (بواقي الرولات)',rsRollRemSpl:'بلا وصل + وصل البواقي (وصلة واحدة للطبقة)',rsRollMinLbl:'أقل طول باقٍ صالح للاستعمال',rsRollUsable:'بواقي صالحة للاستعمال (≥ {m})',rsRollScrap:'هدر (بواقي أقصر من الحد)',rsRemBack:'يرجع للمخزن (آخر رول)',rsRemOk:'صالح للاستعمال',rsRemScrap:'هدر',rsRemColor:'اللون',rsRemLen:'طول الباقي',rsRemStatus:'الحالة',rsRemTitle:'📦 قائمة البواقي للمخزن',rsLegIn:'أخضر: الجزء الزائد — تكملة طبقة بدأت في الرول السابق',rsLegOut:'أزرق فاتح: جزء طبقة يكمل في الرول الجديد',rsJoinTo:'يكمل في رول {n}',rsJoinTo2:'{a} هنا + {b} في رول {n} = {L}',rsJoinFrom2:'{a} هنا + {b} من رول {n} = {L}',rsLegWhole:'رمادي: طبقة كاملة (الماركر | الطول)',rsLegRem:'مخطّط: الباقي من الرول',rsBarNote:'الشريط تحت كل رول = رسم الرول بطوله، بترتيب الفرد على الطاولة (من اليمين)',rsJoinFrom:'تكملة من رول {n}',rsRemSum:'صالحة للاستعمال: {a} قطعة ({b}) · هدر: {c} قطعة ({d}) · آخر رول يرجع للمخزن: {e} ({f})',rsRollBack:'باقي آخر رول (يرجع للمخزن)',rsRollEff:'كفاءة الاستخدام',rsRollPlies:'الطبقات المفرودة (ماركر×عدد)',rsRollUsed:'الطول المستخدم',rsRollRem:'الباقي',
-rsRollMode:'طريقة الفرد',rsRollNoSplice:'بلا وصل — كل طبقة من رول واحد',rsRollCont:'متصل بوصل الرولات — أقل هدر',rsRollSalvage:'بلا وصل + استغلال البواقي بقياسات صغيرة',rsRollSplices:'عدد الوصلات',rsRollTip:'الفرد المتصل يوفّر: {n} رول فقط · هدر {l} · كفاءة {e}% (تحدث وصلة عند نهاية الرول)',
+rsRollMode:'طريقة الفرد',rsRollNoSplice:'بلا وصل — كل طبقة من رول واحد',rsRollCont:'متصل بوصل الرولات — أقل هدر',rsRollSalvage:'بلا وصل + استغلال البواقي بقياسات صغيرة',rsRollSplices:'عدد الوصلات',rsRollCarried:'إجمالي المُرحَّل بالوصل',rsRollOrder:'ترتيب القص (الماركرات)',rsRollSmart:'🎯 أفضلية القص — أقل ترحيل وأقل بواقي (موصى به)',rsRollTip:'الفرد المتصل يوفّر: {n} رول فقط · هدر {l} · كفاءة {e}% (تحدث وصلة عند نهاية الرول)',
 rsRollIdeal:'أساس الحساب طول الماركر ({L}). لأقل هدر: اطلب الرول بطول {y} = {k}× الماركر (يقسمه بلا باقٍ)',rsRollApplyIdeal:'طبّق الطول المثالي',rsRollExtra:'قطع من البواقي تُغطّي الأوردر: {n} قطعة ({l} مستغَلة من الهدر)',
 rsCompareBtn:'⚖️ مقارنة السيناريوهات',rsCompareTitle:'مقارنة سيناريوهات الريشو',rsCmpPick:'اختر خطتين أو أكثر للمقارنة',rsCmpNeed2:'اختر خطتين على الأقل للمقارنة',rsCmpNone:'لا خطط ريشو محفوظة للمقارنة',rsCmpMetric:'المؤشر',rsCmpMarkers:'عدد الماركرات الصالحة',rsCmpWaste:'الهدر مقابل الأقل',rsCmpDate:'التاريخ',rsCmpDo:'قارن',rsCmpPrint:'🖨 طباعة المقارنة',
 rsLenTip:'لتلائم الطول: ',rsLenReduce:'قلّل {s} بمقدار {n} قطعة',rsLenRemove:'احذف {s}',rsLenSwap:'استبدل {a} بـ {b} (أقصر، مع الحفاظ على عدد القطع)',rsAddFit:'يمكن إضافة {s} (يتبقّى {r})',rsAddApply:'اضغط لإضافة هذا القياس إلى الماركر',
@@ -813,7 +814,7 @@ rsSugTbl:'Plan completion',rsSugPliesC:'Suggested plies',rsEditPliesC:'Adjust pl
 rsSpreadBtn:'🧵 Spreading order',rsAnaBtn:'📊 Analysis',rsSaveTitle:'Saving rate',rsSaveOrder:'Order analysis consumption — incl. spread ({u})',rsSavePlan:'Cutting plan consumption — incl. spread ({u})',rsSaveAmt:'Saving ({u})',rsSavePct:'Saving rate',rsSaveNote:'Saving = analysis − plan consumption (incl. spread) · rate = saving ÷ analysis · red (−) = extra',rsAnaTitle:'Order consumption analysis',rsAnaSheet:'Analysis',rsAnaSizes:'Sizes',rsAnaQty:'Total quantity',rsAnaShare:'Share of quantity',rsAnaCp:'Per-piece consumption ({u})',rsAnaCq:'Quantity consumption ({u})',rsAnaCf:'Consumption incl. spread ({u})',rsNoValidMk:'No valid markers to spread',
 rsFarradSig:'Spreader signature',rsCutSupSig:'Cutting supervisor',
 rsRollTbl:'📦 Fabric roll plan',rsRollTitle:'Roll pull order',rsRollBtn:'📦 Roll order',rsRollNo:'Roll',rsRollNo2:'Roll #',rsRollLenLbl:'Roll length',rsStoreKeeper:'Store keeper',rsRollNeedLen:'Enter roll length to compute allocation',rsRollNoMk:'No valid markers yet — complete the plan first',rsRollTooShort:'Roll shorter than the longest marker ({n}) — increase roll length',rsRollCount:'Rolls needed',rsRollTotalLen:'Total roll length',rsRollWaste:'Actual waste (roll remnants)',rsRollRemSpl:'No splice + join remnants (one splice per ply)',rsRollMinLbl:'Minimum usable remnant length',rsRollUsable:'Usable remnants (≥ {m})',rsRollScrap:'Waste (remnants under the minimum)',rsRemBack:'Back to store (last roll)',rsRemOk:'Usable',rsRemScrap:'Waste',rsRemColor:'Color',rsRemLen:'Remnant length',rsRemStatus:'Status',rsRemTitle:'📦 Remnants list for the store',rsLegIn:'Green: extra part — completes a ply started on the previous roll',rsLegOut:'Light blue: part of a ply that continues on the new roll',rsJoinTo:'continues on roll {n}',rsJoinTo2:'{a} here + {b} on roll {n} = {L}',rsJoinFrom2:'{a} here + {b} from roll {n} = {L}',rsLegWhole:'Grey: whole ply (marker | length)',rsLegRem:'Striped: roll remainder',rsBarNote:'The bar under each roll = the roll drawn to scale, in spreading order on the table',rsJoinFrom:'continued from roll {n}',rsRemSum:'Usable: {a} pcs ({b}) · Waste: {c} pcs ({d}) · Last rolls back to store: {e} ({f})',rsRollBack:'Last roll remainder (back to store)',rsRollEff:'Utilization',rsRollPlies:'Plies laid (marker×count)',rsRollUsed:'Used length',rsRollRem:'Remnant',
-rsRollMode:'Spreading method',rsRollNoSplice:'No splice — each ply from one roll',rsRollCont:'Continuous (spliced) — least waste',rsRollSalvage:'No splice + salvage remnants with small sizes',rsRollSplices:'Splices',rsRollTip:'Continuous spreading saves: only {n} rolls · {l} loss · {e}% utilization (a splice occurs at each roll end)',
+rsRollMode:'Spreading method',rsRollNoSplice:'No splice — each ply from one roll',rsRollCont:'Continuous (spliced) — least waste',rsRollSalvage:'No splice + salvage remnants with small sizes',rsRollSplices:'Splices',rsRollCarried:'Total carried by splicing',rsRollOrder:'Cutting order (markers)',rsRollSmart:'🎯 Best cutting order — least carry-over and remnants (recommended)',rsRollTip:'Continuous spreading saves: only {n} rolls · {l} loss · {e}% utilization (a splice occurs at each roll end)',
 rsRollIdeal:'Marker length is the basis ({L}). For least waste: order rolls of {y} = {k}× the marker (divides with no remnant)',rsRollApplyIdeal:'Apply ideal length',rsRollExtra:'Remnant pieces covering the order: {n} pcs ({l} salvaged from waste)',
 rsCompareBtn:'⚖️ Compare scenarios',rsCompareTitle:'Compare ratio scenarios',rsCmpPick:'Pick two or more plans to compare',rsCmpNeed2:'Select at least two plans to compare',rsCmpNone:'No saved ratio plans to compare',rsCmpMetric:'Metric',rsCmpMarkers:'Valid markers',rsCmpWaste:'Waste vs best',rsCmpDate:'Date',rsCmpDo:'Compare',rsCmpPrint:'🖨 Print comparison',
 rsLenTip:'To fit length: ',rsLenReduce:'Reduce {s} by {n} pcs',rsLenRemove:'Remove {s}',rsLenSwap:'Swap {a} for {b} (shorter, keeps piece count)',rsAddFit:'Can add {s} ({r} left)',rsAddApply:'Click to add this size to the marker',
@@ -4413,7 +4414,29 @@ function rsRollPack(items,roll,mode,minP){minP=minP>0?minP:1;const key=roll+'|'+
 function rsRollPack0(items,roll,mode,minP){minP=minP>0?minP:1;const rnd=v=>Math.round(v*100)/100,rolls=[];let splices=0;
   const dem=[];items.forEach(m=>{for(let k=0;k<m.n;k++)dem.push({len:m.len,code:m.code});});
   const nr=()=>{const r={rem:roll,used:0,plies:0,by:{},spl:0};rolls.push(r);return r;};
-  if(mode==='continuous'){let cur=null;
+  if(mode==='smart'&&Math.round(roll*100)<=200000&&items.some(m=>m.n>0)){
+    // «أفضلية القص»: كل رول يُملأ بأفضل تركيبة طبقات كاملة (من أي ماركرات) تجعل باقيه أصغر ما يمكن؛ الباقي إن كان ≥ أقل طول صالح
+    // يُرحَّل بوصلة إلى أول طبقة في الرول التالي، وإن كان أصغر يُترك. النتيجة: أقل ترحيل وأقل بواقي، والرولات بترتيب القص
+    const C=Math.round(roll*100),mP=Math.round(minP*100),T=[];
+    items.forEach(m=>{if(!(m.n>0))return;const L=Math.round(m.len*100);let t=T.find(x=>x.L===L&&x.code===m.code);if(!t)T.push(t={L,code:m.code,len:m.len,n:0});t.n+=m.n;});
+    T.sort((a,b)=>b.L-a.L);
+    const reach=new Uint8Array(C+1),cnt=new Int32Array(C+1),from=new Int16Array(C+1);
+    const fill=cap=>{reach.fill(0,0,cap+1);reach[0]=1;let best=0;
+      T.forEach((t,ti)=>{if(!t.n||t.L>cap)return;cnt.fill(0,0,cap+1);for(let c=t.L;c<=cap;c++)if(!reach[c]&&reach[c-t.L]&&cnt[c-t.L]<t.n){reach[c]=1;cnt[c]=cnt[c-t.L]+1;from[c]=ti;if(c>best)best=c;}});return best;};
+    let pend=null;
+    for(let guard=0;guard<200000&&(pend||T.some(t=>t.n>0));guard++){const r=nr(),idx=rolls.length-1;let cap=C,usedCm=0;
+      if(pend){const take=Math.min(pend.need,cap);cap-=take;usedCm+=take;r.spl++;splices++;(r.joinIn=r.joinIn||[]).push({code:pend.code,from:pend.from,len:rnd(take/100)});pend.need-=take;
+        if(pend.need>0){(r.joins=r.joins||[]).push({code:pend.code,to:idx+1,len:0});pend.from=idx;r.used=rnd(usedCm/100);r.rem=rnd(roll-r.used);continue;}pend=null;}
+      const best=fill(cap);let c=best;while(c>0){const t=T[from[c]];t.n--;r.plies++;r.by[t.code]=(r.by[t.code]||0)+1;c-=t.L;}
+      usedCm+=best;let e=cap-best;
+      if(e>=mP&&T.some(t=>t.n>0)){// الباقي يبدأ طبقة تُكمَّل من الرول التالي: نختار الماركر الذي يجعل الرول التالي يمتلئ أفضل (نجرّب حتى ٦ أطوال مختلفة)
+        // الجزء المكمِّل في الرول التالي لا يقل عن أقل طول صالح: إن كان الباقي قريباً من طول الطبقة نأخذ منه (الطول − أقل طول صالح) ويبقى فتات صغير
+        const cands=T.filter(t=>t.n>0&&t.L>=2*mP);let pick=null,pb=-1,pn=0;const seen=new Set();
+        for(const t of cands){if(seen.has(t.L))continue;seen.add(t.L);if(seen.size>6)break;const need=Math.max(mP,t.L-e),lost=e-(t.L-need);t.n--;const f=need>=C?0:fill(C-need);t.n++;
+          const sc=(need>=C?0:f+need)-lost;if(sc>pb){pb=sc;pick=t;pn=need;}}
+        if(pick){const first=pick.L-pn;pick.n--;r.plies++;r.by[pick.code]=(r.by[pick.code]||0)+1;usedCm+=first;(r.joins=r.joins||[]).push({code:pick.code,to:idx+1,len:rnd(first/100)});pend={code:pick.code,need:pn,from:idx};e-=first;}}
+      r.used=rnd(usedCm/100);r.rem=rnd(roll-r.used);}}
+  else if(mode==='continuous'||mode==='smart'){let cur=null;
     dem.forEach(d=>{let need=d.len,first=true,prev=-1;while(need>1e-6){if(!cur||cur.rem<1e-6)cur=nr();const take=Math.min(need,cur.rem),idx=rolls.indexOf(cur);
       cur.rem=rnd(cur.rem-take);cur.used=rnd(cur.used+take);need=rnd(need-take);
       if(first){cur.by[d.code]=(cur.by[d.code]||0)+1;cur.plies++;first=false;if(need>1e-6)(cur.joins=cur.joins||[]).push({code:d.code,to:idx+1,len:rnd(take)});}
@@ -4471,16 +4494,18 @@ function rsRollFin(g){const rnd=v=>Math.round(v*100)/100,rs=g.rolls,last=rs.leng
   g.back=rnd(Math.max(0,last));g.loss=rnd(rs.reduce((a,r)=>a+r.rem,0)-g.back);const usedRolls=g.totRoll-g.back,used=g.totalFab+(g.salvLen||0);
   g.eff=usedRolls>0?Math.round(used/usedRolls*10000)/100:0;
   // البواقي (عدا الرول الأخير): صالحة للاستعمال إن كانت ≥ أقل طول صالح، وإلا هدر
-  const mp=g.minP||1;g.usable=rnd(rs.slice(0,-1).reduce((a,r)=>a+(r.rem>=mp-0.005?r.rem:0),0));g.scrap=rnd(g.loss-g.usable);return g;}
+  const mp=g.minP||1;g.usable=rnd(rs.slice(0,-1).reduce((a,r)=>a+(r.rem>=mp-0.005?r.rem:0),0));g.scrap=rnd(g.loss-g.usable);
+  g.carried=rnd(rs.reduce((a,r)=>a+(r.joins||[]).reduce((x,j)=>x+(j.len||0),0),0));return g;}// carried: مجموع أطوال أجزاء الطبقات المرحَّلة بوصلة إلى رول آخر
+function rsRollSpl(mode){return mode==='continuous'||mode==='remsplice'||mode==='smart';}
 // تجميع مجموعات الرولات (لون لكل مجموعة) في نتيجة واحدة: الإجماليات + بديل «متصل» لكل مجموعة للتلميح
 function rsRollGroups(groups,roll,mode,salvage,minP){const rnd=v=>Math.round(v*100)/100;
-  groups.forEach(g=>{Object.assign(g,rsRollPack(g.items,roll,mode==='continuous'||mode==='remsplice'?mode:'nosplice',minP));g.extra={};g.extraTotal=0;g.salvLen=0;
+  groups.forEach(g=>{Object.assign(g,rsRollPack(g.items,roll,mode==='continuous'||mode==='remsplice'||mode==='smart'?mode:'nosplice',minP));g.extra={};g.extraTotal=0;g.salvLen=0;
     if(mode==='salvage'&&salvage)salvage(g);
     if(mode!=='continuous'){const alt=rsRollPack(g.items,roll,'continuous');g.alt={nRolls:alt.nRolls,loss:alt.loss,eff:alt.eff};}});
   const sum=k=>rnd(groups.reduce((a,g)=>a+(g[k]||0),0));
   const nRolls=groups.reduce((a,g)=>a+g.nRolls,0),totRoll=sum('totRoll'),used=rnd(sum('totalFab')+sum('salvLen')),back=sum('back');
   return {roll,mode,groups,nRolls,totRoll,totalFab:sum('totalFab'),loss:sum('loss'),back,eff:totRoll-back>0?Math.round(used/(totRoll-back)*10000)/100:0,
-    minP:minP>0?minP:1,usable:sum('usable'),scrap:sum('scrap'),splices:groups.reduce((a,g)=>a+(g.splices||0),0),extraTotal:groups.reduce((a,g)=>a+g.extraTotal,0),salvLen:sum('salvLen')};}
+    minP:minP>0?minP:1,usable:sum('usable'),scrap:sum('scrap'),carried:sum('carried'),splices:groups.reduce((a,g)=>a+(g.splices||0),0),extraTotal:groups.reduce((a,g)=>a+g.extraTotal,0),salvLen:sum('salvLen')};}
 // خطة الرولات لصفحة الريشو: طول الطبقة = طول الماركر الفعّال + مسافة الفرد؛ وبالألوان: رولات كل لون وحدها بطبقاته فقط
 function rsRollCompute(){
   const cons={};rsAllSizes().forEach(x=>cons[x.size]=x.cons);
@@ -4521,7 +4546,7 @@ function rsRollHtml(d,uf,u){const R=v=>Math.round(v*uf*100)/100;
   const card=(l,v,col)=>`<div style="flex:1 1 120px;min-width:120px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;text-align:center;background:var(--card)">
     <div style="font-size:11px;color:var(--mut);font-weight:700">${l}</div><div style="font-size:18px;font-weight:800;color:${col||'var(--teal)'};margin-top:2px">${v}</div></div>`;
   const cards=x=>`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-    ${card(t('rsRollCount'),x.nRolls)}${card(t('rsRollTotalLen'),R(x.totRoll)+' '+u)}${card(t('rsRollWaste'),R(x.loss)+' '+u,x.loss>Math.max(1,x.nRolls*0.5)?'var(--bad)':'var(--ok)')}${card(tf('rsRollUsable',{m:R(d.minP||1)+' '+u}),R(x.usable||0)+' '+u,'var(--ok)')}${card(t('rsRollBack'),R(x.back||0)+' '+u,'var(--blue)')}${card(t('rsRollEff'),x.eff+'%',x.eff>=90?'var(--ok)':x.eff>=80?'var(--warn)':'var(--bad)')}${d.mode==='continuous'||d.mode==='remsplice'?card(t('rsRollSplices'),x.splices,x.splices>0?'var(--warn)':'var(--ok)'):''}</div>`;
+    ${card(t('rsRollCount'),x.nRolls)}${card(t('rsRollTotalLen'),R(x.totRoll)+' '+u)}${card(t('rsRollWaste'),R(x.loss)+' '+u,x.loss>Math.max(1,x.nRolls*0.5)?'var(--bad)':'var(--ok)')}${card(tf('rsRollUsable',{m:R(d.minP||1)+' '+u}),R(x.usable||0)+' '+u,'var(--ok)')}${card(t('rsRollBack'),R(x.back||0)+' '+u,'var(--blue)')}${card(t('rsRollEff'),x.eff+'%',x.eff>=90?'var(--ok)':x.eff>=80?'var(--warn)':'var(--bad)')}${rsRollSpl(d.mode)?card(t('rsRollSplices'),x.splices,x.splices>0?'var(--warn)':'var(--ok)')+card(t('rsRollCarried'),R(x.carried||0)+' '+u,'var(--bad)'):''}</div>`;
   const multi=d.groups.length>1||!!(d.groups[0]&&d.groups[0].name);
   const grp=(g,gi)=>{let tip='';
     if(d.mode!=='continuous'&&g.eff<90&&g.alt&&g.alt.nRolls<g.nRolls)tip=`<div style="margin-bottom:10px;font-size:12px;color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn-bd);border-radius:8px;padding:8px 11px">💡 ${tf('rsRollTip',{n:g.alt.nRolls,l:R(g.alt.loss)+' '+u,e:g.alt.eff})}</div>`;
@@ -4600,7 +4625,9 @@ function rsRollSideHtml(d,uf,u,pr){const R=v=>Math.round(v*uf*100)/100,G=d.group
   const rows=[[t('rsRollCount'),g=>g.nRolls,d.nRolls],[t('rsRollTotalLen'),g=>R(g.totRoll)+' '+u,R(d.totRoll)+' '+u],[t('rsPlies'),g=>g.rolls.reduce((a,r)=>a+r.plies,0),G.reduce((a,g)=>a+g.rolls.reduce((x,r)=>x+r.plies,0),0)],
     [t('rsRollWaste'),g=>R(g.loss)+' '+u,R(d.loss)+' '+u],[tf('rsRollUsable',{m:R(d.minP)+' '+u}),g=>R(g.usable||0)+' '+u,R(d.usable||0)+' '+u],[t('rsRollScrap'),g=>R(g.scrap||0)+' '+u,R(d.scrap||0)+' '+u],
     [t('rsRollBack'),g=>R(g.back||0)+' '+u,R(d.back||0)+' '+u],[t('rsRollEff'),g=>g.eff+'%',d.eff+'%']];
-  if(d.mode==='continuous'||d.mode==='remsplice')rows.push([t('rsRollSplices'),g=>g.splices,d.splices]);
+  if(rsRollSpl(d.mode))rows.push([t('rsRollSplices'),g=>g.splices,d.splices],[t('rsRollCarried'),g=>R(g.carried||0)+' '+u,R(d.carried||0)+' '+u]);
+  // «أفضلية القص»: ترتيب الماركرات كما تظهر في الرولات (أول رول يبدأ فيه كل ماركر)
+  if(d.mode==='smart')rows.push([t('rsRollOrder'),g=>{const o=[];g.rolls.forEach(r=>Object.keys(r.by).forEach(c=>{if(!o.includes(c))o.push(c);}));return `<span dir="ltr" style="font-size:${pr?10:11.5}px;font-weight:700;line-height:1.7;display:inline-block;white-space:normal">${o.map(esc).join(' → ')}</span>`;},'']);
   const cmp=`<div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;${pr?'font-size:11.5px':'min-width:'+(200+G.length*110)+'px;font-size:13px'}">
     <tr>${hd('')}${G.map((g,i)=>hd('🎨 '+esc(g.name||t('rlNoColor')),col(i))).join('')}${hd(esc(t('total')))}</tr>
     ${rows.map(([l,f,tv])=>`<tr>${td(esc(l),'font-weight:800;text-align:start')}${G.map(g=>td(f(g),'font-weight:700')).join('')}${td(tv,'font-weight:900')}</tr>`).join('')}</table></div>`;
@@ -4622,7 +4649,7 @@ function rsRollPlan(){clearTimeout(RS_ROLL_T);const host=$('rs-rolls');if(host)h
   if(d.err==='short'){host.innerHTML=`<div class="msg err" style="padding:8px 12px;border-radius:8px">${tf('rsRollTooShort',{n:R(d.maxMk)+' '+u})}</div>`;return;}
   // اقتراح طول الرول المثالي — مضاعف لطول الطبقة السائدة
   let rollHint='';
-  if(d.mode!=='continuous'){const id=rsRollIdeal(d);
+  if(d.mode!=='continuous'&&d.mode!=='smart'){const id=rsRollIdeal(d);
     if(id&&Math.abs(id.ideal-d.roll)>0.05){
       rollHint=`<div style="margin-bottom:10px;font-size:12px;color:var(--teal);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:8px 11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <span>🎯 ${tf('rsRollIdeal',{L:R(id.Ldom)+' '+u,k:id.k,y:R(id.ideal)+' '+u})}</span>

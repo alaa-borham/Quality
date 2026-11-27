@@ -277,6 +277,9 @@ const rl = await page.evaluate(async () => {
       res.actSum = sf.act.reduce((a, x) => a + x.act * x.made, 0); res.actFab = sf.fabf; res.actMade = sf.act.reduce((a, x) => a + x.made, 0); res.actRun = sf.run;
       res.actAna = an.rows.every(x => x.act > 0) && an.actAvg > 0; res.actHtml = rsSpreadHtml(sf).includes(tf('rsAnaAct', { u: sf.u })) && rsAnalysisHtml(an).includes(tf('rsAnaAct', { u: an.u })); }
     $('rs-rolllen').value = '50'; rsRollPlan();
+    { // «أفضلية القص» هي الطريقة الافتراضية، وتعرض الوصلات والمُرحَّل وترتيب القص
+      res.rollDef = $('rs-rollmode').value; const ds = rsRollCompute(); res.smartMode = ds.mode; res.smartRows = $('rs-rolls').textContent.includes(t('rsRollCarried')) && $('rs-rolls').textContent.includes(t('rsRollOrder'));
+      res.smartPl = ds.groups.reduce((a, g) => a + g.rolls.reduce((x, r) => x + r.plies, 0), 0); }
     const d = rsRollCompute(), plies = rsReadMarkers().reduce((a, m) => a + (+m.plies || 0), 0);
     res.mGroups = d.groups.map(g => g.name).join(','); res.mPlies = d.groups.reduce((a, g) => a + g.rolls.reduce((x, r) => x + r.plies, 0), 0); res.plies = plies;
     res.spreadIn = d.mk.every(m => m.len > 0) && Math.abs(d.spread - 0.02) < 1e-9; res.shown = $('rs-rolls').textContent.includes('W') && $('rs-rolls').textContent.includes('C'); });
@@ -289,6 +292,7 @@ const rl = await page.evaluate(async () => {
     window.print = () => {}; rlPrint(); $('print-area').innerHTML = ''; goMarker('rs'); });
   return { log, ...res };
 });
+chk('rolls: «best cutting order» is the default mode, shows splices/carried/cutting order, all plies placed', rl.rollDef === 'smart' && rl.smartMode === 'smart' && rl.smartRows === true && rl.smartPl === rl.plies, { def: rl.rollDef, rows: rl.smartRows, pl: rl.smartPl, plies: rl.plies });
 chk('actual piece consumption per size: sums back to the plan fabric, shown in analysis + spreading form', Math.abs(rl.actSum - rl.actFab) < 0.5 && rl.actMade === rl.actRun && rl.actAna === true && rl.actHtml === true, { sum: rl.actSum, fab: rl.actFab, made: rl.actMade, run: rl.actRun, ana: rl.actAna, html: rl.actHtml });
 chk('spreading form: total pieces per colour row (W 122 · C 101)', rl.cpcsHtml === true && JSON.stringify(rl.cpcs) === '[122,101]', { cpcs: rl.cpcs, html: rl.cpcsHtml });
 chk('rolls: no errors (marker page + file page)', rl.log.length === 0, rl.log);

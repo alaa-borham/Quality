@@ -233,6 +233,17 @@ chk('xlCrc("123456789") = CBF43926', X.xlCrc(new TextEncoder().encode('123456789
   const okJ = rj.rolls.every((r, i) => r.used <= 22.86 + 1e-6 && (r.joins || []).every(j => (rj.rolls[j.to].joinIn || []).some(k => k.from === i && k.code === j.code)));
   const pl = P => P.rolls.reduce((a, r) => { Object.entries(r.by).forEach(([c, n]) => a[c] = (a[c] || 0) + n); return a; }, {});
   chk('rolls: join remnants — fewer rolls than no-splice, every ply placed once, joins linked, within roll length', okJ && rj.nRolls < rn.nRolls && pl(rj).A === 40 && pl(rj).B === 20 && rj.splices > 0 && Math.abs(rj.rolls.reduce((a, r) => a + r.used, 0) - (360 + 164)) < 0.1, { j: rj.nRolls, n: rn.nRolls, s: rj.splices });
+  // «أفضلية القص»: كل رول يُملأ بأفضل تركيبة طبقات كاملة، والباقي فقط يُرحَّل بوصلة — وصلات ومُرحَّل أقل من «المتصل»، ورولات قريبة من الحد الأدنى
+  { const IT = [{ code: 'A', len: 11.47, n: 60 }, { code: 'B', len: 10.9, n: 45 }, { code: 'C', len: 9.6, n: 30 }, { code: 'D', len: 7.5, n: 25 }, { code: 'E', len: 2.81, n: 40 }], roll = 22.86, mp = 0.9144;
+    const sm = X.rsRollPack(IT, roll, 'smart', mp), co = X.rsRollPack(IT, roll, 'continuous', mp), fab = IT.reduce((a, m) => a + m.len * m.n, 0), ps = pl(sm);
+    const linked = sm.rolls.every((r, i) => (r.joins || []).every(j => (sm.rolls[j.to].joinIn || []).some(k => k.from === i && k.code === j.code)));
+    const pieces = sm.rolls.every(r => (r.joins || []).concat(r.joinIn || []).every(j => !(j.len > 0) || j.len >= mp - 0.011));
+    chk('rolls: best cutting order — every ply placed once, within roll length, fabric conserved', IT.every(m => ps[m.code] === m.n) && sm.rolls.every(r => r.used <= roll + 0.011 && r.rem >= -0.011) && Math.abs(sm.rolls.reduce((a, r) => a + r.used, 0) - fab) < 0.5, { rolls: sm.nRolls });
+    chk('rolls: best cutting order — joins linked both ways, every spliced piece ≥ min usable length', linked && pieces, { splices: sm.splices });
+    chk('rolls: best cutting order — fewer splices and less carried length than continuous, rolls within 2% of the minimum, leftovers are only small scraps',
+      sm.splices < co.splices * 0.75 && sm.carried < co.carried * 0.75 && sm.nRolls <= Math.ceil(co.nRolls * 1.02) && sm.usable < 0.5 && sm.rolls.slice(0, -1).every(r => r.rem < mp), { sm: [sm.nRolls, sm.splices, sm.carried, sm.loss], co: [co.nRolls, co.splices, co.carried] });
+    const ex = X.rsRollPack([{ code: 'A', len: 10, n: 12 }, { code: 'B', len: 5, n: 8 }], 20, 'smart', 1);
+    chk('rolls: best cutting order — exact fits need no splice at all', ex.splices === 0 && ex.nRolls === 8 && ex.loss === 0, { n: ex.nRolls, s: ex.splices }); }
   const g = X.rsRollGroups([{ name: 'G', items: [{ code: 'A', len: 9, n: 11 }] }, { name: 'B', items: [{ code: 'A', len: 9, n: 5 }] }], 100, 'nosplice');
   chk('rolls: each color rolled separately, totals summed', g.groups.length === 2 && g.groups[0].nRolls === 1 && g.groups[1].nRolls === 1 && g.nRolls === 2 && Math.abs(g.totalFab - 144) < 1e-9, g); }
 
